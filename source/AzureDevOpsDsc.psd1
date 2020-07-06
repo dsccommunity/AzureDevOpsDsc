@@ -3,7 +3,7 @@
     moduleVersion      = '0.0.1'
 
     # ID used to uniquely identify this module
-    GUID               = 'e537cd71-bfd8-46b9-bba3-26ff7eaca412'
+    GUID               = '3f8bbada-0fa9-4d80-b3d8-f019c3c60230'
 
     # Author of this module
     Author             = 'DSC Community'
@@ -15,7 +15,7 @@
     Copyright          = 'Copyright the DSC Community contributors. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description        = 'Module with DSC resources for deployment and configuration of Microsoft SQL Server.'
+    Description        = 'Module with DSC resources for deployment and configuration of Azure DevOps Server.'
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion  = '5.0'
