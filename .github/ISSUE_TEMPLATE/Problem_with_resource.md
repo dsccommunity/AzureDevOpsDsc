@@ -69,5 +69,5 @@ about: If you have a problem, bug, or enhancement with a resource in this resour
 #### Version of the DSC module that was used
 <!--
     To help with this information, please run this command:
-    Get-Module -Name 'SqlServerDsc' -ListAvailable | ft Name,Version,Path
+    Get-Module -Name 'AzureDevOpsDSC' -ListAvailable | ft Name,Version,Path
 -->
