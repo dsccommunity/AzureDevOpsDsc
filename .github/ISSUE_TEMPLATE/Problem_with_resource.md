@@ -32,16 +32,12 @@ about: If you have a problem, bug, or enhancement with a resource in this resour
 # insert configuration here
 ```
 
-#### SQL Server edition and version the target node is running
-<!--
-    To help with this information, please run this command in SQL:
-    select @@version
--->
+#### Azure DevOps Server version the target node is running
 
-#### SQL Server PowerShell modules present on the target node
+#### VSTeam PowerShell modules present on the target node
 <!--
     To help with this information, please run this command:
-    Get-Module -Name '*sql*' -ListAvailable | ? Name -ne 'SqlServerDsc' | ft Name,Version,Path
+    Get-Module -Name 'VSTeam' -ListAvailable | ft Name,Version,Path
 -->
 
 #### The operating system the target node is running
