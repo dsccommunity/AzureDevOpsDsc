@@ -1,19 +1,19 @@
-Function Test-VstsOperation{
+Function Test-AzDevOpsOperation{
 
     [CmdletBinding()]
     [OutputType([bool])]
     param(
       [Parameter(Mandatory)]
       [Alias('Uri')]
-      [string]$VstsServerApiUri,
+      [string]$AzDevOpsServerApiUri,
 
       [Parameter(Mandatory)]
       [Alias('Pat','PersonalAccessToken')]
-      [string]$VstsPat,
+      [string]$AzDevOpsPat,
 
       [Parameter(Mandatory)]
       [Alias('OperationId','Id')]
-      [string]$VstsOperationId,
+      [string]$AzDevOpsOperationId,
 
       [Parameter(Mandatory,ParameterSetName='IsComplete')]
       [switch]$IsComplete,
@@ -23,22 +23,22 @@ Function Test-VstsOperation{
     )
 
     If(!$IsComplete -and !$IsSuccessful){
-      throw "The '-IsComplete' switch or the '-IsSuccessful' switch must be used when calling 'Test-VstsOperation'."
+      throw "The '-IsComplete' switch or the '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
       return
     }
 
 
 
-    [object[]]$VstsOperation = Get-VstsOperation -VstsServerApiUri $VstsServerApiUri -VstsPat $VstsPat `
-                                                 -VstsOperationId $VstsOperationId
+    [object[]]$AzDevOpsOperation = Get-AzDevOpsOperation -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
+                                                 -AzDevOpsOperationId $AzDevOpsOperationId
 
 
     # Note: Operation Statuses listed here:
     #       https://docs.microsoft.com/en-us/rest/api/azure/devops/operations/operations/get?view=azure-devops-rest-6.0#operationstatus
-    If($IsSuccessful -and $VstsOperation.status -eq 'succeeded'){
+    If($IsSuccessful -and $AzDevOpsOperation.status -eq 'succeeded'){
       return $true
     }
-    ElseIf($IsComplete -and $VstsOperation.status -in 'succeeded','cancelled','failed'){
+    ElseIf($IsComplete -and $AzDevOpsOperation.status -in 'succeeded','cancelled','failed'){
       return $true
     }
 
