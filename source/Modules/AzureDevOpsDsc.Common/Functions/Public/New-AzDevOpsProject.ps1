@@ -8,9 +8,9 @@
           https://dev.azure.com/someOrganizationName/_apis/
 
     .PARAMETER Pat
-        The 'Personal Access Token' (PAT) to be used by any subsequent requests/Projects
+        The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
         against the Azure DevOps API. This PAT must have the relevant permissions assigned
-        for the subsequent Projects being performed.
+        for the subsequent operations being performed.
 
     .PARAMETER ProjectId
         The 'id' of the 'Project' being created.
@@ -42,10 +42,12 @@ function New-AzDevOpsProject
     [OutputType([System.Object])]
     param
     (
+        [Parameter(Mandatory = $true)]
         [Alias('Uri')]
         [System.String]
         $ApiUri,
 
+        [Parameter(Mandatory = $true)]
         [Alias('PersonalAccessToken')]
         [System.String]
         $Pat,
