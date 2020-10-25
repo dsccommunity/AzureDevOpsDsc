@@ -1,4 +1,4 @@
-Function Get-AzDevOpsServerApiObject{
+function Get-AzDevOpsServerApiObject{
 
     [CmdletBinding()]
     [OutputType([object[]])]

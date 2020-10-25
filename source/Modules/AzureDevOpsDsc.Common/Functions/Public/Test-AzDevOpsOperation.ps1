@@ -1,4 +1,4 @@
-Function Test-AzDevOpsOperation{
+function Test-AzDevOpsOperation{
 
     [CmdletBinding()]
     [OutputType([bool])]

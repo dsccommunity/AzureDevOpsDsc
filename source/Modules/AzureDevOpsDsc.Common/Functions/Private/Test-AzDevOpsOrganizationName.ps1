@@ -1,4 +1,4 @@
-Function Test-AzDevOpsOrganizationName{
+function Test-AzDevOpsOrganizationName{
 
   [CmdletBinding()]
   [OutputType([bool])]

@@ -1,4 +1,4 @@
-Function Get-AzDevOpsServerApiUri{
+function Get-AzDevOpsServerApiUri{
 
   [CmdletBinding()]
   [OutputType([string])]

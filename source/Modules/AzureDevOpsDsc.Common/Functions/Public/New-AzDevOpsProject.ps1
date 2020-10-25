@@ -1,4 +1,4 @@
-Function New-AzDevOpsProject{
+function New-AzDevOpsProject{
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact='Medium')]
     [OutputType([object[]])]
