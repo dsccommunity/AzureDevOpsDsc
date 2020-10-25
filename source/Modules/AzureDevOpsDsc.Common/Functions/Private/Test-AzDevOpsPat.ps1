@@ -1,17 +1,16 @@
 <#
     .SYNOPSIS
         Peforms test on a provided 'Personal Access Token' (PAT) to provide a
-        boolean ($true or $false) return value.
+        boolean ($true or $false) return value. Returns $true if the test is successful.
 
-        NOTE: Use of the '-IsValid' switch is required - This will provide a return value
-              of $true
+        NOTE: Use of the '-IsValid' switch is required.
 
     .PARAMETER Pat
         The 'Personal Access Token' (PAT) to be tested/validated.
 
     .PARAMETER IsValid
         Use of this switch will validate the format of the 'Personal Access Token' (PAT)
-        rather than the existence/presence/validity of the PAT itself.
+        rather than the existence/presence of the PAT itself.
 
         Failure to use this switch will throw an exception.
 
