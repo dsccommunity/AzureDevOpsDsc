@@ -54,7 +54,7 @@ function New-AzDevOpsServerApiObject{
                            -AzDevOpsOperationId $AzDevOpsOperationId `
                            -IsSuccessful
 
-        Get-AzDevOpsServerApiObject -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
+        Get-AzDevOpsApiObject -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
                                 -AzDevOpsObjectName $AzDevOpsObjectName `
                                 -AzDevOpsObjectId $AzDevOpsObjectId
       }
