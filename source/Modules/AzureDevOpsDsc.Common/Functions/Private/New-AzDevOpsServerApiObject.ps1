@@ -1,4 +1,4 @@
-function New-AzDevOpsServerApiObject{
+function New-AzDevOpsApiObject{
 
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact='Medium')]
     [OutputType([object[]])]

@@ -51,7 +51,7 @@ function New-AzDevOpsProject{
 
     if ($Force -or $PSCmdlet.ShouldProcess($AzDevOpsServerApiUri,$AzDevOpsObjectName)) {
 
-      [object]$AzDevOpsObject = New-AzDevOpsServerApiObject -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
+      [object]$AzDevOpsObject = New-AzDevOpsApiObject -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
                                                     -AzDevOpsObjectName $AzDevOpsObjectName `
                                                     -AzDevOpsObject $($AzDevOpsObjectJson | ConvertFrom-Json) `
                                                     -Force:$Force
