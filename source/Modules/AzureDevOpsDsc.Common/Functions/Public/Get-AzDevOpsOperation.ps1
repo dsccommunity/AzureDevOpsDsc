@@ -14,7 +14,7 @@ function Get-AzDevOpsOperation{
     )
 
     [string]$AzDevOpsObjectName = 'Operation'
-    [object[]]$AzDevOpsServerApiObjects = Get-AzDevOpsServerApiObject -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
+    [object[]]$AzDevOpsServerApiObjects = Get-AzDevOpsApiObject -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
                                                               -AzDevOpsObjectName $AzDevOpsObjectName -AzDevOpsObjectId $AzDevOpsOperationId
 
     return $AzDevOpsServerApiObjects |
