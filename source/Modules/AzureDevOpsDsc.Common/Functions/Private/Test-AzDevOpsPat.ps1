@@ -30,7 +30,7 @@ function Test-AzDevOpsPat
         [System.String]
         $Pat,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
