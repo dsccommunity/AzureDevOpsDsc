@@ -1,4 +1,4 @@
-Function Test-AzDevOpsPat{
+function Test-AzDevOpsPat{
 
   [CmdletBinding()]
   [OutputType([bool])]

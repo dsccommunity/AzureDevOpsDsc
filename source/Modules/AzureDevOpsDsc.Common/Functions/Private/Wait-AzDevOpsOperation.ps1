@@ -1,4 +1,4 @@
-Function Wait-AzDevOpsOperation {
+function Wait-AzDevOpsOperation {
 
   [CmdletBinding()]
   param(

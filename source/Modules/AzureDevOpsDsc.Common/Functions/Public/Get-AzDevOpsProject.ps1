@@ -1,4 +1,4 @@
-Function Get-AzDevOpsProject{
+function Get-AzDevOpsProject{
 
     [CmdletBinding()]
     [OutputType([object[]])]
