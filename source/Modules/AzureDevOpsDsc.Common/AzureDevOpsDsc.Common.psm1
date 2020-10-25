@@ -1,4 +1,6 @@
 
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
+
 # Obtain all functions within PSModule
 $functionSubDirectoryPaths = @(
     "$PSScriptRoot\Functions\Public"
