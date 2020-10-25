@@ -42,7 +42,7 @@
 #>
 function New-AzDevOpsApiObject
 {
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([System.Object])]
     param
     (
