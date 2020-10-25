@@ -19,7 +19,7 @@ function Get-AzDevOpsServerApiObject{
 
     # Remove any $AzDevOpsObjectId if using a wildcard character
     # TODO: Might want to make this more generic (i.e. if !(Test-AzDevOpsObjectId $AzDevOpsObjectId -IsValid') then set to $null)
-    If($AzDevOpsObjectId -contains '*'){
+    if($AzDevOpsObjectId -contains '*'){
       $AzDevOpsObjectId = $null
     }
 
@@ -31,7 +31,7 @@ function Get-AzDevOpsServerApiObject{
 
     # TODO: Need to generate this from a function
     [string]$AzDevOpsServerApiObjectUri = $AzDevOpsServerApiUri + "/$AzDevOpsObjectNamePluralUriString"
-    If(![string]::IsNullOrWhiteSpace($AzDevOpsObjectId)){
+    if(![string]::IsNullOrWhiteSpace($AzDevOpsObjectId)){
       $AzDevOpsServerApiObjectUri = $AzDevOpsServerApiObjectUri + "/$AzDevOpsObjectId"
     }
     $AzDevOpsServerApiObjectUri = $AzDevOpsServerApiObjectUri +  '?' + $AzDevOpsApiVersionUriParameter
@@ -44,7 +44,7 @@ function Get-AzDevOpsServerApiObject{
     [object]$AzDevOpsServerApiObjects = Invoke-RestMethod -Uri $AzDevOpsServerApiObjectUri -Method $Method -Headers $AzDevOpsServerApiHeader
 
     # If not a single, object request, use the object(s) in the 'value' property
-    If([string]::IsNullOrWhiteSpace($AzDevOpsObjectId)){
+    if([string]::IsNullOrWhiteSpace($AzDevOpsObjectId)){
       [object[]]$AzDevOpsServerApiObjects = $AzDevOpsServerApiObjects.value
     }
 

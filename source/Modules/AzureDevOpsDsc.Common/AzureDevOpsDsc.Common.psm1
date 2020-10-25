@@ -24,7 +24,7 @@ ForEach ($function in $functions)
         )
     )
 
-    If ($function.FullName -ilike "$PSScriptRoot\Functions\Public\*")
+    if ($function.FullName -ilike "$PSScriptRoot\Functions\Public\*")
     {
         Write-Verbose "Exporting '$($function.BaseName)'..."
         Export-ModuleMember -Function $($function.BaseName)

@@ -48,7 +48,7 @@ function New-AzDevOpsServerApiObject{
 
       [object]$AzDevOpsServerApiOperation = Invoke-RestMethod -Uri $AzDevOpsServerApiObjectUri -Method $Method -Headers $AzDevOpsServerApiHeader -Body $AzDevOpsObjectJson -ContentType $ContentType
 
-      If($Wait){
+      if($Wait){
 
         Wait-AzDevOpsOperation -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
                            -AzDevOpsOperationId $AzDevOpsOperationId `

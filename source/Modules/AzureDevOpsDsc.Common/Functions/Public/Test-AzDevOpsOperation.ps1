@@ -22,7 +22,7 @@ function Test-AzDevOpsOperation{
       [switch]$IsSuccessful
     )
 
-    If(!$IsComplete -and !$IsSuccessful){
+    if(!$IsComplete -and !$IsSuccessful){
       throw "The '-IsComplete' switch or the '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
       return
     }
@@ -35,10 +35,10 @@ function Test-AzDevOpsOperation{
 
     # Note: Operation Statuses listed here:
     #       https://docs.microsoft.com/en-us/rest/api/azure/devops/operations/operations/get?view=azure-devops-rest-6.0#operationstatus
-    If($IsSuccessful -and $AzDevOpsOperation.status -eq 'succeeded'){
+    if($IsSuccessful -and $AzDevOpsOperation.status -eq 'succeeded'){
       return $true
     }
-    ElseIf($IsComplete -and $AzDevOpsOperation.status -in 'succeeded','cancelled','failed'){
+    elseIf($IsComplete -and $AzDevOpsOperation.status -in 'succeeded','cancelled','failed'){
       return $true
     }
 
