@@ -1,18 +1,36 @@
-Function Get-AzDevOpsServerApiHeader{
+<#
+    .SYNOPSIS
+        Generates an API/HTTP request header for use when performing API/HTTP
+        requests/operations against the Azure DevOps API.
 
-  [CmdletBinding()]
-  [OutputType([hashtable])]
-  param(
+    .PARAMETER Pat
+        The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
+        against the Azure DevOps API. This PAT must have the relevant permissions assigned
+        for the subsequent operations being performed.
 
-    [ValidateScript({Test-AzDevOpsPat -AzDevOpsPat $_ -IsValid})]
-    [Alias('Pat', 'PersonalAccessToken')]
-    [string]$AzDevOpsPat
+    .EXAMPLE
+        Get-AzDevOpsServerApiHeader -Pat 'YourPatHere'
 
-  )
+        Returns an API/HTTP request header using the 'Personal Access Token' (PAT) provided.
+#>
+function Get-AzDevOpsServerApiHeader
+{
+    [CmdletBinding()]
+    [OutputType([Hashtable])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
+        [Alias('PersonalAccessToken')]
+        [System.String]
+        $Pat
+    )
 
-  [hashtable]$AzDevOpsServerApiHeader = @{
-    Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($AzDevOpsPat)"))
-  }
+    [Hashtable]$apiHeader = @{
+        Authorization = 'Basic ' +
+            [Convert]::ToBase64String(
+                [Text.Encoding]::ASCII.GetBytes(":$Pat"))
+    }
 
-  return $AzDevOpsServerApiHeader
+    return $apiHeader
 }
