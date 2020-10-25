@@ -1,5 +1,5 @@
 # Localized resources for helper module AzureDevOpsDsc.Common.
 
 ConvertFrom-StringData @'
-    ExceptionThrown = An '{0}' was thrown by '{1}'. Exception was '{2}' (AZDEVOPSCOMMON0001)
+    MandatoryIsValidSwitchNotUsed = The '-IsValid' switch must be used when calling '{0}'. (AZDEVOPSCOMMON0501)
 '@
