@@ -1,18 +1,18 @@
-Function Wait-VstsOperation {
+Function Wait-AzDevOpsOperation {
 
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)]
     [Alias('Uri')]
-    [string]$VstsServerApiUri,
+    [string]$AzDevOpsServerApiUri,
 
     [Parameter(Mandatory)]
     [Alias('Pat', 'PersonalAccessToken')]
-    [string]$VstsPat,
+    [string]$AzDevOpsPat,
 
     [Parameter(Mandatory)]
     [Alias('OperationId', 'Id')]
-    [string]$VstsOperationId,
+    [string]$AzDevOpsOperationId,
 
     [Alias('IntervalMilliseconds')]
     [int]$WaitIntervalMilliseconds = 500,
@@ -28,24 +28,24 @@ Function Wait-VstsOperation {
   )
 
   If (!$IsComplete -and !$IsSuccessful) {
-    throw "The '-IsComplete' switch or the '-IsSuccessful' switch must be used when calling 'Test-VstsOperation'."
+    throw "The '-IsComplete' switch or the '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
     return
   }
   ElseIf (!$IsComplete -and !$IsSuccessful) {
-    throw "Only the '-IsComplete' switch or the alternative '-IsSuccessful' switch must be used when calling 'Test-VstsOperation'."
+    throw "Only the '-IsComplete' switch or the alternative '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
     return
   }
 
   [DateTime]$WaitStartDateTime = [DateTime]::UtcNow
 
-  while (!(Test-VstsOperation -VstsServerApiUri $VstsServerApiUri -VstsPat $VstsPat `
-        -VstsOperationId $VstsOperationId `
+  while (!(Test-AzDevOpsOperation -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
+        -AzDevOpsOperationId $AzDevOpsOperationId `
         -IsComplete:$IsComplete -IsSuccessful:$IsSuccessful)) {
 
     Start-Sleep -Milliseconds $WaitIntervalMilliseconds
 
     if ($(New-TimeSpan -Start $WaitStartDateTime -End $([DateTime]::UtcNow)).Milliseconds -gt $WaitTimeoutMilliseconds) {
-      throw "The 'Wait-VstsOperation' operation for VstsOperationId of '$VstsOperationId' exceeded specified, maximum timeout ($WaitTimeoutMilliseconds milliseconds)"
+      throw "The 'Wait-AzDevOpsOperation' operation for AzDevOpsOperationId of '$AzDevOpsOperationId' exceeded specified, maximum timeout ($WaitTimeoutMilliseconds milliseconds)"
       return
     }
 
