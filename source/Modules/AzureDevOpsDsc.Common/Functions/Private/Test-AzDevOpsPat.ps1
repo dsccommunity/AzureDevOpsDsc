@@ -24,11 +24,12 @@
 function Test-AzDevOpsPat
 {
     [CmdletBinding()]
-    [OutputType([bool])]
+    [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
-        [string]$Pat,
+        [System.String]
+        $Pat,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -41,7 +42,7 @@ function Test-AzDevOpsPat
         New-InvalidOperationException -Message $errorMessage
     }
 
-    if ([string]::IsNullOrWhiteSpace($Pat) -or
+    if ([System.String]::IsNullOrWhiteSpace($Pat) -or
         $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
     {
         return $false
