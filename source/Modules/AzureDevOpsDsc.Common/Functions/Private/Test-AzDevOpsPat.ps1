@@ -1,25 +1,51 @@
-function Test-AzDevOpsPat{
+<#
+    .SYNOPSIS
+        Peforms test on a provided 'Personal Access Token' (PAT) to provide a
+        boolean ($true or $false) return value.
 
-  [CmdletBinding()]
-  [OutputType([bool])]
-  param(
-    [Alias('Pat')]
-    [string]$AzDevOpsPat,
+        NOTE: Use of the '-IsValid' switch is required - This will provide a return value
+              of $true
 
-    [switch]$IsValid
-  )
+    .PARAMETER Pat
+        The 'Personal Access Token' (PAT) to be tested/validated.
 
-  If(!$IsValid){
-    throw "The '-IsValid' switch must be used when calling 'Test-AzDevOpsPat'."
-    return
-  }
+    .PARAMETER IsValid
+        Use of this switch will validate the format of the 'Personal Access Token' (PAT)
+        rather than the existence/presence/validity of the PAT itself.
 
-  If([string]::IsNullOrWhiteSpace($AzDevOpsPat)){
-    return $false
-  }
-  ElseIf($AzDevOpsPat.Length -ne 52){
-    return $false
-  }
+        Failure to use this switch will throw an exception.
 
-  return $true
+    .EXAMPLE
+        Test-AzDevOpsPat -Pat 'YourPatHere' -IsValid
+
+        Returns $true if the 'Personal Access Token' (PAT) provided is of a valid format.
+        Returns $false if it is not.
+#>
+function Test-AzDevOpsPat
+{
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string]$Pat,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $IsValid
+    )
+
+    If (!$IsValid)
+    {
+        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
+        New-InvalidOperationException -Message $errorMessage
+    }
+
+    If ([string]::IsNullOrWhiteSpace($Pat) -or
+        $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
+    {
+        return $false
+    }
+
+    return $true
 }
