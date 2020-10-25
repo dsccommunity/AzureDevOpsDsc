@@ -1,54 +1,113 @@
-function Wait-AzDevOpsOperation {
+<#
+    .SYNOPSIS
+        Waits for an Azure DevOps API operation.
 
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory)]
-    [Alias('Uri')]
-    [string]$AzDevOpsServerApiUri,
+        NOTE: Use of one of the '-IsSuccessful' or '-IsComplete' switch is required.
 
-    [Parameter(Mandatory)]
-    [Alias('Pat', 'PersonalAccessToken')]
-    [string]$AzDevOpsPat,
+    .PARAMETER ApiUri
+        The URI of the Azure DevOps API to be connected to. For example:
 
-    [Parameter(Mandatory)]
-    [Alias('OperationId', 'Id')]
-    [string]$AzDevOpsOperationId,
+          https://dev.azure.com/someOrganizationName/_apis/
 
-    [Alias('IntervalMilliseconds')]
-    [int]$WaitIntervalMilliseconds = 500,
+    .PARAMETER Pat
+        The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
+        against the Azure DevOps API. This PAT must have the relevant permissions assigned
+        for the subsequent operations being performed.
 
-    [Alias('TimeoutMilliseconds')]
-    [int]$WaitTimeoutMilliseconds = 30000, # 30 seconds
+    .PARAMETER OperationId
+        The 'id' of the Azure DevOps API operation. This is typically obtained from a response
+        provided by the API when a request is made to it.
 
-    [Parameter(Mandatory, ParameterSetName = 'IsComplete')]
-    [switch]$IsComplete,
+    .PARAMETER IsComplete
+        Use of this switch will ensure the function waits for the Azure DevOps API operation
+        to complete (Note: The operation could complete with error or/and without success).
 
-    [Parameter(Mandatory, ParameterSetName = 'IsSuccessful')]
-    [switch]$IsSuccessful
-  )
+        Failure to use this switch or the '-IsSuccessful' one as an alternative will throw an
+        exception. An exception will also be thrown if the wait exceeds the timeout.
 
-  if (!$IsComplete -and !$IsSuccessful) {
-    throw "The '-IsComplete' switch or the '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
-    return
-  }
-  elseIf (!$IsComplete -and !$IsSuccessful) {
-    throw "Only the '-IsComplete' switch or the alternative '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
-    return
-  }
+    .PARAMETER IsSuccessful
+        Use of this switch will ensure the function waits for the Azure DevOps API operation
+        to successfully complete (Note: The operation must complete with success).
 
-  [DateTime]$WaitStartDateTime = [DateTime]::UtcNow
+        Failure to use this switch or the '-IsComplete' one as an alternative will throw an
+        exception. An exception will also be thrown if the wait exceeds the timeout.
 
-  while (!(Test-AzDevOpsOperation -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
-        -AzDevOpsOperationId $AzDevOpsOperationId `
-        -IsComplete:$IsComplete -IsSuccessful:$IsSuccessful)) {
+    .EXAMPLE
+        Wait-AzDevOpsOperation -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -OperationId 'YourOperationId' `
+                               -IsComplete
 
-    Start-Sleep -Milliseconds $WaitIntervalMilliseconds
+        Waits for the Azure DevOps 'Operation' (identified by the 'OperationId') to complete (although the
+        operation may not complete successfully).
 
-    if ($(New-TimeSpan -Start $WaitStartDateTime -End $([DateTime]::UtcNow)).Milliseconds -gt $WaitTimeoutMilliseconds) {
-      throw "The 'Wait-AzDevOpsOperation' operation for AzDevOpsOperationId of '$AzDevOpsOperationId' exceeded specified, maximum timeout ($WaitTimeoutMilliseconds milliseconds)"
-      return
+    .EXAMPLE
+        Wait-AzDevOpsOperation -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -OperationId 'YourOperationId' `
+                               -IsSuccessful
+
+        Waits for the Azure DevOps 'Operation' (identified by the 'OperationId') to complete successfully.
+#>
+function Wait-AzDevOpsOperation
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [Alias('Uri')]
+        [System.String]
+        $ApiUri,
+
+        [Parameter(Mandatory = $true)]
+        [Alias('PersonalAccessToken')]
+        [System.String]
+        $Pat,
+
+        [Parameter(Mandatory = $true)]
+        [Alias('Id')]
+        [System.String]
+        $OperationId,
+
+        [Parameter()]
+        [Alias('Interval','IntervalMilliseconds')]
+        [System.UInt32]
+        $WaitIntervalMilliseconds = 100,
+
+        [Parameter()]
+        [Alias('Timeout','TimeoutMilliseconds')]
+        [System.UInt32]
+        $WaitTimeoutMilliseconds = 10000,
+
+        [Parameter(Mandatory = $true, ParameterSetName = 'IsComplete')]
+        [System.Management.Automation.SwitchParameter]
+        $IsComplete,
+
+        [Parameter(Mandatory = $true, ParameterSetName = 'IsSuccessful')]
+        [System.Management.Automation.SwitchParameter]
+        $IsSuccessful
+    )
+
+    if (!$IsComplete -and !$IsSuccessful)
+    {
+        $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesNotUsed -f $MyInvocation.MyCommand
+        New-InvalidOperationException -Message $errorMessage
+    }
+    elseif (!$IsComplete -and !$IsSuccessful) # Failsafe: Unlikely/Impossible to occur while both setup with different 'ParameterSetName' values
+    {
+        $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesBothUsed -f $MyInvocation.MyCommand
+        New-InvalidOperationException -Message $errorMessage
     }
 
-  }
 
+    [System.DateTime]$waitStartDateTime = [System.DateTime]::UtcNow
+
+    while (!(Test-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
+                                    -OperationId $OperationId `
+                                    -IsComplete:$IsComplete -IsSuccessful:$IsSuccessful))
+    {
+        Start-Sleep -Milliseconds $WaitIntervalMilliseconds
+
+        if ($(New-TimeSpan -Start $waitStartDateTime -End $([System.DateTime]::UtcNow)).Milliseconds -gt $WaitTimeoutMilliseconds)
+        {
+            $errorMessage = $script:localizedData.AzDevOpsOperationTimeoutExceeded -f $MyInvocation.MyCommand, $OperationId, $WaitTimeoutMilliseconds
+            New-InvalidOperationException -Message $errorMessage
+        }
+    }
 }
