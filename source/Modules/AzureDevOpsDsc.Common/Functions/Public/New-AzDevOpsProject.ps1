@@ -1,44 +1,88 @@
-function New-AzDevOpsProject{
+<#
+    .SYNOPSIS
+        Creates a new Azure DevOps 'Project' with the specified properties set by the parameters.
 
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact='Medium')]
-    [OutputType([object[]])]
-    param(
-      [Alias('Uri')]
-      [string]$AzDevOpsServerApiUri,
+    .PARAMETER ApiUri
+        The URI of the Azure DevOps API to be connected to. For example:
 
-      [Alias('Pat','PersonalAccessToken')]
-      [string]$AzDevOpsPat,
+          https://dev.azure.com/someOrganizationName/_apis/
 
-      [Parameter(Mandatory)]
-      [Alias('ProjectId','Id')]
-      [string]$AzDevOpsProjectId,
+    .PARAMETER Pat
+        The 'Personal Access Token' (PAT) to be used by any subsequent requests/Projects
+        against the Azure DevOps API. This PAT must have the relevant permissions assigned
+        for the subsequent Projects being performed.
 
-      [Parameter(Mandatory)]
-      [Alias('ProjectName','Name')]
-      [string]$AzDevOpsProjectName,
+    .PARAMETER ProjectId
+        The 'id' of the 'Project' being created.
 
-      [Parameter(Mandatory)]
-      [Alias('ProjectDescription','Description')]
-      [string]$AzDevOpsProjectDescription,
+    .PARAMETER ProjectName
+        The 'name' of the 'Project' being created.
 
-      [Parameter(Mandatory)]
-      [Alias('SourceControlType')]
-      [ValidateSet('Git')]
-      [string]$AzDevOpsSourceControlType,
+    .PARAMETER ProjectDescription
+        The 'description' of the 'Project' being created.
 
-      [switch]$Force
+    .PARAMETER SourceControlType
+        The 'sourceControlType' of the 'Project' being created.
+
+        Options are 'Tfvc' or 'Git'. Defaults to 'Git' if no value provided.
+
+    .PARAMETER Force
+        When this switch is used, any confirmation will be overidden/ignored.
+
+    .EXAMPLE
+        New-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' `
+                            -ProjectId 'YourProjectIdHere' -ProjectName 'YourProjectNameHere' `
+                            -ProjectName 'YourProjectDescriptionHere' -SourceControlType 'Git'
+
+        Creates a 'Project' (assocated with the Organization/ApiUrl) in Azure DevOps using project-related, parameter values provided.
+#>
+function New-AzDevOpsProject
+{
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([System.Object])]
+    param
+    (
+        [Alias('Uri')]
+        [System.String]
+        $ApiUri,
+
+        [Alias('PersonalAccessToken')]
+        [System.String]
+        $Pat,
+
+        [Parameter(Mandatory = $true)]
+        [Alias('Id')]
+        [System.String]
+        $ProjectId,
+
+        [Parameter(Mandatory = $true)]
+        [Alias('Name')]
+        [System.String]
+        $ProjectName,
+
+        [Parameter(Mandatory = $true)]
+        [Alias('Description')]
+        [System.String]
+        $ProjectDescription,
+
+        [Parameter()]
+        [ValidateSet('Git','Tfvc')]
+        [System.String]
+        $SourceControlType = 'Git',
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
     )
 
-    [string]$AzDevOpsObjectName = 'Project'
-
-    [string]$AzDevOpsObjectJson = '
+    [string]$objectJson = '
     {
-      "id": "'+ $AzDevOpsProjectId +'",
-      "name": "'+ $AzDevOpsProjectName +'",
-      "description": "'+ $AzDevOpsProjectDescription +'",
+      "id": "' + $ProjectId + '",
+      "name": "' + $ProjectName + '",
+      "description": "' + $ProjectDescription + '",
       "capabilities": {
         "versioncontrol": {
-          "sourceControlType": "'+ $AzDevOpsSourceControlType +'"
+          "sourceControlType": "' + $SourceControlType + '"
         },
         "processTemplate": {
           "templateTypeId": "6b724908-ef14-45cf-84f8-768b5384da45"
@@ -47,15 +91,15 @@ function New-AzDevOpsProject{
     }
 '
 
-    [object]$AzDevOpsObject = $null
+    [System.Object]$object = $null
 
-    if ($Force -or $PSCmdlet.ShouldProcess($AzDevOpsServerApiUri,$AzDevOpsObjectName)) {
-
-      [object]$AzDevOpsObject = New-AzDevOpsApiObject -AzDevOpsServerApiUri $AzDevOpsServerApiUri -AzDevOpsPat $AzDevOpsPat `
-                                                    -AzDevOpsObjectName $AzDevOpsObjectName `
-                                                    -AzDevOpsObject $($AzDevOpsObjectJson | ConvertFrom-Json) `
-                                                    -Force:$Force
+    if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $objectName))
+    {
+        [System.Object]$object = New-AzDevOpsApiObject -$ApiUri $ApiUri -Pat $Pat `
+                                                       -ObjectName 'Project' `
+                                                       -Object $($objectJson | ConvertFrom-Json) `
+                                                       -Force:$Force
     }
 
-    return $AzDevOpsObject
-  }
+    return $object
+}
