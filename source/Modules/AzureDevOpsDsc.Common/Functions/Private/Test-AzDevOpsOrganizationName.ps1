@@ -1,27 +1,51 @@
-function Test-AzDevOpsOrganizationName{
+<#
+    .SYNOPSIS
+        Peforms test on a provided 'OrganizationName' to provide a boolean ($true or $false)
+        return value. Returns $true if the test is successful.
 
-  [CmdletBinding()]
-  [OutputType([bool])]
-  param(
-    [Alias('OrganizationName')]
-    [string]$AzDevOpsOrganizationName,
+        NOTE: Use of the '-IsValid' switch is required.
 
-    [switch]$IsValid
-  )
+    .PARAMETER OrganizationName
+        The 'OrganizationName' to be tested/validated.
 
-  if(!$IsValid){
-    throw "The '-IsValid' switch must be used when calling 'Test-AzDevOpsOrganizationName'."
-    return
-  }
+    .PARAMETER IsValid
+        Use of this switch will validate the format of the 'OrganizationName'
+        rather than the existence/presence of it.
 
-  if([string]::IsNullOrWhiteSpace($AzDevOpsOrganizationName)){
-    return $false
-  }
-  elseIf($AzDevOpsOrganizationName.Contains(' ') -or
-         $AzDevOpsOrganizationName.Contains('%')){
-    return $false
-  }
+        Failure to use this switch will throw an exception.
 
-  return $true
+    .EXAMPLE
+        Test-AzDevOpsOrganizationName -OrganizationName 'YourOrganizationNameHere' -IsValid
+
+        Returns $true if the 'OrganizationName' provided is of a valid format.
+        Returns $false if it is not.
+#>
+function Test-AzDevOpsOrganizationName
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $OrganizationName,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $IsValid
+    )
+
+    if (!$IsValid)
+    {
+        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
+        New-InvalidOperationException -Message $errorMessage
+    }
+
+    if ([System.String]::IsNullOrWhiteSpace($OrganizationName) -or
+        ($OrganizationName.Contains(' ') -or $OrganizationName.Contains('%')))
+    {
+        return $false
+    }
+
+    return $true
 }
-
