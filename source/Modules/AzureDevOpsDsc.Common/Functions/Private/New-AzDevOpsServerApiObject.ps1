@@ -38,7 +38,7 @@ function New-AzDevOpsServerApiObject{
 
     [string]$Method = 'Post'
     [string]$ContentType = 'application/json'
-    [hashtable]$AzDevOpsServerApiHeader = Get-AzDevOpsServerApiHeader -AzDevOpsPat $AzDevOpsPat
+    [hashtable]$AzDevOpsServerApiHeader = Get-AzDevOpsApiHttpRequestHeader -AzDevOpsPat $AzDevOpsPat
 
     # TODO: Need to tidy up?
 
