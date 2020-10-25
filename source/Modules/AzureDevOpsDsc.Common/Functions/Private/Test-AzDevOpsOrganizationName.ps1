@@ -30,7 +30,7 @@ function Test-AzDevOpsOrganizationName
         [System.String]
         $OrganizationName,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
