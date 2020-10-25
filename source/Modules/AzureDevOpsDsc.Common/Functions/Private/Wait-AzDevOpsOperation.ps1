@@ -27,11 +27,11 @@ function Wait-AzDevOpsOperation {
     [switch]$IsSuccessful
   )
 
-  If (!$IsComplete -and !$IsSuccessful) {
+  if (!$IsComplete -and !$IsSuccessful) {
     throw "The '-IsComplete' switch or the '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
     return
   }
-  ElseIf (!$IsComplete -and !$IsSuccessful) {
+  elseIf (!$IsComplete -and !$IsSuccessful) {
     throw "Only the '-IsComplete' switch or the alternative '-IsSuccessful' switch must be used when calling 'Test-AzDevOpsOperation'."
     return
   }

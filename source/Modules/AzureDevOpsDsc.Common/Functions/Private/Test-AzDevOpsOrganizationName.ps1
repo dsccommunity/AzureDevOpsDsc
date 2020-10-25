@@ -9,15 +9,15 @@ function Test-AzDevOpsOrganizationName{
     [switch]$IsValid
   )
 
-  If(!$IsValid){
+  if(!$IsValid){
     throw "The '-IsValid' switch must be used when calling 'Test-AzDevOpsOrganizationName'."
     return
   }
 
-  If([string]::IsNullOrWhiteSpace($AzDevOpsOrganizationName)){
+  if([string]::IsNullOrWhiteSpace($AzDevOpsOrganizationName)){
     return $false
   }
-  ElseIf($AzDevOpsOrganizationName.Contains(' ') -or
+  elseIf($AzDevOpsOrganizationName.Contains(' ') -or
          $AzDevOpsOrganizationName.Contains('%')){
     return $false
   }

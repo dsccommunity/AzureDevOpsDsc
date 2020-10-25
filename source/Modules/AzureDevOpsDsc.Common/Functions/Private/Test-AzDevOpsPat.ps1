@@ -35,13 +35,13 @@ function Test-AzDevOpsPat
         $IsValid
     )
 
-    If (!$IsValid)
+    if (!$IsValid)
     {
         $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
         New-InvalidOperationException -Message $errorMessage
     }
 
-    If ([string]::IsNullOrWhiteSpace($Pat) -or
+    if ([string]::IsNullOrWhiteSpace($Pat) -or
         $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
     {
         return $false
