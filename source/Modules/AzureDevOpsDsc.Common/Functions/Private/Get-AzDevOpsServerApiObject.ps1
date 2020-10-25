@@ -38,7 +38,7 @@ function Get-AzDevOpsServerApiObject{
 
 
     [string]$Method = 'Get'
-    [hashtable]$AzDevOpsServerApiHeader = Get-AzDevOpsServerApiHeader -AzDevOpsPat $AzDevOpsPat
+    [hashtable]$AzDevOpsServerApiHeader = Get-AzDevOpsApiHttpRequestHeader -AzDevOpsPat $AzDevOpsPat
 
     # TODO: Need to tidy up?
     [object]$AzDevOpsServerApiObjects = Invoke-RestMethod -Uri $AzDevOpsServerApiObjectUri -Method $Method -Headers $AzDevOpsServerApiHeader

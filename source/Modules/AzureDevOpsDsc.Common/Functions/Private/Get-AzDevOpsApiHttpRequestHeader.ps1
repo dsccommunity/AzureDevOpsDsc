@@ -9,11 +9,11 @@
         for the subsequent operations being performed.
 
     .EXAMPLE
-        Get-AzDevOpsServerApiHeader -Pat 'YourPatHere'
+        Get-AzDevOpsApiHttpRequestHeader -Pat 'YourPatHere'
 
         Returns an API/HTTP request header using the 'Personal Access Token' (PAT) provided.
 #>
-function Get-AzDevOpsServerApiHeader
+function Get-AzDevOpsApiHttpRequestHeader
 {
     [CmdletBinding()]
     [OutputType([Hashtable])]
