@@ -13,8 +13,8 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 enum Ensure
 {
-  Present
-  Absent
+    Present
+    Absent
 }
 
 
@@ -39,7 +39,7 @@ class DSC_AzDevOpsProject
     [Alias('Id')]
     [string]$ProjectId
 
-    [DscProperty(Key,Mandatory)]
+    [DscProperty(Key, Mandatory)]
     [Alias('Name')]
     [string]$ProjectName
 
@@ -51,6 +51,21 @@ class DSC_AzDevOpsProject
 
     [DSC_AzDevOpsProject] Get()
     {
+        $inputParameters = @{
+            #Ensure      = $this.Ensure
+            ApiUri      = $this.ApiUri
+            Pat         = $this.Pat
+            ProjectName = $this.ProjectName
+            #ProjectDescription = $this.ProjectDescription
+        }
+
+        #$project = Get-AzDevOpsProject @inputParameters
+        $project = $null
+        if ($null -eq $project)
+        {
+            return $null
+        }
+
         $newObject = [DSC_AzDevOpsProject]::new()
         $newObject.Ensure = $this.Ensure
         $newObject.ApiUri = $this.ApiUri
@@ -68,7 +83,9 @@ class DSC_AzDevOpsProject
     }
 
 
-    [void] Set() {}
+    [void] Set()
+    {
+    }
 
 
 }
