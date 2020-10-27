@@ -23,6 +23,10 @@ class DSC_AzDevOpsProject
 {
 
     [DscProperty()]
+    [Ensure]$Ensure
+
+
+    [DscProperty()]
     [Alias('Uri')]
     [string]$ApiUri
 
@@ -31,12 +35,13 @@ class DSC_AzDevOpsProject
     [string]$Pat
 
 
+    [DscProperty(Mandatory)]
+    [Alias('Id')]
+    [string]$ProjectId
+
     [DscProperty(Key,Mandatory)]
     [Alias('Name')]
     [string]$ProjectName
-
-    [DscProperty()]
-    [Ensure]$Ensure
 
     [DscProperty()]
     [Alias('Description')]
@@ -46,17 +51,14 @@ class DSC_AzDevOpsProject
 
     [DSC_AzDevOpsProject] Get()
     {
-        $parameterSet = @{
-            ApiUri      = $this.ApiUri
-            Pat         = $this.Pat
-            ProjectName = $this.ProjectName
-        }
+        $newObject = [DSC_AzDevOpsProject]::new()
+        $newObject.Ensure = $this.Ensure
+        $newObject.ApiUri = $this.ApiUri
+        $newObject.Pat = $this.Pat
+        $newObject.ProjectName = $this.ProjectName
+        $newObject.ProjectDescription = $this.ProjectDescription
 
-        return [DSC_AzDevOpsProject]::new() #|
-                    #Add-Member -NotePropertyName 'ApiUri' -NotePropertyValue $this.ApiUri -Force -PassThru |
-                    #Add-Member -NotePropertyName 'Pat' -NotePropertyValue $this.Pat -Force -PassThru |
-                    #Add-Member -NotePropertyName 'ProjectName' -NotePropertyValue $this.ProjectName -Force -PassThru
-
+        return $newObject
     }
 
 
