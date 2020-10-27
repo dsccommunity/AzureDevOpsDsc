@@ -20,4 +20,8 @@
     'DscResource.AnalyzerRules' = 'latest'
     xDscResourceDesigner        = 'latest'
     'DscResource.DocGenerator'  = 'latest'
+    'DscResource.Common'        = 'latest'
+
+    # Prerequisites modules needed for examples or integration tests
+    PSDscResources              = '2.12.0.0'
 }
