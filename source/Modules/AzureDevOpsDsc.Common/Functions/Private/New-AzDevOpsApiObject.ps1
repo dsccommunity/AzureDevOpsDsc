@@ -47,11 +47,13 @@ function New-AzDevOpsApiObject
     param
     (
         [Parameter(Mandatory = $true)]
+        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
         [Alias('Uri')]
         [System.String]
         $ApiUri,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
         [Alias('PersonalAccessToken')]
         [System.String]
         $Pat,
