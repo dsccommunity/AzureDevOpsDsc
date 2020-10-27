@@ -62,11 +62,13 @@ function Get-AzDevOpsProject
         $Pat,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
         [Alias('Id')]
         [System.String]
         $ProjectId = '*',
 
         [Parameter()]
+        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid })]
         [Alias('Name')]
         [System.String]
         $ProjectName = '*'
