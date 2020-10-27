@@ -95,12 +95,3 @@ function Test-ContinuousIntegrationTaskCategory
 
     return $result
 }
-
-<#
-    .SYNOPSIS
-        Waits for LCM to become idle.
-
-    .NOTES
-        Used in integration test where integration tests run to quickly before
-        LCM have time to cool down.
-#>
