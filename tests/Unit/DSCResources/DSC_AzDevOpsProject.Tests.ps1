@@ -52,15 +52,26 @@ try
 
             BeforeAll {
 
+                $getApiUri = "https:\\www.someUri.api"
+                $getPat = "1234567890123456789012345678901234567890123456789012"
+
                 $getProjectName = "ProjectName_$projectId"
                 $getProjectDescription = "ProjectDescription_$projectId"
 
                 $getParameters = @{
+                    ApiUri = $getApiUri
+                    Pat = $getPat
                     ProjectId = $getProjectId
                     ProjectName = $getProjectName
                     ProjectDescription = $getProjectDescription
                 }
 
+                $AzDevOpsProjectResource = [DSC_AzDevOpsProject]::new()
+                $AzDevOpsProjectResource.ApiUri = $getApiUri
+                $AzDevOpsProjectResource.Pat = $getPat
+                $AzDevOpsProjectResource.ProjectId = $getProjectId
+                $AzDevOpsProjectResource.ProjectName = $getProjectName
+                $AzDevOpsProjectResource.ProjectDescription = $getProjectDescription
             }
 
 
@@ -68,7 +79,6 @@ try
                 Context 'When the Azure DevOps "Project" does not exist' {
                     BeforeAll {
 
-                        $AzDevOpsProjectResource = [DSC_AzDevOpsProject]::new()
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
                             Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
                                     return $null
@@ -80,6 +90,8 @@ try
                         $getResult = $AzDevOpsProjectResource.Get()
 
                         $getResult | Should -Be $null
+                        $getResult.ApiUri | Should -Be $null
+                        $getResult.Pat | Should -Be $null
                         $getResult.ProjectId | Should -Be $null
                         $getResult.ProjectName | Should -Be $null
                         $getResult.ProjectDescription | Should -Be $null
@@ -92,7 +104,6 @@ try
                         $differentProjectName = "z" + $getParameters.ProjectName
                         $getParameters.ProjectName = $differentProjectName
 
-                        $AzDevOpsProjectResource = [DSC_AzDevOpsProject]::new()
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
                             Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
                                     return $getParameters
@@ -100,27 +111,13 @@ try
 
                     }
 
-                    #$differentProjectName = "z" + $getParameters.ProjectName
-                    #$getParameters.ProjectName = $differentProjectName
-
-                    #$AzDevOpsProjectResource = [DSC_AzDevOpsProject]::new()
-                    #$AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                    #    Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
-                    #            return $getParameters
-                    #        } -Force -PassThru
-
-                    #$AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                    #    Add-Member -NotePropertyName 'ApiUri' -NotePropertyValue 'https:\\someUri' -Force -PassThru
-
-                    #$AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                    #    Add-Member -NotePropertyName 'Pat' -NotePropertyValue 'lxppuwlhjbxdteknmsbjfybsl6bdd5edsdisosv4hngd2rwou5pq' -Force -PassThru
-
-
-                    It 'Should return the correct values' {
+                    It 'Should return the correct values, with "ProjectName" values different' {
                         $getResult = $AzDevOpsProjectResource.Get()
 
+                        $getResult.ApiUri | Should -Be $getApiUri
+                        $getResult.Pat | Should -Be $getPat
                         $getResult.ProjectId | Should -Be $getProjectId
-                        $getResult.ProjectName | Should -Be $differentProjectName
+                        $getResult.ProjectName | Should -Not -Be $differentProjectName # Different
                         $getResult.ProjectDescription | Should -Be $getProjectDescription
                     }
                 }
@@ -130,7 +127,6 @@ try
                         $differentProjectDescription = "z" + $getParameters.ProjectDescription
                         $getParameters.ProjectDescription = $differentProjectDescription
 
-                        $AzDevOpsProjectResource = [DSC_AzDevOpsProject]::new()
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
                             Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
                                     return $getParameters
@@ -138,12 +134,14 @@ try
 
                     }
 
-                    It 'Should return the correct values' {
+                    It 'Should return the correct values, with "ProjectDescription" values different' {
                         $getResult = $AzDevOpsProjectResource.Get()
 
-                        #$getResult.ProjectId | Should -Be $getProjectId
+                        $getResult.ApiUri | Should -Be $getApiUri
+                        $getResult.Pat | Should -Be $getPat
+                        $getResult.ProjectId | Should -Be $getProjectId
                         $getResult.ProjectName | Should -Be $getprojectName
-                        $getResult.ProjectDescription | Should -Be $differentProjectDescription
+                        $getResult.ProjectDescription | Should -Not -Be $differentProjectDescription # Different
                     }
                 }
             }
@@ -151,7 +149,6 @@ try
             Context 'When Azure DevOps is in the desired state' {
                 BeforeAll {
 
-                    $AzDevOpsProjectResource = [DSC_AzDevOpsProject]::new()
                     $AzDevOpsProjectResource = $AzDevOpsProjectResource |
                         Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
                                 return $getParameters
@@ -160,9 +157,11 @@ try
                 }
 
                 It 'Should return the correct values' {
-                    $getResult = [DSC_AzDevOpsProject]::Get()
+                    $getResult = $AzDevOpsProjectResource.Get()
 
-                    #$getResult.ProjectId | Should -Be $getProjectId
+                    $getResult.ApiUri | Should -Be $getApiUri
+                    $getResult.Pat | Should -Be $getPat
+                    $getResult.ProjectId | Should -Be $getProjectId
                     $getResult.ProjectName | Should -Be $getprojectName
                     $getResult.ProjectDescription | Should -Be $getProjectDescription
                 }
