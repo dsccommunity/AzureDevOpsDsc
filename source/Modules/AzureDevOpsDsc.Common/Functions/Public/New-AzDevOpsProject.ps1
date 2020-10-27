@@ -55,16 +55,19 @@ function New-AzDevOpsProject
         $Pat,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
         [Alias('Id')]
         [System.String]
         $ProjectId,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid })]
         [Alias('Name')]
         [System.String]
         $ProjectName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-AzDevOpsProjectDescription -ProjectDescription $_ -IsValid })]
         [Alias('Description')]
         [System.String]
         $ProjectDescription,

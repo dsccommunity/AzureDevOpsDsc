@@ -58,6 +58,7 @@ function Get-AzDevOpsApiObject
         $ObjectName,
 
         [Parameter()]
+        [ValidateScript({ Test-AzDevOpsObjectId -ObjectId $_ -IsValid })]
         [System.String]
         $ObjectId
     )

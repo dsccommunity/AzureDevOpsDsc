@@ -46,6 +46,7 @@ function New-AzDevOpsConnection
         $Pat,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Credential')]
+        [ValidateScript({ Test-AzDevOpsCredential -Credential $_ -IsValid })]
         [System.Management.Automation.PSCredential]
         $Credential
     )
