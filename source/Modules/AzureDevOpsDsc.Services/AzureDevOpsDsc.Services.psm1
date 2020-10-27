@@ -1,6 +1,6 @@
 # Setup/Import 'DscResource.Services' helper module
-$script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Services'
-Import-Module -Name $script:resourceHelperModulePath
+#$script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Services'
+#Import-Module -Name $script:resourceHelperModulePath
 
 
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
