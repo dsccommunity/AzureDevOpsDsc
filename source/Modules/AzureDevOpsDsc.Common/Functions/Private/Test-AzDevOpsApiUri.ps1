@@ -27,7 +27,6 @@ function Test-AzDevOpsApiUri
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
         [System.String]
         $ApiUri,
 
