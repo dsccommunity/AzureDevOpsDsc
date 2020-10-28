@@ -24,5 +24,5 @@ function Get-AzDevOpsServicesApiUri
 
     [System.String]$uri = Get-AzDevOpsServicesUri -OrganizationName $OrganizationName
 
-    return $uri + "_apis"
+    return $uri + "_apis/"
 }
