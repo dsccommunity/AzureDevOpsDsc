@@ -35,9 +35,9 @@ class DSC_AzDevOpsProject
     [string]$Pat
 
 
-    [DscProperty(Mandatory)]
+    [DscProperty()]
     [Alias('Id')]
-    [string]$ProjectId
+    [string]$ProjectId = '*'
 
     [DscProperty(Key, Mandatory)]
     [Alias('Name')]
@@ -47,40 +47,38 @@ class DSC_AzDevOpsProject
     [Alias('Description')]
     [string]$ProjectDescription
 
+    [hashtable]GetAzDevOpsObject()
+    {
+        $getParameters = @{
+            ApiUri      = $this.ApiUri
+            Pat         = $this.Pat
+            ProjectId   = $(if ([string]::IsNullOrWhiteSpace($this.ProjectId)) { [guid]::NewGuid().ToString() }else{$this.ProjectId})
+            ProjectName = $this.ProjectName
+        }
 
+        return Get-AzDevOpsProject @getParameters
+    }
 
     [DSC_AzDevOpsProject] Get()
     {
-        $inputParameters = @{
-            #Ensure      = $this.Ensure
-            ApiUri      = $this.ApiUri
-            Pat         = $this.Pat
-            ProjectName = $this.ProjectName
-            #ProjectDescription = $this.ProjectDescription
-        }
+        $project = $this.GetAzDevOpsObject()
 
-        #############################################################
-        #############################################################
-        # TODO: Call to this is failing ... StackOverflowException
-        #############################################################
-        #############################################################
-        #$project = Get-AzDevOpsProject @inputParameters
-        #############################################################
-        #############################################################
-        #############################################################
-        #############################################################
-        $project = $null
         if ($null -eq $project)
         {
             return $null
         }
 
         return [DSC_AzDevOpsProject]@{
+
+            # Existing properties
             Ensure = $this.Ensure
             ApiUri = $this.ApiUri
             Pat = $this.Pat
-            ProjectName = $this.ProjectName
-            ProjectDescription = $this.ProjectDescription
+
+            # Updated properties (from 'Get')
+            ProjectId = $project.id
+            ProjectName = $project.name
+            ProjectDescription = $project.description
         }
 
     }

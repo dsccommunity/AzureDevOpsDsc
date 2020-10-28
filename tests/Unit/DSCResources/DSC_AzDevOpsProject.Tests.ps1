@@ -48,22 +48,21 @@ try
 
         Describe 'AzDevOpsProject\Get' -Tag 'Get' {
 
-            $getProjectId = [GUID]::NewGuid()
+
 
             BeforeAll {
 
-                $getApiUri = "https:\\www.someUri.api"
+                $getApiUri = "https://www.someUri.api/_apis/"
                 $getPat = "1234567890123456789012345678901234567890123456789012"
 
+                $getProjectId = [GUID]::NewGuid().ToString()
                 $getProjectName = "ProjectName_$projectId"
                 $getProjectDescription = "ProjectDescription_$projectId"
 
-                $getParameters = @{
-                    ApiUri = $getApiUri
-                    Pat = $getPat
-                    ProjectId = $getProjectId
-                    ProjectName = $getProjectName
-                    ProjectDescription = $getProjectDescription
+                $getAzDevOpsObject = @{
+                    id = $getProjectId
+                    name = $getProjectName
+                    description = $getProjectDescription
                 }
 
                 $AzDevOpsProjectResource = [DSC_AzDevOpsProject]@{
@@ -81,7 +80,7 @@ try
                     BeforeAll {
 
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                            Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
                                     return $null
                                 } -Force -PassThru
 
@@ -100,14 +99,38 @@ try
                 }
 
 
-                Context 'When the Azure DevOps "Project" exists but "ProjectName" parameter is different' {
+                Context 'When the Azure DevOps "Project" exists but "ProjectId" parameter is different' {
                     BeforeAll {
-                        $differentProjectName = "z" + $getParameters.ProjectName
-                        $getParameters.ProjectName = $differentProjectName
+                        $differentProjectId = [GUID]::NewGuid().ToString()
+                        $getAzDevOpsObject.ProjectId = $differentProjectId
 
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                            Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
-                                    return $getParameters
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
+                                    return $getAzDevOpsObject
+                                } -Force -PassThru
+
+                    }
+
+                    It 'Should return the correct values, with "ProjectId" values different' {
+                        $getResult = $AzDevOpsProjectResource.Get()
+
+                        $getResult.ApiUri | Should -Be $getApiUri
+                        $getResult.Pat | Should -Be $getPat
+                        $getResult.ProjectId | Should -Not -Be $differentProjectId # Different
+                        $getResult.ProjectName | Should -Be $getProjectName
+                        $getResult.ProjectDescription | Should -Be $getProjectDescription
+                    }
+                }
+
+
+                Context 'When the Azure DevOps "Project" exists but "ProjectName" parameter is different' {
+                    BeforeAll {
+                        $differentProjectName = "z" + $getAzDevOpsObject.ProjectName
+                        $getAzDevOpsObject.ProjectName = $differentProjectName
+
+                        $AzDevOpsProjectResource = $AzDevOpsProjectResource |
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
+                                    return $getAzDevOpsObject
                                 } -Force -PassThru
 
                     }
@@ -125,12 +148,12 @@ try
 
                 Context 'When the Azure DevOps "Project" exists but "ProjectDescription" parameter is different' {
                     BeforeAll {
-                        $differentProjectDescription = "z" + $getParameters.ProjectDescription
-                        $getParameters.ProjectDescription = $differentProjectDescription
+                        $differentProjectDescription = "z" + $getAzDevOpsObject.ProjectDescription
+                        $getAzDevOpsObject.ProjectDescription = $differentProjectDescription
 
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                            Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
-                                    return $getParameters
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
+                                    return $getAzDevOpsObject
                                 } -Force -PassThru
 
                     }
@@ -151,8 +174,8 @@ try
                 BeforeAll {
 
                     $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                        Add-Member -MemberType 'ScriptMethod' -Name 'Get-AzDevOpsProject' -Value {
-                                return $getParameters
+                        Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
+                                return $getAzDevOpsObject
                             } -Force -PassThru
 
                 }
