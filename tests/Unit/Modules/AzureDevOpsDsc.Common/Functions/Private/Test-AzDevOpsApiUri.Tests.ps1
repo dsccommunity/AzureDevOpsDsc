@@ -89,7 +89,7 @@ InModuleScope $script:subModuleName {
                     }
 
                     It 'Should return $false - "<ApiUri>"' -TestCases $testCasesInvalidApiUris {
-                        param ([string]$OrganizationName)
+                        param ([string]$ApiUri)
 
                         $result = Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid
                         $result | Should -Be $false
