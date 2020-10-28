@@ -71,7 +71,7 @@ InModuleScope $script:subModuleName {
                     }
 
                     It 'Should return $false - "<Pat>"' -TestCases $testCasesInvalidPats {
-                        param ([string]$OrganizationName)
+                        param ([string]$Pat)
 
                         $result = Test-AzDevOpsPat -Pat $Pat -IsValid
                         $result | Should -Be $false

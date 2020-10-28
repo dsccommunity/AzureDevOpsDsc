@@ -73,7 +73,7 @@ InModuleScope $script:subModuleName {
                     }
 
                     It 'Should return $false - "<ObjectId>"' -TestCases $testCasesInvalidObjectIds {
-                        param ([string]$OrganizationName)
+                        param ([string]$ObjectId)
 
                         $result = Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid
                         $result | Should -Be $false
