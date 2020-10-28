@@ -41,8 +41,11 @@ function Test-AzDevOpsObjectId
         New-InvalidOperationException -Message $errorMessage
     }
 
-    # TODO:
-    #  - Validate it's a GUID?
+
+    if(![guid]::TryParse($ObjectId, $([ref][guid]::Empty))){
+        return $false
+    }
+
 
     return $true
 }
