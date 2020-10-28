@@ -75,14 +75,14 @@ class DSC_AzDevOpsProject
             return $null
         }
 
-        $newObject = [DSC_AzDevOpsProject]::new()
-        $newObject.Ensure = $this.Ensure
-        $newObject.ApiUri = $this.ApiUri
-        $newObject.Pat = $this.Pat
-        $newObject.ProjectName = $this.ProjectName
-        $newObject.ProjectDescription = $this.ProjectDescription
+        return [DSC_AzDevOpsProject]@{
+            Ensure = $this.Ensure
+            ApiUri = $this.ApiUri
+            Pat = $this.Pat
+            ProjectName = $this.ProjectName
+            ProjectDescription = $this.ProjectDescription
+        }
 
-        return $newObject
     }
 
 
