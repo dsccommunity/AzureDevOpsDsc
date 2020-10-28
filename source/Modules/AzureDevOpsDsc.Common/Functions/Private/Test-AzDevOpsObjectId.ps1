@@ -42,7 +42,8 @@ function Test-AzDevOpsObjectId
     }
 
 
-    if(![guid]::TryParse($ObjectId, $([ref][guid]::Empty))){
+    if (![guid]::TryParse($ObjectId, $([ref][guid]::Empty)))
+    {
         return $false
     }
 
