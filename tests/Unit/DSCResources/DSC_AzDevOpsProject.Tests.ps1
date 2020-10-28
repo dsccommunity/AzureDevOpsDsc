@@ -66,12 +66,13 @@ try
                     ProjectDescription = $getProjectDescription
                 }
 
-                $AzDevOpsProjectResource = [DSC_AzDevOpsProject]::new()
-                $AzDevOpsProjectResource.ApiUri = $getApiUri
-                $AzDevOpsProjectResource.Pat = $getPat
-                $AzDevOpsProjectResource.ProjectId = $getProjectId
-                $AzDevOpsProjectResource.ProjectName = $getProjectName
-                $AzDevOpsProjectResource.ProjectDescription = $getProjectDescription
+                $AzDevOpsProjectResource = [DSC_AzDevOpsProject]@{
+                    ApiUri = $getApiUri
+                    Pat = $getPat
+                    ProjectId = $getProjectId
+                    ProjectName = $getProjectName
+                    ProjectDescription = $getProjectDescription
+                }
             }
 
 
