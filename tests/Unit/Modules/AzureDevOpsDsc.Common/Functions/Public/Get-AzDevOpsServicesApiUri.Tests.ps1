@@ -34,13 +34,22 @@ InModuleScope $script:subModuleName {
                     $result | Should -Be "https://dev.azure.com/$OrganizationName/_apis/"
                 }
 
-                It 'Should return "Get-AzDevOpsServicesUri"+"_apis/" - "<OrganizationName>"' -TestCases $testCasesValidOrganizationNames {
+                It 'Should return $("Get-AzDevOpsServicesUri"+"_apis/") - "<OrganizationName>"' -TestCases $testCasesValidOrganizationNames {
                     param ([string]$OrganizationName)
 
                     $result = Get-AzDevOpsServicesApiUri -OrganizationName $OrganizationName
-                    $result | Should -Be $(Get-AzDevOpsServicesUri -OrganizationName $OrganizationName) + '_apis/'
+                    $result | Should -Be $($(Get-AzDevOpsServicesUri -OrganizationName $OrganizationName) + '_apis/')
                 }
+
+                It 'Should return URI in lowercase' {
+                    $OrganizationName = 'UPPERcasedORGANIZATIONname'
+
+                    $result = Get-AzDevOpsServicesApiUri -OrganizationName $OrganizationName
+                    $result | Should -BeExactly $(Get-AzDevOpsServicesApiUri -OrganizationName $OrganizationName).ToLower()
+                }
+
             }
+
 
 
         }

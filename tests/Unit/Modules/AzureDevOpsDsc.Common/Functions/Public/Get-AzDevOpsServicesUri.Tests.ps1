@@ -63,6 +63,13 @@ InModuleScope $script:subModuleName {
                     { Get-AzDevOpsServicesUri -OrganizationName $OrganizationName } | Should -Throw
 
                 }
+
+                It 'Should return URI in lowercase' {
+                    $OrganizationName = 'UPPERcasedORGANIZATIONname'
+
+                    $result = Get-AzDevOpsServicesUri -OrganizationName $OrganizationName
+                    $result | Should -BeExactly $(Get-AzDevOpsServicesUri -OrganizationName $OrganizationName).ToLower()
+                }
             }
         }
 
