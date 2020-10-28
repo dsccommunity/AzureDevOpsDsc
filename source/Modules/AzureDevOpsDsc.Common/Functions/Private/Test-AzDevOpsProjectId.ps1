@@ -41,7 +41,7 @@ function Test-AzDevOpsProjectId
         New-InvalidOperationException -Message $errorMessage
     }
 
-    if (!(Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid:$IsValid))
+    if (!(Test-AzDevOpsObjectId -ObjectId $ProjectId -IsValid:$IsValid))
     {
         return $false
     }
