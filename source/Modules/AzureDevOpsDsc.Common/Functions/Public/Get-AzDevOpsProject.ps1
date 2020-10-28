@@ -61,7 +61,7 @@ function Get-AzDevOpsProject
         [System.String]
         $Pat,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
         [Alias('Id')]
         [System.String]
