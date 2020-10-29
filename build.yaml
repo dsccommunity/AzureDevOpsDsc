@@ -3,12 +3,23 @@
 #          ModuleBuilder Configuration             #
 ####################################################
 CopyPaths:
-  - en-US
   - DSCClassResources
   - DSCResources
+  - en-US
+  - Examples
   - Modules
 Encoding: UTF8
 VersionedOutputDirectory: true
+
+####################################################
+#     Dependent Modules Configuration (Sampler)    #
+####################################################
+NestedModule:
+  DscResource.Common:
+    CopyOnly: true
+    Path: ./output/RequiredModules/DscResource.Common
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
 
 ####################################################
 #            Pipeline Configuration                #
