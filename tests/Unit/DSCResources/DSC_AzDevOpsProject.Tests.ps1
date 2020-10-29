@@ -20,7 +20,7 @@ function Invoke-TestSetup
     $script:testEnvironment = Initialize-TestEnvironment `
         -DSCModuleName $script:dscModuleName `
         -DSCResourceName $script:dscResourceName `
-        -ResourceType 'Mof' `
+        -ResourceType 'Class' `
         -TestType 'Unit'
 }
 
