@@ -1,59 +1,59 @@
-<#
-    .SYNOPSIS
-        Creates a 'Connection' (assocated with the Organization/ApiUrl) to be used with other functions/cmdlets in this PSModule.
+# <#
+#     .SYNOPSIS
+#         Creates a 'Connection' (assocated with the Organization/ApiUrl) to be used with other functions/cmdlets in this PSModule.
 
-    .PARAMETER ApiUri
-        The URI of the Azure DevOps API to be connected to. For example:
+#     .PARAMETER ApiUri
+#         The URI of the Azure DevOps API to be connected to. For example:
 
-          https://dev.azure.com/someOrganizationName/_apis/
+#           https://dev.azure.com/someOrganizationName/_apis/
 
-    .PARAMETER Pat
-        The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
-        against the Azure DevOps API. This PAT must have the relevant permissions assigned
-        for the subsequent operations being performed.
+#     .PARAMETER Pat
+#         The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
+#         against the Azure DevOps API. This PAT must have the relevant permissions assigned
+#         for the subsequent operations being performed.
 
-    .PARAMETER Credential
-        The 'Credential' to be used by any subsequent requests against the Azure DevOps API.
-        This credential must have the relevant permissions assigned for the subsequent operations
-        being performed.
+#     .PARAMETER Credential
+#         The 'Credential' to be used by any subsequent requests against the Azure DevOps API.
+#         This credential must have the relevant permissions assigned for the subsequent operations
+#         being performed.
 
-    .EXAMPLE
-        New-AzDevOpsConnection -ApiUri 'YourApiUriHere' -Pat 'YourPatHere'
+#     .EXAMPLE
+#         New-AzDevOpsConnection -ApiUri 'YourApiUriHere' -Pat 'YourPatHere'
 
-        Creates a 'Connection' (assocated with the Organization/ApiUrl and using a provided 'Personal Access Token' (PAT)) to be used with other functions/cmdlets in this PSModule.
+#         Creates a 'Connection' (assocated with the Organization/ApiUrl and using a provided 'Personal Access Token' (PAT)) to be used with other functions/cmdlets in this PSModule.
 
-    .EXAMPLE
-        New-AzDevOpsConnection -ApiUri 'YourApiUriHere' -Credential $YourCredentialHere
+#     .EXAMPLE
+#         New-AzDevOpsConnection -ApiUri 'YourApiUriHere' -Credential $YourCredentialHere
 
-        Creates a 'Connection' (assocated with the Organization/ApiUrl and using a provided 'PSCredential' object) to be used with other functions/cmdlets in this PSModule.
-#>
-function New-AzDevOpsConnection
-{
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
-    [OutputType([System.Object])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri,
+#         Creates a 'Connection' (assocated with the Organization/ApiUrl and using a provided 'PSCredential' object) to be used with other functions/cmdlets in this PSModule.
+# #>
+# function New-AzDevOpsConnection
+# {
+#     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+#     [OutputType([System.Object])]
+#     param
+#     (
+#         [Parameter(Mandatory = $true)]
+#         [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
+#         [Alias('Uri')]
+#         [System.String]
+#         $ApiUri,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'Pat')]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
+#         [Parameter(Mandatory = $true, ParameterSetName = 'Pat')]
+#         [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
+#         [Alias('PersonalAccessToken')]
+#         [System.String]
+#         $Pat,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'Credential')]
-        [ValidateScript({ Test-AzDevOpsCredential -Credential $_ -IsValid })]
-        [System.Management.Automation.PSCredential]
-        $Credential
-    )
+#         [Parameter(Mandatory = $true, ParameterSetName = 'Credential')]
+#         [ValidateScript({ Test-AzDevOpsCredential -Credential $_ -IsValid })]
+#         [System.Management.Automation.PSCredential]
+#         $Credential
+#     )
 
-    [System.Object]$connection = $null
+#     [System.Object]$connection = $null
 
-    # TODO!
+#     # TODO!
 
-    return $connection
-}
+#     return $connection
+# }
