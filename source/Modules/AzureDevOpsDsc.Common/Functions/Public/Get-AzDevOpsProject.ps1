@@ -63,22 +63,43 @@ function Get-AzDevOpsProject
 
         [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
-        [Alias('Id')]
+        [Alias('ObjectId','Id')]
         [System.String]
-        $ProjectId = '*',
+        $ProjectId,
 
         [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid })]
         [Alias('Name')]
         [System.String]
-        $ProjectName = '*'
+        $ProjectName
     )
 
-    [object[]]$apiObjects = Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat `
-                                                  -ObjectName 'Project' `
-                                                  -ObjectId $ProjectId
 
-    return $apiObjects |
-        Where-Object name -ilike $ProjectName |
-        Where-Object id -ilike $ProjectId
-  }
+    $azDevOpsApiObjectParameters = @{
+        ApiUri = $ApiUri;
+        Pat = $Pat;
+        ObjectName = 'Project'}
+
+
+    If(![string]::IsNullOrWhiteSpace($ProjectId)){
+        $azDevOpsApiObjectParameters.ObjectId = $ProjectId
+    }
+
+
+    [object[]]$apiObjects = Get-AzDevOpsApiObject @azDevOpsApiObjectParameters
+
+
+    If(![string]::IsNullOrWhiteSpace($ProjectId)){
+        $apiObjects = $apiObjects |
+            Where-Object id -ilike $ProjectId
+    }
+
+
+    If(![string]::IsNullOrWhiteSpace($ProjectName)){
+        $apiObjects = $apiObjects |
+            Where-Object name -ilike $ProjectName
+    }
+
+
+    return [object[]]$apiObjects
+}
