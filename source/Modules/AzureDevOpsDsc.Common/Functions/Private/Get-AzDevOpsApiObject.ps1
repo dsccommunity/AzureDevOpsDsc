@@ -53,12 +53,12 @@ function Get-AzDevOpsApiObject
         $Pat,
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet('Operation','Project')]
+        [ValidateScript({ Test-AzDevOpsApiObjectName -ObjectId $_ -IsValid })]
         [System.String]
         $ObjectName,
 
         [Parameter()]
-        [ValidateScript({ Test-AzDevOpsObjectId -ObjectId $_ -IsValid })]
+        [ValidateScript({ Test-AzDevOpsApiObjectId -ObjectId $_ -IsValid })]
         [System.String]
         $ObjectId
     )
