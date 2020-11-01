@@ -15,12 +15,12 @@
         Failure to use this switch will throw an exception.
 
     .EXAMPLE
-        Test-AzDevOpsObjectName -ObjectName 'YourObjectNameHere' -IsValid
+        Test-AzDevOpsApiObjectName -ObjectName 'YourObjectNameHere' -IsValid
 
         Returns $true if the 'ObjectName' provided is of a valid format.
         Returns $false if it is not.
 #>
-function Test-AzDevOpsObjectName
+function Test-AzDevOpsApiObjectName
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
