@@ -9,11 +9,11 @@ InModuleScope $script:subModuleName {
 
         $testCasesValidOrganizationNames = @(
             @{
-                OrganizationName = 'Organisation1' },
+                OrganizationName = 'Project1' },
             @{
-                OrganizationName = 'Organisation-2' },
+                OrganizationName = 'Project-2' },
             @{
-                OrganizationName = 'Organisation_3' }
+                OrganizationName = 'Project_3' }
         )
 
         $testCasesEmptyOrganizationNames = @(
@@ -86,11 +86,11 @@ InModuleScope $script:subModuleName {
 
             $testCasesValidOrganizationNames = @(
                 @{
-                    OrganizationName = 'Organisation1' },
+                    OrganizationName = 'Project1' },
                 @{
-                    OrganizationName = 'Organisation-2' },
+                    OrganizationName = 'Project-2' },
                 @{
-                    OrganizationName = 'Organisation_3' }
+                    OrganizationName = 'Project_3' }
             )
 
             Context 'When called without using "-IsValid" switch' {
