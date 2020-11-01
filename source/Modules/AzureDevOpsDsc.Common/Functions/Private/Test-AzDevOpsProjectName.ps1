@@ -41,5 +41,11 @@ function Test-AzDevOpsProjectName
         New-InvalidOperationException -Message $errorMessage
     }
 
+    if ([System.String]::IsNullOrWhiteSpace($ProjectName) -or
+        ($ProjectName.Contains('%')))
+    {
+        return $false
+    }
+
     return $true
 }
