@@ -64,7 +64,7 @@ function Get-AzDevOpsApiObject
     )
 
     # Remove any $ObjectId if using a wildcard character
-    # TODO: Might want to make this more generic (i.e. if !(Test-AzDevOpsObjectId $ObjectId -IsValid') then set to $null)
+    # TODO: Might want to make this more generic (i.e. if !(Test-AzDevOpsApiObjectId $ObjectId -IsValid') then set to $null)
     if ($ObjectId -contains '*')
     {
         $ObjectId = $null
