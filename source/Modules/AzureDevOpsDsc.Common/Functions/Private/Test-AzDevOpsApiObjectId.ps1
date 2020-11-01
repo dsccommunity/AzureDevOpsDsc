@@ -15,12 +15,12 @@
         Failure to use this switch will throw an exception.
 
     .EXAMPLE
-        Test-AzDevOpsObjectId -ObjectId 'YourObjectIdHere' -IsValid
+        Test-AzDevOpsApiObjectId -ObjectId 'YourObjectIdHere' -IsValid
 
         Returns $true if the 'ObjectId' provided is of a valid format.
         Returns $false if it is not.
 #>
-function Test-AzDevOpsObjectId
+function Test-AzDevOpsApiObjectId
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
