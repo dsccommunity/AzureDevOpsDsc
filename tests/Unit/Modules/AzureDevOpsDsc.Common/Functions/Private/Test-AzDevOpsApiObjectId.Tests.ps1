@@ -5,7 +5,7 @@
 
 InModuleScope $script:subModuleName {
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsObjectId' -Tag 'TestAzDevOpsObjectId' {
+    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiObjectId' -Tag 'TestAzDevOpsApiObjectId' {
 
         $testCasesValidObjectIds = @(
             @{
@@ -47,13 +47,13 @@ InModuleScope $script:subModuleName {
                     It 'Should not throw - "<ObjectId>"' -TestCases $testCasesValidObjectIds {
                         param ([string]$ObjectId)
 
-                        { Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid } | Should -Not -Throw
+                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid } | Should -Not -Throw
                     }
 
                     It 'Should return $true - "<ObjectId>"' -TestCases $testCasesValidObjectIds {
                         param ([string]$ObjectId)
 
-                        $result = Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid
+                        $result = Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid
                         $result | Should -Be $true
                     }
                 }
@@ -63,19 +63,19 @@ InModuleScope $script:subModuleName {
                     It 'Should throw - "<ObjectId>"' -TestCases $testCasesEmptyObjectIds {
                         param ([string]$ObjectId)
 
-                        { Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid } | Should -Throw
+                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid } | Should -Throw
                     }
 
                     It 'Should not throw - "<ObjectId>"' -TestCases $testCasesInvalidObjectIds {
                         param ([string]$ObjectId)
 
-                        { Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid } | Should -Not -Throw
+                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid } | Should -Not -Throw
                     }
 
                     It 'Should return $false - "<ObjectId>"' -TestCases $testCasesInvalidObjectIds {
                         param ([string]$ObjectId)
 
-                        $result = Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid
+                        $result = Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid
                         $result | Should -Be $false
                     }
                 }
@@ -95,7 +95,7 @@ InModuleScope $script:subModuleName {
                     It 'Should throw - "<ObjectId>"' -TestCases $testCasesValidObjectIds {
                         param ([string]$ObjectId)
 
-                        { Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
                     }
 
                 }
@@ -105,13 +105,13 @@ InModuleScope $script:subModuleName {
                     It 'Should throw - "<ObjectId>"' -TestCases $testCasesEmptyObjectIds {
                         param ([string]$ObjectId)
 
-                        { Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
                     }
 
                     It 'Should throw - "<ObjectId>"' -TestCases $testCasesInvalidObjectIds {
                         param ([string]$ObjectId)
 
-                        { Test-AzDevOpsObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
                     }
 
                 }
