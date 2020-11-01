@@ -93,7 +93,7 @@ InModuleScope $script:subModuleName {
                     param ([string]$ApiUri, [string]$Pat)
 
                     Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Scope Context
+                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
             }
@@ -118,7 +118,7 @@ InModuleScope $script:subModuleName {
                     param ([string]$ApiUri, [string]$Pat, [string]$OperationId)
 
                     Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $OperationId | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Scope Context
+                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
                 Context 'When a "Operation" with supplied "OperationId" parameter value does not exist' {

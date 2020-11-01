@@ -119,7 +119,7 @@ InModuleScope $script:subModuleName {
                     param ([string]$ApiUri, [string]$Pat)
 
                     Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Scope Context
+                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
             }
@@ -146,7 +146,7 @@ InModuleScope $script:subModuleName {
                         param ([string]$ApiUri, [string]$Pat, [string]$ProjectName)
 
                         Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat -ProjectName $ProjectName | Out-Null
-                        Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Scope Context
+                        Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                     }
                 }
 
@@ -181,7 +181,7 @@ InModuleScope $script:subModuleName {
                     param ([string]$ApiUri, [string]$Pat, [string]$ProjectId)
 
                     Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat -ProjectId $ProjectId | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Scope Context
+                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
                 Context 'When a "Project" with supplied "ProjectId" parameter value does not exist' {
