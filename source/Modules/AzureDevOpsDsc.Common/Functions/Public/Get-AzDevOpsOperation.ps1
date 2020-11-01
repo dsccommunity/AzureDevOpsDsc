@@ -38,17 +38,33 @@ function Get-AzDevOpsOperation
         [System.String]
         $Pat,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsOperationId -OperationId $_ -IsValid })]
         [Alias('Id')]
         [System.String]
         $OperationId
     )
 
-    [System.Object[]]$apiObjects = Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat `
-                                                         -ObjectName 'Operation' `
-                                                         -ObjectId $OperationId
 
-    return $apiObjects |
-        Where-Object id -ilike $OperationId
+    $azDevOpsApiObjectParameters = @{
+        ApiUri = $ApiUri;
+        Pat = $Pat;
+        ObjectName = 'Operation'}
+
+
+    If(![string]::IsNullOrWhiteSpace($OperationId)){
+        $azDevOpsApiObjectParameters.ObjectId = $OperationId
+    }
+
+
+    [System.Object[]]$apiObjects = Get-AzDevOpsApiObject @azDevOpsApiObjectParameters
+
+
+    If(![string]::IsNullOrWhiteSpace($OperationId)){
+        $apiObjects = $apiObjects |
+            Where-Object id -ilike $OperationId
+    }
+
+
+    return [object[]]$apiObjects
 }
