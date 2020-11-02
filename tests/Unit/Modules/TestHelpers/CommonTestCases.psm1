@@ -20,7 +20,7 @@ function Get-TestCaseValue
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','Pat',`
                      'ProjectName','OrganizationName',`
-                     'ObjectId')]
+                     'ObjectId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
 
@@ -203,6 +203,14 @@ function Get-TestCaseValue
     }
 
 
+    # OperationId (derived from ObjectId)
+    $testCaseValues.OperationId = $testCaseValues.ObjectId
+
+
+    # ProjectId (derived from ObjectId)
+    $testCaseValues.ProjectId = $testCaseValues.ObjectId
+
+
     return $testCaseValues[$ScopeName][$TestCaseName]
 
 }
@@ -228,7 +236,7 @@ function Get-TestCase
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','Pat',`
                      'ProjectName','OrganizationName',`
-                     'ObjectId')]
+                     'ObjectId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
 
@@ -247,4 +255,72 @@ function Get-TestCase
         return $testCase
     }
 
+}
+
+
+
+function Join-Hashtable
+{
+    [OutputType([hashtable[]])]
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [hashtable]
+        $htold,
+
+        [Parameter(Mandatory = $true)]
+        [hashtable]
+        $htnew
+    )
+
+    $keys = $htold.getenumerator() | foreach-object {$_.key}
+    $keys | foreach-object {
+        $key = $_
+        if ($htnew.containskey($key))
+        {
+            $htold.remove($key)
+        }
+    }
+    $htnew = $htold + $htnew
+    return $htnew
+}
+
+
+
+function CartesianProduct {
+    param(
+        [hashtable[][]]$HashtableArray
+    )
+
+    [hashtable[]]$previousOutputHashTableArray = @()
+
+    [int]$currentHashtableArrayNo = 0
+    [int]$noOfHashtableArrays = $HashtableArray.Count
+
+    while ($currentHashtableArrayNo -lt $noOfHashtableArrays)
+    {
+        [hashtable[]]$currentOutputHashTableArray = @()
+
+        if($currentHashtableArrayNo -gt 0)
+        {
+            $previousOutputHashTableArray | ForEach-Object {
+                $previousOutputHashTable = $_
+
+                $HashtableArray[$currentHashtableArrayNo] | ForEach-Object {
+                    $currentOutputHashTable = $_
+
+                    $currentOutputHashTableArray += Join-Hashtable -htold $previousOutputHashTable -htnew $currentOutputHashTable
+                }
+            }
+        }
+        else {
+            $currentOutputHashTableArray = $HashtableArray[$currentHashtableArrayNo]
+        }
+
+        $previousOutputHashTableArray = $currentOutputHashTableArray
+        $currentHashtableArrayNo++
+    }
+
+    $previousOutputHashTableArray
 }
