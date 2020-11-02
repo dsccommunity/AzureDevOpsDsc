@@ -1,5 +1,4 @@
 
-
 <#
     .SYNOPSIS
         Returns arrays of values to be used within test cases.
@@ -247,16 +246,17 @@ function Get-TestCase
     )
 
     $testCaseValues = Get-TestCaseValue -ScopeName $ScopeName -TestCaseName $TestCaseName
+    [hashtable[]]$testCases = @()
 
     $testCaseValues | ForEach-Object {
 
         [hashtable]$testCase = @{}
         $testCase[$ScopeName] = $_
-        return $testCase
+        $testCases += $testCase
     }
 
+    return $testCases
 }
-
 
 
 function Join-Hashtable
@@ -267,31 +267,38 @@ function Join-Hashtable
     (
         [Parameter(Mandatory = $true)]
         [hashtable]
-        $htold,
+        $Hashtable1,
 
         [Parameter(Mandatory = $true)]
         [hashtable]
-        $htnew
+        $Hashtable2
     )
 
-    $keys = $htold.getenumerator() | foreach-object {$_.key}
+    $keys = $Hashtable1.getenumerator() | foreach-object {$_.key}
     $keys | foreach-object {
         $key = $_
-        if ($htnew.containskey($key))
+        if ($Hashtable2.containskey($key))
         {
-            $htold.remove($key)
+            $Hashtable1.remove($key)
         }
     }
-    $htnew = $htold + $htnew
-    return $htnew
+    $Hashtable2 = $Hashtable1 + $Hashtable2
+    return $Hashtable2
 }
 
 
 
-function CartesianProduct {
-    param(
-        [hashtable[][]]$HashtableArray
+function Join-HashtableArray
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [hashtable[][]]
+        $HashtableArray
     )
+    #Write-Verbose "$($HashtableArray[0].Count) in HashtableArray0"
+    #Write-Verbose "$($HashtableArray[1].Count) in HashtableArray1"
 
     [hashtable[]]$previousOutputHashTableArray = @()
 
@@ -300,17 +307,23 @@ function CartesianProduct {
 
     while ($currentHashtableArrayNo -lt $noOfHashtableArrays)
     {
+        #Write-Verbose $currentHashtableArrayNo
         [hashtable[]]$currentOutputHashTableArray = @()
 
         if($currentHashtableArrayNo -gt 0)
         {
+            #Write-Verbose "$($previousOutputHashTableArray.Count) in previousOutputHashTableArray"
+
             $previousOutputHashTableArray | ForEach-Object {
                 $previousOutputHashTable = $_
+                #Write-Verbose $previousOutputHashTable.ObjectId
 
                 $HashtableArray[$currentHashtableArrayNo] | ForEach-Object {
                     $currentOutputHashTable = $_
+                    #Write-Verbose $currentOutputHashTable.Pat
 
-                    $currentOutputHashTableArray += Join-Hashtable -htold $previousOutputHashTable -htnew $currentOutputHashTable
+                    $currentOutputHashTableArray += Join-Hashtable -Hashtable1 $previousOutputHashTable -Hashtable2 $currentOutputHashTable
+                    #Write-Verbose "$($currentOutputHashTableArray.Count) objects"
                 }
             }
         }
@@ -319,8 +332,37 @@ function CartesianProduct {
         }
 
         $previousOutputHashTableArray = $currentOutputHashTableArray
-        $currentHashtableArrayNo++
+        $currentHashtableArrayNo = $currentHashtableArrayNo + 1
     }
 
     $previousOutputHashTableArray
+}
+
+
+function Join-TestCaseArray
+{
+    [CmdletBinding()]
+    [OutputType([hashtable[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [hashtable[][]]
+        [Alias('TestCases')]
+        $TestCaseArray,
+
+        [Parameter()]
+        [switch]
+        $Expand
+    )
+
+
+    if (!$Expand)
+    {
+        throw 'Must use "-Expand" switch in "Join-TestCaseArray"'
+    }
+    else
+    {
+        Join-HashtableArray -HashtableArray $TestCaseArray
+    }
+
 }
