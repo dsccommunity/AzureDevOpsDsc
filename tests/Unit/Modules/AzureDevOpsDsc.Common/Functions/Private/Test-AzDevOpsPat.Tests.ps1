@@ -7,32 +7,9 @@ InModuleScope $script:subModuleName {
 
     Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsPat' -Tag 'TestAzDevOpsPat' {
 
-        $testCasesValidPats = @(
-            @{
-                Pat = '1234567890123456789012345678901234567890123456789012' },
-            @{
-                Pat = '0987654321098765432109876543210987654321098765432109' },
-            @{
-                Pat = '0913uhuh3wedwndfwsni2242msfwneu254uhufs009oosfmikm34' }
-        )
-
-        $testCasesEmptyPats = @(
-            @{
-                Pat = $null },
-            @{
-                Pat = '' }
-        )
-
-        $testCasesInvalidPats = @(
-            @{
-                Pat = ' ' },
-            @{
-                Pat = 'a 1' },
-            @{
-                Pat = '0913uhuh3wedwnd4wsni2242msfwn4u254uhufs009oosfmikm3' },
-            @{
-                Pat = '0913uhuh3wedwnd4wsni2242msfwn4u254uhufs009oosfmikm34x' }
-        )
+        $testCasesValidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Valid'
+        $testCasesEmptyPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Empty'
+        $testCasesInvalidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Invalid'
 
         Context 'When called with valid parameters' {
             BeforeAll {
