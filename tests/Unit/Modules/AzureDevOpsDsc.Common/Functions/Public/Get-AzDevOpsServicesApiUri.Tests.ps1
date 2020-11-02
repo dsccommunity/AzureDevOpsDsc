@@ -12,14 +12,7 @@ InModuleScope $script:subModuleName {
 
             Context 'When called with valid "Organisation" parameter' {
 
-                $testCasesValidOrganizationNames = @(
-                    @{
-                        OrganizationName = 'Organisation1' },
-                    @{
-                        OrganizationName = 'Organisation-2' },
-                    @{
-                        OrganizationName = 'Organisation_3' }
-                )
+                $testCasesValidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Valid'
 
                 It 'Should not throw - "<OrganizationName>"' -TestCases $testCasesValidOrganizationNames {
                     param ([string]$OrganizationName)
@@ -60,18 +53,7 @@ InModuleScope $script:subModuleName {
 
             Context 'When called with invalid "OrganizationName" parameter' {
 
-                $testCasesInvalidOrganizationNames = @(
-                    @{
-                        OrganizationName = $null },
-                    @{
-                        OrganizationName = '' },
-                    @{
-                        OrganizationName = ' ' },
-                    @{
-                        OrganizationName = '%' },
-                    @{
-                        OrganizationName = 'Organization 0' }
-                )
+                $testCasesInvalidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Invalid'
 
                 It "Should throw - '<OrganizationName>'" -TestCases $testCasesInvalidOrganizationNames {
                     param ([string]$OrganizationName)
