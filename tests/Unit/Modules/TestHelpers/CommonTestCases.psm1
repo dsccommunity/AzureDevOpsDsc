@@ -52,15 +52,15 @@ function Get-TestCaseValue
             [string]::Empty
         )
 
+        Whitespace = @( # NOTE: $testCaseValues.String.Empty
+            ' ',
+            '  '
+        )
+
         Null = @(
             $null
         )
     }
-
-    $testCaseValues.String.Whitespace = $testCaseValues.String.Empty + @(
-        ' ',
-        '  '
-    )
 
     $testCaseValues.String.NullOrWhitespace = $testCaseValues.String.Null + $testCaseValues.String.Whitespace
 
