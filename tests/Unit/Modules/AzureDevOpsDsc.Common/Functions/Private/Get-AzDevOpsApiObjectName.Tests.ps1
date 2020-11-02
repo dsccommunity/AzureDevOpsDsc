@@ -12,12 +12,7 @@ InModuleScope $script:subModuleName {
 
             BeforeAll {
 
-                $testCasesValidObjectName = @(
-                    @{
-                        ObjectName = 'Operation'},
-                    @{
-                        ObjectName = 'Project'}
-                )
+                $testCasesValidObjectName = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Valid'
             }
 
             It 'Should not throw' {
