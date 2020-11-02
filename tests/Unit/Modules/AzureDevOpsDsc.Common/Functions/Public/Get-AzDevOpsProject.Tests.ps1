@@ -10,94 +10,30 @@ InModuleScope $script:subModuleName {
         Context 'When called with valid parameters' {
             BeforeAll {
                 Mock -ModuleName $script:subModuleName Get-AzDevOpsApiObject {
-                    return @(
+
+                    $mockProjectIds = Get-TestCase -ScopeName 'ProjectId' -TestCaseName 'Valid'
+                    $mockProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Valid'
+                    $mockProjects = Join-TestCaseArray -Expand -TestCases $mockProjectIds, $mockProjectNames
+
+                    return $mockProjects | ForEach-Object {
                         @{
-                            id='8d4bff8d-6169-45cf-b085-fe12ad67e76b';
-                            name='Mock Project Name 1'; },
-                        @{
-                            id='485ab935-7de3-4894-ba6f-ed418d4eda92';
-                            name='Mock Project Name 2'; }
-                    )
-                }
-            }
-
-
-            $testCasesValidApiUris = @(
-                @{
-                    ApiUri = 'http://someuri.api/_apis/' },
-                @{
-                    ApiUri = 'https://someuri.api/_apis/' }
-            )
-
-            $testCasesValidPats = @(
-                @{
-                    Pat = '1234567890123456789012345678901234567890123456789012' },
-                @{
-                    Pat = '0987654321098765432109876543210987654321098765432109' },
-                @{
-                    Pat = '0913uhuh3wedwndfwsni2242msfwneu254uhufs009oosfmikm34' }
-            )
-
-            $testCasesValidApiUriPatCombined = $testCasesValidApiUris | ForEach-Object {
-
-                $apiUri = $_.ApiUri
-                $testCasesValidPats | ForEach-Object {
-
-                    $pat = $_.Pat
-                    return @{
-                        ApiUri = $apiUri
-                        Pat = $pat
+                            id = $_.ProjectId
+                            name = $_.ProjectName
+                        }
                     }
                 }
-
             }
 
 
-            $testCasesValidProjectNames = @( # Note: Same as mock for 'Get-AzDevOpsApiObject'
-                @{
-                    ProjectName = 'Mock Project Name 1' },
-                @{
-                    ProjectName = 'Mock Project Name 2' }
-            )
+            $testCasesValidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Valid'
+            $testCasesValidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Valid'
+            $testCasesValidApiUriPatCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUris, $testCasesValidPats
 
-            $testCasesValidProjectIds = @( # Note: Same as mock for 'Get-AzDevOpsApiObject'
-                @{
-                    ProjectId = '8d4bff8d-6169-45cf-b085-fe12ad67e76b' },
-                @{
-                    ProjectId = '485ab935-7de3-4894-ba6f-ed418d4eda92' }
-            )
+            $testCasesValidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Valid'
+            $testCasesValidApiUriPatProjectNameCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatCombined, $testCasesValidProjectNames
 
-            $testCasesValidApiUriPatProjectNameCombined = $testCasesValidApiUriPatCombined | ForEach-Object {
-
-                $apiUri = $_.ApiUri
-                $pat = $_.Pat
-                $testCasesValidProjectNames | ForEach-Object {
-
-                    $projectName = $_.ProjectName
-                    return @{
-                        ApiUri = $apiUri
-                        Pat = $pat
-                        ProjectName = $projectName
-                    }
-                }
-
-            }
-
-            $testCasesValidApiUriPatProjectIdCombined = $testCasesValidApiUriPatCombined | ForEach-Object {
-
-                $apiUri = $_.ApiUri
-                $pat = $_.Pat
-                $testCasesValidProjectIds | ForEach-Object {
-
-                    $projectId = $_.ProjectId
-                    return @{
-                        ApiUri = $apiUri
-                        Pat = $pat
-                        ProjectId = $projectId
-                    }
-                }
-
-            }
+            $testCasesValidProjectIds = Get-TestCase -ScopeName 'ProjectId' -TestCaseName 'Valid'
+            $testCasesValidApiUriPatProjectIdCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatCombined, $testCasesValidProjectIds
 
 
             Context 'When called with no "ProjectId" parameter and no "ProjectName" parameter' {
@@ -206,27 +142,8 @@ InModuleScope $script:subModuleName {
 
             Context 'When called with invalid "Pat" parameter' {
 
-                $testCasesEmptyPats = @(
-                    @{
-                        ApiUri = $null },
-                    @{
-                        ApiUri = '' }
-                )
-
-                $testCasesInvalidPats = @(
-                    @{
-                        Pat = $null },
-                    @{
-                        Pat = '' }
-                    @{
-                        Pat = ' ' },
-                    @{
-                        Pat = 'a 1' },
-                    @{
-                        Pat = '0913uhuh3wedwnd4wsni2242msfwn4u254uhufs009oosfmikm3' },
-                    @{
-                        Pat = '0913uhuh3wedwnd4wsni2242msfwn4u254uhufs009oosfmikm34x' }
-                )
+                $testCasesEmptyPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Empty'
+                $testCasesInvalidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Invalid'
 
                 Context 'When called without "ApiUri" parameter' {
                     It "Should throw - '<Pat>'" -TestCases $testCasesInvalidPats {
@@ -260,43 +177,8 @@ InModuleScope $script:subModuleName {
 
             Context 'When called with invalid "ApiUri" parameter' {
 
-                $testCasesEmptyApiUris = @(
-                    @{
-                        ApiUri = $null },
-                    @{
-                        ApiUri = '' }
-                )
-
-                $testCasesInvalidApiUris = @(
-                    @{
-                        ApiUri = ' ' },
-                    @{
-                        ApiUri = 'a 1' },
-
-                    # Incorrect prefixes
-                    @{
-                        ApiUri = 'ftp://someuri.api/_apis/' },
-                    @{
-                        ApiUri = 'someuri.api/_apis/' },
-
-                    # Missing trailing '/' (after http(s))
-                    @{
-                        ApiUri = 'http:/someuri.api/_apis/' },
-                    @{
-                        ApiUri = 'https:/someuri.api/_apis/' },
-
-                    # Missing trailing '/'
-                    @{
-                        ApiUri = 'http://someuri.api/_apis' },
-                    @{
-                        ApiUri = 'https://someuri.api/_apis' },
-
-                    # Missing trailing '/_apis/'
-                    @{
-                        ApiUri = 'http://someuri.api/' },
-                    @{
-                        ApiUri = 'https://someuri.api/' }
-                )
+                $testCasesEmptyApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Empty'
+                $testCasesInvalidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Invalid'
 
                 Context 'When called without "Pat" parameter' {
                     It "Should throw - '<ApiUri>'" -TestCases $testCasesInvalidApiUris {
