@@ -4,6 +4,7 @@
 #>
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestCases.psm1')
 
 if (-not (Test-BuildCategory -Type 'Unit'))
 {
