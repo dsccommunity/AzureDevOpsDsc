@@ -7,30 +7,9 @@ InModuleScope $script:subModuleName {
 
     Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsOrganizationName' -Tag 'TestAzDevOpsOrganizationName' {
 
-        $testCasesValidOrganizationNames = @(
-            @{
-                OrganizationName = 'Project1' },
-            @{
-                OrganizationName = 'Project-2' },
-            @{
-                OrganizationName = 'Project_3' }
-        )
-
-        $testCasesEmptyOrganizationNames = @(
-            @{
-                OrganizationName = $null },
-            @{
-                OrganizationName = '' }
-        )
-
-        $testCasesInvalidOrganizationNames = @(
-            @{
-                OrganizationName = ' ' },
-            @{
-                OrganizationName = '%' },
-            @{
-                OrganizationName = 'Organization 0' }
-        )
+        $testCasesValidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Valid'
+        $testCasesEmptyOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Empty'
+        $testCasesInvalidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Invalid'
 
         Context 'When called with valid parameters' {
             BeforeAll {
@@ -84,14 +63,7 @@ InModuleScope $script:subModuleName {
             BeforeAll {
             }
 
-            $testCasesValidOrganizationNames = @(
-                @{
-                    OrganizationName = 'Project1' },
-                @{
-                    OrganizationName = 'Project-2' },
-                @{
-                    OrganizationName = 'Project_3' }
-            )
+            $testCasesValidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Valid'
 
             Context 'When called without using "-IsValid" switch' {
 
