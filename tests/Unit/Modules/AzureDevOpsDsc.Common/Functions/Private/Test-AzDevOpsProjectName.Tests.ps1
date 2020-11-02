@@ -7,30 +7,9 @@ InModuleScope $script:subModuleName {
 
     Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsProjectName' -Tag 'TestAzDevOpsProjectName' {
 
-        $testCasesValidProjectNames = @(
-            @{
-                ProjectName = 'Project 0' },
-            @{
-                ProjectName = 'Project1' },
-            @{
-                ProjectName = 'Project-2' },
-            @{
-                ProjectName = 'Project_3' }
-        )
-
-        $testCasesEmptyProjectNames = @(
-            @{
-                ProjectName = $null },
-            @{
-                ProjectName = '' }
-        )
-
-        $testCasesInvalidProjectNames = @(
-            @{
-                ProjectName = ' ' },
-            @{
-                ProjectName = '%' }
-        )
+        $testCasesValidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Valid'
+        $testCasesEmptyProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Empty'
+        $testCasesInvalidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Invalid'
 
         Context 'When called with valid parameters' {
             BeforeAll {
@@ -84,14 +63,7 @@ InModuleScope $script:subModuleName {
             BeforeAll {
             }
 
-            $testCasesValidProjectNames = @(
-                @{
-                    ProjectName = 'Project1' },
-                @{
-                    ProjectName = 'Project-2' },
-                @{
-                    ProjectName = 'Project_3' }
-            )
+            $testCasesValidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Valid'
 
             Context 'When called without using "-IsValid" switch' {
 

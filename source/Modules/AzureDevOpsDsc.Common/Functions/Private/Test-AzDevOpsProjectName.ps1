@@ -42,7 +42,7 @@ function Test-AzDevOpsProjectName
     }
 
     if ([System.String]::IsNullOrWhiteSpace($ProjectName) -or
-        ($ProjectName.Contains('%')))
+        ($ProjectName.Contains('%') -or $ProjectName.Contains('*') -or $ProjectName.StartsWith(' ') -or $ProjectName.EndsWith(' ')))
     {
         return $false
     }
