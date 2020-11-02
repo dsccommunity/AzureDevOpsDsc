@@ -7,34 +7,9 @@ InModuleScope $script:subModuleName {
 
     Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsOperationId' -Tag 'TestAzDevOpsOperationId' {
 
-        $testCasesValidOperationIds = @(
-            @{
-                OperationId = 'd59709e7-6fdf-40c6-88fa-ac5dc10bbfc3' },
-            @{
-                OperationId = '74cd62c6-54b0-4f5f-986f-b4eea2c4c1d0' },
-            @{
-                OperationId = '4fe84ba8-d9f9-4880-ad5e-e18c99a1b2b4' }
-        )
-
-        $testCasesEmptyOperationIds = @(
-            @{
-                OperationId = $null },
-            @{
-                OperationId = '' }
-        )
-
-        $testCasesInvalidOperationIds = @(
-            @{
-                OperationId = ' ' },
-            @{
-                OperationId = 'a 1' },
-            @{
-                OperationId = 'd59709e7-6fdf-40c6-88fa-ac5dc10bbfc' },
-            @{
-                OperationId = '74cd62c6-54b0-4f5f-986f-b4eea2c4c1d0a' }
-            @{
-                OperationId = '74cd62c6554b014f5fa986fcb4eea2c4c1d0' }
-        )
+        $testCasesValidOperationIds = Get-TestCase -ScopeName 'OperationId' -TestCaseName 'Valid'
+        $testCasesEmptyOperationIds = Get-TestCase -ScopeName 'OperationId' -TestCaseName 'Empty'
+        $testCasesInvalidOperationIds = Get-TestCase -ScopeName 'OperationId' -TestCaseName 'Invalid'
 
         Context 'When called with valid parameters' {
             BeforeAll {
