@@ -7,34 +7,9 @@ InModuleScope $script:subModuleName {
 
     Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsProjectId' -Tag 'TestAzDevOpsProjectId' {
 
-        $testCasesValidProjectIds = @(
-            @{
-                ProjectId = 'd59709e7-6fdf-40c6-88fa-ac5dc10bbfc3' },
-            @{
-                ProjectId = '74cd62c6-54b0-4f5f-986f-b4eea2c4c1d0' },
-            @{
-                ProjectId = '4fe84ba8-d9f9-4880-ad5e-e18c99a1b2b4' }
-        )
-
-        $testCasesEmptyProjectIds = @(
-            @{
-                ProjectId = $null },
-            @{
-                ProjectId = '' }
-        )
-
-        $testCasesInvalidProjectIds = @(
-            @{
-                ProjectId = ' ' },
-            @{
-                ProjectId = 'a 1' },
-            @{
-                ProjectId = 'd59709e7-6fdf-40c6-88fa-ac5dc10bbfc' },
-            @{
-                ProjectId = '74cd62c6-54b0-4f5f-986f-b4eea2c4c1d0a' }
-            @{
-                ProjectId = '74cd62c6554b014f5fa986fcb4eea2c4c1d0' }
-        )
+        $testCasesValidProjectIds = Get-TestCase -ScopeName 'ProjectId' -TestCaseName 'Valid'
+        $testCasesEmptyProjectIds = Get-TestCase -ScopeName 'ProjectId' -TestCaseName 'Empty'
+        $testCasesInvalidProjectIds = Get-TestCase -ScopeName 'ProjectId' -TestCaseName 'Invalid'
 
         Context 'When called with valid parameters' {
             BeforeAll {
