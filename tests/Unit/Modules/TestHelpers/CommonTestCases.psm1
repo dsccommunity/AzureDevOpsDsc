@@ -259,10 +259,30 @@ function Get-TestCase
 }
 
 
+<#
+    .SYNOPSIS
+        Combines/joins 2, input hashtables into 1 output hashtable.
+
+        All keys and their values across both input hashtables are maintained with the
+        exception of keys present in both hashtables. In this instance 'Hashtable2' key
+        values are maintained for duplicated keys.
+
+    .PARAMETER Hashtable1
+        A hash table to be joined with another provided in the 'Hashtable2' parameter.
+
+        This hashtables keys values are overidden by the values from 'Hashtable2' if
+        there are keys present in both 'Hashtable1' and 'Hashtable2'.
+
+    .PARAMETER Hashtable2
+        A hash table to be joined with another provided in the 'Hashtable1' parameter
+
+        This hashtables keys values are maintained/kept over the values from 'Hashtable1'
+        if there are keys present in both 'Hashtable1' and 'Hashtable2'.
+#>
 function Join-Hashtable
 {
-    [OutputType([hashtable[]])]
     [CmdletBinding()]
+    [OutputType([hashtable[]])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -288,57 +308,92 @@ function Join-Hashtable
 
 
 
+<#
+    .SYNOPSIS
+        Combines/joins multiple, hashtable arrays into a single, output hashtable array.
+
+    .PARAMETER HashtableArray
+        Contains an array of hashtable arrays to be joined into a single hashtable array.
+
+    .PARAMETER Expand
+        When this switch is used, a 'Cartesean Product' of input hashtables (within each
+        hashtable array, within the array of hashtable arrays provided in the 'HashtableArray'
+        parameter).
+
+        The output from this function will contain every combination of hashtable for every
+        other hashtable in each of the provided hashtable arrays.
+#>
 function Join-HashtableArray
 {
     [CmdletBinding()]
+    [OutputType([hashtable[]])]
     param
     (
         [Parameter(Mandatory = $true)]
         [hashtable[][]]
-        $HashtableArray
+        $HashtableArray,
+
+        [Parameter()]
+        [switch]
+        $Expand
     )
-    #Write-Verbose "$($HashtableArray[0].Count) in HashtableArray0"
-    #Write-Verbose "$($HashtableArray[1].Count) in HashtableArray1"
 
-    [hashtable[]]$previousOutputHashTableArray = @()
-
-    [int]$currentHashtableArrayNo = 0
-    [int]$noOfHashtableArrays = $HashtableArray.Count
-
-    while ($currentHashtableArrayNo -lt $noOfHashtableArrays)
+    if (!$Expand)
     {
-        #Write-Verbose $currentHashtableArrayNo
-        [hashtable[]]$currentOutputHashTableArray = @()
+        throw 'Must use "-Expand" switch in "Join-HashtableArray" function (within "CommonTestCases.psm1")'
+    }
+    else
+    {
 
-        if($currentHashtableArrayNo -gt 0)
+        [hashtable[]]$previousOutputHashTableArray = @()
+
+        [int]$currentHashtableArrayNo = 0
+        [int]$noOfHashtableArrays = $HashtableArray.Count
+
+        while ($currentHashtableArrayNo -lt $noOfHashtableArrays)
         {
-            #Write-Verbose "$($previousOutputHashTableArray.Count) in previousOutputHashTableArray"
+            [hashtable[]]$currentOutputHashTableArray = @()
 
-            $previousOutputHashTableArray | ForEach-Object {
-                $previousOutputHashTable = $_
-                #Write-Verbose $previousOutputHashTable.ObjectId
+            if ($currentHashtableArrayNo -gt 0)
+            {
+                $previousOutputHashTableArray | ForEach-Object {
+                    $previousOutputHashTable = $_
 
-                $HashtableArray[$currentHashtableArrayNo] | ForEach-Object {
-                    $currentOutputHashTable = $_
-                    #Write-Verbose $currentOutputHashTable.Pat
+                    $HashtableArray[$currentHashtableArrayNo] | ForEach-Object {
+                        $currentOutputHashTable = $_
 
-                    $currentOutputHashTableArray += Join-Hashtable -Hashtable1 $previousOutputHashTable -Hashtable2 $currentOutputHashTable
-                    #Write-Verbose "$($currentOutputHashTableArray.Count) objects"
+                        $currentOutputHashTableArray += Join-Hashtable -Hashtable1 $previousOutputHashTable -Hashtable2 $currentOutputHashTable
+                    }
                 }
             }
-        }
-        else {
-            $currentOutputHashTableArray = $HashtableArray[$currentHashtableArrayNo]
+            else {
+                $currentOutputHashTableArray = $HashtableArray[$currentHashtableArrayNo]
+            }
+
+            $previousOutputHashTableArray = $currentOutputHashTableArray
+            $currentHashtableArrayNo++
         }
 
-        $previousOutputHashTableArray = $currentOutputHashTableArray
-        $currentHashtableArrayNo = $currentHashtableArrayNo + 1
+        return $previousOutputHashTableArray
     }
-
-    $previousOutputHashTableArray
 }
 
 
+<#
+    .SYNOPSIS
+        Combines/joins multiple, TestCase arrays into a single, output TestCase array.
+
+    .PARAMETER TestCaseArray
+        Contains an array of TestCase arrays to be joined into a single TestCase array.
+
+    .PARAMETER Expand
+        When this switch is used, a 'Cartesean Product' of input hashtables (within each
+        hashtable array, within the array of hashtable arrays provided in the 'HashtableArray'
+        parameter).
+
+        The output from this function will contain every combination of hashtable for every
+        other hashtable in each of the provided hashtable arrays.
+#>
 function Join-TestCaseArray
 {
     [CmdletBinding()]
@@ -358,11 +413,11 @@ function Join-TestCaseArray
 
     if (!$Expand)
     {
-        throw 'Must use "-Expand" switch in "Join-TestCaseArray"'
+        throw 'Must use "-Expand" switch in "Join-TestCaseArray" function (within "CommonTestCases.psm1")'
     }
     else
     {
-        Join-HashtableArray -HashtableArray $TestCaseArray
+        Join-HashtableArray -HashtableArray $TestCaseArray -Expand:$Expand
     }
 
 }
