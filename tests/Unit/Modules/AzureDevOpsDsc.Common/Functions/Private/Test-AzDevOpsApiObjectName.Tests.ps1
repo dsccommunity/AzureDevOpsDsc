@@ -7,30 +7,9 @@ InModuleScope $script:subModuleName {
 
     Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiObjectName' -Tag 'TestAzDevOpsApiObjectName' {
 
-        $testCasesValidObjectNames = @(
-            @{
-                ObjectName = 'Operation' },
-            @{
-                ObjectName = 'Project' }
-        )
-
-        $testCasesEmptyObjectNames = @(
-            @{
-                ObjectName = $null },
-            @{
-                ObjectName = '' }
-        )
-
-        $testCasesInvalidObjectNames = @(
-            @{
-                ObjectName = ' ' },
-            @{
-                ObjectName = 'a 1' },
-            @{
-                ObjectName = 'NonObject' },
-            @{
-                ObjectName = 'SomeOtherInvalidObject' }
-        )
+        $testCasesValidObjectNames = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Valid'
+        $testCasesEmptyObjectNames = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Empty'
+        $testCasesInvalidObjectNames = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Invalid'
 
         Context 'When validating, valid "ObjectName" test cases' {
 

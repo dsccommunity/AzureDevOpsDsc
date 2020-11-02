@@ -18,7 +18,7 @@ function Get-TestCaseValue
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','Pat',`
-                     'ProjectName','OrganizationName',`
+                     'ObjectName','ProjectName','OrganizationName',`
                      'ObjectId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
@@ -180,6 +180,29 @@ function Get-TestCaseValue
     }
 
 
+    # ObjectName
+    $testCaseValues.ObjectName = @{
+
+        Valid = @(
+            'Operation',
+            'Project'
+        )
+
+        Invalid = @(
+            'NonObject',
+            'SomeOtherInvalidObject',
+            'Some Object',                 # Contains space
+            ' Some Object',                # Leading space
+            'Some Object '                 # Trailing space
+        )
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
     # ObjectId
     $testCaseValues.ObjectId = @{
 
@@ -234,7 +257,7 @@ function Get-TestCase
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','Pat',`
-                     'ProjectName','OrganizationName',`
+                     'ObjectName','ProjectName','OrganizationName',`
                      'ObjectId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,

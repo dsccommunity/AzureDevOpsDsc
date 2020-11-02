@@ -7,50 +7,9 @@ InModuleScope $script:subModuleName {
 
     Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiUri' -Tag 'TestAzDevOpsApiUri' {
 
-        $testCasesValidApiUris = @(
-            @{
-                ApiUri = 'http://someuri.api/_apis/' },
-            @{
-                ApiUri = 'https://someuri.api/_apis/' }
-        )
-
-        $testCasesEmptyApiUris = @(
-            @{
-                ApiUri = $null },
-            @{
-                ApiUri = '' }
-        )
-
-        $testCasesInvalidApiUris = @(
-            @{
-                ApiUri = ' ' },
-            @{
-                ApiUri = 'a 1' },
-
-            # Incorrect prefixes
-            @{
-                ApiUri = 'ftp://someuri.api/_apis/' },
-            @{
-                ApiUri = 'someuri.api/_apis/' },
-
-            # Missing trailing '/' (after http(s))
-            @{
-                ApiUri = 'http:/someuri.api/_apis/' },
-            @{
-                ApiUri = 'https:/someuri.api/_apis/' },
-
-            # Missing trailing '/'
-            @{
-                ApiUri = 'http://someuri.api/_apis' },
-            @{
-                ApiUri = 'https://someuri.api/_apis' },
-
-            # Missing trailing '/_apis/'
-            @{
-                ApiUri = 'http://someuri.api/' },
-            @{
-                ApiUri = 'https://someuri.api/' }
-        )
+        $testCasesValidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Valid'
+        $testCasesEmptyApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Empty'
+        $testCasesInvalidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Invalid'
 
         Context 'When called with valid parameters' {
             BeforeAll {
