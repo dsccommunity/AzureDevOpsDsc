@@ -42,7 +42,7 @@ function Test-AzDevOpsOrganizationName
     }
 
     if ([System.String]::IsNullOrWhiteSpace($OrganizationName) -or
-        ($OrganizationName.Contains(' ') -or $OrganizationName.Contains('%')))
+        ($OrganizationName.Contains(' ') -or $OrganizationName.Contains('%') -or $OrganizationName.Contains('*') -or $OrganizationName.StartsWith(' ') -or $OrganizationName.EndsWith(' ')))
     {
         return $false
     }
