@@ -8,8 +8,26 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 # Obtain all functions within PSModule
 $functionSubDirectoryPaths = @(
-    "$PSScriptRoot\Functions\Public"
-    "$PSScriptRoot\Functions\Private"
+
+    # Api
+    "$PSScriptRoot\Api\Functions\Public",
+    "$PSScriptRoot\Api\Functions\Private",
+
+    # Connection
+    "$PSScriptRoot\Connection\Functions\Public",
+    "$PSScriptRoot\Connection\Functions\Private",
+
+    # Objects
+    "$PSScriptRoot\Objects\Functions\Public",
+    "$PSScriptRoot\Objects\Functions\Private",
+
+    # Server
+    "$PSScriptRoot\Server\Functions\Public",
+    "$PSScriptRoot\Server\Functions\Private",
+
+    # Services
+    "$PSScriptRoot\Services\Functions\Public",
+    "$PSScriptRoot\Services\Functions\Private"
 )
 $functions = Get-ChildItem -Path $functionSubDirectoryPaths -Recurse -Include "*.ps1"
 
@@ -24,7 +42,7 @@ ForEach ($function in $functions)
         )
     )
 
-    if ($function.FullName -ilike "$PSScriptRoot\Functions\Public\*")
+    if ($function.FullName -ilike "$PSScriptRoot\*\Functions\Public\*")
     {
         Write-Verbose "Exporting '$($function.BaseName)'..."
         Export-ModuleMember -Function $($function.BaseName)
