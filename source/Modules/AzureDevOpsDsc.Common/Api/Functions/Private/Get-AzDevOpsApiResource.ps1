@@ -71,34 +71,21 @@ function Get-AzDevOpsApiResource
         $ResourceId
     )
 
-    # Remove any $ResourceId if using a wildcard character
-    # TODO: Might want to make this more generic (i.e. if !(Test-AzDevOpsApiResourceId $ResourceId -IsValid') then set to $null)
-    if ($ResourceId -contains '*')
-    {
-        $ResourceId = $null
+
+    $apiResourceUriParameters = @{
+        ApiUri = $ApiUri
+        ApiVersion = $ApiVersion
+        ResourceName = $ResourceName
     }
-
-    # TODO: Need something to pluralise and lowercase this resource for the URI
-    $resourceNamePluralUriString = $ResourceName.ToLower() + "s"
-
-    # TODO: Need to get this from input parameter?
-    $apiVersionUriParameter = "api-version=$ApiVersion"
-
-    # TODO: Need to generate this from a function
-    $apiResourceUri = $ApiUri + "/$resourceNamePluralUriString"
-    if (![System.String]::IsNullOrWhiteSpace($ResourceId))
-    {
-        $apiResourceUri = $apiResourceUri + "/$ResourceId"
-    }
-    $apiResourceUri = $apiResourceUri + '?' + $apiVersionUriParameter
-
+    [string]$apiResourceUri = Get-AzDevOpsApiResourceUri @apiResourceUriParameters
 
 
     [Hashtable]$apiHttpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
 
-    # TODO: Need to tidy up?
-    [System.Object[]]$apiObjects = @()
+
+    [System.Object[]]$apiResources = @()
     $apiResources += Invoke-RestMethod -Uri $apiResourceUri -Method 'Get' -Headers $apiHttpRequestHeader
+
 
     # If not a single, resource request, set from the resource(s) in the 'value' property within the response
     if ([System.String]::IsNullOrWhiteSpace($ResourceId))
