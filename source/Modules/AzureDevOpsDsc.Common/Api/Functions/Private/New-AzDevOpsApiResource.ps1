@@ -107,9 +107,9 @@ function New-AzDevOpsApiResource
                                    -IsSuccessful
 
             # Obtains and returns the new resource
-            New-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
-                                  -ResourceName $ResourceName `
-                                  -ResourceId $ResourceId # TODO: Might have to remove the assumption that this works (see above also). Input resource's 'id' value looks to be ignored when creating resource.
+            Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
+                                    -ResourceName $ResourceName `
+                                    -ResourceId $ResourceId # TODO: Might have to remove the assumption that this works (see above also). Input resource's 'id' value looks to be ignored when creating resource.
         }
     }
 }
