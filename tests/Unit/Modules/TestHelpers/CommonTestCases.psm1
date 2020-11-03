@@ -18,7 +18,7 @@ function Get-TestCaseValue
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
-                     'ResourceName','ProjectName','OrganizationName',`
+                     'ResourceName','ProjectDescription','ProjectName','OrganizationName',`
                      'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
@@ -223,6 +223,33 @@ function Get-TestCaseValue
     }
 
 
+    # ProjectDescription
+    $testCaseValues.ProjectDescription = @{
+
+        Valid = @(
+            'ProjectDescription',
+            'Project Description',
+            'Project-Description',
+            'Project_Description'
+        )
+
+        Invalid = @(
+            '%',                                     # Just '%' character
+            '*',                                     # Just '*' character
+            'Project%Description',                   # Contains '%'
+            'Project*Description'                    # Contains '*'
+            ' ProjectDescription',                   # Leading ' ' (whitespace)
+            'ProjectDescription ',                   # Trailing ' ' (whitespace)
+            ' ProjectDescription '                   # Leading and trailing ' ' (whitespace)
+        ) + $testCaseValues.String.Whitespace        # Any that are just whitespace characters
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
     # ProjectName
     $testCaseValues.ProjectName = @{
 
@@ -327,7 +354,7 @@ function Get-TestCase
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
-                     'ResourceName','ProjectName','OrganizationName',`
+                     'ResourceName','ProjectDescription','ProjectName','OrganizationName',`
                      'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
