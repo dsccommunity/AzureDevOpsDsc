@@ -10,6 +10,9 @@
 
           https://dev.azure.com/someOrganizationName/_apis/
 
+    .PARAMETER ApiVersion
+        The version of the Azure DevOps API to use in the call/execution to/against the API.
+
     .PARAMETER Pat
         The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
         against the Azure DevOps API. This PAT must have the relevant permissions assigned
@@ -46,6 +49,11 @@ function Get-AzDevOpsApiObject
         [System.String]
         $ApiUri,
 
+        [Parameter()]
+        [ValidateScript( { Test-AzDevOpsApiVersion -ApiVersion $_ -IsValid })]
+        [System.String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
+
         [Parameter(Mandatory=$true)]
         [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
         [Alias('PersonalAccessToken')]
@@ -60,12 +68,7 @@ function Get-AzDevOpsApiObject
         [Parameter()]
         [ValidateScript({ Test-AzDevOpsApiObjectId -ObjectId $_ -IsValid })]
         [System.String]
-        $ObjectId,
-
-        [Parameter()]
-        [ValidateScript( { Test-AzDevOpsApiVersion -ApiVersion $_ -IsValid })]
-        [System.String]
-        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+        $ObjectId
     )
 
     # Remove any $ObjectId if using a wildcard character
