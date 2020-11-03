@@ -26,11 +26,11 @@ function Get-AzDevOpsApiHttpRequestHeader
         $Pat
     )
 
-    [Hashtable]$apiHeader = @{
+    [Hashtable]$apiHttpRequestHeader = @{
         Authorization = 'Basic ' +
             [Convert]::ToBase64String(
                 [Text.Encoding]::ASCII.GetBytes(":$Pat"))
     }
 
-    return $apiHeader
+    return $apiHttpRequestHeader
 }
