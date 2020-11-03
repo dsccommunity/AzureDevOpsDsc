@@ -82,7 +82,7 @@ function New-AzDevOpsProject
         $Force
     )
 
-    [string]$objectJson = '
+    [string]$resourceJson = '
     {
       "id": "' + $ProjectId + '",
       "name": "' + $ProjectName + '",
@@ -98,15 +98,15 @@ function New-AzDevOpsProject
     }
 '
 
-    [System.Object]$object = $null
+    [System.Object]$resource = $null
 
-    if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $objectName))
+    if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $resourceName))
     {
-        [System.Object]$object = New-AzDevOpsApiObject -$ApiUri $ApiUri -Pat $Pat `
-                                                       -ObjectName 'Project' `
-                                                       -Object $($objectJson | ConvertFrom-Json) `
+        [System.Object]$resource = New-AzDevOpsApiResource -$ApiUri $ApiUri -Pat $Pat `
+                                                       -ResourceName 'Project' `
+                                                       -Resource $($resourceJson | ConvertFrom-Json) `
                                                        -Force:$Force
     }
 
-    return $object
+    return $resource
 }

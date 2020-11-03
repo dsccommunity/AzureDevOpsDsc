@@ -29,7 +29,7 @@ InModuleScope $script:subModuleName {
                     $result.GetType() | Should -BeIn @(@('ApiVersion1','ApiVersion2').GetType(),'ApiVersion1'.GetType())
                 }
 
-                It 'Should return all objects that are present in $testCasesValidApiVersion variable'{
+                It 'Should return all resources that are present in $testCasesValidApiVersion variable'{
                     param ()
 
                     [string[]]$result = Get-AzDevOpsApiVersion

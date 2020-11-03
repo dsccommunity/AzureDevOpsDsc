@@ -18,7 +18,7 @@
     .EXAMPLE
         Get-AzDevOpsOperation -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -OperationId 'YourOperationIdHere'
 
-        Returns the 'Operation' object from Azure DevOps related to the 'OperationId' value provided.
+        Returns the 'Operation' resource from Azure DevOps related to the 'OperationId' value provided.
 #>
 function Get-AzDevOpsOperation
 {
@@ -46,25 +46,25 @@ function Get-AzDevOpsOperation
     )
 
 
-    $azDevOpsApiObjectParameters = @{
+    $azDevOpsApiResourceParameters = @{
         ApiUri = $ApiUri;
         Pat = $Pat;
-        ObjectName = 'Operation'}
+        ResourceName = 'Operation'}
 
 
     If(![string]::IsNullOrWhiteSpace($OperationId)){
-        $azDevOpsApiObjectParameters.ObjectId = $OperationId
+        $azDevOpsApiResourceParameters.ResourceId = $OperationId
     }
 
 
-    [System.Object[]]$apiObjects = Get-AzDevOpsApiObject @azDevOpsApiObjectParameters
+    [System.Object[]]$apiResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
 
 
     If(![string]::IsNullOrWhiteSpace($OperationId)){
-        $apiObjects = $apiObjects |
+        $apiResources = $apiResources |
             Where-Object id -ilike $OperationId
     }
 
 
-    return [object[]]$apiObjects
+    return [object[]]$apiResources
 }

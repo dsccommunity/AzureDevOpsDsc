@@ -9,7 +9,7 @@ InModuleScope $script:subModuleName {
 
         Context 'When called with valid parameters' {
             BeforeAll {
-                Mock -ModuleName $script:subModuleName Get-AzDevOpsApiObject {
+                Mock -ModuleName $script:subModuleName Get-AzDevOpsApiResource {
                     return $(Get-TestCase -ScopeName 'OperationId' -TestCaseName 'Valid') |
                         ForEach-Object {
                             @{
@@ -43,11 +43,11 @@ InModuleScope $script:subModuleName {
                     $result.GetType() | Should -BeIn @(@(@{},@{}).GetType(),@{}.GetType())
                 }
 
-                It 'Should call "Get-AzDevOpsApiObject" function only once - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPatCombined {
+                It 'Should call "Get-AzDevOpsApiResource" function only once - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPatCombined {
                     param ([string]$ApiUri, [string]$Pat)
 
                     Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
+                    Should -Invoke Get-AzDevOpsApiResource -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
             }
@@ -68,11 +68,11 @@ InModuleScope $script:subModuleName {
                     $result.GetType() | Should -BeIn @(@(@{},@{}).GetType(),@{}.GetType())
                 }
 
-                It 'Should call "Get-AzDevOpsApiObject" function only once - "<ApiUri>", "<Pat>", "<OperationId>"' -TestCases $testCasesValidApiUriPatOperationIdCombined {
+                It 'Should call "Get-AzDevOpsApiResource" function only once - "<ApiUri>", "<Pat>", "<OperationId>"' -TestCases $testCasesValidApiUriPatOperationIdCombined {
                     param ([string]$ApiUri, [string]$Pat, [string]$OperationId)
 
                     Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $OperationId | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
+                    Should -Invoke Get-AzDevOpsApiResource -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
                 Context 'When a "Operation" with supplied "OperationId" parameter value does not exist' {

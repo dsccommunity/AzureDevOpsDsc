@@ -32,11 +32,11 @@ InModuleScope $script:subModuleName {
                         $result | Should -Be $true
                     }
 
-                    It 'Should return same as "Test-AzDevOpsApiObjectId" - "<ProjectId>"' -TestCases $testCasesValidProjectIds {
+                    It 'Should return same as "Test-AzDevOpsApiResourceId" - "<ProjectId>"' -TestCases $testCasesValidProjectIds {
                         param ([string]$ProjectId)
 
                         $result = Test-AzDevOpsProjectId -ProjectId $ProjectId -IsValid
-                        $result | Should -Be $(Test-AzDevOpsApiObjectId -ObjectId $ProjectId -IsValid)
+                        $result | Should -Be $(Test-AzDevOpsApiResourceId -ResourceId $ProjectId -IsValid)
                     }
                 }
 
@@ -61,11 +61,11 @@ InModuleScope $script:subModuleName {
                         $result | Should -Be $false
                     }
 
-                    It 'Should return same as "Test-AzDevOpsApiObjectId" - "<ProjectId>"' -TestCases $testCasesInvalidProjectIds {
+                    It 'Should return same as "Test-AzDevOpsApiResourceId" - "<ProjectId>"' -TestCases $testCasesInvalidProjectIds {
                         param ([string]$ProjectId)
 
                         $result = Test-AzDevOpsProjectId -ProjectId $ProjectId -IsValid
-                        $result | Should -Be $(Test-AzDevOpsApiObjectId -ObjectId $ProjectId -IsValid)
+                        $result | Should -Be $(Test-AzDevOpsApiResourceId -ResourceId $ProjectId -IsValid)
                     }
                 }
 

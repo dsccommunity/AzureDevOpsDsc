@@ -1,26 +1,26 @@
 <#
     .SYNOPSIS
-        Peforms test on a provided 'ObjectId' to provide a boolean ($true or $false)
+        Peforms test on a provided 'ResourceName' to provide a boolean ($true or $false)
         return value. Returns $true if the test is successful.
 
         NOTE: Use of the '-IsValid' switch is required.
 
-    .PARAMETER ObjectId
-        The 'ObjectId' to be tested/validated.
+    .PARAMETER ResourceName
+        The 'ResourceName' to be tested/validated.
 
     .PARAMETER IsValid
-        Use of this switch will validate the format of the 'ObjectId'
+        Use of this switch will validate the format of the 'ResourceName'
         rather than the existence/presence of it.
 
         Failure to use this switch will throw an exception.
 
     .EXAMPLE
-        Test-AzDevOpsApiObjectId -ObjectId 'YourObjectIdHere' -IsValid
+        Test-AzDevOpsApiResourceName -ResourceName 'YourResourceNameHere' -IsValid
 
-        Returns $true if the 'ObjectId' provided is of a valid format.
+        Returns $true if the 'ResourceName' provided is of a valid format.
         Returns $false if it is not.
 #>
-function Test-AzDevOpsApiObjectId
+function Test-AzDevOpsApiResourceName
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
@@ -28,7 +28,7 @@ function Test-AzDevOpsApiObjectId
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $ObjectId,
+        $ResourceName,
 
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.SwitchParameter]
@@ -42,7 +42,7 @@ function Test-AzDevOpsApiObjectId
     }
 
 
-    if (![guid]::TryParse($ObjectId, $([ref][guid]::Empty)))
+    if (!($(Get-AzDevOpsApiResourceName).Contains($ResourceName)))
     {
         return $false
     }
