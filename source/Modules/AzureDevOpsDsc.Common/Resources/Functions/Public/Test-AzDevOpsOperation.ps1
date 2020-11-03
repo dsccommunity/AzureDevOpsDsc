@@ -71,11 +71,11 @@ function Test-AzDevOpsOperation
         [System.String]
         $OperationId,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'IsComplete')]
+        [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $IsComplete,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'IsSuccessful')]
+        [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $IsSuccessful
     )
@@ -85,7 +85,7 @@ function Test-AzDevOpsOperation
         $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesNotUsed -f $MyInvocation.MyCommand
         New-InvalidOperationException -Message $errorMessage
     }
-    elseif (!$IsComplete -and !$IsSuccessful) # Failsafe: Unlikely/Impossible to occur while both setup with different 'ParameterSetName' values
+    elseif ($IsComplete -and $IsSuccessful)
     {
         $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesBothUsed -f $MyInvocation.MyCommand
         New-InvalidOperationException -Message $errorMessage
