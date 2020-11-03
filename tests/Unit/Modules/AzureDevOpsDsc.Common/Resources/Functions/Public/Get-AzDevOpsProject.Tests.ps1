@@ -9,7 +9,7 @@ InModuleScope $script:subModuleName {
 
         Context 'When called with valid parameters' {
             BeforeAll {
-                Mock -ModuleName $script:subModuleName Get-AzDevOpsApiObject {
+                Mock -ModuleName $script:subModuleName Get-AzDevOpsApiResource {
 
                     $mockProjectIds = Get-TestCase -ScopeName 'ProjectId' -TestCaseName 'Valid'
                     $mockProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Valid'
@@ -51,11 +51,11 @@ InModuleScope $script:subModuleName {
                     $result.GetType() | Should -BeIn @(@(@{},@{}).GetType(),@{}.GetType())
                 }
 
-                It 'Should call "Get-AzDevOpsApiObject" function only once - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPatCombined {
+                It 'Should call "Get-AzDevOpsApiResource" function only once - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPatCombined {
                     param ([string]$ApiUri, [string]$Pat)
 
                     Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
+                    Should -Invoke Get-AzDevOpsApiResource -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
             }
@@ -78,11 +78,11 @@ InModuleScope $script:subModuleName {
 
                 Context 'When a "Project" with supplied "ProjectName" parameter value exists' {
 
-                    It 'Should call "Get-AzDevOpsApiObject" function only once - "<ApiUri>", "<Pat>", "<ProjectName>"' -TestCases $testCasesValidApiUriPatProjectNameCombined {
+                    It 'Should call "Get-AzDevOpsApiResource" function only once - "<ApiUri>", "<Pat>", "<ProjectName>"' -TestCases $testCasesValidApiUriPatProjectNameCombined {
                         param ([string]$ApiUri, [string]$Pat, [string]$ProjectName)
 
                         Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat -ProjectName $ProjectName | Out-Null
-                        Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
+                        Should -Invoke Get-AzDevOpsApiResource -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                     }
                 }
 
@@ -113,11 +113,11 @@ InModuleScope $script:subModuleName {
                     $result.GetType() | Should -BeIn @(@(@{},@{}).GetType(),@{}.GetType())
                 }
 
-                It 'Should call "Get-AzDevOpsApiObject" function only once - "<ApiUri>", "<Pat>", "<ProjectId>"' -TestCases $testCasesValidApiUriPatProjectIdCombined {
+                It 'Should call "Get-AzDevOpsApiResource" function only once - "<ApiUri>", "<Pat>", "<ProjectId>"' -TestCases $testCasesValidApiUriPatProjectIdCombined {
                     param ([string]$ApiUri, [string]$Pat, [string]$ProjectId)
 
                     Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat -ProjectId $ProjectId | Out-Null
-                    Should -Invoke Get-AzDevOpsApiObject -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
+                    Should -Invoke Get-AzDevOpsApiResource -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
                 Context 'When a "Project" with supplied "ProjectId" parameter value does not exist' {

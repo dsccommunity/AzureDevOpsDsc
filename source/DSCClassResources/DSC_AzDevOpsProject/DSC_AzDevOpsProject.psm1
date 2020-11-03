@@ -47,7 +47,7 @@ class DSC_AzDevOpsProject
     [Alias('Description')]
     [string]$ProjectDescription
 
-    [hashtable]GetAzDevOpsObject()
+    [hashtable]GetAzDevOpsResource()
     {
         $getParameters = @{
             ApiUri      = $this.ApiUri
@@ -61,7 +61,7 @@ class DSC_AzDevOpsProject
 
     [DSC_AzDevOpsProject] Get()
     {
-        $project = $this.GetAzDevOpsObject()
+        $project = $this.GetAzDevOpsResource()
 
         if ($null -eq $project)
         {

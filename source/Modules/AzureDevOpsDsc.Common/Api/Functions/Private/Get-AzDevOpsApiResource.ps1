@@ -1,0 +1,110 @@
+<#
+    .SYNOPSIS
+        Returns an array of resources returned from the Azure DevOps API. The type of resource
+        returned is generic to make this function reusable across all resources from the API.
+
+        The resource type requested from the API is determined by the 'ResourceName' parameter.
+
+    .PARAMETER ApiUri
+        The URI of the Azure DevOps API to be connected to. For example:
+
+          https://dev.azure.com/someOrganizationName/_apis/
+
+    .PARAMETER ApiVersion
+        The version of the Azure DevOps API to use in the call/execution to/against the API.
+
+    .PARAMETER Pat
+        The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
+        against the Azure DevOps API. This PAT must have the relevant permissions assigned
+        for the subsequent operations being performed.
+
+    .PARAMETER ResourceName
+        The name of the resource being obtained from the Azure DevOps API (e.g. 'Project' or 'Operation')
+
+    .PARAMETER ResourceId
+        The 'id' of the resource type being obtained. For example, if the 'ResourceName' parameter value
+        was 'Project', the 'ResourceId' value would be assumed to be the 'id' of a 'Project'.
+
+    .EXAMPLE
+        Get-AzDevOpsApiResource -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ResourceName 'Project'
+
+        Returns all 'Project' resources from the Azure DevOps API related to the Organization/ApiUri
+        value provided.
+
+    .EXAMPLE
+        Get-AzDevOpsApiResource -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ResourceName 'Project' -ResourceId 'YourProjectId'
+
+        Returns the 'Project' resource from the Azure DevOps API related to the Organization/ApiUri
+        value provided (where the 'id' of the 'Project' is equal to 'YourProjectId').
+#>
+function Get-AzDevOpsApiResource
+{
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
+        [Alias('Uri')]
+        [System.String]
+        $ApiUri,
+
+        [Parameter()]
+        [ValidateScript( { Test-AzDevOpsApiVersion -ApiVersion $_ -IsValid })]
+        [System.String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
+
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
+        [Alias('PersonalAccessToken')]
+        [System.String]
+        $Pat,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({ Test-AzDevOpsApiResourceName -ResourceName $_ -IsValid })]
+        [System.String]
+        $ResourceName,
+
+        [Parameter()]
+        [ValidateScript({ Test-AzDevOpsApiResourceId -ResourceId $_ -IsValid })]
+        [System.String]
+        $ResourceId
+    )
+
+    # Remove any $ResourceId if using a wildcard character
+    # TODO: Might want to make this more generic (i.e. if !(Test-AzDevOpsApiResourceId $ResourceId -IsValid') then set to $null)
+    if ($ResourceId -contains '*')
+    {
+        $ResourceId = $null
+    }
+
+    # TODO: Need something to pluralise and lowercase this resource for the URI
+    $resourceNamePluralUriString = $ResourceName.ToLower() + "s"
+
+    # TODO: Need to get this from input parameter?
+    $apiVersionUriParameter = "api-version=$ApiVersion"
+
+    # TODO: Need to generate this from a function
+    $apiResourceUri = $ApiUri + "/$resourceNamePluralUriString"
+    if (![System.String]::IsNullOrWhiteSpace($ResourceId))
+    {
+        $apiResourceUri = $apiResourceUri + "/$ResourceId"
+    }
+    $apiResourceUri = $apiResourceUri + '?' + $apiVersionUriParameter
+
+
+
+    [Hashtable]$apiHttpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
+
+    # TODO: Need to tidy up?
+    [System.Object[]]$apiObjects = @()
+    $apiResources += Invoke-RestMethod -Uri $apiResourceUri -Method 'Get' -Headers $apiHttpRequestHeader
+
+    # If not a single, resource request, set from the resource(s) in the 'value' property within the response
+    if ([System.String]::IsNullOrWhiteSpace($ResourceId))
+    {
+        [System.Object[]]$apiResources = $apiResources.value
+    }
+
+    return $apiResources
+}

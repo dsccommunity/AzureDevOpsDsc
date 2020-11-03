@@ -6,7 +6,7 @@
     .EXAMPLE
         Get-AzDevOpsApiVersion
 
-        Returns all the names of the objects that can be used/managed in the Azure DevOps API.
+        Returns all the names of the resources that can be used/managed in the Azure DevOps API.
 #>
 function Get-AzDevOpsApiVersion
 {

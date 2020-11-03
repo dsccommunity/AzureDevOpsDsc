@@ -18,8 +18,8 @@ function Get-TestCaseValue
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','ApiVersion','Pat',`
-                     'ObjectName','ProjectName','OrganizationName',`
-                     'ObjectId','OperationId','ProjectId')]
+                     'ResourceName','ProjectName','OrganizationName',`
+                     'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
 
@@ -211,8 +211,8 @@ function Get-TestCaseValue
     }
 
 
-    # ObjectName
-    $testCaseValues.ObjectName = @{
+    # ResourceName
+    $testCaseValues.ResourceName = @{
 
         Valid = @(
             'Operation',
@@ -220,11 +220,11 @@ function Get-TestCaseValue
         )
 
         Invalid = @(
-            'NonObject',
-            'SomeOtherInvalidObject',
-            'Some Object',                 # Contains space
-            ' Some Object',                # Leading space
-            'Some Object '                 # Trailing space
+            'NonResource',
+            'SomeOtherInvalidResource',
+            'Some Resource',                 # Contains space
+            ' Some Resource',                # Leading space
+            'Some Resource '                 # Trailing space
         )
 
         Empty            = $testCaseValues.String.Empty
@@ -234,8 +234,8 @@ function Get-TestCaseValue
     }
 
 
-    # ObjectId
-    $testCaseValues.ObjectId = @{
+    # ResourceId
+    $testCaseValues.ResourceId = @{
 
         Valid = @(
             'd59709e7-6fdf-40c6-88fa-ac5dc10bbfc3',
@@ -256,12 +256,12 @@ function Get-TestCaseValue
     }
 
 
-    # OperationId (derived from ObjectId)
-    $testCaseValues.OperationId = $testCaseValues.ObjectId
+    # OperationId (derived from ResourceId)
+    $testCaseValues.OperationId = $testCaseValues.ResourceId
 
 
-    # ProjectId (derived from ObjectId)
-    $testCaseValues.ProjectId = $testCaseValues.ObjectId
+    # ProjectId (derived from ResourceId)
+    $testCaseValues.ProjectId = $testCaseValues.ResourceId
 
 
     return $testCaseValues[$ScopeName][$TestCaseName]
@@ -288,8 +288,8 @@ function Get-TestCase
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','ApiVersion','Pat',`
-                     'ObjectName','ProjectName','OrganizationName',`
-                     'ObjectId','OperationId','ProjectId')]
+                     'ResourceName','ProjectName','OrganizationName',`
+                     'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
 

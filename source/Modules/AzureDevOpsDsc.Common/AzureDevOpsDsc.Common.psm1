@@ -17,9 +17,9 @@ $functionSubDirectoryPaths = @(
     "$PSScriptRoot\Connection\Functions\Public",
     "$PSScriptRoot\Connection\Functions\Private",
 
-    # Objects
-    "$PSScriptRoot\Objects\Functions\Public",
-    "$PSScriptRoot\Objects\Functions\Private",
+    # Resources
+    "$PSScriptRoot\Resources\Functions\Public",
+    "$PSScriptRoot\Resources\Functions\Private",
 
     # Server
     "$PSScriptRoot\Server\Functions\Public",

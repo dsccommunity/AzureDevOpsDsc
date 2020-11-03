@@ -5,34 +5,34 @@
 
 InModuleScope $script:subModuleName {
 
-    Describe 'AzureDevOpsDsc.Common\Get-AzDevOpsApiObjectName' -Tag 'GetAzDevOpsApiObjectName' {
+    Describe 'AzureDevOpsDsc.Common\Get-AzDevOpsApiResourceName' -Tag 'GetAzDevOpsApiResourceName' {
 
         Context 'When called with valid parameters' {
 
 
             BeforeAll {
 
-                $testCasesValidObjectName = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Valid'
+                $testCasesValidResourceName = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
             }
 
             It 'Should not throw' {
                 param ()
 
-                { Get-AzDevOpsApiObjectName } | Should -Not -Throw
+                { Get-AzDevOpsApiResourceName } | Should -Not -Throw
             }
 
             It 'Should return "object[]"' {
                 param ()
 
-                $result = Get-AzDevOpsApiObjectName
-                $result.GetType() | Should -Be @('ObjectName1','ObjectName2').GetType()
+                $result = Get-AzDevOpsApiResourceName
+                $result.GetType() | Should -Be @('ResourceName1','ResourceName2').GetType()
             }
 
-            It 'Should return all objects that are present in $testCasesValidObjectName variable'{
+            It 'Should return all resources that are present in $testCasesValidResourceName variable'{
                 param ()
 
-                $result = Get-AzDevOpsApiObjectName
-                $result.Count | Should -Be $($testCasesValidObjectName.Count)
+                $result = Get-AzDevOpsApiResourceName
+                $result.Count | Should -Be $($testCasesValidResourceName.Count)
             }
 
         }

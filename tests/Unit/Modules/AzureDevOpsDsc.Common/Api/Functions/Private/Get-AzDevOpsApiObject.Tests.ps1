@@ -5,12 +5,12 @@
 
 InModuleScope $script:subModuleName {
 
-    Describe 'AzureDevOpsDsc.Common\Get-AzDevOpsApiObject' -Tag 'GetAzDevOpsApiObject' {
+    Describe 'AzureDevOpsDsc.Common\Get-AzDevOpsApiResource' -Tag 'GetAzDevOpsApiResource' {
 
         Context 'When called with valid parameters' {
             BeforeAll {
 
-                [string]$nonPresentObjectId = '114bff8d-6169-45cf-b085-fe121267e7aa'
+                [string]$nonPresentResourceId = '114bff8d-6169-45cf-b085-fe121267e7aa'
 
                 Mock Invoke-RestMethod -Verifiable {
 
@@ -19,10 +19,10 @@ InModuleScope $script:subModuleName {
                         "count": 2,
                         "value": [
                             {
-                                "id": "$ObjectId",
+                                "id": "$ResourceId",
                                 "name": "Test Project 1",
                                 "description": "Test Project Description 1",
-                                "url": "https://dev.azure.com/fabrikam/_apis/projects/$ObjectId",
+                                "url": "https://dev.azure.com/fabrikam/_apis/projects/$ResourceId",
                                 "state": "wellFormed"
                             },
                             {
@@ -36,20 +36,20 @@ InModuleScope $script:subModuleName {
                     }
 "@  | ConvertFrom-Json
 
-                    if (![string]::IsNullOrWhiteSpace($ObjectId))
+                    if (![string]::IsNullOrWhiteSpace($ResourceId))
                     {
                         $response = $response.value |
-                            Where-Object { $_.id -eq $ObjectId} |
-                            Where-Object { $_.id -ne $nonPresentObjectId}
+                            Where-Object { $_.id -eq $ResourceId} |
+                            Where-Object { $_.id -ne $nonPresentResourceId}
                     }
 
-                    #if ([string]::IsNullOrWhiteSpace($ObjectId))
+                    #if ([string]::IsNullOrWhiteSpace($ResourceId))
                     #{
                     #    $response = $response.Value
                     #}
                     #else {
                     #    $response = $response.Value |
-                    #        Where-Object { $_.id -eq $ObjectId }
+                    #        Where-Object { $_.id -eq $ResourceId }
                     #}
 
                     return $response
@@ -60,28 +60,28 @@ InModuleScope $script:subModuleName {
             $testCasesValidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Valid'
             $testCasesValidApiUriPatCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUris, $testCasesValidPats
 
-            $testCasesValidObjectNames = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Valid'
-            $testCasesValidApiUriPatObjectNameCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatCombined, $testCasesValidObjectNames
+            $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
+            $testCasesValidApiUriPatResourceNameCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatCombined, $testCasesValidResourceNames
 
-            $testCasesValidObjectIds = Get-TestCase -ScopeName 'ObjectId' -TestCaseName 'Valid'
-            $testCasesValidApiUriPatObjectNameObjectIdCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatObjectNameCombined, $testCasesValidObjectIds
+            $testCasesValidResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Valid'
+            $testCasesValidApiUriPatResourceNameResourceIdCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatResourceNameCombined, $testCasesValidResourceIds
 
-            Context 'When called with no "ObjectId" parameter' {
+            Context 'When called with no "ResourceId" parameter' {
 
-                It 'Should not throw - "<ApiUri>", "<Pat>", "<ObjectName>"' -TestCases $testCasesValidApiUriPatObjectNameCombined {
-                    param ([string]$ApiUri, [string]$Pat, [string]$ObjectName)
+                It 'Should not throw - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNameCombined {
+                    param ([string]$ApiUri, [string]$Pat, [string]$ResourceName)
 
-                    { Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat -ObjectName $ObjectName } | Should -Not -Throw
+                    { Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName } | Should -Not -Throw
                 }
 
-                It 'Should return "object[]" or "hashtable" - "<ApiUri>", "<Pat>", "<ObjectName>"' -TestCases $testCasesValidApiUriPatObjectNameCombined {
-                    param ([string]$ApiUri, [string]$Pat, [string]$ObjectName)
+                It 'Should return "object[]" or "hashtable" - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNameCombined {
+                    param ([string]$ApiUri, [string]$Pat, [string]$ResourceName)
 
-                    $result = Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat -ObjectName $ObjectName
+                    $result = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
                     #Write-Warning "x"
                     #Write-Warning "$ApiUri"
                     #Write-Warning "$Pat"
-                    #Write-Warning "$ObjectName"
+                    #Write-Warning "$ResourceName"
                     #Write-Warning "$result"
                     #Write-Warning "yy"
 
@@ -90,45 +90,45 @@ InModuleScope $script:subModuleName {
                     $result.GetType() | Should -BeIn @(@(@{},@{}).GetType(),@{}.GetType())
                 }
 
-                It 'Should call "Get-AzDevOpsApiObject" function only once - "<ApiUri>", "<Pat>", "<ObjectName>"' -TestCases $testCasesValidApiUriPatObjectNameCombined {
-                    param ([string]$ApiUri, [string]$Pat, [string]$ObjectName)
+                It 'Should call "Get-AzDevOpsApiResource" function only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNameCombined {
+                    param ([string]$ApiUri, [string]$Pat, [string]$ResourceName)
 
-                    Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat -ObjectName $ObjectName | Out-Null
+                    Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName | Out-Null
                     Should -Invoke Invoke-RestMethod -Times 1 -Exactly -Scope It
                 }
 
             }
 
 
-            Context 'When called with an "ObjectId" parameter' {
+            Context 'When called with an "ResourceId" parameter' {
 
-                It 'Should not throw - "<ApiUri>", "<Pat>", "<ObjectName>", "<ObjectId>"' -TestCases $testCasesValidApiUriPatObjectNameObjectIdCombined {
-                    param ([string]$ApiUri, [string]$Pat, [string]$ObjectName, [string]$ObjectId)
+                It 'Should not throw - "<ApiUri>", "<Pat>", "<ResourceName>", "<ResourceId>"' -TestCases $testCasesValidApiUriPatResourceNameResourceIdCombined {
+                    param ([string]$ApiUri, [string]$Pat, [string]$ResourceName, [string]$ResourceId)
 
-                    { Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat -ObjectName $ObjectName -ObjectId $ObjectId } | Should -Not -Throw
+                    { Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName -ResourceId $ResourceId } | Should -Not -Throw
                 }
 
-                It 'Should return "object[]" or "hashtable" - "<ApiUri>", "<Pat>", "<ObjectName>", "<ObjectId>"' -TestCases $testCasesValidApiUriPatObjectNameObjectIdCombined {
-                    param ([string]$ApiUri, [string]$Pat, [string]$ObjectName, [string]$ObjectId)
+                It 'Should return "object[]" or "hashtable" - "<ApiUri>", "<Pat>", "<ResourceName>", "<ResourceId>"' -TestCases $testCasesValidApiUriPatResourceNameResourceIdCombined {
+                    param ([string]$ApiUri, [string]$Pat, [string]$ResourceName, [string]$ResourceId)
 
-                    $result = Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat -ObjectName $ObjectName -ObjectId $ObjectId
+                    $result = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName -ResourceId $ResourceId
 
                     $result.GetType() | Should -Be $(New-Object -TypeName PSCustomObject).GetType()
                 }
 
-                It 'Should call "Get-AzDevOpsApiObject" function only once - "<ApiUri>", "<Pat>", "<ObjectName>", "<ObjectId>"' -TestCases $testCasesValidApiUriPatObjectNameObjectIdCombined {
-                    param ([string]$ApiUri, [string]$Pat, [string]$ObjectName, [string]$ObjectId)
+                It 'Should call "Get-AzDevOpsApiResource" function only once - "<ApiUri>", "<Pat>", "<ResourceName>", "<ResourceId>"' -TestCases $testCasesValidApiUriPatResourceNameResourceIdCombined {
+                    param ([string]$ApiUri, [string]$Pat, [string]$ResourceName, [string]$ResourceId)
 
-                    Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat -ObjectName $ObjectName -ObjectId $ObjectId | Out-Null
+                    Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName -ResourceId $ResourceId | Out-Null
                     Should -Invoke Invoke-RestMethod -ModuleName $script:subModuleName -Times 1 -Exactly -Scope It
                 }
 
-                Context 'When a "Object" with supplied "ObjectId" parameter value does not exist' {
+                Context 'When a "Resource" with supplied "ResourceId" parameter value does not exist' {
 
-                    It 'Should return $null - "<ApiUri>", "<Pat>", "<ObjectName>"' -TestCases $testCasesValidApiUriPatObjectNameCombined {
-                        param ([string]$ApiUri, [string]$Pat, [string]$ObjectName)
+                    It 'Should return $null - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNameCombined {
+                        param ([string]$ApiUri, [string]$Pat, [string]$ResourceName)
 
-                        $result = Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $Pat -ObjectName $ObjectName -ObjectId $nonPresentObjectId # Non-present "ObjectId"
+                        $result = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName -ResourceId $nonPresentResourceId # Non-present "ResourceId"
                         $result | Should -Be $null
                     }
                 }
@@ -152,7 +152,7 @@ InModuleScope $script:subModuleName {
                     It "Should throw - '<Pat>'" -TestCases $testCasesInvalidPats {
                         param ([string]$Pat)
 
-                        { Get-AzDevOpsApiObject -Pat $Pat } | Should -Throw
+                        { Get-AzDevOpsApiResource -Pat $Pat } | Should -Throw
 
                     }
                 }
@@ -162,7 +162,7 @@ InModuleScope $script:subModuleName {
                         param ([string]$Pat)
 
                         $validApiUri = 'https://someuri.api/_apis/'
-                        { Get-AzDevOpsApiObject -ApiUri $validApiUri -Pat $Pat } | Should -Throw
+                        { Get-AzDevOpsApiResource -ApiUri $validApiUri -Pat $Pat } | Should -Throw
 
                     }
                 }
@@ -172,7 +172,7 @@ InModuleScope $script:subModuleName {
                         param ([string]$Pat)
 
                         $invalidApiUri = 'someInvalidApiUrl'
-                        { Get-AzDevOpsApiObject -ApiUri $invalidApiUri -Pat $Pat } | Should -Throw
+                        { Get-AzDevOpsApiResource -ApiUri $invalidApiUri -Pat $Pat } | Should -Throw
 
                     }
                 }
@@ -187,7 +187,7 @@ InModuleScope $script:subModuleName {
                     It "Should throw - '<ApiUri>'" -TestCases $testCasesInvalidApiUris {
                         param ([string]$ApiUri)
 
-                        { Get-AzDevOpsApiObject -ApiUri $ApiUri } | Should -Throw
+                        { Get-AzDevOpsApiResource -ApiUri $ApiUri } | Should -Throw
 
                     }
                 }
@@ -197,7 +197,7 @@ InModuleScope $script:subModuleName {
                         param ([string]$ApiUri)
 
                         $validPat = '1234567890123456789012345678901234567890123456789012'
-                        { Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $validPat } | Should -Throw
+                        { Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $validPat } | Should -Throw
 
                     }
                 }
@@ -207,7 +207,7 @@ InModuleScope $script:subModuleName {
                         param ([string]$ApiUri)
 
                         $invalidPat = '123456789012'
-                        { Get-AzDevOpsApiObject -ApiUri $ApiUri -Pat $invalidPat } | Should -Throw
+                        { Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $invalidPat } | Should -Throw
 
                     }
                 }

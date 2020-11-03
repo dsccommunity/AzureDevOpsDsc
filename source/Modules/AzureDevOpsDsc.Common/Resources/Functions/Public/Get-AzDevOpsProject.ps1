@@ -21,27 +21,27 @@
     .EXAMPLE
         Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere'
 
-        Returns all the 'Project' objects (assocated with the Organization/ApiUrl) from Azure DevOps.
+        Returns all the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps.
 
     .EXAMPLE
         Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectName '*'
 
-        Returns all the 'Project' objects (assocated with the Organization/ApiUrl) from Azure DevOps.
+        Returns all the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps.
 
     .EXAMPLE
         Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectId 'YourProjectIdHere'
 
-        Returns the 'Project' objects (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectId' value provided.
+        Returns the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectId' value provided.
 
     .EXAMPLE
         Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectName 'YourProjectNameHere'
 
-        Returns the 'Project' objects (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectName' value provided.
+        Returns the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectName' value provided.
 
     .EXAMPLE
         Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectId 'YourProjectIdHere' -ProjectName 'YourProjectNameHere'
 
-        Returns the 'Project' objects (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectId' and 'ProjectName' value provided.
+        Returns the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectId' and 'ProjectName' value provided.
 #>
 function Get-AzDevOpsProject
 {
@@ -63,7 +63,7 @@ function Get-AzDevOpsProject
 
         [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
-        [Alias('ObjectId','Id')]
+        [Alias('ResourceId','Id')]
         [System.String]
         $ProjectId,
 
@@ -75,31 +75,31 @@ function Get-AzDevOpsProject
     )
 
 
-    $azDevOpsApiObjectParameters = @{
+    $azDevOpsApiResourceParameters = @{
         ApiUri = $ApiUri;
         Pat = $Pat;
-        ObjectName = 'Project'}
+        ResourceName = 'Project'}
 
 
     If(![string]::IsNullOrWhiteSpace($ProjectId)){
-        $azDevOpsApiObjectParameters.ObjectId = $ProjectId
+        $azDevOpsApiResourceParameters.ResourceId = $ProjectId
     }
 
 
-    [object[]]$apiObjects = Get-AzDevOpsApiObject @azDevOpsApiObjectParameters
+    [object[]]$apiResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
 
 
     If(![string]::IsNullOrWhiteSpace($ProjectId)){
-        $apiObjects = $apiObjects |
+        $apiResources = $apiResources |
             Where-Object id -ilike $ProjectId
     }
 
 
     If(![string]::IsNullOrWhiteSpace($ProjectName)){
-        $apiObjects = $apiObjects |
+        $apiResources = $apiResources |
             Where-Object name -ilike $ProjectName
     }
 
 
-    return [object[]]$apiObjects
+    return [object[]]$apiResources
 }

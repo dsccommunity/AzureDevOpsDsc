@@ -59,7 +59,7 @@ try
                 $getProjectName = "ProjectName_$projectId"
                 $getProjectDescription = "ProjectDescription_$projectId"
 
-                $getAzDevOpsObject = @{
+                $getAzDevOpsResource = @{
                     id = $getProjectId
                     name = $getProjectName
                     description = $getProjectDescription
@@ -80,7 +80,7 @@ try
                     BeforeAll {
 
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsResource' -Value {
                                     return $null
                                 } -Force -PassThru
 
@@ -102,11 +102,11 @@ try
                 Context 'When the Azure DevOps "Project" exists but "ProjectId" parameter is different' {
                     BeforeAll {
                         $differentProjectId = [GUID]::NewGuid().ToString()
-                        $getAzDevOpsObject.ProjectId = $differentProjectId
+                        $getAzDevOpsResource.ProjectId = $differentProjectId
 
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
-                                    return $getAzDevOpsObject
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsResource' -Value {
+                                    return $getAzDevOpsResource
                                 } -Force -PassThru
 
                     }
@@ -125,12 +125,12 @@ try
 
                 Context 'When the Azure DevOps "Project" exists but "ProjectName" parameter is different' {
                     BeforeAll {
-                        $differentProjectName = "z" + $getAzDevOpsObject.ProjectName
-                        $getAzDevOpsObject.ProjectName = $differentProjectName
+                        $differentProjectName = "z" + $getAzDevOpsResource.ProjectName
+                        $getAzDevOpsResource.ProjectName = $differentProjectName
 
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
-                                    return $getAzDevOpsObject
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsResource' -Value {
+                                    return $getAzDevOpsResource
                                 } -Force -PassThru
 
                     }
@@ -148,12 +148,12 @@ try
 
                 Context 'When the Azure DevOps "Project" exists but "ProjectDescription" parameter is different' {
                     BeforeAll {
-                        $differentProjectDescription = "z" + $getAzDevOpsObject.ProjectDescription
-                        $getAzDevOpsObject.ProjectDescription = $differentProjectDescription
+                        $differentProjectDescription = "z" + $getAzDevOpsResource.ProjectDescription
+                        $getAzDevOpsResource.ProjectDescription = $differentProjectDescription
 
                         $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
-                                    return $getAzDevOpsObject
+                            Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsResource' -Value {
+                                    return $getAzDevOpsResource
                                 } -Force -PassThru
 
                     }
@@ -174,8 +174,8 @@ try
                 BeforeAll {
 
                     $AzDevOpsProjectResource = $AzDevOpsProjectResource |
-                        Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsObject' -Value {
-                                return $getAzDevOpsObject
+                        Add-Member -MemberType 'ScriptMethod' -Name 'GetAzDevOpsResource' -Value {
+                                return $getAzDevOpsResource
                             } -Force -PassThru
 
                 }

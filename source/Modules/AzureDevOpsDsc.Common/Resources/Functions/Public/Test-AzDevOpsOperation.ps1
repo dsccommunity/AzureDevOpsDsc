@@ -92,7 +92,7 @@ function Test-AzDevOpsOperation
     }
 
 
-    [object[]]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
+    [resource[]]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
                                                  -OperationId $OperationId
 
 

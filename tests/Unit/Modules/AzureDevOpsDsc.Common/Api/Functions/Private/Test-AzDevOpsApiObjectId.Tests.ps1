@@ -5,11 +5,11 @@
 
 InModuleScope $script:subModuleName {
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiObjectId' -Tag 'TestAzDevOpsApiObjectId' {
+    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiResourceId' -Tag 'TestAzDevOpsApiResourceId' {
 
-        $testCasesValidObjectIds = Get-TestCase -ScopeName 'ObjectId' -TestCaseName 'Valid'
-        $testCasesEmptyObjectIds = Get-TestCase -ScopeName 'ObjectId' -TestCaseName 'Empty'
-        $testCasesInvalidObjectIds = Get-TestCase -ScopeName 'ObjectId' -TestCaseName 'Invalid'
+        $testCasesValidResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Valid'
+        $testCasesEmptyResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Empty'
+        $testCasesInvalidResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Invalid'
 
         Context 'When called with valid parameters' {
             BeforeAll {
@@ -17,40 +17,40 @@ InModuleScope $script:subModuleName {
 
             Context 'When called using "-IsValid" switch' {
 
-                Context 'When called with valid "ObjectId" parameter' {
+                Context 'When called with valid "ResourceId" parameter' {
 
-                    It 'Should not throw - "<ObjectId>"' -TestCases $testCasesValidObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should not throw - "<ResourceId>"' -TestCases $testCasesValidResourceIds {
+                        param ([string]$ResourceId)
 
-                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid } | Should -Not -Throw
+                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ObjectId>"' -TestCases $testCasesValidObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should return $true - "<ResourceId>"' -TestCases $testCasesValidResourceIds {
+                        param ([string]$ResourceId)
 
-                        $result = Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid
+                        $result = Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid
                         $result | Should -Be $true
                     }
                 }
 
-                Context 'When called with invalid "ObjectId" parameter' {
+                Context 'When called with invalid "ResourceId" parameter' {
 
-                    It 'Should throw - "<ObjectId>"' -TestCases $testCasesEmptyObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should throw - "<ResourceId>"' -TestCases $testCasesEmptyResourceIds {
+                        param ([string]$ResourceId)
 
-                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid } | Should -Throw
+                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid } | Should -Throw
                     }
 
-                    It 'Should not throw - "<ObjectId>"' -TestCases $testCasesInvalidObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should not throw - "<ResourceId>"' -TestCases $testCasesInvalidResourceIds {
+                        param ([string]$ResourceId)
 
-                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid } | Should -Not -Throw
+                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ObjectId>"' -TestCases $testCasesInvalidObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should return $false - "<ResourceId>"' -TestCases $testCasesInvalidResourceIds {
+                        param ([string]$ResourceId)
 
-                        $result = Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid
+                        $result = Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid
                         $result | Should -Be $false
                     }
                 }
@@ -65,28 +65,28 @@ InModuleScope $script:subModuleName {
 
             Context 'When called without using "-IsValid" switch' {
 
-                Context 'When called with valid "ObjectId" parameter' {
+                Context 'When called with valid "ResourceId" parameter' {
 
-                    It 'Should throw - "<ObjectId>"' -TestCases $testCasesValidObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should throw - "<ResourceId>"' -TestCases $testCasesValidResourceIds {
+                        param ([string]$ResourceId)
 
-                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid:$false } | Should -Throw
                     }
 
                 }
 
-                Context 'When called with invalid "ObjectId" parameter' {
+                Context 'When called with invalid "ResourceId" parameter' {
 
-                    It 'Should throw - "<ObjectId>"' -TestCases $testCasesEmptyObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should throw - "<ResourceId>"' -TestCases $testCasesEmptyResourceIds {
+                        param ([string]$ResourceId)
 
-                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid:$false } | Should -Throw
                     }
 
-                    It 'Should throw - "<ObjectId>"' -TestCases $testCasesInvalidObjectIds {
-                        param ([string]$ObjectId)
+                    It 'Should throw - "<ResourceId>"' -TestCases $testCasesInvalidResourceIds {
+                        param ([string]$ResourceId)
 
-                        { Test-AzDevOpsApiObjectId -ObjectId $ObjectId -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid:$false } | Should -Throw
                     }
 
                 }

@@ -5,19 +5,19 @@
 
 InModuleScope $script:subModuleName {
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiObjectName' -Tag 'TestAzDevOpsApiObjectName' {
+    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiResourceName' -Tag 'TestAzDevOpsApiResourceName' {
 
-        $testCasesValidObjectNames = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Valid'
-        $testCasesEmptyObjectNames = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Empty'
-        $testCasesInvalidObjectNames = Get-TestCase -ScopeName 'ObjectName' -TestCaseName 'Invalid'
+        $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
+        $testCasesEmptyResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Empty'
+        $testCasesInvalidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Invalid'
 
-        Context 'When validating, valid "ObjectName" test cases' {
+        Context 'When validating, valid "ResourceName" test cases' {
 
-            It 'Should also be returned from "Get-AzDevOpsApiObjectName" function - <ObjectName>' -TestCases $testCasesValidObjectNames {
-                param ([string]$ObjectName)
+            It 'Should also be returned from "Get-AzDevOpsApiResourceName" function - <ResourceName>' -TestCases $testCasesValidResourceNames {
+                param ([string]$ResourceName)
 
-                $($(Get-AzDevOpsApiObjectName |
-                    Where-Object { $_ -ceq $ObjectName})) | Should -Be $ObjectName
+                $($(Get-AzDevOpsApiResourceName |
+                    Where-Object { $_ -ceq $ResourceName})) | Should -Be $ResourceName
 
             }
 
@@ -29,40 +29,40 @@ InModuleScope $script:subModuleName {
 
             Context 'When called using "-IsValid" switch' {
 
-                Context 'When called with valid "ObjectName" parameter' {
+                Context 'When called with valid "ResourceName" parameter' {
 
-                    It 'Should not throw - "<ObjectName>"' -TestCases $testCasesValidObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should not throw - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
+                        param ([string]$ResourceName)
 
-                        { Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid } | Should -Not -Throw
+                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ObjectName>"' -TestCases $testCasesValidObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should return $true - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
+                        param ([string]$ResourceName)
 
-                        $result = Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid
+                        $result = Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid
                         $result | Should -Be $true
                     }
                 }
 
-                Context 'When called with invalid "ObjectName" parameter' {
+                Context 'When called with invalid "ResourceName" parameter' {
 
-                    It 'Should throw - "<ObjectName>"' -TestCases $testCasesEmptyObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should throw - "<ResourceName>"' -TestCases $testCasesEmptyResourceNames {
+                        param ([string]$ResourceName)
 
-                        { Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid } | Should -Throw
+                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Throw
                     }
 
-                    It 'Should not throw - "<ObjectName>"' -TestCases $testCasesInvalidObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should not throw - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
+                        param ([string]$ResourceName)
 
-                        { Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid } | Should -Not -Throw
+                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ObjectName>"' -TestCases $testCasesInvalidObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should return $false - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
+                        param ([string]$ResourceName)
 
-                        $result = Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid
+                        $result = Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid
                         $result | Should -Be $false
                     }
                 }
@@ -77,28 +77,28 @@ InModuleScope $script:subModuleName {
 
             Context 'When called without using "-IsValid" switch' {
 
-                Context 'When called with valid "ObjectName" parameter' {
+                Context 'When called with valid "ResourceName" parameter' {
 
-                    It 'Should throw - "<ObjectName>"' -TestCases $testCasesValidObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should throw - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
+                        param ([string]$ResourceName)
 
-                        { Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid:$false } | Should -Throw
                     }
 
                 }
 
-                Context 'When called with invalid "ObjectName" parameter' {
+                Context 'When called with invalid "ResourceName" parameter' {
 
-                    It 'Should throw - "<ObjectName>"' -TestCases $testCasesEmptyObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should throw - "<ResourceName>"' -TestCases $testCasesEmptyResourceNames {
+                        param ([string]$ResourceName)
 
-                        { Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid:$false } | Should -Throw
                     }
 
-                    It 'Should throw - "<ObjectName>"' -TestCases $testCasesInvalidObjectNames {
-                        param ([string]$ObjectName)
+                    It 'Should throw - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
+                        param ([string]$ResourceName)
 
-                        { Test-AzDevOpsApiObjectName -ObjectName $ObjectName -IsValid:$false } | Should -Throw
+                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid:$false } | Should -Throw
                     }
 
                 }
