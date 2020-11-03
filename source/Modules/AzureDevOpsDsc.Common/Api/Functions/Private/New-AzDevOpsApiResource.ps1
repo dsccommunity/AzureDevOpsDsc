@@ -59,7 +59,7 @@ function New-AzDevOpsApiResource
         $Pat,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Operation','Project')]
+        [ValidateScript({ Test-AzDevOpsApiResourceName -ResourceName $_ -IsValid })]
         [System.String]
         $ResourceName,
 
