@@ -54,7 +54,7 @@ function New-AzDevOpsProject
         [System.String]
         $Pat,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
         [Alias('Id')]
         [System.String]
@@ -102,10 +102,10 @@ function New-AzDevOpsProject
 
     if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $resourceName))
     {
-        [System.Object]$resource = New-AzDevOpsApiResource -$ApiUri $ApiUri -Pat $Pat `
-                                                       -ResourceName 'Project' `
-                                                       -Resource $($resourceJson | ConvertFrom-Json) `
-                                                       -Force:$Force
+        [System.Object]$resource = New-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
+                                                           -ResourceName 'Project' `
+                                                           -Resource $($resourceJson | ConvertFrom-Json) `
+                                                           -Force:$Force -Wait
     }
 
     return $resource
