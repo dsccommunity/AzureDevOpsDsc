@@ -19,7 +19,7 @@ function Get-AzDevOpsApiUriAreaName
     [OutputType([System.Object[]])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsApiResourceName -ResourceName $_ -IsValid })]
         [System.String]
         $ResourceName
@@ -36,5 +36,5 @@ function Get-AzDevOpsApiUriAreaName
         return $resourceNameToApiUriAreaName[$ResourceName]
     }
 
-    return $resourceNameToApiUriAreaName.Values
+    return $resourceNameToApiUriAreaName.Values | Select-Object -Unique
 }

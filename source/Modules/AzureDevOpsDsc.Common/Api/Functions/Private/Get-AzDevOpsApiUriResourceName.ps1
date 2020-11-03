@@ -19,21 +19,21 @@ function Get-AzDevOpsApiUriResourceName
     [OutputType([System.Object[]])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsApiResourceName -ResourceName $_ -IsValid })]
         [System.String]
         $ResourceName
     )
 
-    [hashtable]$resourceNameToApiUriResourceName = @{
+    [hashtable]$apiResourceNameToApiUriResourceName = @{
         Operation = 'operations'
         Project = 'projects'
     }
 
     if (![string]::IsNullOrWhiteSpace($ResourceName))
     {
-        return $resourceNameToApiUriResourceName[$ResourceName]
+        return $apiResourceNameToApiUriResourceName[$ResourceName]
     }
 
-    return $resourceNameToApiUriResourceName.Values
+    return $apiResourceNameToApiUriResourceName.Values
 }

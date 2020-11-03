@@ -17,7 +17,7 @@ function Get-TestCaseValue
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('String','ApiUri','ApiVersion','Pat',`
+        [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
                      'ResourceName','ProjectName','OrganizationName',`
                      'ResourceId','OperationId','ProjectId')]
         [System.String]
@@ -94,6 +94,45 @@ function Get-TestCaseValue
             # Missing trailing '/_apis/' in URI
             'http://someuri.api/'
             'https://someuri.api/'
+        )
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
+    # ApiUriAreaName
+    $testCaseValues.ApiUriAreaName = @{
+
+        Valid = @(
+            'core'
+        )
+
+        Invalid = @(
+
+            'invalidApiUriAreaName'
+        )
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
+    # ApiUriResourceName
+    $testCaseValues.ApiUriResourceName = @{
+
+        Valid = @(
+            'operations',
+            'projects'
+        )
+
+        Invalid = @(
+
+            'invalidApiUriResourceName'
         )
 
         Empty            = $testCaseValues.String.Empty
@@ -287,7 +326,7 @@ function Get-TestCase
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('String','ApiUri','ApiVersion','Pat',`
+        [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
                      'ResourceName','ProjectName','OrganizationName',`
                      'ResourceId','OperationId','ProjectId')]
         [System.String]
