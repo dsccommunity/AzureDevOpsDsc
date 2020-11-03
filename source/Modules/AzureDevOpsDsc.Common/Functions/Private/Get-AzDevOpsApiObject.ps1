@@ -60,7 +60,12 @@ function Get-AzDevOpsApiObject
         [Parameter()]
         [ValidateScript({ Test-AzDevOpsApiObjectId -ObjectId $_ -IsValid })]
         [System.String]
-        $ObjectId
+        $ObjectId,
+
+        [Parameter()]
+        [ValidateScript( { Test-AzDevOpsApiVersion -ApiVersion $_ -IsValid })]
+        [System.String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
     # Remove any $ObjectId if using a wildcard character
@@ -74,7 +79,7 @@ function Get-AzDevOpsApiObject
     $objectNamePluralUriString = $ObjectName.ToLower() + "s"
 
     # TODO: Need to get this from input parameter?
-    $apiVersionUriParameter = 'api-version=5.1'
+    $apiVersionUriParameter = "api-version=$ApiVersion"
 
     # TODO: Need to generate this from a function
     $apiObjectUri = $ApiUri + "/$objectNamePluralUriString"
