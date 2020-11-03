@@ -71,11 +71,19 @@ function Get-AzDevOpsApiResource
         $ResourceId
     )
 
+    if ($ResourceId -contains '*')
+    {
+        $ResourceId = $null
+    }
 
     $apiResourceUriParameters = @{
         ApiUri = $ApiUri
         ApiVersion = $ApiVersion
         ResourceName = $ResourceName
+    }
+    if (![string]::IsNullOrWhiteSpace($ResourceId))
+    {
+        $apiResourceUriParameters.ResourceId = $ResourceId
     }
     [string]$apiResourceUri = Get-AzDevOpsApiResourceUri @apiResourceUriParameters
 
