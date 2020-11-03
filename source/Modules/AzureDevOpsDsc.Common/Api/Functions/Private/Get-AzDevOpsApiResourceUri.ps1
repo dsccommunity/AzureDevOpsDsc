@@ -66,7 +66,7 @@ function Get-AzDevOpsApiResourceUri
 
 
     # Append the URI-specific, 'AreaName' of the 'Resource' onto the URI (only if not in the 'core' area)
-    if ($apiResourceAreaName -ne 'core')
+    if ($apiUriResourceAreaName -ne 'core')
     {
         $apiResourceUri = $apiResourceUri + "$apiUriResourceAreaName/"
     }
