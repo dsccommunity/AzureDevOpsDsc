@@ -12,9 +12,6 @@
         against the Azure DevOps API. This PAT must have the relevant permissions assigned
         for the subsequent operations being performed.
 
-    .PARAMETER ProjectId
-        The 'id' of the 'Project' being created.
-
     .PARAMETER ProjectName
         The 'name' of the 'Project' being created.
 
@@ -31,8 +28,8 @@
 
     .EXAMPLE
         New-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' `
-                            -ProjectId 'YourProjectIdHere' -ProjectName 'YourProjectNameHere' `
-                            -ProjectName 'YourProjectDescriptionHere' -SourceControlType 'Git'
+                            -ProjectName 'YourProjectNameHere' `
+                            -ProjectDescription 'YourProjectDescriptionHere' -SourceControlType 'Git'
 
         Creates a 'Project' (assocated with the Organization/ApiUrl) in Azure DevOps using project-related, parameter values provided.
 #>
@@ -53,12 +50,6 @@ function New-AzDevOpsProject
         [Alias('PersonalAccessToken')]
         [System.String]
         $Pat,
-
-        [Parameter()]
-        [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
-        [Alias('Id')]
-        [System.String]
-        $ProjectId,
 
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid })]
@@ -84,7 +75,7 @@ function New-AzDevOpsProject
 
     [string]$resourceJson = '
     {
-      "id": "' + $ProjectId + '",
+      "id": "00000000-0000-0000-0000-000000000000",
       "name": "' + $ProjectName + '",
       "description": "' + $ProjectDescription + '",
       "capabilities": {
@@ -98,15 +89,20 @@ function New-AzDevOpsProject
     }
 '
 
-    [System.Object]$resource = $null
+    [System.Object]$newResource = $null
+    $ResourceName = 'Project'
 
-    if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $resourceName))
+    if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $ResourceName))
     {
-        [System.Object]$resource = New-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
-                                                           -ResourceName 'Project' `
-                                                           -Resource $($resourceJson | ConvertFrom-Json) `
-                                                           -Force:$Force -Wait
+        New-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
+                                -ResourceName $ResourceName `
+                                -Resource $($resourceJson | ConvertFrom-Json) `
+                                -Force:$Force -Wait | Out-Null
+
+        [System.Object]$newResource = Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat `
+                                                          -ResourceName $ResourceName `
+                                                          -ProjectName $ProjectName
     }
 
-    return $resource
+    return $newResource
 }
