@@ -44,15 +44,6 @@ try
 
         Context ('When using configuration {0}' -f $configurationName) {
 
-            It "Should exist - '$configFile'" {
-                Test-Path $configFile | Should -BeTrue
-            }
-
-            It "Should not be null or empty - '$configurationName'" {
-                $configurationName | Should -Not -BeNullOrEmpty
-            }
-
-
             It 'Should compile and apply the MOF without throwing' {
                 {
                     $configurationParameters = @{
