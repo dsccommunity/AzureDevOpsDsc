@@ -86,6 +86,9 @@ function Get-AzDevOpsApiResourceUri
     # Append any parameters to the URI
     $apiResourceUriParameters = @{
         "api-version" = $ApiVersion  # Taken from input parameter
+
+        # Always add these into URI (NOTE: Crude at present)
+        "includeCapabilities" = 'true'                          # Projects - Specifically to return full project capabilties
     }
 
     $apiResourceUri = $apiResourceUri + '?'
