@@ -52,6 +52,11 @@ function New-AzDevOpsApiResource
         [System.String]
         $ApiUri,
 
+        [Parameter()]
+        [ValidateScript( { Test-AzDevOpsApiVersion -ApiVersion $_ -IsValid })]
+        [System.String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
+
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
         [Alias('PersonalAccessToken')]
@@ -76,26 +81,22 @@ function New-AzDevOpsApiResource
         $Force
     )
 
-    # TODO: Need something to pluralise and lowercase this resource for the URI
-    $resourceNamePluralUriString = $ResourceName.ToLower() + "s"
-
-    # TODO: Need something to convert to JSON
-    $resourceJson = $Resource | ConvertTo-Json -Depth 10 -Compress
-
-    # TODO: Need to get this from input parameter?
-    $apiVersionUriParameter = 'api-version=5.1'
-
-    # TODO: Need to generate this from a function
-    $apiResourceUri = $ApiUri + "/$resourceNamePluralUriString" + '?' + $apiVersionUriParameter
-
-
-
     if ($Force -or $PSCmdlet.ShouldProcess($apiResourceUri, $ResourceName))
     {
-        [System.Object]$apiOperation = $null
-        [Hashtable]$apiHttpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
+        $apiResourceUriParameters = @{
+            ApiUri = $ApiUri
+            ApiVersion = $ApiVersion
+            ResourceName = $ResourceName
+        }
 
-        [System.Object]$apiOperation = Invoke-RestMethod -Uri $apiResourceUri -Method 'Post' -Headers $apiHttpRequestHeader -Body $resourceJson -ContentType 'application/json'
+        [string]$apiResourceUri = Get-AzDevOpsApiResourceUri @apiResourceUriParameters
+        [Hashtable]$apiHttpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
+        [string]$apiHttpRequestBody = $Resource | ConvertTo-Json -Depth 10 -Compress
+
+        [System.Object]$apiOperation = $null
+        [System.Object]$apiOperation = Invoke-RestMethod -Uri $apiResourceUri -Method 'Post' `
+                                                         -Headers $apiHttpRequestHeader -Body $apiHttpRequestBody `
+                                                         -ContentType 'application/json'
 
         if ($Wait)
         {
