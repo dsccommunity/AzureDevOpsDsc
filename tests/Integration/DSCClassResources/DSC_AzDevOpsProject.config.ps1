@@ -23,7 +23,7 @@
 
                 #ProjectId                  = 'ac6c91cc-a07f-4b8d-b146-aa6929d2882c'
                 ProjectName                = 'TestProjectName'
-                ProjectDescription         = 'TestProjectDescription2'
+                ProjectDescription         = 'TestProjectDescription'
 
                 SourceControlType          = 'Git'
 
@@ -38,12 +38,70 @@
 
 <#
     .SYNOPSIS
-        Reverts the SQL Server Agent service account of the default instance to
-        the original account that was initially used during installation.
+        Attempts to ensure an Azure DevOps 'Project' (that uses 'Git' for source control) is present.
 
     .NOTES
-        This test is intentionally meant to run using the credentials in
-        $SqlInstallCredential.
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureGitProjectPresent_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureGitProjectPresent
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestGitProjectName'
+            ProjectDescription  = 'TestGitProjectDescription'
+
+            SourceControlType   = 'Git'
+
+            Ensure              = $Node.Ensure
+        }
+    }
+}
+
+
+<#
+    .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' (that uses 'TFVC' for source control) is present.
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureTfvcProjectPresent_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureTfvcProjectPresent
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestTfvcProjectName'
+            ProjectDescription  = 'TestTfvcProjectDescription'
+
+            SourceControlType   = 'Tfvc'
+
+            Ensure              = $Node.Ensure
+        }
+    }
+}
+
+
+<#
+    .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' is updated.
+
+    .NOTES
+
 #>
 Configuration DSC_AzDevOpsProject_EnsureProjectPresent_Config
 {
@@ -51,7 +109,7 @@ Configuration DSC_AzDevOpsProject_EnsureProjectPresent_Config
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test
+        DSC_AzDevOpsProject Integration_Test_EnsureProjectPresent
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -60,7 +118,70 @@ Configuration DSC_AzDevOpsProject_EnsureProjectPresent_Config
             ProjectName         = $Node.ProjectName
             ProjectDescription  = $Node.ProjectDescription
 
+            SourceControlType   = $Node.SourceControlType
+
             Ensure              = $Node.Ensure
         }
     }
 }
+
+
+<#
+    .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' is updated.
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureProjectUpdated_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureProjectUpdated
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = $Node.ProjectName
+            ProjectDescription  = 'AnAmendedProjectDescription'
+
+            SourceControlType   = $Node.SourceControlType
+
+            Ensure              = $Node.Ensure
+        }
+    }
+}
+
+
+<#
+    .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' is updated.
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureProjectRemoved_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureProjectRemoved
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = $Node.ProjectName
+            #ProjectDescription  = $Node.ProjectDescription
+
+            #SourceControlType   = $Node.SourceControlType
+
+            Ensure              = 'Absent'
+        }
+    }
+}
+
