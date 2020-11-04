@@ -17,13 +17,22 @@ enum Ensure
     Absent
 }
 
+enum RequiredFunction
+{
+    None
+    New
+    Set
+    Remove
+}
+
+
 
 [DscResource()]
 class DSC_AzDevOpsProject
 {
 
     [DscProperty()]
-    [string]$Ensure
+    [Ensure]$Ensure
 
 
     [DscProperty()]
@@ -35,7 +44,7 @@ class DSC_AzDevOpsProject
     [string]$Pat
 
 
-    [DscProperty()]
+    [DscProperty()] # Note: Do want to be able to pass this back populated so not set as 'NotConfigurable'
     [Alias('Id')]
     [string]$ProjectId
 
@@ -62,6 +71,12 @@ class DSC_AzDevOpsProject
             $getParameters.ProjectId = $this.ProjectId
         }
 
+        Write-Verbose "GetAzDevOpsResource()..."
+        Write-Verbose "this.Ensure                 : $($this.Ensure) "
+        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
+        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
+        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
+
         return Get-AzDevOpsProject @getParameters
     }
 
@@ -74,6 +89,16 @@ class DSC_AzDevOpsProject
         {
             return $null
         }
+
+        Write-Verbose "Get()..."
+        Write-Verbose "this.Ensure                 : $($this.Ensure) "
+        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
+        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
+        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
+        Write-Verbose "existing.Ensure             : $($existing.Ensure) "
+        Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
+        Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
+        Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
 
         return [DSC_AzDevOpsProject]@{
 
@@ -95,22 +120,97 @@ class DSC_AzDevOpsProject
     {
         $existing = $this.Get()
 
-        if ($existing.ProjectDescription -ne $this.ProjectDescription -or
-            $existing.SourceControlType -ne $this.SourceControlType)
+        Write-Verbose "Test()..."
+        Write-Verbose "this.Ensure                 : $($this.Ensure) "
+        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
+        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
+        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
+        Write-Verbose "existing.Ensure             : $($existing.Ensure) "
+        Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
+        Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
+        Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
+
+        switch ($this.Ensure)
         {
-            return $false
+            'Present' {
+                # If not already present, or different to expected/desired - return $false (i.e. state is incorrect)
+                if ($null -eq $existing)
+                {
+                    return $false
+                }
+                # Following comparisons are DSCResource-specific
+                elseif ($existing.ProjectDescription -ne $this.ProjectDescription -or
+                        $existing.SourceControlType -ne $this.SourceControlType)
+                {
+                    return $false
+                }
+                break
+            }
+            'Absent' {
+                # If currently/already present - return $false (i.e. state is incorrect)
+                if ($null -ne $existing)
+                {
+                    return $false
+                }
+                break
+            }
+            default
+            {
+                throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($this.Ensure)'."
+            }
         }
 
+        # State is already as desired - return $true
         return $true
+
     }
 
 
     [void] Set()
     {
         $existing = $this.Get()
+        $requiredFunction = [RequiredFunction]::None
+
+        Write-Verbose "Set()..."
+        Write-Verbose "this.Ensure                 : $($this.Ensure) "
+        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
+        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
+        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
+        Write-Verbose "existing.Ensure             : $($existing.Ensure) "
+        Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
+        Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
+        Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
+
+        switch ($this.Ensure)
+        {
+            'Present' {
+                # If not already present, or different to expected/desired - return $false (i.e. state is incorrect)
+                if ($null -eq $existing)
+                {
+                    $requiredFunction = [RequiredFunction]::New
+                }
+                elseif ($existing.ProjectDescription -ne $this.ProjectDescription -or
+                        $existing.SourceControlType -ne $this.SourceControlType)
+                {
+                    $requiredFunction = [RequiredFunction]::Set
+                }
+                break
+            }
+            'Absent' {
+                # If currently/already present - return $false (i.e. state is incorrect)
+                if ($null -ne $existing)
+                {
+                    $requiredFunction = [RequiredFunction]::Remove
+                }
+                break
+            }
+            default {
+                throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($this.Ensure)'."
+            }
+        }
 
 
-        $setParameters = @{
+        $newSetParameters = @{
             ApiUri             = $this.ApiUri
             Pat                = $this.Pat
 
@@ -121,22 +221,31 @@ class DSC_AzDevOpsProject
 
         if (![string]::IsNullOrWhiteSpace($this.ProjectId))
         {
-            $setParameters.ProjectId = $this.ProjectId
+            $newSetParameters.ProjectId = $this.ProjectId
         }
 
 
-        if ($null -eq $existing)
+        switch ($requiredFunction)
         {
-            New-AzDevOpsProject @setParameters -Force | Out-Null
+            'None' {
+                break
+            }
+            'New' {
+                New-AzDevOpsProject @newSetParameters -Force | Out-Null
+                Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'New-AzDevOpsProject' command
+                break
+            }
+            'Set' {
+                throw 'Need to implement "Set-AzDevOpsProject" (using PATCH)'
+                Set-AzDevOpsProject @newSetParameters -Force | Out-Null
+                Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
+                break
+            }
+            default {
+                throw "Could not obtain a valid 'RequiredFunction' value within 'DSC_AzDevOpsProject' Set() function."
+            }
         }
-        else
-        {
-            throw 'Need to implement "Set-AzDevOpsProject" (using PATCH)'
-            Set-AzDevOpsProject @setParameters -Force | Out-Null
-        }
-
 
     }
-
 
 }
