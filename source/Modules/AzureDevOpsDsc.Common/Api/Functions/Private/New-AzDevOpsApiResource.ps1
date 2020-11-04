@@ -28,8 +28,8 @@
         provided.
 
         NOTE: In this example, the '-Wait' switch is provided so the function will wait for the corresponding API 'Operation'
-        to complete before the function completes. If the creation of the resource has been successful, it will be return by the
-        function. If the creation of the resource has failed, an exception will be thrown.
+        to complete before the function completes. No return value is provided by this function and if the creation of the
+        resource has failed, an exception will be thrown.
 
     .EXAMPLE
         New-AzDevOpsApiResource -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ResourceName 'Project' -Resource $YourResource
