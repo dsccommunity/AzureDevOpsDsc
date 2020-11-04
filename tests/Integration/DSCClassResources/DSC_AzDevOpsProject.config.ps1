@@ -23,7 +23,9 @@
 
                 #ProjectId                  = 'ac6c91cc-a07f-4b8d-b146-aa6929d2882c'
                 ProjectName                = 'TestProjectName'
-                ProjectDescription         = 'TestProjectDescription'
+                ProjectDescription         = 'TestProjectDescription2'
+
+                SourceControlType          = 'Git'
 
                 Ensure                     = 'Present'
 
