@@ -76,8 +76,6 @@ function New-AzDevOpsApiResource
         $Force
     )
 
-    $ResourceId = $Resource.id # TODO: Might have to remove the assumption that this works (see below also). Input resource's 'id' value looks to be ignored when creating resource.
-
     # TODO: Need something to pluralise and lowercase this resource for the URI
     $resourceNamePluralUriString = $ResourceName.ToLower() + "s"
 
@@ -105,11 +103,6 @@ function New-AzDevOpsApiResource
             Wait-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
                                    -OperationId $apiOperation.id `
                                    -IsSuccessful
-
-            # Obtains and returns the new resource
-            Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
-                                    -ResourceName $ResourceName `
-                                    -ResourceId $ResourceId # TODO: Might have to remove the assumption that this works (see above also). Input resource's 'id' value looks to be ignored when creating resource.
         }
     }
 }
