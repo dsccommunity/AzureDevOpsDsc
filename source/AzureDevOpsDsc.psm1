@@ -276,6 +276,19 @@ class DSC_AzDevOpsProject
                 Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
                 break
             }
+            'Remove' {
+                $removeParameters = @{
+                    ApiUri             = $newSetParameters.ApiUri
+                    Pat                = $newSetParameters.Pat
+
+                    ProjectId          = $newSetParameters.ProjectId
+                }
+
+                throw "Need to create 'Remove-AzDevOpsProject' function!!"
+                Remove-AzDevOpsProject @removeParameters -Force | Out-Null
+                Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
+                break
+            }
             default {
                 throw "Could not obtain a valid 'RequiredFunction' value within 'DSC_AzDevOpsProject' Set() function."
             }
