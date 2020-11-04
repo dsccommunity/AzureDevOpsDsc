@@ -100,7 +100,6 @@ function New-AzDevOpsProject
                                 -Force:$Force -Wait | Out-Null
 
         [System.Object]$newResource = Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat `
-                                                          -ResourceName $ResourceName `
                                                           -ProjectName $ProjectName
     }
 
