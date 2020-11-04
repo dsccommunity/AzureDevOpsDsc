@@ -116,6 +116,7 @@ class DSC_AzDevOpsProject
             ProjectId = $existing.id
             ProjectName = $existing.name
             ProjectDescription = $existing.description
+            SourceControlType = $existing.capabilities.versioncontrol.sourceControlType
         }
 
     }
