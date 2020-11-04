@@ -90,7 +90,16 @@ class DSC_AzDevOpsProject
 
         if ($null -eq $existing)
         {
-            return $null
+            return [DSC_AzDevOpsProject]@{
+
+                # Existing properties
+                ApiUri = $this.ApiUri
+                Pat = $this.Pat
+                ProjectName = $this.ProjectName
+
+                # Updated properties (from 'Get')
+                Ensure = 'Absent'
+            }
         }
 
         Write-Verbose "Get()..."
@@ -108,11 +117,12 @@ class DSC_AzDevOpsProject
         return [DSC_AzDevOpsProject]@{
 
             # Existing properties
-            Ensure = $this.Ensure
             ApiUri = $this.ApiUri
             Pat = $this.Pat
 
+
             # Updated properties (from 'Get')
+            Ensure = 'Present'
             ProjectId = $existing.id
             ProjectName = $existing.name
             ProjectDescription = $existing.description
@@ -150,7 +160,7 @@ class DSC_AzDevOpsProject
         {
             'Present' {
                 # If not already present, or different to expected/desired - return $false (i.e. state is incorrect)
-                if ($null -eq $existing)
+                if ($null -eq $existing -or $existing.Ensure -eq 'Absent')
                 {
                     return $false
                 }
@@ -169,7 +179,7 @@ class DSC_AzDevOpsProject
             }
             'Absent' {
                 # If currently/already present - return $false (i.e. state is incorrect)
-                if ($null -ne $existing)
+                if ($null -ne $existing -and $existing.Ensure -ne 'Absent')
                 {
                     return $false
                 }
@@ -214,7 +224,7 @@ class DSC_AzDevOpsProject
         {
             'Present' {
                 # If not already present, or different to expected/desired - return $false (i.e. state is incorrect)
-                if ($null -eq $existing)
+                if ($null -eq $existing -or $existing.Ensure -ne 'Present')
                 {
                     $requiredFunction = [RequiredFunction]::New
                 }
@@ -233,7 +243,7 @@ class DSC_AzDevOpsProject
             }
             'Absent' {
                 # If currently/already present - return $false (i.e. state is incorrect)
-                if ($null -ne $existing)
+                if ($null -ne $existing -and $existing.Ensure -ne 'Absent')
                 {
                     $requiredFunction = [RequiredFunction]::Remove
                 }
@@ -288,7 +298,6 @@ class DSC_AzDevOpsProject
                     ProjectId          = $newSetParameters.ProjectId
                 }
 
-                throw "Need to create 'Remove-AzDevOpsProject' function!!"
                 Remove-AzDevOpsProject @removeParameters -Force | Out-Null
                 Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
                 break
