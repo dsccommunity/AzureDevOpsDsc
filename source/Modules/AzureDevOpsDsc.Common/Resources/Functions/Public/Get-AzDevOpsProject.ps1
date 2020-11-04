@@ -101,13 +101,11 @@ function Get-AzDevOpsProject
     }
 
     [object[]]$projects = @()
-    Write-Verbose "$($apiListResources.Count) in apiListResources"
 
     if ($apiListResources.Count -gt 0)
     {
         $apiListResources |
             ForEach-Object {
-                Write-Verbose "$($_ | ConvertTo-Json)"
 
                 $azDevOpsProjectParameters = @{
                     ApiUri = $ApiUri;
