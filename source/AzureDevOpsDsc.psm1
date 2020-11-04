@@ -56,6 +56,9 @@ class DSC_AzDevOpsProject
     [Alias('Description')]
     [string]$ProjectDescription
 
+    [DscProperty()]
+    [string]$SourceControlType
+
 
     [PSCustomObject]GetAzDevOpsResource()
     {
@@ -95,10 +98,12 @@ class DSC_AzDevOpsProject
         Write-Verbose "this.ProjectId              : $($this.ProjectId) "
         Write-Verbose "this.ProjectName            : $($this.ProjectName) "
         Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
+        Write-Verbose "this.SourceControlType      : $($this.SourceControlType) "
         Write-Verbose "existing.Ensure             : $($existing.Ensure) "
         Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
         Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
         Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
+        Write-Verbose "existing.SourceControlType  : $($existing.SourceControlType) "
 
         return [DSC_AzDevOpsProject]@{
 
@@ -119,16 +124,26 @@ class DSC_AzDevOpsProject
     [bool] Test()
     {
         $existing = $this.Get()
+        # Note: $this is effectively 'desired' values
 
         Write-Verbose "Test()..."
         Write-Verbose "this.Ensure                 : $($this.Ensure) "
         Write-Verbose "this.ProjectId              : $($this.ProjectId) "
         Write-Verbose "this.ProjectName            : $($this.ProjectName) "
         Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
+        Write-Verbose "this.SourceControlType      : $($this.SourceControlType) "
         Write-Verbose "existing.Ensure             : $($existing.Ensure) "
         Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
         Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
         Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
+        Write-Verbose "existing.SourceControlType  : $($existing.SourceControlType) "
+
+        # Set $this.ProjectId to $existing.ProjectId if it's known and can be recovered from existing resource
+        if ([string]::IsNullOrWhiteSpace($this.ProjectId) -and ![string]::IsNullOrWhiteSpace($existing.ProjectId))
+        {
+            $this.ProjectId = $existing.ProjectId
+            Write-Verbose "this.ProjectId              : $($this.ProjectId) (Since updated)"
+        }
 
         switch ($this.Ensure)
         {
@@ -138,9 +153,14 @@ class DSC_AzDevOpsProject
                 {
                     return $false
                 }
-                # Following comparisons are DSCResource-specific
-                elseif ($existing.ProjectDescription -ne $this.ProjectDescription -or
-                        $existing.SourceControlType -ne $this.SourceControlType)
+                # Following comparisons are DSCResource-specific but UNSUPPORTED
+                elseif ($existing.SourceControlType -ne $this.SourceControlType)
+                {
+                    throw "This DSCResource does not support changes to the following properties: SourceControlType"
+                }
+                # Following comparisons are DSCResource-specific and supported
+                elseif ($existing.ProjectName -ne $this.ProjectName -or
+                        $existing.ProjectDescription -ne $this.ProjectDescription)
                 {
                     return $false
                 }
@@ -168,8 +188,8 @@ class DSC_AzDevOpsProject
 
     [void] Set()
     {
-        $existing = $this.Get()
         $requiredFunction = [RequiredFunction]::None
+        $existing = $this.Get()
 
         Write-Verbose "Set()..."
         Write-Verbose "this.Ensure                 : $($this.Ensure) "
@@ -181,6 +201,14 @@ class DSC_AzDevOpsProject
         Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
         Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
 
+        # Set $this.ProjectId to $existing.ProjectId if it's known and can be recovered from existing resource
+        if ([string]::IsNullOrWhiteSpace($this.ProjectId) -and ![string]::IsNullOrWhiteSpace($existing.ProjectId))
+        {
+            $this.ProjectId = $existing.ProjectId
+            Write-Verbose "this.ProjectId              : $($this.ProjectId) (Since updated)"
+        }
+
+
         switch ($this.Ensure)
         {
             'Present' {
@@ -189,8 +217,14 @@ class DSC_AzDevOpsProject
                 {
                     $requiredFunction = [RequiredFunction]::New
                 }
-                elseif ($existing.ProjectDescription -ne $this.ProjectDescription -or
-                        $existing.SourceControlType -ne $this.SourceControlType)
+                # Following comparisons are DSCResource-specific but UNSUPPORTED
+                elseif ($existing.SourceControlType -ne $this.SourceControlType)
+                {
+                    throw "This DSCResource does not support changes to the following properties: SourceControlType"
+                }
+                # Following comparisons are DSCResource-specific and supported
+                elseif ($existing.ProjectName -ne $this.ProjectName -or
+                        $existing.ProjectDescription -ne $this.ProjectDescription)
                 {
                     $requiredFunction = [RequiredFunction]::Set
                 }
@@ -216,7 +250,9 @@ class DSC_AzDevOpsProject
 
             ProjectName        = $this.ProjectName
             ProjectDescription = $this.ProjectDescription
-            SourceControlType  = 'Git'
+
+            # Not supported
+            # SourceControlType  = $this.SourceControlType
         }
 
         if (![string]::IsNullOrWhiteSpace($this.ProjectId))
@@ -236,7 +272,6 @@ class DSC_AzDevOpsProject
                 break
             }
             'Set' {
-                throw 'Need to implement "Set-AzDevOpsProject" (using PATCH)'
                 Set-AzDevOpsProject @newSetParameters -Force | Out-Null
                 Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
                 break
