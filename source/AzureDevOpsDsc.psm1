@@ -252,8 +252,7 @@ class DSC_AzDevOpsProject
             ProjectName        = $this.ProjectName
             ProjectDescription = $this.ProjectDescription
 
-            # Not supported
-            # SourceControlType  = $this.SourceControlType
+            SourceControlType  = $this.SourceControlType
         }
 
         if (![string]::IsNullOrWhiteSpace($this.ProjectId))
@@ -273,6 +272,10 @@ class DSC_AzDevOpsProject
                 break
             }
             'Set' {
+                # Remove any not supported
+                $newSetParameters.Remove('SourceControlType')
+
+
                 Set-AzDevOpsProject @newSetParameters -Force | Out-Null
                 Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
                 break
