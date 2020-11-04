@@ -85,6 +85,7 @@ try
                     -and $_.ResourceId -eq $resourceId
                 }
 
+                $resourceCurrentState.Ensure | Should -Be 'Present'
                 $resourceCurrentState.ProjectName | Should -Be 'TestGitProjectName'
                 $resourceCurrentState.ProjectDescription | Should -Be 'TestGitProjectDescription'
                 $resourceCurrentState.SourceControlType | Should -Be 'Git'
@@ -144,6 +145,7 @@ try
                     -and $_.ResourceId -eq $resourceId
                 }
 
+                $resourceCurrentState.Ensure | Should -Be 'Present'
                 $resourceCurrentState.ProjectName | Should -Be 'TestTfvcProjectName'
                 $resourceCurrentState.ProjectDescription | Should -Be 'TestTfvcProjectDescription'
                 $resourceCurrentState.SourceControlType | Should -Be 'Tfvc'
@@ -204,6 +206,7 @@ try
                 }
 
                 # These are all defaults from values provided in configuration data
+                $resourceCurrentState.Ensure | Should -Be 'Present'
                 $resourceCurrentState.ProjectName | Should -Be 'TestProjectName'
                 $resourceCurrentState.ProjectDescription | Should -Be 'TestProjectDescription'
                 $resourceCurrentState.SourceControlType | Should -Be 'Git'
@@ -264,9 +267,67 @@ try
                     -and $_.ResourceId -eq $resourceId
                 }
 
+                $resourceCurrentState.Ensure | Should -Be 'Present'
                 $resourceCurrentState.ProjectName | Should -Be 'TestProjectName'
                 $resourceCurrentState.ProjectDescription | Should -Be 'AnAmendedProjectDescription'
                 $resourceCurrentState.SourceControlType | Should -Be 'Git' # Must be the same (change not supported with this)
+            }
+
+
+            It 'Should return $true when Test-DscConfiguration is run' {
+                Test-DscConfiguration -Verbose | Should -Be 'True'
+            }
+        }
+
+
+        Context ("When compiling, applying and testing the MOF - '$($script:dscResourceName)_EnsureProjectRemoved_Config'") {
+
+            BeforeAll {
+                $configurationName = "$($script:dscResourceName)_EnsureProjectRemoved_Config"
+                $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test_EnsureProjectRemoved"
+            }
+
+
+            It 'Should not throw when compiling MOF and when calling "Start-DscConfiguration"' {
+                {
+                    $configurationParameters = @{
+                        OutputPath           = $TestDrive
+                        # The variable $ConfigurationData was dot-sourced above.
+                        ConfigurationData    = $ConfigurationData
+                    }
+
+                    . $configFile
+                    & $configurationName @configurationParameters
+
+                    $startDscConfigurationParameters = @{
+                        Path         = $TestDrive
+                        ComputerName = 'localhost'
+                        Wait         = $true
+                        Verbose      = $true
+                        Force        = $true
+                        ErrorAction  = 'Stop'
+                    }
+
+                    Start-DscConfiguration @startDscConfigurationParameters
+                } | Should -Not -Throw
+            }
+
+
+            It 'Should not throw when calling "Get-DscConfiguration"' {
+                {
+                    $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+
+            It 'Should have set the resource and all the parameters should match' {
+                $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq $configurationName `
+                    -and $_.ResourceId -eq $resourceId
+                }
+
+                $resourceCurrentState.Ensure | Should -Be 'Absent'
+                $resourceCurrentState.ProjectName | Should -Be 'TestProjectName'
             }
 
 
