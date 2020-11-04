@@ -92,8 +92,8 @@ function Test-AzDevOpsOperation
     }
 
 
-    [resource[]]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
-                                                 -OperationId $OperationId
+    [object[]]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
+                                                   -OperationId $OperationId
 
 
     # Reference: https://docs.microsoft.com/en-us/rest/api/azure/devops/operations/operations/get?view=azure-devops-rest-6.0#operationstatus
