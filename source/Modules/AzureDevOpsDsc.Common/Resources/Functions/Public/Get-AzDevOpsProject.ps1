@@ -86,20 +86,36 @@ function Get-AzDevOpsProject
     }
 
 
-    [object[]]$apiResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
+    [object[]]$apiListResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
 
 
     If(![string]::IsNullOrWhiteSpace($ProjectId)){
-        $apiResources = $apiResources |
+        $apiListResources = $apiListResources |
             Where-Object id -ilike $ProjectId
     }
 
 
     If(![string]::IsNullOrWhiteSpace($ProjectName)){
-        $apiResources = $apiResources |
+        $apiListResources = $apiListResources |
             Where-Object name -ilike $ProjectName
     }
 
+    [object[]]$projects = @()
+    Write-Verbose "$($apiListResources.Count) in apiListResources"
 
-    return [object[]]$apiResources
+    if ($apiListResources.Count -gt 0)
+    {
+        $apiListResources |
+            ForEach-Object {
+                Write-Verbose "$($_ | ConvertTo-Json)"
+
+                $azDevOpsProjectParameters = @{
+                    ApiUri = $ApiUri;
+                    Pat = $Pat;
+                    ResourceName = 'Project'
+                    ResourceId = $_.id}
+                $projects += $(Get-AzDevOpsApiResource @azDevOpsProjectParameters)
+            }
+    }
+    return [object[]]$projects
 }
