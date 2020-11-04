@@ -25,6 +25,8 @@
                 ProjectName                = 'TestProjectName'
                 ProjectDescription         = 'TestProjectDescription'
 
+                Ensure                     = 'Present'
+
                 #CertificateFile            = $env:DscPublicCertificatePath
             }
         )
