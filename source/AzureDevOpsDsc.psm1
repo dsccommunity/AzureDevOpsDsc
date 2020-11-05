@@ -17,12 +17,13 @@ enum Ensure
     Absent
 }
 
-enum RequiredFunction
+enum RequiredAction
 {
     None
     New
     Set
     Remove
+    Error
 }
 
 
@@ -231,14 +232,14 @@ class DSC_AzDevOpsResource
     }
 
 
-    [Hashtable]GetCurrentStateProperties()
+    hidden [Hashtable]GetCurrentStateProperties()
     {
         # Obtain 'CurrentStateResourceObject' and pass into overidden function of inheriting class
         return $this.GetCurrentStateProperties($this.GetCurrentStateResourceObject())
     }
 
     # This method must be overidden by inheriting classes
-    [Hashtable]GetCurrentStateProperties([object]$CurrentResourceObject)
+    hidden [Hashtable]GetCurrentStateProperties([object]$CurrentResourceObject)
     {
         $thisType = $this.GetType()
         if ($thisType -eq [DSC_AzDevOpsResource])
@@ -250,7 +251,7 @@ class DSC_AzDevOpsResource
     }
 
 
-    [Ensure]GetEnsure([object]$ResourceObject)
+    hidden [Ensure]GetEnsure([object]$ResourceObject)
     {
         [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
 
@@ -261,23 +262,112 @@ class DSC_AzDevOpsResource
         return [Ensure]::Present
     }
 
-    [Hashtable]GetDesiredStateProperties()
+    hidden [Hashtable]GetDesiredStateProperties()
     {
         return $this.GetResourceProperties()
     }
 
 
-    [bool]IsInDesiredState(
-        [hashtable]$Desired,
-        [hashtable]$Current)
+    hidden [RequiredAction]GetRequiredAction()
     {
-        $thisType = $this.GetType()
-        if ($thisType -eq [DSC_AzDevOpsResource])
+        [hashtable]$currentProperties = $this.GetCurrentStateProperties()
+        [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
+
+        [string[]]$propertyNamesUnsupportedForSet = @()
+        [string[]]$propertyNamesToCompare = $this.GetDscResourceDscPropertyNames()
+
+
+        # Update 'AlternateKey' property:
+        # Set $desiredProperties."$alternateKeyPropertyName" to $currentProperties."$alternateKeyPropertyName" if it's desired
+        # value is blank/null but it's current/existing value is known (and can be recovered from $currentProperties).
+        #
+        # This ensures that alternate keys (typically ResourceIds) not provided in the DSC configuration do not flag differences
+        [string]$alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
+        if ([string]::IsNullOrWhiteSpace($desiredProperties."$alternateKeyPropertyName") -and
+            ![string]::IsNullOrWhiteSpace($currentProperties."$alternateKeyPropertyName"))
         {
-            throw "Method 'IsInDesiredState()' in '$($thisType.Name)' must be overidden by an inheriting class."
-            return $null
+            $desiredProperties."$alternateKeyPropertyName" = $currentProperties."$alternateKeyPropertyName"
         }
-        return $null
+
+
+        # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already 'Present' but property values differ)
+        switch ($desiredProperties.Ensure)
+        {
+            'Present' {
+
+                # If not already present, or different to expected/desired - return 'New' (i.e. Resource needs creating)
+                if ($null -eq $currentProperties -or $currentProperties.Ensure -ne 'Present')
+                {
+                    return [RequiredAction]::New
+                    break
+                }
+
+                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a 'New' resource)
+                if ($propertyNamesUnsupportedForSet.Count -gt 0)
+                {
+                    $propertyNamesUnsupportedForSet | ForEach-Object {
+                        if ($currentProperties."$_" -ne $desiredProperties."$_")
+                        {
+                            throw "The '$($this.GetType().Name)', DSC resource does not support changes for/to the '$_' property."
+                            return [RequiredAction]::Error
+                            break
+                        }
+                    }
+                }
+
+                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a 'New' resource)
+                if ($propertyNamesToCompare.Count -gt 0)
+                {
+                    $propertyNamesToCompare | ForEach-Object {
+                        if ($currentProperties."$_" -ne $desiredProperties."$_")
+                        {
+                            return [RequiredAction]::Set
+                            break
+                        }
+                    }
+                }
+
+                # Otherwise, no changes to make (i.e. The desired state is already achieved)
+                return [RequiredAction]::None
+                break
+            }
+            'Absent' {
+                # If currently/already present - return $false (i.e. state is incorrect)
+                if ($null -ne $currentProperties -and $currentProperties.Ensure -ne 'Absent')
+                {
+                    return [RequiredAction]::Remove
+                    break
+                }
+
+                # Otherwise, no changes to make (i.e. The desired state is already achieved)
+                return [RequiredAction]::None
+                break
+            }
+            default {
+                throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
+                return [RequiredAction]::Error
+            }
+        }
+
+        return [RequiredAction]::Error
+
+    }
+
+
+    hidden [bool]IsInDesiredState()
+    {
+        if ($this.GetRequiredAction() -eq [RequiredAction]::None)
+        {
+            return $true
+        }
+
+        return $false
+    }
+
+
+    [bool] TestNew()
+    {
+        return $this.IsInDesiredState()
     }
 
 }
@@ -396,6 +486,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
     }
 
 
+
     [bool] Test()
     {
         Write-Verbose "Test(): Calling 'GetCurrentStateProperties'..."
@@ -404,6 +495,15 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
         Write-Verbose "Test(): CurrentStateProperties are..."
         Write-Verbose $($current | ConvertTo-Json)
+        Write-Verbose "Test(): "
+
+
+        Write-Verbose "Test(): Calling 'GetDesiredStateProperties'..."
+        $desired = $this.GetDesiredStateProperties()
+        Write-Verbose "Test(): Successfully called 'GetDesiredStateProperties'."
+
+        Write-Verbose "Test(): DesiredStateProperties are..."
+        Write-Verbose $($desired | ConvertTo-Json)
         Write-Verbose "Test(): "
 
 
@@ -472,7 +572,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
     [void] Set()
     {
-        $requiredFunction = [RequiredFunction]::None
+        $requiredFunction = [RequiredAction]::None
         $existing = $this.Get()
 
         Write-Verbose "Set()..."
@@ -499,7 +599,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 # If not already present, or different to expected/desired - return $false (i.e. state is incorrect)
                 if ($null -eq $existing -or $existing.Ensure -ne 'Present')
                 {
-                    $requiredFunction = [RequiredFunction]::New
+                    $requiredFunction = [RequiredAction]::New
                 }
                 # Following comparisons are DSCResource-specific but UNSUPPORTED
                 elseif ($existing.SourceControlType -ne $this.SourceControlType)
@@ -510,7 +610,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 elseif ($existing.ProjectName -ne $this.ProjectName -or
                         $existing.ProjectDescription -ne $this.ProjectDescription)
                 {
-                    $requiredFunction = [RequiredFunction]::Set
+                    $requiredFunction = [RequiredAction]::Set
                 }
                 break
             }
@@ -518,7 +618,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 # If currently/already present - return $false (i.e. state is incorrect)
                 if ($null -ne $existing -and $existing.Ensure -ne 'Absent')
                 {
-                    $requiredFunction = [RequiredFunction]::Remove
+                    $requiredFunction = [RequiredAction]::Remove
                 }
                 break
             }
@@ -573,7 +673,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 break
             }
             default {
-                throw "Could not obtain a valid 'RequiredFunction' value within 'DSC_AzDevOpsProject' Set() function."
+                throw "Could not obtain a valid 'RequiredAction' value within 'DSC_AzDevOpsProject' Set() function."
             }
         }
 
