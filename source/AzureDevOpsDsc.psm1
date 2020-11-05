@@ -278,7 +278,6 @@ class DSC_AzDevOpsProject
             }
             'New' {
                 New-AzDevOpsProject @newSetParameters -Force | Out-Null
-                Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'New-AzDevOpsProject' command
                 break
             }
             'Set' {
@@ -287,7 +286,6 @@ class DSC_AzDevOpsProject
 
 
                 Set-AzDevOpsProject @newSetParameters -Force | Out-Null
-                Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
                 break
             }
             'Remove' {
@@ -299,7 +297,6 @@ class DSC_AzDevOpsProject
                 }
 
                 Remove-AzDevOpsProject @removeParameters -Force | Out-Null
-                Start-Sleep -Seconds 5 # Need/Want to remove .... and replace with wait in the 'Set-AzDevOpsProject' command
                 break
             }
             default {
