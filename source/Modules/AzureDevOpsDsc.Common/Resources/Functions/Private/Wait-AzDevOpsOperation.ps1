@@ -108,7 +108,7 @@ function Wait-AzDevOpsOperation
 
         if ($(New-TimeSpan -Start $waitStartDateTime -End $([System.DateTime]::UtcNow)).Milliseconds -gt $WaitTimeoutMilliseconds)
         {
-            $errorMessage = $script:localizedData.AzDevOpsOperationTimeoutExceeded -f $MyInvocation.MyCommand, $OperationId, $WaitTimeoutMilliseconds
+            $errorMessage = $script:localizedData.AzDevOpsOperationWaitTimeoutExceeded -f $MyInvocation.MyCommand, $OperationId, $WaitTimeoutMilliseconds
             New-InvalidOperationException -Message $errorMessage
         }
     }
