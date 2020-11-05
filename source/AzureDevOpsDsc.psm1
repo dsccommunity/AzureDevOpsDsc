@@ -26,11 +26,8 @@ enum RequiredFunction
 }
 
 
-
-[DscResource()]
-class DSC_AzDevOpsProject
+class DSC_AzDevOpsResource
 {
-
     [DscProperty()]
     [Ensure]$Ensure
 
@@ -42,7 +39,12 @@ class DSC_AzDevOpsProject
     [DscProperty()]
     [Alias('PersonalAccessToken')]
     [string]$Pat
+}
 
+
+[DscResource()]
+class DSC_AzDevOpsProject : DSC_AzDevOpsResource
+{
 
     [DscProperty()] # Note: Do want to be able to pass this back populated so not set as 'NotConfigurable'
     [Alias('Id')]
