@@ -62,13 +62,13 @@ class DSC_AzDevOpsResource
         [string[]]$thisDscPropertyNames = @()
 
         [Type]$thisType = $this.GetType()
+        [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
 
-        $thisProperties = $thisType.GetProperties()
         $thisProperties | ForEach-Object {
-
+            [System.Reflection.PropertyInfo]$propertyInfo = $_
             $PropertyName = $_.Name
 
-            $_.GetCustomAttributes($true) |
+            $propertyInfo.GetCustomAttributes($true) |
             ForEach-Object {
 
                 if ($_.TypeId.Name -eq 'DscPropertyAttribute')
@@ -85,12 +85,15 @@ class DSC_AzDevOpsResource
     {
         [string[]]$thisDscKeyPropertyNames = @()
 
-        $thisProperties = $this.GetDscResourceDscPropertyNames()
-        $thisProperties | ForEach-Object {
+        [Type]$thisType = $this.GetType()
+        [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
 
+        $thisProperties | ForEach-Object {
+            Write-Verbose $_.Name
+            [System.Reflection.PropertyInfo]$propertyInfo = $_
             $PropertyName = $_.Name
 
-            $_.GetCustomAttributes($true) |
+            $propertyInfo.GetCustomAttributes($true) |
             ForEach-Object {
 
                 if ($_.TypeId.Name -eq 'DscPropertyAttribute' -and
@@ -149,26 +152,13 @@ class DSC_AzDevOpsResource
     # This method must be overidden by inheriting classes
     hidden [string]GetResourceAlternateKeyPropertyName()
     {
-        $thisType = $this.GetType()
-        if ($thisType -eq [DSC_AzDevOpsResource])
-        {
-            throw "Method 'GetResourceAlternateKeyPropertyName()' in '$($thisType.Name)' must be overidden by an inheriting class."
-            return $null
-        }
-        return $null
+        return "$($this.GetResourceName())Id"
     }
 
 
     hidden [string]GetResourceAlternateKey()
     {
-        [string]$alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
-
-        if ([string]::IsNullOrWhiteSpace($alternateKeyPropertyName))
-        {
-            return $null
-        }
-
-        return $this."$alternateKeyPropertyName"
+        return $this."$($this.GetResourceAlternateKeyPropertyName())"
     }
 
 
@@ -210,21 +200,34 @@ class DSC_AzDevOpsResource
     hidden [object]GetCurrentStateResourceObject()
     {
         [string]$thisResourceKey = $this.GetResourceKey()
+        [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
         [string]$thisResourceAlternateKey = $this.GetResourceAlternateKey()
+        [string]$thisResourceAlternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
         [string]$thisResourceGetMethodName = $this.GetResourceGetMethodName()
 
         $getParameters = @{
-            ApiUri             = $this.ApiUri
-            Pat                = $this.Pat
-            "$thisResourceKey" = $this."$thisResourceKey"
+            ApiUri                         = $this.ApiUri
+            Pat                            = $this.Pat
+            "$thisResourceKeyPropertyName" = $thisResourceKey
         }
 
-        if (![string]::IsNullOrWhiteSpace($this."$thisResourceAlternateKey"))
+        if (![string]::IsNullOrWhiteSpace($thisResourceAlternateKey))
         {
-            $getParameters."$thisResourceAlternateKey" = $this."$thisResourceAlternateKey"
+            $getParameters."$thisResourceAlternateKeyPropertyName" = $thisResourceAlternateKey
         }
 
-        return & $thisResourceGetMethodName @getParameters
+        Write-Verbose "Calling '$thisResourceGetMethodName'..."
+
+        $currentStateResourceObject = $(& $thisResourceGetMethodName @getParameters)
+
+        if ($null -eq $currentStateResourceObject)
+        {
+            return New-Object -TypeName 'PSObject' -Property @{
+                Ensure = [Ensure]::Absent
+            }
+        }
+
+        return $currentStateResourceObject
     }
 
 
@@ -235,7 +238,7 @@ class DSC_AzDevOpsResource
     }
 
     # This method must be overidden by inheriting classes
-    [Hashtable]GetCurrentStateProperties([object]$ResourceObject)
+    [Hashtable]GetCurrentStateProperties([object]$CurrentResourceObject)
     {
         $thisType = $this.GetType()
         if ($thisType -eq [DSC_AzDevOpsResource])
@@ -244,6 +247,18 @@ class DSC_AzDevOpsResource
             return $null
         }
         return $null
+    }
+
+
+    [Ensure]GetEnsure([object]$ResourceObject)
+    {
+        [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
+
+        if ([string]::IsNullOrWhiteSpace($ResourceObject."$thisResourceKeyPropertyName"))
+        {
+            return [Ensure]::Absent
+        }
+        return [Ensure]::Present
     }
 
     [Hashtable]GetDesiredStateProperties()
@@ -271,6 +286,27 @@ class DSC_AzDevOpsResource
 [DscResource()]
 class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 {
+
+    [Hashtable]GetCurrentStateProperties([object]$CurrentResourceObject)
+    {
+        $properties = @{
+            Pat = $this.Pat
+            ApiUri = $this.ApiUri
+
+            Ensure = $($this.GetEnsure($CurrentResourceObject))
+        }
+
+        if ($null -ne $CurrentResourceObject)
+        {
+            $properties.ProductId = $CurrentResourceObject['id']
+            $properties.ProductName = $CurrentResourceObject['name']
+            $properties.Description = $CurrentResourceObject['description']
+        }
+
+        return $properties
+    }
+
+
 
     [DscProperty()] # Note: Do want to be able to pass this back populated so not set as 'NotConfigurable'
     [Alias('Id')]
@@ -362,6 +398,15 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
     [bool] Test()
     {
+        Write-Verbose "Test(): Calling 'GetCurrentStateProperties'..."
+        $current = $this.GetCurrentStateProperties()
+        Write-Verbose "Test(): Successfully called 'GetCurrentStateProperties'."
+
+        Write-Verbose "Test(): CurrentStateProperties are..."
+        Write-Verbose $($current | ConvertTo-Json)
+        Write-Verbose "Test(): "
+
+
         $existing = $this.Get()
         # Note: $this is effectively 'desired' values
 
