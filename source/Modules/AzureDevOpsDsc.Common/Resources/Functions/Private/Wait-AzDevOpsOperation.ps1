@@ -70,12 +70,12 @@ function Wait-AzDevOpsOperation
         [Parameter()]
         [Alias('Interval','IntervalMilliseconds')]
         [System.UInt32]
-        $WaitIntervalMilliseconds = 100,
+        $WaitIntervalMilliseconds = $(Get-AzDevOpsApiWaitIntervalMs),
 
         [Parameter()]
         [Alias('Timeout','TimeoutMilliseconds')]
         [System.UInt32]
-        $WaitTimeoutMilliseconds = 10000,
+        $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
