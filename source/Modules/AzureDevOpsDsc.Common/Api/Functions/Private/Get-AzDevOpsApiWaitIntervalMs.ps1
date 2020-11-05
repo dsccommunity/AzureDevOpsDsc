@@ -15,5 +15,5 @@ function Get-AzDevOpsApiWaitIntervalMs
     [OutputType([int])]
     param ()
 
-    return 250
+    return 500
 }
