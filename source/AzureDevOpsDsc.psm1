@@ -39,7 +39,7 @@ class DSC_AzDevOpsResource
     [string]$Pat
 
     [DscProperty()]
-    [Ensure]$Ensure
+    [string]$Ensure
 
 
     # Non-DSC properties for use in operations/comparisons
@@ -49,7 +49,7 @@ class DSC_AzDevOpsResource
     hidden [string]$ResourceKey
     hidden [string]$ResourceKeyPropertyName
     hidden [string]$ResourceName = $this.GetResourceName()
-    hidden [hashtable]$ResourceProperties = $this.GetResourceProperties()
+    #hidden [hashtable]$ResourceProperties = $this.GetResourceProperties()
 
 
     # Constructor(s)
@@ -90,7 +90,7 @@ class DSC_AzDevOpsResource
         [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
 
         $thisProperties | ForEach-Object {
-            Write-Verbose $_.Name
+
             [System.Reflection.PropertyInfo]$propertyInfo = $_
             $PropertyName = $_.Name
 
@@ -165,12 +165,15 @@ class DSC_AzDevOpsResource
 
     hidden [Hashtable]GetResourceProperties()
     {
-        [PSObject]$thisObject = $this
+        #[PSObject]$thisObject = $this
         [Hashtable]$thisProperties = @{}
 
-        $thisObject.PSObject.Properties | ForEach-Object {
-            $thisProperties[$_.Name] = $_.Value
+        $this.GetDscResourceDscPropertyNames() | ForEach-Object {
+            $thisProperties."$_" = $this."$_"
         }
+        #$thisObject.PSObject.Properties | ForEach-Object {
+        #    $thisProperties[$_.Name] = $_.Value
+        #}
 
         return $thisProperties
     }
@@ -200,6 +203,7 @@ class DSC_AzDevOpsResource
 
     hidden [object]GetCurrentStateResourceObject()
     {
+        Write-Verbose "GetCurrentStateResourceObject()..."
         [string]$thisResourceKey = $this.GetResourceKey()
         [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
         [string]$thisResourceAlternateKey = $this.GetResourceAlternateKey()
@@ -214,20 +218,25 @@ class DSC_AzDevOpsResource
 
         if (![string]::IsNullOrWhiteSpace($thisResourceAlternateKey))
         {
+            Write-Verbose "thisResourceAlternateKey was not null or whitespace."
             $getParameters."$thisResourceAlternateKeyPropertyName" = $thisResourceAlternateKey
         }
 
-        Write-Verbose "Calling '$thisResourceGetMethodName'..."
-
+        #Write-Verbose "Calling '$thisResourceGetMethodName'..."
+        #Write-Verbose $($getParameters | ConvertTo-Json)
         $currentStateResourceObject = $(& $thisResourceGetMethodName @getParameters)
+        #Write-Verbose "'$thisResourceGetMethodName' end..."
+        #Write-Verbose $($currentStateResourceObject | ConvertTo-Json)
 
         if ($null -eq $currentStateResourceObject)
         {
+            #Write-Verbose "currentStateResourceObject was null."
             return New-Object -TypeName 'PSObject' -Property @{
-                Ensure = [Ensure]::Absent
+                Ensure = 'Absent'
             }
         }
 
+        #Write-Verbose "GetCurrentStateResourceObject() end."
         return $currentStateResourceObject
     }
 
@@ -239,7 +248,7 @@ class DSC_AzDevOpsResource
     }
 
     # This method must be overidden by inheriting classes
-    hidden [Hashtable]GetCurrentStateProperties([object]$CurrentResourceObject)
+    hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $thisType = $this.GetType()
         if ($thisType -eq [DSC_AzDevOpsResource])
@@ -251,24 +260,13 @@ class DSC_AzDevOpsResource
     }
 
 
-    hidden [Ensure]GetEnsure([object]$ResourceObject)
-    {
-        [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
-
-        if ([string]::IsNullOrWhiteSpace($ResourceObject."$thisResourceKeyPropertyName"))
-        {
-            return [Ensure]::Absent
-        }
-        return [Ensure]::Present
-    }
-
     hidden [Hashtable]GetDesiredStateProperties()
     {
         return $this.GetResourceProperties()
     }
 
 
-    hidden [RequiredAction]GetRequiredAction()
+    hidden [string]GetRequiredAction()
     {
         [hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
@@ -283,80 +281,137 @@ class DSC_AzDevOpsResource
         #
         # This ensures that alternate keys (typically ResourceIds) not provided in the DSC configuration do not flag differences
         [string]$alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
-        if ([string]::IsNullOrWhiteSpace($desiredProperties."$alternateKeyPropertyName") -and
-            ![string]::IsNullOrWhiteSpace($currentProperties."$alternateKeyPropertyName"))
+        Write-Verbose "got ... alternateKeyPropertyName : $alternateKeyPropertyName"
+        if ([string]::IsNullOrWhiteSpace($desiredProperties[$alternateKeyPropertyName]) -and
+            ![string]::IsNullOrWhiteSpace($currentProperties[$alternateKeyPropertyName]))
         {
+            Write-Verbose "Set ... alternateKeyPropertyName"
             $desiredProperties."$alternateKeyPropertyName" = $currentProperties."$alternateKeyPropertyName"
         }
 
 
+        Write-Verbose '============================================================'
+        Write-Verbose 'Current:'
+        Write-Verbose $($currentProperties | ConvertTo-Json)
+        Write-Verbose '============================================================'
+        Write-Verbose 'Desired:'
+        Write-Verbose $($desiredProperties | ConvertTo-Json)
+        Write-Verbose '============================================================'
+
+
         # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already 'Present' but property values differ)
-        switch ($desiredProperties.Ensure)
+        $requiredAction = 'None'
+
+        switch ($($desiredProperties.Ensure.ToString()))
         {
             'Present' {
 
                 # If not already present, or different to expected/desired - return 'New' (i.e. Resource needs creating)
-                if ($null -eq $currentProperties -or $currentProperties.Ensure -ne 'Present')
+                if ($null -eq $currentProperties -or $($currentProperties.Ensure.ToString()) -ne 'Present')
                 {
-                    return [RequiredAction]::New
-                    break
+                    $requiredAction = 'New'
                 }
+
+                # Return if not 'None'
+                if ($requiredAction -ne 'None')
+                {
+                    return $requiredAction
+                }
+
+                Write-Verbose "-----------------------------------------------------"
+                Write-Verbose "GetRequiredAction RequiredAction  : Passed 'New'"
+                Write-Verbose "-----------------------------------------------------"
 
                 # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a 'New' resource)
                 if ($propertyNamesUnsupportedForSet.Count -gt 0)
                 {
                     $propertyNamesUnsupportedForSet | ForEach-Object {
-                        if ($currentProperties."$_" -ne $desiredProperties."$_")
+
+                        Write-Verbose "Comparing UNSUPPORTED: $_"
+                        Write-Verbose $("Current: "+ $($currentProperties."$_"))
+                        Write-Verbose $("Desired: "+ $($desiredProperties."$_"))
+
+                        if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
                             throw "The '$($this.GetType().Name)', DSC resource does not support changes for/to the '$_' property."
-                            return [RequiredAction]::Error
-                            break
+                            $requiredAction = 'Error'
                         }
                     }
                 }
+
+                # Return if not 'None'
+                if ($requiredAction -ne 'None')
+                {
+                    return $requiredAction
+                    break
+                }
+
+                Write-Verbose "-----------------------------------------------------"
+                Write-Verbose "GetRequiredAction RequiredAction  : Passed 'Error'"
+                Write-Verbose "-----------------------------------------------------"
 
                 # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a 'New' resource)
                 if ($propertyNamesToCompare.Count -gt 0)
                 {
                     $propertyNamesToCompare | ForEach-Object {
-                        if ($currentProperties."$_" -ne $desiredProperties."$_")
+
+                        Write-Verbose "Comparing OK: $_"
+                        Write-Verbose $("Current: "+ $($currentProperties."$_"))
+                        Write-Verbose $("Desired: "+ $($desiredProperties."$_"))
+
+                        if ($($currentProperties."$_") -ne $($desiredProperties."$_"))
                         {
-                            return [RequiredAction]::Set
-                            break
+                            $requiredAction = 'Set'
                         }
                     }
                 }
 
-                # Otherwise, no changes to make (i.e. The desired state is already achieved)
-                return [RequiredAction]::None
-                break
-            }
-            'Absent' {
-                # If currently/already present - return $false (i.e. state is incorrect)
-                if ($null -ne $currentProperties -and $currentProperties.Ensure -ne 'Absent')
+                # Return if not 'None'
+                if ($requiredAction -ne 'None')
                 {
-                    return [RequiredAction]::Remove
+                    return $requiredAction
                     break
                 }
 
+                Write-Verbose "-----------------------------------------------------"
+                Write-Verbose "GetRequiredAction RequiredAction  : Passed 'Set'"
+                Write-Verbose "-----------------------------------------------------"
+
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
-                return [RequiredAction]::None
+                return $requiredAction
+                break
+            }
+            'Absent' {
+
+                # If currently/already present - return $false (i.e. state is incorrect)
+                if ($null -ne $currentProperties -and $currentProperties.Ensure -ne 'Absent')
+                {
+                    $requiredAction = 'Remove'
+                }
+
+                # Return if not 'None'
+                if ($requiredAction -ne 'None')
+                {
+                    return $requiredAction
+                }
+
+                # Otherwise, no changes to make (i.e. The desired state is already achieved)
+                return $requiredAction
                 break
             }
             default {
                 throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
-                return [RequiredAction]::Error
+                return 'Error'
             }
         }
 
-        return [RequiredAction]::Error
-
+        return $requiredAction
     }
 
 
     hidden [bool]IsInDesiredState()
     {
-        if ($this.GetRequiredAction() -eq [RequiredAction]::None)
+        if ($this.GetRequiredAction() -eq 'None')
         {
             return $true
         }
@@ -377,22 +432,31 @@ class DSC_AzDevOpsResource
 class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 {
 
-    [Hashtable]GetCurrentStateProperties([object]$CurrentResourceObject)
+    [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
+        Write-Verbose "GetCurrentStateProperties()..."
         $properties = @{
             Pat = $this.Pat
             ApiUri = $this.ApiUri
-
-            Ensure = $($this.GetEnsure($CurrentResourceObject))
+            Ensure = 'Absent'
         }
 
         if ($null -ne $CurrentResourceObject)
         {
-            $properties.ProductId = $CurrentResourceObject['id']
-            $properties.ProductName = $CurrentResourceObject['name']
-            $properties.Description = $CurrentResourceObject['description']
+            if (![string]::IsNullOrWhiteSpace($CurrentResourceObject.id))
+            {
+                $properties.Ensure = 'Present'
+            }
+            #Write-Verbose "(CurrentResourceObject was not null)..."
+            #Write-Verbose $($CurrentResourceObject | ConvertTo-Json)
+            $properties.ProjectId = $CurrentResourceObject.id
+            $properties.ProjectName = $CurrentResourceObject.name
+            $properties.ProjectDescription = $CurrentResourceObject.description
+            $properties.SourceControlType = $CurrentResourceObject.capabilities.versioncontrol.sourceControlType
         }
-
+        #Write-Verbose 'properties'
+        #Write-Verbose $($properties | ConvertTo-Json)
+        #Write-Verbose "GetCurrentStateProperties() end."
         return $properties
     }
 
@@ -489,158 +553,57 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
     [bool] Test()
     {
-        Write-Verbose "Test(): Calling 'GetCurrentStateProperties'..."
-        $current = $this.GetCurrentStateProperties()
-        Write-Verbose "Test(): Successfully called 'GetCurrentStateProperties'."
-
-        Write-Verbose "Test(): CurrentStateProperties are..."
-        Write-Verbose $($current | ConvertTo-Json)
-        Write-Verbose "Test(): "
-
-
-        Write-Verbose "Test(): Calling 'GetDesiredStateProperties'..."
-        $desired = $this.GetDesiredStateProperties()
-        Write-Verbose "Test(): Successfully called 'GetDesiredStateProperties'."
-
-        Write-Verbose "Test(): DesiredStateProperties are..."
-        Write-Verbose $($desired | ConvertTo-Json)
-        Write-Verbose "Test(): "
-
-
-        $existing = $this.Get()
-        # Note: $this is effectively 'desired' values
-
-        Write-Verbose "Test()..."
-        Write-Verbose "this.Ensure                 : $($this.Ensure) "
-        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
-        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
-        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
-        Write-Verbose "this.SourceControlType      : $($this.SourceControlType) "
-        Write-Verbose "existing.Ensure             : $($existing.Ensure) "
-        Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
-        Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
-        Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
-        Write-Verbose "existing.SourceControlType  : $($existing.SourceControlType) "
-
-        # Set $this.ProjectId to $existing.ProjectId if it's known and can be recovered from existing resource
-        if ([string]::IsNullOrWhiteSpace($this.ProjectId) -and ![string]::IsNullOrWhiteSpace($existing.ProjectId))
-        {
-            $this.ProjectId = $existing.ProjectId
-            Write-Verbose "this.ProjectId              : $($this.ProjectId) (Since updated)"
-        }
-
-        switch ($this.Ensure)
-        {
-            'Present' {
-                # If not already present, or different to expected/desired - return $false (i.e. state is incorrect)
-                if ($null -eq $existing -or $existing.Ensure -eq 'Absent')
-                {
-                    return $false
-                }
-                # Following comparisons are DSCResource-specific but UNSUPPORTED
-                elseif ($existing.SourceControlType -ne $this.SourceControlType)
-                {
-                    throw "This DSCResource does not support changes to the following properties: SourceControlType"
-                }
-                # Following comparisons are DSCResource-specific and supported
-                elseif ($existing.ProjectName -ne $this.ProjectName -or
-                        $existing.ProjectDescription -ne $this.ProjectDescription)
-                {
-                    return $false
-                }
-                break
-            }
-            'Absent' {
-                # If currently/already present - return $false (i.e. state is incorrect)
-                if ($null -ne $existing -and $existing.Ensure -ne 'Absent')
-                {
-                    return $false
-                }
-                break
-            }
-            default
-            {
-                throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($this.Ensure)'."
-            }
-        }
-
-        # State is already as desired - return $true
-        return $true
-
+        return $this.IsInDesiredState()
     }
 
 
     [void] Set()
     {
-        $requiredFunction = [RequiredAction]::None
-        $existing = $this.Get()
-
         Write-Verbose "Set()..."
-        Write-Verbose "this.Ensure                 : $($this.Ensure) "
-        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
-        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
-        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
-        Write-Verbose "existing.Ensure             : $($existing.Ensure) "
-        Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
-        Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
-        Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
+
+
+        $requiredFunction = $this.GetRequiredAction()
+        Write-Verbose "-----------------------------------------------------"
+        Write-Verbose "RequiredFunction  : $requiredFunction"
+        Write-Verbose "-----------------------------------------------------"
+
+
+        $current = $this.GetCurrentStateProperties()
+        $desired = $this.GetDesiredStateProperties()
+
+        Write-Verbose "current.Ensure                 : $($current.Ensure) "
+        Write-Verbose "current.ProjectId              : $($current.ProjectId) "
+        Write-Verbose "current.ProjectName            : $($current.ProjectName) "
+        Write-Verbose "current.ProjectDescription     : $($current.ProjectDescription) "
+        Write-Verbose "current.SourceControlType      : $($current.SourceControlType) "
+        Write-Verbose "desired.Ensure                 : $($desired.Ensure) "
+        Write-Verbose "desired.ProjectId              : $($desired.ProjectId) "
+        Write-Verbose "desired.ProjectName            : $($desired.ProjectName) "
+        Write-Verbose "desired.ProjectDescription     : $($desired.ProjectDescription) "
+        Write-Verbose "desired.SourceControlType      : $($desired.SourceControlType) "
+
 
         # Set $this.ProjectId to $existing.ProjectId if it's known and can be recovered from existing resource
-        if ([string]::IsNullOrWhiteSpace($this.ProjectId) -and ![string]::IsNullOrWhiteSpace($existing.ProjectId))
+        if ([string]::IsNullOrWhiteSpace($desired.ProjectId) -and ![string]::IsNullOrWhiteSpace($current.ProjectId))
         {
-            $this.ProjectId = $existing.ProjectId
-            Write-Verbose "this.ProjectId              : $($this.ProjectId) (Since updated)"
-        }
-
-
-        switch ($this.Ensure)
-        {
-            'Present' {
-                # If not already present, or different to expected/desired - return $false (i.e. state is incorrect)
-                if ($null -eq $existing -or $existing.Ensure -ne 'Present')
-                {
-                    $requiredFunction = [RequiredAction]::New
-                }
-                # Following comparisons are DSCResource-specific but UNSUPPORTED
-                elseif ($existing.SourceControlType -ne $this.SourceControlType)
-                {
-                    throw "This DSCResource does not support changes to the following properties: SourceControlType"
-                }
-                # Following comparisons are DSCResource-specific and supported
-                elseif ($existing.ProjectName -ne $this.ProjectName -or
-                        $existing.ProjectDescription -ne $this.ProjectDescription)
-                {
-                    $requiredFunction = [RequiredAction]::Set
-                }
-                break
-            }
-            'Absent' {
-                # If currently/already present - return $false (i.e. state is incorrect)
-                if ($null -ne $existing -and $existing.Ensure -ne 'Absent')
-                {
-                    $requiredFunction = [RequiredAction]::Remove
-                }
-                break
-            }
-            default {
-                throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($this.Ensure)'."
-            }
+            $desired.ProjectId = $current.ProjectId
+            Write-Verbose "desired.ProjectId              : $($desired.ProjectId) (Since updated)"
         }
 
 
         $newSetParameters = @{
-            ApiUri             = $this.ApiUri
-            Pat                = $this.Pat
+            ApiUri             = $current.ApiUri
+            Pat                = $current.Pat
 
-            ProjectName        = $this.ProjectName
-            ProjectDescription = $this.ProjectDescription
+            ProjectName        = $desired.ProjectName
+            ProjectDescription = $desired.ProjectDescription
 
-            SourceControlType  = $this.SourceControlType
+            SourceControlType  = $desired.SourceControlType
         }
 
-        if (![string]::IsNullOrWhiteSpace($this.ProjectId))
+        if (![string]::IsNullOrWhiteSpace($desired.ProjectId))
         {
-            $newSetParameters.ProjectId = $this.ProjectId
+            $newSetParameters.ProjectId = $desired.ProjectId
         }
 
 
@@ -651,6 +614,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
             }
             'New' {
                 New-AzDevOpsProject @newSetParameters -Force | Out-Null
+                Start-Sleep -Seconds 5
                 break
             }
             'Set' {
@@ -659,6 +623,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
 
                 Set-AzDevOpsProject @newSetParameters -Force | Out-Null
+                Start-Sleep -Seconds 5
                 break
             }
             'Remove' {
@@ -670,6 +635,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 }
 
                 Remove-AzDevOpsProject @removeParameters -Force | Out-Null
+                Start-Sleep -Seconds 5
                 break
             }
             default {
