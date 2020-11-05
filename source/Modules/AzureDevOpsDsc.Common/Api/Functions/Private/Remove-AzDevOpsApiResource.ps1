@@ -104,6 +104,9 @@ function Remove-AzDevOpsApiResource
             Wait-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
                                    -OperationId $apiOperation.id `
                                    -IsSuccessful
+
+            # Adds an additional, post-operation delay/buffer to mitigate subsequent calls trying to obtain new/updated items too quickly from the API
+            Start-Sleep -Milliseconds 250
         }
     }
 }
