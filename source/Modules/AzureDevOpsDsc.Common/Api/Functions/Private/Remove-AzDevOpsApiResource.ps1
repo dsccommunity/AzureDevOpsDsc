@@ -106,7 +106,7 @@ function Remove-AzDevOpsApiResource
                                    -IsSuccessful
 
             # Adds an additional, post-operation delay/buffer to mitigate subsequent calls trying to obtain new/updated items too quickly from the API
-            Start-Sleep -Milliseconds 250
+            Start-Sleep -Milliseconds $(Get-AzDevOpsApiWaitIntervalMs)
         }
     }
 }
