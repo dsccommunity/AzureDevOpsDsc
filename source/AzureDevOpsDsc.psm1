@@ -216,7 +216,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
 
-    hidden [System.Management.Automation.PSObject]GetCurrentStateResourceObject()
+    hidden [System.Management.Automation.PSObject]GetDscResourceCurrentStateObject()
     {
         # Setup a default set of parameters to pass into the object's 'Get' method
         $getParameters = @{
@@ -247,14 +247,14 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
     }
 
 
-    hidden [Hashtable]GetCurrentStateProperties()
+    hidden [Hashtable]GetDscCurrentStateProperties()
     {
         # Obtain 'CurrentStateResourceObject' and pass into overidden function of inheriting class
-        return $this.GetCurrentStateProperties($this.GetCurrentStateResourceObject())
+        return $this.GetDscCurrentStateProperties($this.GetDscResourceCurrentStateObject())
     }
 
     # This method must be overidden by inheriting class(es)
-    hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
+    hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         # Obtain the type of $this object. Throw an exception if this is being called from the base class method.
         $thisType = $this.GetType()
@@ -266,7 +266,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
     }
 
 
-    hidden [Hashtable]GetDesiredStateProperties()
+    hidden [Hashtable]GetDscDesiredStateProperties()
     {
         [Hashtable]$desiredStateProperties = @{}
 
@@ -279,10 +279,10 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
     }
 
 
-    hidden [RequiredAction]GetRequiredAction()
+    hidden [RequiredAction]GetDscRequiredAction()
     {
-        [Hashtable]$currentProperties = $this.GetCurrentStateProperties()
-        [Hashtable]$desiredProperties = $this.GetDesiredStateProperties()
+        [Hashtable]$currentProperties = $this.GetDscCurrentStateProperties()
+        [Hashtable]$desiredProperties = $this.GetDscDesiredStateProperties()
 
         [System.String[]]$propertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
         [System.String[]]$propertyNamesToCompare = $this.GetDscResourcePropertyNames()
@@ -312,7 +312,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
         # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
-        $requiredAction = [RequiredAction]::None
+        $dscRequiredAction = [RequiredAction]::None
 
         switch ($desiredProperties.Ensure)
         {
@@ -321,13 +321,13 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                 # If not already present, or different to expected/desired - return [RequiredAction]::New (i.e. Resource needs creating)
                 if ($null -eq $currentProperties -or $($currentProperties.Ensure) -ne [Ensure]::Present)
                 {
-                    $requiredAction = [RequiredAction]::New
+                    $dscRequiredAction = [RequiredAction]::New
                 }
 
                 # Return if not [RequiredAction]::None
-                if ($requiredAction -ne [RequiredAction]::None)
+                if ($dscRequiredAction -ne [RequiredAction]::None)
                 {
-                    return $requiredAction
+                    return $dscRequiredAction
                 }
 
                 # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
@@ -342,20 +342,20 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                         if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
                             throw "The '$($this.GetType().Name)', DSC resource does not support changes for/to the '$_' property."
-                            $requiredAction = [RequiredAction]::Error
+                            $dscRequiredAction = [RequiredAction]::Error
                         }
                     }
                 }
 
                 # Return if not [RequiredAction]::None
-                if ($requiredAction -ne [RequiredAction]::None)
+                if ($dscRequiredAction -ne [RequiredAction]::None)
                 {
-                    return $requiredAction
+                    return $dscRequiredAction
                     break
                 }
 
                 Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetRequiredAction RequiredAction  : Passed [RequiredAction]::Error"
+                Write-Verbose "GetDscRequiredAction RequiredAction  : Passed [RequiredAction]::Error"
                 Write-Verbose "-----------------------------------------------------"
 
                 # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
@@ -369,24 +369,24 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
                         if ($($currentProperties."$_") -ne $($desiredProperties."$_"))
                         {
-                            $requiredAction = [RequiredAction]::Set
+                            $dscRequiredAction = [RequiredAction]::Set
                         }
                     }
                 }
 
                 # Return if not [RequiredAction]::None
-                if ($requiredAction -ne [RequiredAction]::None)
+                if ($dscRequiredAction -ne [RequiredAction]::None)
                 {
-                    return $requiredAction
+                    return $dscRequiredAction
                     break
                 }
 
                 Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetRequiredAction RequiredAction  : Passed [RequiredAction]::Set"
+                Write-Verbose "GetDscRequiredAction RequiredAction  : Passed [RequiredAction]::Set"
                 Write-Verbose "-----------------------------------------------------"
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
-                return $requiredAction
+                return $dscRequiredAction
                 break
             }
             ([Ensure]::Absent) {
@@ -394,17 +394,17 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                 # If currently/already present - return $false (i.e. state is incorrect)
                 if ($null -ne $currentProperties -and $currentProperties.Ensure -ne [Ensure]::Absent)
                 {
-                    $requiredAction = [RequiredAction]::Remove
+                    $dscRequiredAction = [RequiredAction]::Remove
                 }
 
                 # Return if not [RequiredAction]::None
-                if ($requiredAction -ne [RequiredAction]::None)
+                if ($dscRequiredAction -ne [RequiredAction]::None)
                 {
-                    return $requiredAction
+                    return $dscRequiredAction
                 }
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
-                return $requiredAction
+                return $dscRequiredAction
                 break
             }
             default {
@@ -413,13 +413,13 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
             }
         }
 
-        return $requiredAction
+        return $dscRequiredAction
     }
 
 
     hidden [System.Boolean]IsInDesiredState()
     {
-        if ($this.GetRequiredAction() -eq [RequiredAction]::None)
+        if ($this.GetDscRequiredAction() -eq [RequiredAction]::None)
         {
             return $true
         }
@@ -495,17 +495,17 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
     [void] SetToDesiredState()
     {
-        [RequiredAction]$requiredAction = $this.GetRequiredAction()
+        [RequiredAction]$dscRequiredAction = $this.GetDscRequiredAction()
 
-        if ($requiredAction -in @([RequiredAction]::'New', [RequiredAction]::'Set', [RequiredAction]::'Remove'))
+        if ($dscRequiredAction -in @([RequiredAction]::'New', [RequiredAction]::'Set', [RequiredAction]::'Remove'))
         {
-            $currentStateProperties = $this.GetCurrentStateProperties()
-            $desiredStateProperties = $this.GetDesiredStateProperties()
+            $dscCurrentStateProperties = $this.GetDscCurrentStateProperties()
+            $dscDesiredStateProperties = $this.GetDscDesiredStateProperties()
 
-            $requiredActionFunctionName = $this.GetResourceFunctionName($requiredAction)
-            $desiredStateParameters = $this.GetDesiredStateParameters($currentStateProperties, $desiredStateProperties, $requiredAction)
+            $dscRequiredActionFunctionName = $this.GetResourceFunctionName($dscRequiredAction)
+            $dscDesiredStateParameters = $this.GetDesiredStateParameters($dscCurrentStateProperties, $dscDesiredStateProperties, $dscRequiredAction)
 
-            & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
+            & $dscRequiredActionFunctionName @dscDesiredStateParameters -Force | Out-Null
             Start-Sleep -Seconds 5
         }
     }
@@ -535,7 +535,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
 
     [DSC_AzDevOpsProject] Get()
     {
-        return [DSC_AzDevOpsProject]$($this.GetCurrentStateProperties())
+        return [DSC_AzDevOpsProject]$($this.GetDscCurrentStateProperties())
     }
 
     [System.Boolean] Test()
@@ -554,7 +554,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
         return @('SourceControlType')
     }
 
-    hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
+    hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $properties = @{
             Pat = $this.Pat
