@@ -32,10 +32,6 @@ enum RequiredAction
 
 class AzDevOpsApiResource
 {
-    <#
-        .SYNOPSIS
-            Returns the 'Name' of the resource (e.g. 'Project')
-    #>
     [string]$ResourceName = $this.GetResourceName()
 
     hidden [string]GetResourceName()
@@ -48,9 +44,6 @@ class AzDevOpsApiResource
 
 
     <#
-        .SYNOPSIS
-            Returns the 'Id' of the resource (e.g. 'ProjectId')
-
         .NOTES
             When creating an object via the Azure DevOps API, the ID (if provided) is ignored
             and Azure DevOps creates/generates the Id (a GUID) which can then be used for the
@@ -75,9 +68,6 @@ class AzDevOpsApiResource
 
 
     <#
-        .SYNOPSIS
-            Returns the 'Key' of the resource (e.g. 'ProjectName')
-
         .NOTES
             When creating an object via the Azure DevOps API, the 'Key' of the object will be
             another, alternate, unique key/identifier to the 'ResourceId' but this will be
@@ -100,7 +90,7 @@ class AzDevOpsApiResource
         return $this."$keyPropertyName"
     }
 
-    hidden [string]GetResourceKeyPropertyName() # TODO: Need to remove this from here...
+    hidden [string]GetResourceKeyPropertyName() # TODO: Need to remove this from here (it's DSC specific)...
     {
         # Uses the same value as the 'DscResourceDscKeyPropertyName()'
         return $this.GetDscResourceKeyPropertyName()
@@ -149,42 +139,18 @@ class AzDevOpsApiResource
 
     hidden [string]GetResourceFunctionName([RequiredAction]$RequiredAction)
     {
-        switch ($RequiredAction)
+        if ($RequiredAction -in @(
+                [RequiredAction]::Get,
+                [RequiredAction]::New,
+                [RequiredAction]::Set,
+                [RequiredAction]::Remove,
+                [RequiredAction]::Test))
         {
-            ([RequiredAction]::Get) {
-                return $this.GetResourceGetFunctionName()
-                break
-            }
-
-            ([RequiredAction]::New) {
-                return $this.GetResourceNewFunctionName()
-                break
-            }
-
-            ([RequiredAction]::Set) {
-                return $this.GetResourceSetFunctionName()
-                break
-            }
-
-            ([RequiredAction]::Remove) {
-                return $this.GetResourceRemoveFunctionName()
-                break
-            }
-
-            ([RequiredAction]::Test) {
-                return $this.GetResourceTestFunctionName()
-                break
-            }
-
-            default {
-                throw "Cannot obtain a function name within 'GetResourceFunctionName()' for RequiredAction of '$($RequiredAction)'."
-            }
-
+            $thisResourceName = $this.GetResourceName()
+            return "$($RequiredAction)-AzDevOps$thisResourceName"
         }
 
-
-        $thisResourceName = $this.GetResourceName()
-        return "Get-AzDevOps$thisResourceName"
+        return $null
     }
 
 }
