@@ -484,29 +484,21 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         Write-Verbose "desired.SourceControlType      : $($desired.SourceControlType) "
 
 
-        # Set $this.ProjectId to $existing.ProjectId if it's known and can be recovered from existing resource
+        # Set $desired."$alternateKeyPropertyName" to $current."$alternateKeyPropertyName" if it's known and can be recovered from existing resource
         if ([string]::IsNullOrWhiteSpace($desired."$alternateKeyPropertyName") -and
             ![string]::IsNullOrWhiteSpace($current."$alternateKeyPropertyName"))
         {
             $desired."$alternateKeyPropertyName" = $current."$alternateKeyPropertyName"
             Write-Verbose $("desired.$alternateKeyPropertyName  : "+$($desired."$alternateKeyPropertyName")+" (Since updated)")
         }
-
-
-        $newSetParameters = @{
-            ApiUri             = $current.ApiUri
-            Pat                = $current.Pat
-
-            ProjectName        = $desired.ProjectName
-            ProjectDescription = $desired.ProjectDescription
-
-            SourceControlType  = $desired.SourceControlType
-        }
-
-        if (![string]::IsNullOrWhiteSpace($desired.ProjectId))
+        # Alternatively, if $desired."$alternateKeyPropertyName" is null/empty, remove it (as we don't want to pass an empty/null parameter)
+        elseif ([string]::IsNullOrWhiteSpace($desired."$alternateKeyPropertyName"))
         {
-            $newSetParameters.ProjectId = $desired.ProjectId
+            $desired.Remove($alternateKeyPropertyName)
         }
+
+
+        $desired.Remove('Ensure')
 
 
         switch ($requiredAction)
@@ -516,28 +508,31 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
             }
             ([RequiredAction]::'New') {
                 $thisResourceNewFunctionName = $this.GetResourceNewFunctionName()
+
                 Write-Verbose "Calling '$thisResourceNewFunctionName'..."
-                & $thisResourceNewFunctionName @newSetParameters -Force | Out-Null
+                Write-Verbose $($desired | ConvertTo-Json)
+                & $thisResourceNewFunctionName @desired -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
             ([RequiredAction]::'Set') {
                 # Remove any not supported
-                $newSetParameters.Remove('SourceControlType')
+                $desired.Remove('SourceControlType')
 
 
                 $thisResourceSetFunctionName = $this.GetResourceSetFunctionName()
                 Write-Verbose "Calling '$thisResourceSetFunctionName'..."
-                & $thisResourceSetFunctionName @newSetParameters -Force | Out-Null
+                Write-Verbose $($desired | ConvertTo-Json)
+                & $thisResourceSetFunctionName @desired -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
             ([RequiredAction]::'Remove') {
                 $removeParameters = @{
-                    ApiUri             = $newSetParameters.ApiUri
-                    Pat                = $newSetParameters.Pat
+                    ApiUri                      = $desired.ApiUri
+                    Pat                         = $desired.Pat
 
-                    ProjectId          = $newSetParameters.ProjectId
+                    "$alternateKeyPropertyName" = $desired."$alternateKeyPropertyName"
                 }
 
                 $thisResourceRemoveFunctionName = $this.GetResourceRemoveFunctionName()
