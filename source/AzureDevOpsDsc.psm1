@@ -521,6 +521,23 @@ class DSC_AzDevOpsResource
 [DscResource()]
 class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 {
+    [DscProperty()]
+    [Alias('Id')]
+    [string]$ProjectId
+
+    [DscProperty(Key, Mandatory)]
+    [Alias('Name')]
+    [string]$ProjectName
+
+    [DscProperty()]
+    [Alias('Description')]
+    [string]$ProjectDescription
+
+    [DscProperty()]
+    [string]$SourceControlType
+
+
+
     [DSC_AzDevOpsProject] Get()
     {
         return [DSC_AzDevOpsProject]$($this.GetCurrentStateProperties())
@@ -531,11 +548,28 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         return $this.IsInDesiredState()
     }
 
+    [void] Set()
+    {
+        [RequiredAction]$requiredAction = $this.GetRequiredAction()
+
+        if ($requiredAction -in @([RequiredAction]::'New', [RequiredAction]::'Set', [RequiredAction]::'Remove'))
+        {
+            $currentStateProperties = $this.GetCurrentStateProperties()
+            $desiredStateProperties = $this.GetDesiredStateProperties()
+
+            $requiredActionFunctionName = $this.GetResourceFunctionName($requiredAction)
+            $desiredStateParameters = $this.GetDesiredStateParameters($currentStateProperties, $desiredStateProperties, $requiredAction)
+
+            & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
+            Start-Sleep -Seconds 5
+        }
+    }
+
+
+
     hidden [string[]]GetDscResourceDscUnsupportedForSetPropertyNames()
     {
-        return @(
-            'SourceControlType'
-            )
+        return @('SourceControlType')
     }
 
     hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
@@ -559,78 +593,6 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         }
 
         return $properties
-    }
-
-
-
-    [DscProperty()]
-    [Alias('Id')]
-    [string]$ProjectId
-
-    [DscProperty(Key, Mandatory)]
-    [Alias('Name')]
-    [string]$ProjectName
-
-    [DscProperty()]
-    [Alias('Description')]
-    [string]$ProjectDescription
-
-    [DscProperty()]
-    [string]$SourceControlType
-
-
-
-    [void] Set()
-    {
-        Write-Verbose "Set()..."
-
-        [RequiredAction]$requiredAction = $this.GetRequiredAction()
-        $requiredActionFunctionName = $this.GetResourceFunctionName($requiredAction)
-
-        $current = $this.GetCurrentStateProperties()
-        $desired = $this.GetDesiredStateProperties()
-        $desiredStateParameters = $this.GetDesiredStateParameters($current, $desired, $requiredAction)
-
-
-
-        Write-Verbose "current.Ensure                 : $($current.Ensure) "
-        Write-Verbose "current.ProjectId              : $($current.ProjectId) "
-        Write-Verbose "current.ProjectName            : $($current.ProjectName) "
-        Write-Verbose "current.ProjectDescription     : $($current.ProjectDescription) "
-        Write-Verbose "current.SourceControlType      : $($current.SourceControlType) "
-        Write-Verbose "desired.Ensure                 : $($desired.Ensure) "
-        Write-Verbose "desired.ProjectId              : $($desired.ProjectId) "
-        Write-Verbose "desired.ProjectName            : $($desired.ProjectName) "
-        Write-Verbose "desired.ProjectDescription     : $($desired.ProjectDescription) "
-        Write-Verbose "desired.SourceControlType      : $($desired.SourceControlType) "
-
-
-
-        switch ($requiredAction)
-        {
-            ([RequiredAction]::'None') {
-                break
-            }
-            ([RequiredAction]::'New') {
-                & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
-                Start-Sleep -Seconds 5
-                break
-            }
-            ([RequiredAction]::'Set') {
-                & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
-                Start-Sleep -Seconds 5
-                break
-            }
-            ([RequiredAction]::'Remove') {
-                & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
-                Start-Sleep -Seconds 5
-                break
-            }
-            default {
-                throw "Could not obtain a valid 'RequiredAction' value within 'DSC_AzDevOpsProject' Set() function."
-            }
-        }
-
     }
 
 }
