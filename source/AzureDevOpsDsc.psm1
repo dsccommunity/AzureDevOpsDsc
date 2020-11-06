@@ -419,18 +419,16 @@ class DSC_AzDevOpsResource
         return $false
     }
 
-
-    [bool] TestNew()
-    {
-        return $this.IsInDesiredState()
-    }
-
 }
 
 
 [DscResource()]
 class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 {
+    [bool] Test()
+    {
+        return $this.IsInDesiredState()
+    }
 
     [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
@@ -548,14 +546,6 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         }
 
     }
-
-
-
-    [bool] Test()
-    {
-        return $this.IsInDesiredState()
-    }
-
 
     [void] Set()
     {
