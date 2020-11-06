@@ -40,7 +40,7 @@ function Get-AzDevOpsOperation
 
         [Parameter()]
         [ValidateScript({ Test-AzDevOpsOperationId -OperationId $_ -IsValid })]
-        [Alias('Id')]
+        [Alias('ResourceId','Id')]
         [System.String]
         $OperationId
     )
