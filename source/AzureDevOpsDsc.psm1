@@ -20,9 +20,11 @@ enum Ensure
 enum RequiredAction
 {
     None
+    Get
     New
     Set
     Remove
+    Test
     Error
 }
 
@@ -110,32 +112,6 @@ class AzDevOpsApiResource
     }
 
 
-
-    hidden [string]GetResourceGetFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Get-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceNewFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "New-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceSetFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Set-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceRemoveFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Remove-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceTestFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Test-AzDevOps$thisResourceName"
-    }
 
     hidden [string]GetResourceFunctionName([RequiredAction]$RequiredAction)
     {
@@ -283,7 +259,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
         [string]$thisResourceId = $this.GetResourceId()
         [string]$thisResourceIdPropertyName = $this.GetResourceIdPropertyName()
-        [string]$thisResourceGetFunctionName = $this.GetResourceGetFunctionName()
+        [string]$thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
 
         $getParameters = @{
             ApiUri                         = $this.ApiUri
