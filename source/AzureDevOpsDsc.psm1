@@ -32,22 +32,9 @@ enum RequiredAction
 
 class AzDevOpsDscResource
 {
-    [System.String]
-    $DscResourceKey = $this.GetDscResourceKey()
-
-    [System.String]
-    $DscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
-
-    [System.String[]]
-    $DscResourcePropertyNames = $this.GetDscResourcePropertyNames()
-
-    [System.String[]]
-    $DscResourcePropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
-
-
     hidden [System.String]GetDscResourceKey()
     {
-        [System.String]$thisDscKeyPropertyName = $this.DscResourceKeyPropertyName
+        [System.String]$thisDscKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
         if ([System.String]::IsNullOrWhiteSpace($thisDscKeyPropertyName))
         {
@@ -196,7 +183,7 @@ class AzDevOpsApiDscResource : AzDevOpsDscResource
     {
         [Hashtable]$thisProperties = @{}
 
-        $this.DscResourcePropertyNames | ForEach-Object {
+        $this.GetDscResourcePropertyNames() | ForEach-Object {
             $thisProperties."$_" = $this."$_"
         }
 
@@ -302,7 +289,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
         [Hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [Hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
-        [System.String[]]$propertyNamesWithNoSetSupport = $this.DscResourcePropertyNamesWithNoSetSupport
+        [System.String[]]$propertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
         [System.String[]]$propertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
 
@@ -490,7 +477,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
-            [System.String[]]$unsupportedForSetPropertyNames = $this.DscResourcePropertyNamesWithNoSetSupport
+            [System.String[]]$unsupportedForSetPropertyNames = $this.GetDscResourcePropertyNamesWithNoSetSupport()
 
             if ($RequiredAction -eq [RequiredAction]::Set -and
                 $unsupportedForSetPropertyNames.Count -gt 0)
