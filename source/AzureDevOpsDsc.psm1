@@ -28,7 +28,142 @@ enum RequiredAction
 
 
 
-class DSC_AzDevOpsResource
+
+
+class AzDevOpsApiResource
+{
+    # Hidden, non-DSC properties for use in operations/comparisons
+    hidden [string]$ResourceKey = $this.GetResourceKey()
+    hidden [string]$ResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
+    hidden [string]$ResourceName = $this.GetResourceName()
+
+
+
+    hidden [string]GetResourceName()
+    {
+        # Assumes a naming convention is followed between the DSC
+        # resource name and the name of the resource within the API
+        return $this.GetType().ToString().Replace('DSC_AzDevOps','').Replace('AzDevOps','')
+    }
+
+
+
+    hidden [string]GetResourceKey()
+    {
+        [string]$keyPropertyName = $this.GetResourceKeyPropertyName()
+
+        if ([string]::IsNullOrWhiteSpace($keyPropertyName))
+        {
+            return $null
+        }
+
+        return $this."$keyPropertyName"
+    }
+
+    hidden [string]GetResourceKeyPropertyName()
+    {
+        # Uses the same value as the 'DscResourceDscKeyPropertyName()'
+        return $this.GetDscResourceDscKeyPropertyName()
+    }
+
+
+
+    hidden [string]GetResourceAlternateKeyPropertyName()
+    {
+        return "$($this.GetResourceName())Id"
+    }
+
+    hidden [string]GetResourceAlternateKey()
+    {
+        return $this."$($this.GetResourceAlternateKeyPropertyName())"
+    }
+
+
+
+    hidden [Hashtable]GetResourceProperties()
+    {
+        [Hashtable]$thisProperties = @{}
+
+        $this.GetDscResourceDscPropertyNames() | ForEach-Object {
+            $thisProperties."$_" = $this."$_"
+        }
+
+        return $thisProperties
+    }
+
+
+
+    hidden [string]GetResourceGetFunctionName()
+    {
+        $thisResourceName = $this.GetResourceName()
+        return "Get-AzDevOps$thisResourceName"
+    }
+    hidden [string]GetResourceNewFunctionName()
+    {
+        $thisResourceName = $this.GetResourceName()
+        return "New-AzDevOps$thisResourceName"
+    }
+    hidden [string]GetResourceSetFunctionName()
+    {
+        $thisResourceName = $this.GetResourceName()
+        return "Set-AzDevOps$thisResourceName"
+    }
+    hidden [string]GetResourceRemoveFunctionName()
+    {
+        $thisResourceName = $this.GetResourceName()
+        return "Remove-AzDevOps$thisResourceName"
+    }
+    hidden [string]GetResourceTestFunctionName()
+    {
+        $thisResourceName = $this.GetResourceName()
+        return "Test-AzDevOps$thisResourceName"
+    }
+
+    hidden [string]GetResourceFunctionName([RequiredAction]$RequiredAction)
+    {
+        switch ($RequiredAction)
+        {
+            ([RequiredAction]::Get) {
+                return $this.GetResourceGetFunctionName()
+                break
+            }
+
+            ([RequiredAction]::New) {
+                return $this.GetResourceNewFunctionName()
+                break
+            }
+
+            ([RequiredAction]::Set) {
+                return $this.GetResourceSetFunctionName()
+                break
+            }
+
+            ([RequiredAction]::Remove) {
+                return $this.GetResourceRemoveFunctionName()
+                break
+            }
+
+            ([RequiredAction]::Test) {
+                return $this.GetResourceTestFunctionName()
+                break
+            }
+
+            default {
+                throw "Cannot obtain a function name within 'GetResourceFunctionName()' for RequiredAction of '$($RequiredAction)'."
+            }
+
+        }
+
+
+        $thisResourceName = $this.GetResourceName()
+        return "Get-AzDevOps$thisResourceName"
+    }
+
+}
+
+
+
+class DSC_AzDevOpsResource : AzDevOpsApiResource
 {
     # DSC-specific properties for use in operations/comparisons
     [DscProperty()]
@@ -41,12 +176,6 @@ class DSC_AzDevOpsResource
 
     [DscProperty()]
     [Ensure]$Ensure
-
-
-    # Hidden, non-DSC properties for use in operations/comparisons
-    hidden [string]$ResourceKey
-    hidden [string]$ResourceKeyPropertyName
-    hidden [string]$ResourceName = $this.GetResourceName()
 
 
     # Constructor(s)
@@ -121,125 +250,6 @@ class DSC_AzDevOpsResource
 
 
 
-    # Non DSC-specific methods
-
-    hidden [string]GetResourceName()
-    {
-        # Assumes a naming convention is followed between the DSC
-        # resource name and the name of the resource within the API
-        return $this.GetType().ToString().Replace('DSC_AzDevOps','')
-    }
-
-
-    hidden [string]GetResourceKeyPropertyName()
-    {
-        # Uses the same value as the 'DscResourceDscKeyPropertyName()'
-        return $this.GetDscResourceDscKeyPropertyName()
-    }
-
-
-    hidden [string]GetResourceKey()
-    {
-        [string]$keyPropertyName = $this.GetResourceKeyPropertyName()
-
-        if ([string]::IsNullOrWhiteSpace($keyPropertyName))
-        {
-            return $null
-        }
-
-        return $this."$keyPropertyName"
-    }
-
-
-    hidden [string]GetResourceAlternateKeyPropertyName()
-    {
-        return "$($this.GetResourceName())Id"
-    }
-
-
-    hidden [string]GetResourceAlternateKey()
-    {
-        return $this."$($this.GetResourceAlternateKeyPropertyName())"
-    }
-
-
-    hidden [Hashtable]GetResourceProperties()
-    {
-        [Hashtable]$thisProperties = @{}
-
-        $this.GetDscResourceDscPropertyNames() | ForEach-Object {
-            $thisProperties."$_" = $this."$_"
-        }
-
-        return $thisProperties
-    }
-
-
-    hidden [string]GetResourceGetFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Get-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceNewFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "New-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceSetFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Set-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceRemoveFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Remove-AzDevOps$thisResourceName"
-    }
-    hidden [string]GetResourceTestFunctionName()
-    {
-        $thisResourceName = $this.GetResourceName()
-        return "Test-AzDevOps$thisResourceName"
-    }
-
-    hidden [string]GetResourceFunctionName([RequiredAction]$RequiredAction)
-    {
-        switch ($RequiredAction)
-        {
-            ([RequiredAction]::Get) {
-                return $this.GetResourceGetFunctionName()
-                break
-            }
-
-            ([RequiredAction]::New) {
-                return $this.GetResourceNewFunctionName()
-                break
-            }
-
-            ([RequiredAction]::Set) {
-                return $this.GetResourceSetFunctionName()
-                break
-            }
-
-            ([RequiredAction]::Remove) {
-                return $this.GetResourceRemoveFunctionName()
-                break
-            }
-
-            ([RequiredAction]::Test) {
-                return $this.GetResourceTestFunctionName()
-                break
-            }
-
-            default {
-                throw "Cannot obtain a function name within 'GetResourceFunctionName()' for RequiredAction of '$($RequiredAction)'."
-            }
-
-        }
-
-
-        $thisResourceName = $this.GetResourceName()
-        return "Get-AzDevOps$thisResourceName"
-    }
 
 
     hidden [object]GetCurrentStateResourceObject()
