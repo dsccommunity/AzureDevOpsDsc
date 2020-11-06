@@ -378,12 +378,6 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
     }
 
 
-    hidden [System.Boolean]IsInDesiredState()
-    {
-        return ($this.GetDscRequiredAction() -eq [RequiredAction]::None)
-    }
-
-
     hidden [Hashtable]GetDesiredStateParameters([Hashtable]$CurrentStateProperties, [Hashtable]$DesiredStateProperties, [RequiredAction]$RequiredAction)
     {
         [Hashtable]$desiredStateParameters = $DesiredStateProperties
@@ -445,6 +439,12 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
         return $desiredStateParameters
+    }
+
+
+    hidden [System.Boolean]IsInDesiredState()
+    {
+        return ($this.GetDscRequiredAction() -eq [RequiredAction]::None)
     }
 
 
