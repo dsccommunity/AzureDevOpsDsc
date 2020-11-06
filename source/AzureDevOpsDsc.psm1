@@ -562,9 +562,9 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         Write-Verbose "Set()..."
 
 
-        [RequiredAction]$requiredFunction = $this.GetRequiredAction()
+        [RequiredAction]$requiredAction = $this.GetRequiredAction()
         Write-Verbose "-----------------------------------------------------"
-        Write-Verbose "RequiredFunction  : $requiredFunction"
+        Write-Verbose "RequiredAction  : $requiredAction"
         Write-Verbose "-----------------------------------------------------"
 
 
@@ -607,7 +607,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         }
 
 
-        switch ($requiredFunction)
+        switch ($requiredAction)
         {
             ([RequiredAction]::'None') {
                 break
