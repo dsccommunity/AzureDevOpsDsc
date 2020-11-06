@@ -84,7 +84,7 @@ class AzDevOpsApiResource
     {
         [Hashtable]$thisProperties = @{}
 
-        $this.GetDscResourceDscPropertyNames() | ForEach-Object {
+        $this.GetDscPropertyNames() | ForEach-Object {
             $thisProperties."$_" = $this."$_"
         }
 
@@ -183,15 +183,15 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
 
     # DSC-specific methods
-    hidden [string[]]GetDscResourceDscPropertyNames()
+    hidden [System.String[]]GetDscPropertyNames()
     {
-        [string[]]$thisDscPropertyNames = @()
+        [System.String[]]$thisDscPropertyNames = @()
 
         [Type]$thisType = $this.GetType()
         [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
 
         $thisProperties | ForEach-Object {
-            [System.Reflection.PropertyInfo]$propertyInfo = $_
+            $propertyInfo = $_
             $PropertyName = $_.Name
 
             $propertyInfo.GetCustomAttributes($true) |
@@ -316,7 +316,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
         [string[]]$propertyNamesUnsupportedForSet = $this.GetDscResourceDscUnsupportedForSetPropertyNames()
-        [string[]]$propertyNamesToCompare = $this.GetDscResourceDscPropertyNames()
+        [string[]]$propertyNamesToCompare = $this.GetDscPropertyNames()
 
 
         # Update 'AlternateKey' property:
