@@ -302,15 +302,6 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
         }
 
 
-        Write-Verbose '============================================================'
-        Write-Verbose 'Current:'
-        Write-Verbose $($currentProperties | ConvertTo-Json)
-        Write-Verbose '============================================================'
-        Write-Verbose 'Desired:'
-        Write-Verbose $($desiredProperties | ConvertTo-Json)
-        Write-Verbose '============================================================'
-
-
         # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
         $dscRequiredAction = [RequiredAction]::None
 
@@ -322,13 +313,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                 if ($null -eq $currentProperties -or $($currentProperties.Ensure) -ne [Ensure]::Present)
                 {
                     $dscRequiredAction = [RequiredAction]::New
-                    break
-                }
-
-                # Return if not [RequiredAction]::None
-                if ($dscRequiredAction -ne [RequiredAction]::None)
-                {
-                    return $dscRequiredAction
+                    Write-Verbose "DscActionRequired='$dscRequiredAction'"
                     break
                 }
 
@@ -340,15 +325,9 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                         if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
                             throw "The '$($this.GetType().Name)', DSC resource does not support changes for/to the '$_' property."
+                            break
                         }
                     }
-                }
-
-                # Return if not [RequiredAction]::None
-                if ($dscRequiredAction -ne [RequiredAction]::None)
-                {
-                    return $dscRequiredAction
-                    break
                 }
 
                 # Compare all properties ('Current' vs 'Desired')
@@ -358,16 +337,16 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
                         if ($($currentProperties."$_") -ne $($desiredProperties."$_"))
                         {
+                            Write-Verbose "DscPropertyValueMismatch='$_'"
                             $dscRequiredAction = [RequiredAction]::Set
                         }
                     }
-                }
 
-                # Return if not [RequiredAction]::None
-                if ($dscRequiredAction -ne [RequiredAction]::None)
-                {
-                    return $dscRequiredAction
-                    break
+                    if ($dscRequiredAction -eq [RequiredAction]::Set)
+                    {
+                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                        break
+                    }
                 }
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
@@ -380,15 +359,12 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                 if ($null -ne $currentProperties -and $currentProperties.Ensure -ne [Ensure]::Absent)
                 {
                     $dscRequiredAction = [RequiredAction]::Remove
-                }
-
-                # Return if not [RequiredAction]::None
-                if ($dscRequiredAction -ne [RequiredAction]::None)
-                {
-                    return $dscRequiredAction
+                    Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                    break
                 }
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
+                Write-Verbose "DscActionRequired='$dscRequiredAction'"
                 return $dscRequiredAction
                 break
             }
