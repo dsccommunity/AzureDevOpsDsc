@@ -170,22 +170,27 @@ class DSC_AzDevOpsResource
     }
 
 
-    hidden [string]GetResourceGetMethodName()
+    hidden [string]GetResourceGetFunctionName()
     {
         $thisResourceName = $this.GetResourceName()
         return "Get-AzDevOps$thisResourceName"
     }
-    hidden [string]GetResourceSetMethodName()
+    hidden [string]GetResourceNewFunctionName()
+    {
+        $thisResourceName = $this.GetResourceName()
+        return "New-AzDevOps$thisResourceName"
+    }
+    hidden [string]GetResourceSetFunctionName()
     {
         $thisResourceName = $this.GetResourceName()
         return "Set-AzDevOps$thisResourceName"
     }
-    hidden [string]GetResourceRemoveMethodName()
+    hidden [string]GetResourceRemoveFunctionName()
     {
         $thisResourceName = $this.GetResourceName()
         return "Remove-AzDevOps$thisResourceName"
     }
-    hidden [string]GetResourceTestMethodName()
+    hidden [string]GetResourceTestFunctionName()
     {
         $thisResourceName = $this.GetResourceName()
         return "Test-AzDevOps$thisResourceName"
@@ -198,7 +203,7 @@ class DSC_AzDevOpsResource
         [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
         [string]$thisResourceAlternateKey = $this.GetResourceAlternateKey()
         [string]$thisResourceAlternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
-        [string]$thisResourceGetMethodName = $this.GetResourceGetMethodName()
+        [string]$thisResourceGetFunctionName = $this.GetResourceGetFunctionName()
 
         $getParameters = @{
             ApiUri                         = $this.ApiUri
@@ -212,7 +217,7 @@ class DSC_AzDevOpsResource
             $getParameters."$thisResourceAlternateKeyPropertyName" = $thisResourceAlternateKey
         }
 
-        $currentStateResourceObject = $(& $thisResourceGetMethodName @getParameters)
+        $currentStateResourceObject = $(& $thisResourceGetFunctionName @getParameters)
 
         if ($null -eq $currentStateResourceObject)
         {
@@ -456,17 +461,11 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
 
 
-
     [void] Set()
     {
         Write-Verbose "Set()..."
 
-
         [RequiredAction]$requiredAction = $this.GetRequiredAction()
-        Write-Verbose "-----------------------------------------------------"
-        Write-Verbose "RequiredAction  : $requiredAction"
-        Write-Verbose "-----------------------------------------------------"
-
 
         $current = $this.GetCurrentStateProperties()
         $desired = $this.GetDesiredStateProperties()
@@ -513,7 +512,9 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 break
             }
             ([RequiredAction]::'New') {
-                New-AzDevOpsProject @newSetParameters -Force | Out-Null
+                $thisResourceNewFunctionName = $this.GetResourceNewFunctionName()
+                Write-Verbose "Calling '$thisResourceNewFunctionName'..."
+                & $thisResourceNewFunctionName @newSetParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
@@ -522,7 +523,9 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 $newSetParameters.Remove('SourceControlType')
 
 
-                Set-AzDevOpsProject @newSetParameters -Force | Out-Null
+                $thisResourceSetFunctionName = $this.GetResourceSetFunctionName()
+                Write-Verbose "Calling '$thisResourceSetFunctionName'..."
+                & $thisResourceSetFunctionName @newSetParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
@@ -534,7 +537,9 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                     ProjectId          = $newSetParameters.ProjectId
                 }
 
-                Remove-AzDevOpsProject @removeParameters -Force | Out-Null
+                $thisResourceRemoveFunctionName = $this.GetResourceRemoveFunctionName()
+                Write-Verbose "Calling '$thisResourceRemoveFunctionName'..."
+                & $thisResourceRemoveFunctionName @removeParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
