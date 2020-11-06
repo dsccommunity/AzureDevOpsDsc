@@ -53,7 +53,7 @@ function Set-AzDevOpsProject
 
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
-        [Alias('Id')]
+        [Alias('ResourceId','Id')]
         [System.String]
         $ProjectId,
 
