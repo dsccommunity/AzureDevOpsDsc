@@ -47,7 +47,7 @@ class AzDevOpsDscResource
 
     hidden [System.String]GetDscResourceKey()
     {
-        [System.String]$thisDscKeyPropertyName = $this.GetDscResourceKeyPropertyName()
+        [System.String]$thisDscKeyPropertyName = $this.DscResourceKeyPropertyName
 
         if ([System.String]::IsNullOrWhiteSpace($thisDscKeyPropertyName))
         {
