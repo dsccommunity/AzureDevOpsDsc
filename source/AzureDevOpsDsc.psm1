@@ -243,7 +243,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         return $thisDscPropertyNames
     }
 
-    hidden [string[]]GetDscNoSetSupportPropertyNames()
+    hidden [string[]]GetDscPropertyNamesWithNoSetSupport()
     {
         return @()
     }
@@ -316,7 +316,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         [hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
-        [string[]]$propertyNamesWithNoSetSupport = $this.GetDscNoSetSupportPropertyNames()
+        [string[]]$propertyNamesWithNoSetSupport = $this.GetDscPropertyNamesWithNoSetSupport()
         [string[]]$propertyNamesToCompare = $this.GetDscPropertyNames()
 
 
@@ -504,7 +504,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
-            [string[]]$unsupportedForSetPropertyNames = $this.GetDscNoSetSupportPropertyNames()
+            [string[]]$unsupportedForSetPropertyNames = $this.GetDscPropertyNamesWithNoSetSupport()
 
             if ($RequiredAction -eq [RequiredAction]::Set -and
                 $unsupportedForSetPropertyNames.Count -gt 0)
@@ -581,7 +581,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
     }
 
 
-    hidden [string[]]GetDscNoSetSupportPropertyNames()
+    hidden [string[]]GetDscPropertyNamesWithNoSetSupport()
     {
         return @('SourceControlType')
     }
