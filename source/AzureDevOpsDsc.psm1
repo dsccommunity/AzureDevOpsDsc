@@ -39,7 +39,7 @@ class DSC_AzDevOpsResource
     [string]$Pat
 
     [DscProperty()]
-    [string]$Ensure
+    [Ensure]$Ensure
 
 
     # Non-DSC properties for use in operations/comparisons
@@ -232,7 +232,7 @@ class DSC_AzDevOpsResource
         {
             #Write-Verbose "currentStateResourceObject was null."
             return New-Object -TypeName 'PSObject' -Property @{
-                Ensure = 'Absent'
+                Ensure = [Ensure]::Absent
             }
         }
 
@@ -299,15 +299,15 @@ class DSC_AzDevOpsResource
         Write-Verbose '============================================================'
 
 
-        # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already 'Present' but property values differ)
+        # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
         $requiredAction = 'None'
 
-        switch ($($desiredProperties.Ensure.ToString()))
+        switch ($desiredProperties.Ensure)
         {
-            'Present' {
+            ([Ensure]::Present) {
 
                 # If not already present, or different to expected/desired - return 'New' (i.e. Resource needs creating)
-                if ($null -eq $currentProperties -or $($currentProperties.Ensure.ToString()) -ne 'Present')
+                if ($null -eq $currentProperties -or $($currentProperties.Ensure.ToString()) -ne [Ensure]::Present)
                 {
                     $requiredAction = 'New'
                 }
@@ -381,10 +381,10 @@ class DSC_AzDevOpsResource
                 return $requiredAction
                 break
             }
-            'Absent' {
+            ([Ensure]::Absent) {
 
                 # If currently/already present - return $false (i.e. state is incorrect)
-                if ($null -ne $currentProperties -and $currentProperties.Ensure -ne 'Absent')
+                if ($null -ne $currentProperties -and $currentProperties.Ensure -ne [Ensure]::Absent)
                 {
                     $requiredAction = 'Remove'
                 }
@@ -438,14 +438,14 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         $properties = @{
             Pat = $this.Pat
             ApiUri = $this.ApiUri
-            Ensure = 'Absent'
+            Ensure = [Ensure]::Absent
         }
 
         if ($null -ne $CurrentResourceObject)
         {
             if (![string]::IsNullOrWhiteSpace($CurrentResourceObject.id))
             {
-                $properties.Ensure = 'Present'
+                $properties.Ensure = [Ensure]::Present
             }
             #Write-Verbose "(CurrentResourceObject was not null)..."
             #Write-Verbose $($CurrentResourceObject | ConvertTo-Json)
@@ -516,7 +516,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 ProjectName = $this.ProjectName
 
                 # Updated properties (from 'Get')
-                Ensure = 'Absent'
+                Ensure = [Ensure]::Absent
             }
         }
 
@@ -540,7 +540,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
 
             # Updated properties (from 'Get')
-            Ensure = 'Present'
+            Ensure = [Ensure]::Present
             ProjectId = $existing.id
             ProjectName = $existing.name
             ProjectDescription = $existing.description
