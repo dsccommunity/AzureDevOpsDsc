@@ -41,6 +41,9 @@ class AzDevOpsDscResource
     [System.String[]]
     $DscResourcePropertyNames = $this.GetDscResourcePropertyNames()
 
+    [System.String[]]
+    $DscResourcePropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
+
 
     hidden [System.String]GetDscResourceKey()
     {
@@ -309,7 +312,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
         [Hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [Hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
-        [System.String[]]$propertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
+        [System.String[]]$propertyNamesWithNoSetSupport = $this.DscResourcePropertyNamesWithNoSetSupport
         [System.String[]]$propertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
 
@@ -497,7 +500,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
-            [System.String[]]$unsupportedForSetPropertyNames = $this.GetDscResourcePropertyNamesWithNoSetSupport()
+            [System.String[]]$unsupportedForSetPropertyNames = $this.DscResourcePropertyNamesWithNoSetSupport
 
             if ($RequiredAction -eq [RequiredAction]::Set -and
                 $unsupportedForSetPropertyNames.Count -gt 0)
