@@ -78,6 +78,11 @@ class DSC_AzDevOpsResource
         return $thisDscPropertyNames
     }
 
+    hidden [string[]]GetDscResourceDscUnsupportedForSetPropertyNames()
+    {
+        return @()
+    }
+
     hidden [string]GetDscResourceDscKeyPropertyName()
     {
         [string[]]$thisDscKeyPropertyNames = @()
@@ -300,7 +305,7 @@ class DSC_AzDevOpsResource
         [hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
-        [string[]]$propertyNamesUnsupportedForSet = @()
+        [string[]]$propertyNamesUnsupportedForSet = $this.GetDscResourceDscUnsupportedForSetPropertyNames()
         [string[]]$propertyNamesToCompare = $this.GetDscResourceDscPropertyNames()
 
 
@@ -447,41 +452,62 @@ class DSC_AzDevOpsResource
 
     hidden [hashtable]GetDesiredStateParameters([hashtable]$CurrentStateProperties, [hashtable]$DesiredStateProperties, [RequiredAction]$RequiredAction)
     {
+        [hashtable]$desiredStateParameters = $DesiredStateProperties
         [string]$alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
 
 
-        # If the desired state/action is to remove the resource, generate/return a minimal set of parameters
-        if ($RequiredAction -eq [RequiredAction]::Remove)
+        # If actions required are 'None' or 'Error', return a $null value
+        if ($RequiredAction -in @([RequiredAction]::None, [RequiredAction]::Error))
+        {
+            return $null
+        }
+        # If the desired state/action is to remove the resource, generate/return a minimal set of parameters required to remove the resource
+        elseif ($RequiredAction -eq [RequiredAction]::Remove)
         {
             return @{
                 ApiUri                      = $DesiredStateProperties.ApiUri
                 Pat                         = $DesiredStateProperties.Pat
 
-                # Set this from the 'Current' state as we would expect this to have an existing ID to use
+                # Set this from the 'Current' state as we would expect this to have an existing key/ID value to use
                 "$alternateKeyPropertyName" = $CurrentStateProperties."$alternateKeyPropertyName"
             }
         }
-
-
-        # If the desired state/action is to add/new or update/set  the resource, start with the values in the $DesiredStateProperties variable
-        [hashtable]$desiredStateParameters = $DesiredStateProperties
-
-
-        # Set $desiredParameters."$alternateKeyPropertyName" to $CurrentStateProperties."$alternateKeyPropertyName" if it's known and can be recovered from existing resource
-        if ([string]::IsNullOrWhiteSpace($desiredStateParameters."$alternateKeyPropertyName") -and
-            ![string]::IsNullOrWhiteSpace($CurrentStateProperties."$alternateKeyPropertyName"))
+        # If the desired state/action is to add/new or update/set  the resource, start with the values in the $DesiredStateProperties variable, and amend
+        elseif ($RequiredAction -in @([RequiredAction]::New, [RequiredAction]::Set))
         {
-            $desiredStateParameters."$alternateKeyPropertyName" = $CurrentStateProperties."$alternateKeyPropertyName"
+            # Set $desiredParameters."$alternateKeyPropertyName" to $CurrentStateProperties."$alternateKeyPropertyName" if it's known and can be recovered from existing resource
+            if ([string]::IsNullOrWhiteSpace($desiredStateParameters."$alternateKeyPropertyName") -and
+                ![string]::IsNullOrWhiteSpace($CurrentStateProperties."$alternateKeyPropertyName"))
+            {
+                $desiredStateParameters."$alternateKeyPropertyName" = $CurrentStateProperties."$alternateKeyPropertyName"
+            }
+            # Alternatively, if $desiredParameters."$alternateKeyPropertyName" is null/empty, remove the key (as we don't want to pass an empty/null parameter)
+            elseif ([string]::IsNullOrWhiteSpace($desiredStateParameters."$alternateKeyPropertyName"))
+            {
+                $desiredStateParameters.Remove($alternateKeyPropertyName)
+            }
+
+
+            # Do not need/want this passing as a parameter (the action taken will determine the desired state)
+            $desiredStateParameters.Remove('Ensure')
+
+
+            # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
+            [string[]]$unsupportedForSetPropertyNames = $this.GetDscResourceDscUnsupportedForSetPropertyNames()
+
+            if ($RequiredAction -eq [RequiredAction]::Set -and
+                $unsupportedForSetPropertyNames.Count -gt 0)
+            {
+                $unsupportedForSetPropertyNames | ForEach-Object {
+                    $desiredStateParameters.Remove($_)
+                }
+            }
+
         }
-        # Alternatively, if $desiredParameters."$alternateKeyPropertyName" is null/empty, remove the key (as we don't want to pass an empty/null parameter)
-        elseif ([string]::IsNullOrWhiteSpace($desiredStateParameters."$alternateKeyPropertyName"))
+        else
         {
-            $desiredStateParameters.Remove($alternateKeyPropertyName)
+            throw "A required action of '$RequiredAction' has not been catered for in GetDesiredStateParameters() method."
         }
-
-
-        # Do not need/want this passing as a parameter (the action taken will determine the desired state)
-        $desiredStateParameters.Remove('Ensure')
 
 
         return $desiredStateParameters
@@ -505,7 +531,14 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         return $this.IsInDesiredState()
     }
 
-    [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
+    hidden [string[]]GetDscResourceDscUnsupportedForSetPropertyNames()
+    {
+        return @(
+            'SourceControlType'
+            )
+    }
+
+    hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $properties = @{
             Pat = $this.Pat
@@ -584,9 +617,6 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 break
             }
             ([RequiredAction]::'Set') {
-                # Remove any not supported
-                $desiredStateParameters.Remove('SourceControlType')
-
                 & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
