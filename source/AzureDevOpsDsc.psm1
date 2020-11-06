@@ -266,7 +266,7 @@ class DSC_AzDevOpsResource
     }
 
 
-    hidden [string]GetRequiredAction()
+    hidden [RequiredAction]GetRequiredAction()
     {
         [hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
@@ -300,29 +300,29 @@ class DSC_AzDevOpsResource
 
 
         # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
-        $requiredAction = 'None'
+        $requiredAction = [RequiredAction]::None
 
         switch ($desiredProperties.Ensure)
         {
             ([Ensure]::Present) {
 
-                # If not already present, or different to expected/desired - return 'New' (i.e. Resource needs creating)
-                if ($null -eq $currentProperties -or $($currentProperties.Ensure.ToString()) -ne [Ensure]::Present)
+                # If not already present, or different to expected/desired - return [RequiredAction]::New (i.e. Resource needs creating)
+                if ($null -eq $currentProperties -or $($currentProperties.Ensure) -ne [Ensure]::Present)
                 {
-                    $requiredAction = 'New'
+                    $requiredAction = [RequiredAction]::New
                 }
 
-                # Return if not 'None'
-                if ($requiredAction -ne 'None')
+                # Return if not [RequiredAction]::None
+                if ($requiredAction -ne [RequiredAction]::None)
                 {
                     return $requiredAction
                 }
 
                 Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetRequiredAction RequiredAction  : Passed 'New'"
+                Write-Verbose "GetRequiredAction RequiredAction  : Passed [RequiredAction]::New"
                 Write-Verbose "-----------------------------------------------------"
 
-                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a 'New' resource)
+                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
                 if ($propertyNamesUnsupportedForSet.Count -gt 0)
                 {
                     $propertyNamesUnsupportedForSet | ForEach-Object {
@@ -334,23 +334,23 @@ class DSC_AzDevOpsResource
                         if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
                             throw "The '$($this.GetType().Name)', DSC resource does not support changes for/to the '$_' property."
-                            $requiredAction = 'Error'
+                            $requiredAction = [RequiredAction]::Error
                         }
                     }
                 }
 
-                # Return if not 'None'
-                if ($requiredAction -ne 'None')
+                # Return if not [RequiredAction]::None
+                if ($requiredAction -ne [RequiredAction]::None)
                 {
                     return $requiredAction
                     break
                 }
 
                 Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetRequiredAction RequiredAction  : Passed 'Error'"
+                Write-Verbose "GetRequiredAction RequiredAction  : Passed [RequiredAction]::Error"
                 Write-Verbose "-----------------------------------------------------"
 
-                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a 'New' resource)
+                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
                 if ($propertyNamesToCompare.Count -gt 0)
                 {
                     $propertyNamesToCompare | ForEach-Object {
@@ -361,20 +361,20 @@ class DSC_AzDevOpsResource
 
                         if ($($currentProperties."$_") -ne $($desiredProperties."$_"))
                         {
-                            $requiredAction = 'Set'
+                            $requiredAction = [RequiredAction]::Set
                         }
                     }
                 }
 
-                # Return if not 'None'
-                if ($requiredAction -ne 'None')
+                # Return if not [RequiredAction]::None
+                if ($requiredAction -ne [RequiredAction]::None)
                 {
                     return $requiredAction
                     break
                 }
 
                 Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetRequiredAction RequiredAction  : Passed 'Set'"
+                Write-Verbose "GetRequiredAction RequiredAction  : Passed [RequiredAction]::Set"
                 Write-Verbose "-----------------------------------------------------"
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
@@ -386,11 +386,11 @@ class DSC_AzDevOpsResource
                 # If currently/already present - return $false (i.e. state is incorrect)
                 if ($null -ne $currentProperties -and $currentProperties.Ensure -ne [Ensure]::Absent)
                 {
-                    $requiredAction = 'Remove'
+                    $requiredAction = [RequiredAction]::Remove
                 }
 
-                # Return if not 'None'
-                if ($requiredAction -ne 'None')
+                # Return if not [RequiredAction]::None
+                if ($requiredAction -ne [RequiredAction]::None)
                 {
                     return $requiredAction
                 }
@@ -401,7 +401,7 @@ class DSC_AzDevOpsResource
             }
             default {
                 throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
-                return 'Error'
+                return [RequiredAction]::Error
             }
         }
 
@@ -411,7 +411,7 @@ class DSC_AzDevOpsResource
 
     hidden [bool]IsInDesiredState()
     {
-        if ($this.GetRequiredAction() -eq 'None')
+        if ($this.GetRequiredAction() -eq [RequiredAction]::None)
         {
             return $true
         }
@@ -562,7 +562,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         Write-Verbose "Set()..."
 
 
-        $requiredFunction = $this.GetRequiredAction()
+        [RequiredAction]$requiredFunction = $this.GetRequiredAction()
         Write-Verbose "-----------------------------------------------------"
         Write-Verbose "RequiredFunction  : $requiredFunction"
         Write-Verbose "-----------------------------------------------------"
@@ -609,15 +609,15 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
         switch ($requiredFunction)
         {
-            'None' {
+            ([RequiredAction]::'None') {
                 break
             }
-            'New' {
+            ([RequiredAction]::'New') {
                 New-AzDevOpsProject @newSetParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
-            'Set' {
+            ([RequiredAction]::'Set') {
                 # Remove any not supported
                 $newSetParameters.Remove('SourceControlType')
 
@@ -626,7 +626,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 Start-Sleep -Seconds 5
                 break
             }
-            'Remove' {
+            ([RequiredAction]::'Remove') {
                 $removeParameters = @{
                     ApiUri             = $newSetParameters.ApiUri
                     Pat                = $newSetParameters.Pat
