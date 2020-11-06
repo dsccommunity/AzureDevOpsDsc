@@ -469,6 +469,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
         $current = $this.GetCurrentStateProperties()
         $desired = $this.GetDesiredStateProperties()
+        $desiredParameters = $desired
 
         $alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
 
@@ -484,21 +485,21 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         Write-Verbose "desired.SourceControlType      : $($desired.SourceControlType) "
 
 
-        # Set $desired."$alternateKeyPropertyName" to $current."$alternateKeyPropertyName" if it's known and can be recovered from existing resource
-        if ([string]::IsNullOrWhiteSpace($desired."$alternateKeyPropertyName") -and
+        # Set $desiredParameters."$alternateKeyPropertyName" to $current."$alternateKeyPropertyName" if it's known and can be recovered from existing resource
+        if ([string]::IsNullOrWhiteSpace($desiredParameters."$alternateKeyPropertyName") -and
             ![string]::IsNullOrWhiteSpace($current."$alternateKeyPropertyName"))
         {
-            $desired."$alternateKeyPropertyName" = $current."$alternateKeyPropertyName"
+            $desiredParameters."$alternateKeyPropertyName" = $current."$alternateKeyPropertyName"
             Write-Verbose $("desired.$alternateKeyPropertyName  : "+$($desired."$alternateKeyPropertyName")+" (Since updated)")
         }
-        # Alternatively, if $desired."$alternateKeyPropertyName" is null/empty, remove it (as we don't want to pass an empty/null parameter)
-        elseif ([string]::IsNullOrWhiteSpace($desired."$alternateKeyPropertyName"))
+        # Alternatively, if $desiredParameters."$alternateKeyPropertyName" is null/empty, remove it (as we don't want to pass an empty/null parameter)
+        elseif ([string]::IsNullOrWhiteSpace($desiredParameters."$alternateKeyPropertyName"))
         {
-            $desired.Remove($alternateKeyPropertyName)
+            $desiredParameters.Remove($alternateKeyPropertyName)
         }
 
 
-        $desired.Remove('Ensure')
+        $desiredParameters.Remove('Ensure')
 
 
         switch ($requiredAction)
@@ -510,29 +511,29 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 $thisResourceNewFunctionName = $this.GetResourceNewFunctionName()
 
                 Write-Verbose "Calling '$thisResourceNewFunctionName'..."
-                Write-Verbose $($desired | ConvertTo-Json)
-                & $thisResourceNewFunctionName @desired -Force | Out-Null
+                Write-Verbose $($desiredParameters | ConvertTo-Json)
+                & $thisResourceNewFunctionName @desiredParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
             ([RequiredAction]::'Set') {
                 # Remove any not supported
-                $desired.Remove('SourceControlType')
+                $desiredParameters.Remove('SourceControlType')
 
 
                 $thisResourceSetFunctionName = $this.GetResourceSetFunctionName()
                 Write-Verbose "Calling '$thisResourceSetFunctionName'..."
-                Write-Verbose $($desired | ConvertTo-Json)
-                & $thisResourceSetFunctionName @desired -Force | Out-Null
+                Write-Verbose $($desiredParameters | ConvertTo-Json)
+                & $thisResourceSetFunctionName @desiredParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
             ([RequiredAction]::'Remove') {
                 $removeParameters = @{
-                    ApiUri                      = $desired.ApiUri
-                    Pat                         = $desired.Pat
+                    ApiUri                      = $desiredParameters.ApiUri
+                    Pat                         = $desiredParameters.Pat
 
-                    "$alternateKeyPropertyName" = $desired."$alternateKeyPropertyName"
+                    "$alternateKeyPropertyName" = $desiredParameters."$alternateKeyPropertyName"
                 }
 
                 $thisResourceRemoveFunctionName = $this.GetResourceRemoveFunctionName()
