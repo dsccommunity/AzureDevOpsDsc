@@ -470,6 +470,8 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         $current = $this.GetCurrentStateProperties()
         $desired = $this.GetDesiredStateProperties()
 
+        $alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
+
         Write-Verbose "current.Ensure                 : $($current.Ensure) "
         Write-Verbose "current.ProjectId              : $($current.ProjectId) "
         Write-Verbose "current.ProjectName            : $($current.ProjectName) "
@@ -483,10 +485,11 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
 
         # Set $this.ProjectId to $existing.ProjectId if it's known and can be recovered from existing resource
-        if ([string]::IsNullOrWhiteSpace($desired.ProjectId) -and ![string]::IsNullOrWhiteSpace($current.ProjectId))
+        if ([string]::IsNullOrWhiteSpace($desired."$alternateKeyPropertyName") -and
+            ![string]::IsNullOrWhiteSpace($current."$alternateKeyPropertyName"))
         {
-            $desired.ProjectId = $current.ProjectId
-            Write-Verbose "desired.ProjectId              : $($desired.ProjectId) (Since updated)"
+            $desired."$alternateKeyPropertyName" = $current."$alternateKeyPropertyName"
+            Write-Verbose $("desired.$alternateKeyPropertyName  : "+$($desired."$alternateKeyPropertyName")+" (Since updated)")
         }
 
 
