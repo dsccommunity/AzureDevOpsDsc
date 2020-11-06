@@ -327,7 +327,7 @@ try
                 }
 
                 $resourceCurrentState.Ensure | Should -Be 'Absent'
-                $resourceCurrentState.ProjectName | Should -Be 'TestProjectName'
+                $resourceCurrentState.ProjectName | Should -BeNullOrEmpty
             }
 
 

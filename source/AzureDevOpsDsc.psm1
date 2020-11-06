@@ -404,6 +404,11 @@ class DSC_AzDevOpsResource
 [DscResource()]
 class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 {
+    [DSC_AzDevOpsProject] Get()
+    {
+        return [DSC_AzDevOpsProject]$($this.GetCurrentStateProperties())
+    }
+
     [bool] Test()
     {
         return $this.IsInDesiredState()
@@ -468,52 +473,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
     }
 
 
-    [DSC_AzDevOpsProject] Get()
-    {
-        $existing = $this.GetAzDevOpsResource()
 
-        if ($null -eq $existing)
-        {
-            return [DSC_AzDevOpsProject]@{
-
-                # Existing properties
-                ApiUri = $this.ApiUri
-                Pat = $this.Pat
-                ProjectName = $this.ProjectName
-
-                # Updated properties (from 'Get')
-                Ensure = [Ensure]::Absent
-            }
-        }
-
-        Write-Verbose "Get()..."
-        Write-Verbose "this.Ensure                 : $($this.Ensure) "
-        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
-        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
-        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
-        Write-Verbose "this.SourceControlType      : $($this.SourceControlType) "
-        Write-Verbose "existing.Ensure             : $($existing.Ensure) "
-        Write-Verbose "existing.ProjectId          : $($existing.ProjectId) "
-        Write-Verbose "existing.ProjectName        : $($existing.ProjectName) "
-        Write-Verbose "existing.ProjectDescription : $($existing.ProjectDescription) "
-        Write-Verbose "existing.SourceControlType  : $($existing.SourceControlType) "
-
-        return [DSC_AzDevOpsProject]@{
-
-            # Existing properties
-            ApiUri = $this.ApiUri
-            Pat = $this.Pat
-
-
-            # Updated properties (from 'Get')
-            Ensure = [Ensure]::Present
-            ProjectId = $existing.id
-            ProjectName = $existing.name
-            ProjectDescription = $existing.description
-            SourceControlType = $existing.capabilities.versioncontrol.sourceControlType
-        }
-
-    }
 
     [void] Set()
     {
