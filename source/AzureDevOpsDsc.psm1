@@ -34,19 +34,19 @@ class AzDevOpsDscResource
 {
     hidden [System.String]GetDscResourceKey()
     {
-        [System.String]$thisDscKeyPropertyName = $this.GetDscResourceKeyPropertyName()
+        [System.String]$dscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
-        if ([System.String]::IsNullOrWhiteSpace($thisDscKeyPropertyName))
+        if ([System.String]::IsNullOrWhiteSpace($dscResourceKeyPropertyName))
         {
             return $null
         }
 
-        return $this."$thisDscKeyPropertyName"
+        return $this."$dscResourceKeyPropertyName"
     }
 
     hidden [System.String]GetDscResourceKeyPropertyName()
     {
-        [System.String[]]$thisDscKeyPropertyNames = @()
+        [System.String[]]$dscResourceKeyPropertyNames = @()
 
         [Type]$thisType = $this.GetType()
         [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
@@ -62,21 +62,21 @@ class AzDevOpsDscResource
                 if ($_.TypeId.Name -eq 'DscPropertyAttribute' -and
                     $_.Key -eq $true)
                 {
-                    $thisDscKeyPropertyNames += $PropertyName
+                    $dscResourceKeyPropertyNames += $PropertyName
                 }
             }
         }
 
-        if ($null -eq $thisDscKeyPropertyNames -or $thisDscKeyPropertyNames.Count -eq 0)
+        if ($null -eq $dscResourceKeyPropertyNames -or $dscResourceKeyPropertyNames.Count -eq 0)
         {
             throw "Could not obtain a 'DscResourceDscKey' property for type '$($this.GetType().Name)'."
         }
-        elseif ($thisDscKeyPropertyNames.Count -gt 1)
+        elseif ($dscResourceKeyPropertyNames.Count -gt 1)
         {
             throw "Obtained more than 1 property for type '$($this.GetType().Name)' that was marked as a 'Key'. There must only be 1 property on the class set as the 'Key' for DSC."
         }
 
-        return $thisDscKeyPropertyNames[0]
+        return $dscResourceKeyPropertyNames[0]
     }
 
 
