@@ -34,9 +34,9 @@ enum RequiredAction
 
 class AzDevOpsApiResource
 {
-    [string]$ResourceName = $this.GetResourceName()
+    [System.String]$ResourceName = $this.GetResourceName()
 
-    hidden [string]GetResourceName()
+    hidden [System.String]GetResourceName()
     {
         # Assumes a naming convention is followed between the DSC
         # resource name and the name of the resource within the API
@@ -54,15 +54,15 @@ class AzDevOpsApiResource
             As a result, only existing resources from the API will have a ResourceId and new
             resources to be created via the API do not need one providing.
     #>
-    [string]$ResourceId = $this.GetResourceId()
-    [string]$ResourceIdPropertyName = $this.GetResourceIdPropertyName()
+    [System.String]$ResourceId = $this.GetResourceId()
+    [System.String]$ResourceIdPropertyName = $this.GetResourceIdPropertyName()
 
-    hidden [string]GetResourceId()
+    hidden [System.String]GetResourceId()
     {
         return $this."$($this.GetResourceIdPropertyName())"
     }
 
-    hidden [string]GetResourceIdPropertyName()
+    hidden [System.String]GetResourceIdPropertyName()
     {
         return "$($this.GetResourceName())Id"
     }
@@ -77,14 +77,14 @@ class AzDevOpsApiResource
 
             This 'Key' can be used to determine an 'Id' of a new resource that has been added.
     #>
-    [string]$ResourceKey = $this.GetResourceKey()
-    [string]$ResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
+    [System.String]$ResourceKey = $this.GetResourceKey()
+    [System.String]$ResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
 
-    hidden [string]GetResourceKey()
+    hidden [System.String]GetResourceKey()
     {
-        [string]$keyPropertyName = $this.GetResourceKeyPropertyName()
+        [System.String]$keyPropertyName = $this.GetResourceKeyPropertyName()
 
-        if ([string]::IsNullOrWhiteSpace($keyPropertyName))
+        if ([System.String]::IsNullOrWhiteSpace($keyPropertyName))
         {
             return $null
         }
@@ -92,7 +92,7 @@ class AzDevOpsApiResource
         return $this."$keyPropertyName"
     }
 
-    hidden [string]GetResourceKeyPropertyName() # TODO: Need to remove this from here (it's DSC specific)...
+    hidden [System.String]GetResourceKeyPropertyName() # TODO: Need to remove this from here (it's DSC specific)...
     {
         # Uses the same value as the 'DscResourceDscKeyPropertyName()'
         return $this.GetDscResourceKeyPropertyName()
@@ -113,7 +113,7 @@ class AzDevOpsApiResource
 
 
 
-    hidden [string]GetResourceFunctionName([RequiredAction]$RequiredAction)
+    hidden [System.String]GetResourceFunctionName([RequiredAction]$RequiredAction)
     {
         if ($RequiredAction -in @(
                 [RequiredAction]::Get,
@@ -138,11 +138,11 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
     # DSC-specific properties for use in operations/comparisons
     [DscProperty()]
     [Alias('Uri')]
-    [string]$ApiUri
+    [System.String]$ApiUri
 
     [DscProperty()]
     [Alias('PersonalAccessToken')]
-    [string]$Pat
+    [System.String]$Pat
 
     [DscProperty()]
     [Ensure]$Ensure
@@ -161,14 +161,14 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
             This 'Key' can be used to determine an 'Id' of a new resource that has been added.
     #>
-    [string]$DscResourceKey = $this.GetDscResourceKey()
-    [string]$DscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
+    [System.String]$DscResourceKey = $this.GetDscResourceKey()
+    [System.String]$DscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
-    hidden [string]GetDscResourceKey()
+    hidden [System.String]GetDscResourceKey()
     {
-        [string]$keyPropertyName = $this.GetDscResourceKeyPropertyName()
+        [System.String]$keyPropertyName = $this.GetDscResourceKeyPropertyName()
 
-        if ([string]::IsNullOrWhiteSpace($keyPropertyName))
+        if ([System.String]::IsNullOrWhiteSpace($keyPropertyName))
         {
             return $null
         }
@@ -176,9 +176,9 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         return $this."$keyPropertyName"
     }
 
-    hidden [string]GetDscResourceKeyPropertyName()
+    hidden [System.String]GetDscResourceKeyPropertyName()
     {
-        [string[]]$thisDscKeyPropertyNames = @()
+        [System.String[]]$thisDscKeyPropertyNames = @()
 
         [Type]$thisType = $this.GetType()
         [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
@@ -243,7 +243,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         return $thisDscPropertyNames
     }
 
-    hidden [string[]]GetDscPropertyNamesWithNoSetSupport()
+    hidden [System.String[]]GetDscPropertyNamesWithNoSetSupport()
     {
         return @()
     }
@@ -253,13 +253,13 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
 
 
-    hidden [object]GetCurrentStateResourceObject()
+    hidden [System.Object]GetCurrentStateResourceObject()
     {
-        [string]$thisResourceKey = $this.GetResourceKey()
-        [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
-        [string]$thisResourceId = $this.GetResourceId()
-        [string]$thisResourceIdPropertyName = $this.GetResourceIdPropertyName()
-        [string]$thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
+        [System.String]$thisResourceKey = $this.GetResourceKey()
+        [System.String]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
+        [System.String]$thisResourceId = $this.GetResourceId()
+        [System.String]$thisResourceIdPropertyName = $this.GetResourceIdPropertyName()
+        [System.String]$thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
 
         $getParameters = @{
             ApiUri                         = $this.ApiUri
@@ -267,7 +267,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
             "$thisResourceKeyPropertyName" = $thisResourceKey
         }
 
-        if (![string]::IsNullOrWhiteSpace($thisResourceId))
+        if (![System.String]::IsNullOrWhiteSpace($thisResourceId))
         {
             Write-Verbose "thisResourceId was not null or whitespace."
             $getParameters."$thisResourceIdPropertyName" = $thisResourceId
@@ -313,11 +313,11 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
     hidden [RequiredAction]GetRequiredAction()
     {
-        [hashtable]$currentProperties = $this.GetCurrentStateProperties()
-        [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
+        [Hashtable]$currentProperties = $this.GetCurrentStateProperties()
+        [Hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
-        [string[]]$propertyNamesWithNoSetSupport = $this.GetDscPropertyNamesWithNoSetSupport()
-        [string[]]$propertyNamesToCompare = $this.GetDscPropertyNames()
+        [System.String[]]$propertyNamesWithNoSetSupport = $this.GetDscPropertyNamesWithNoSetSupport()
+        [System.String[]]$propertyNamesToCompare = $this.GetDscPropertyNames()
 
 
         # Update 'Id' property:
@@ -325,10 +325,10 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         # value is blank/null but it's current/existing value is known (and can be recovered from $currentProperties).
         #
         # This ensures that alternate keys (typically ResourceIds) not provided in the DSC configuration do not flag differences
-        [string]$IdPropertyName = $this.GetResourceIdPropertyName()
+        [System.String]$IdPropertyName = $this.GetResourceIdPropertyName()
 
-        if ([string]::IsNullOrWhiteSpace($desiredProperties[$IdPropertyName]) -and
-            ![string]::IsNullOrWhiteSpace($currentProperties[$IdPropertyName]))
+        if ([System.String]::IsNullOrWhiteSpace($desiredProperties[$IdPropertyName]) -and
+            ![System.String]::IsNullOrWhiteSpace($currentProperties[$IdPropertyName]))
         {
             $desiredProperties."$IdPropertyName" = $currentProperties."$IdPropertyName"
         }
@@ -449,7 +449,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
     }
 
 
-    hidden [bool]IsInDesiredState()
+    hidden [System.Boolean]IsInDesiredState()
     {
         if ($this.GetRequiredAction() -eq [RequiredAction]::None)
         {
@@ -461,10 +461,10 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
 
 
-    hidden [hashtable]GetDesiredStateParameters([hashtable]$CurrentStateProperties, [hashtable]$DesiredStateProperties, [RequiredAction]$RequiredAction)
+    hidden [Hashtable]GetDesiredStateParameters([Hashtable]$CurrentStateProperties, [Hashtable]$DesiredStateProperties, [RequiredAction]$RequiredAction)
     {
-        [hashtable]$desiredStateParameters = $DesiredStateProperties
-        [string]$IdPropertyName = $this.GetResourceIdPropertyName()
+        [Hashtable]$desiredStateParameters = $DesiredStateProperties
+        [System.String]$IdPropertyName = $this.GetResourceIdPropertyName()
 
 
         # If actions required are 'None' or 'Error', return a $null value
@@ -487,13 +487,13 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         elseif ($RequiredAction -in @([RequiredAction]::New, [RequiredAction]::Set))
         {
             # Set $desiredParameters."$IdPropertyName" to $CurrentStateProperties."$IdPropertyName" if it's known and can be recovered from existing resource
-            if ([string]::IsNullOrWhiteSpace($desiredStateParameters."$IdPropertyName") -and
-                ![string]::IsNullOrWhiteSpace($CurrentStateProperties."$IdPropertyName"))
+            if ([System.String]::IsNullOrWhiteSpace($desiredStateParameters."$IdPropertyName") -and
+                ![System.String]::IsNullOrWhiteSpace($CurrentStateProperties."$IdPropertyName"))
             {
                 $desiredStateParameters."$IdPropertyName" = $CurrentStateProperties."$IdPropertyName"
             }
             # Alternatively, if $desiredParameters."$IdPropertyName" is null/empty, remove the key (as we don't want to pass an empty/null parameter)
-            elseif ([string]::IsNullOrWhiteSpace($desiredStateParameters."$IdPropertyName"))
+            elseif ([System.String]::IsNullOrWhiteSpace($desiredStateParameters."$IdPropertyName"))
             {
                 $desiredStateParameters.Remove($IdPropertyName)
             }
@@ -504,7 +504,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
-            [string[]]$unsupportedForSetPropertyNames = $this.GetDscPropertyNamesWithNoSetSupport()
+            [System.String[]]$unsupportedForSetPropertyNames = $this.GetDscPropertyNamesWithNoSetSupport()
 
             if ($RequiredAction -eq [RequiredAction]::Set -and
                 $unsupportedForSetPropertyNames.Count -gt 0)
@@ -551,18 +551,18 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
 {
     [DscProperty()]
     [Alias('Id')]
-    [string]$ProjectId
+    [System.String]$ProjectId
 
     [DscProperty(Key, Mandatory)]
     [Alias('Name')]
-    [string]$ProjectName
+    [System.String]$ProjectName
 
     [DscProperty()]
     [Alias('Description')]
-    [string]$ProjectDescription
+    [System.String]$ProjectDescription
 
     [DscProperty()]
-    [string]$SourceControlType
+    [System.String]$SourceControlType
 
 
     [DSC_AzDevOpsProject] Get()
@@ -570,7 +570,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
         return [DSC_AzDevOpsProject]$($this.GetCurrentStateProperties())
     }
 
-    [bool] Test()
+    [System.Boolean] Test()
     {
         return $this.IsInDesiredState()
     }
@@ -581,7 +581,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
     }
 
 
-    hidden [string[]]GetDscPropertyNamesWithNoSetSupport()
+    hidden [System.String[]]GetDscPropertyNamesWithNoSetSupport()
     {
         return @('SourceControlType')
     }
@@ -596,7 +596,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
 
         if ($null -ne $CurrentResourceObject)
         {
-            if (![string]::IsNullOrWhiteSpace($CurrentResourceObject.id))
+            if (![System.String]::IsNullOrWhiteSpace($CurrentResourceObject.id))
             {
                 $properties.Ensure = [Ensure]::Present
             }
