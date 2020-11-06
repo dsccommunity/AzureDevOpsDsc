@@ -7,7 +7,7 @@ Import-Module -Name $script:azureDevOpsDscCommonModulePath
 Import-Module -Name $script:azureDevOpsDscServerModulePath
 Import-Module -Name $script:azureDevOpsDscServicesModulePath
 #Import-Module -Name $script:dscResourceCommonModulePath
-#
+
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 
@@ -30,6 +30,7 @@ enum RequiredAction
 
 class DSC_AzDevOpsResource
 {
+    # DSC-specific properties for use in operations/comparisons
     [DscProperty()]
     [Alias('Uri')]
     [string]$ApiUri
@@ -42,14 +43,10 @@ class DSC_AzDevOpsResource
     [Ensure]$Ensure
 
 
-    # Non-DSC properties for use in operations/comparisons
-
-
-    # Hidden properties
+    # Hidden, non-DSC properties for use in operations/comparisons
     hidden [string]$ResourceKey
     hidden [string]$ResourceKeyPropertyName
     hidden [string]$ResourceName = $this.GetResourceName()
-    #hidden [hashtable]$ResourceProperties = $this.GetResourceProperties()
 
 
     # Constructor(s)
@@ -57,7 +54,6 @@ class DSC_AzDevOpsResource
 
 
     # DSC-specific methods
-
     hidden [string[]]GetDscResourceDscPropertyNames()
     {
         [string[]]$thisDscPropertyNames = @()
@@ -132,7 +128,7 @@ class DSC_AzDevOpsResource
 
     hidden [string]GetResourceKeyPropertyName()
     {
-        # Uses the same value as the 'DscResourceDscKeyPropertyName'
+        # Uses the same value as the 'DscResourceDscKeyPropertyName()'
         return $this.GetDscResourceDscKeyPropertyName()
     }
 
@@ -150,7 +146,6 @@ class DSC_AzDevOpsResource
     }
 
 
-    # This method must be overidden by inheriting classes
     hidden [string]GetResourceAlternateKeyPropertyName()
     {
         return "$($this.GetResourceName())Id"
@@ -165,15 +160,11 @@ class DSC_AzDevOpsResource
 
     hidden [Hashtable]GetResourceProperties()
     {
-        #[PSObject]$thisObject = $this
         [Hashtable]$thisProperties = @{}
 
         $this.GetDscResourceDscPropertyNames() | ForEach-Object {
             $thisProperties."$_" = $this."$_"
         }
-        #$thisObject.PSObject.Properties | ForEach-Object {
-        #    $thisProperties[$_.Name] = $_.Value
-        #}
 
         return $thisProperties
     }
@@ -203,7 +194,6 @@ class DSC_AzDevOpsResource
 
     hidden [object]GetCurrentStateResourceObject()
     {
-        Write-Verbose "GetCurrentStateResourceObject()..."
         [string]$thisResourceKey = $this.GetResourceKey()
         [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
         [string]$thisResourceAlternateKey = $this.GetResourceAlternateKey()
@@ -222,21 +212,15 @@ class DSC_AzDevOpsResource
             $getParameters."$thisResourceAlternateKeyPropertyName" = $thisResourceAlternateKey
         }
 
-        #Write-Verbose "Calling '$thisResourceGetMethodName'..."
-        #Write-Verbose $($getParameters | ConvertTo-Json)
         $currentStateResourceObject = $(& $thisResourceGetMethodName @getParameters)
-        #Write-Verbose "'$thisResourceGetMethodName' end..."
-        #Write-Verbose $($currentStateResourceObject | ConvertTo-Json)
 
         if ($null -eq $currentStateResourceObject)
         {
-            #Write-Verbose "currentStateResourceObject was null."
             return New-Object -TypeName 'PSObject' -Property @{
                 Ensure = [Ensure]::Absent
             }
         }
 
-        #Write-Verbose "GetCurrentStateResourceObject() end."
         return $currentStateResourceObject
     }
 
@@ -247,7 +231,7 @@ class DSC_AzDevOpsResource
         return $this.GetCurrentStateProperties($this.GetCurrentStateResourceObject())
     }
 
-    # This method must be overidden by inheriting classes
+    # This method must be overidden by inheriting class(es)
     hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $thisType = $this.GetType()
@@ -281,11 +265,10 @@ class DSC_AzDevOpsResource
         #
         # This ensures that alternate keys (typically ResourceIds) not provided in the DSC configuration do not flag differences
         [string]$alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
-        Write-Verbose "got ... alternateKeyPropertyName : $alternateKeyPropertyName"
+
         if ([string]::IsNullOrWhiteSpace($desiredProperties[$alternateKeyPropertyName]) -and
             ![string]::IsNullOrWhiteSpace($currentProperties[$alternateKeyPropertyName]))
         {
-            Write-Verbose "Set ... alternateKeyPropertyName"
             $desiredProperties."$alternateKeyPropertyName" = $currentProperties."$alternateKeyPropertyName"
         }
 
@@ -317,10 +300,6 @@ class DSC_AzDevOpsResource
                 {
                     return $requiredAction
                 }
-
-                Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetRequiredAction RequiredAction  : Passed [RequiredAction]::New"
-                Write-Verbose "-----------------------------------------------------"
 
                 # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
                 if ($propertyNamesUnsupportedForSet.Count -gt 0)
@@ -432,7 +411,6 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
     [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
-        Write-Verbose "GetCurrentStateProperties()..."
         $properties = @{
             Pat = $this.Pat
             ApiUri = $this.ApiUri
@@ -445,22 +423,18 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
             {
                 $properties.Ensure = [Ensure]::Present
             }
-            #Write-Verbose "(CurrentResourceObject was not null)..."
-            #Write-Verbose $($CurrentResourceObject | ConvertTo-Json)
             $properties.ProjectId = $CurrentResourceObject.id
             $properties.ProjectName = $CurrentResourceObject.name
             $properties.ProjectDescription = $CurrentResourceObject.description
             $properties.SourceControlType = $CurrentResourceObject.capabilities.versioncontrol.sourceControlType
         }
-        #Write-Verbose 'properties'
-        #Write-Verbose $($properties | ConvertTo-Json)
-        #Write-Verbose "GetCurrentStateProperties() end."
+
         return $properties
     }
 
 
 
-    [DscProperty()] # Note: Do want to be able to pass this back populated so not set as 'NotConfigurable'
+    [DscProperty()]
     [Alias('Id')]
     [string]$ProjectId
 
@@ -489,12 +463,6 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         {
             $getParameters.ProjectId = $this.ProjectId
         }
-
-        Write-Verbose "GetAzDevOpsResource()..."
-        Write-Verbose "this.Ensure                 : $($this.Ensure) "
-        Write-Verbose "this.ProjectId              : $($this.ProjectId) "
-        Write-Verbose "this.ProjectName            : $($this.ProjectName) "
-        Write-Verbose "this.ProjectDescription     : $($this.ProjectDescription) "
 
         return Get-AzDevOpsProject @getParameters
     }
