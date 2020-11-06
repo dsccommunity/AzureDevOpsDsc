@@ -95,3 +95,34 @@ function Test-ContinuousIntegrationTaskCategory
 
     return $result
 }
+
+<#
+    .SYNOPSIS
+        Returns the parameters relating to a command.
+
+    .PARAMETER CommandName
+        The name of the command to retrieve the parameters.
+
+    .PARAMETER ModuleName
+        The name of the module the command belongs to.
+
+#>
+function Get-CommandParameter
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter( Mandatory = $true)]
+        [System.String]
+        $CommandName,
+
+        [Parameter()]
+        [System.String]
+        $ModuleName = '*'
+
+    )
+
+    Get-Command -Module $ModuleName -Name $CommandName |
+        ForEach-Object { if ($_.Parameters) {$_.Parameters.Values }}
+
+}
