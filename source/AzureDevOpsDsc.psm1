@@ -39,7 +39,7 @@ class AzDevOpsDscResource
     $DscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
     [System.String[]]
-    $DscResourcePropertyNames = $this.GetDscPropertyNames()
+    $DscResourcePropertyNames = $this.GetDscResourcePropertyNames()
 
 
     hidden [System.String]GetDscResourceKey()
@@ -90,7 +90,7 @@ class AzDevOpsDscResource
     }
 
 
-    hidden [System.String[]]GetDscPropertyNames()
+    hidden [System.String[]]GetDscResourcePropertyNames()
     {
         [System.String[]]$thisDscPropertyNames = @()
 
@@ -114,7 +114,7 @@ class AzDevOpsDscResource
         return $thisDscPropertyNames
     }
 
-    hidden [System.String[]]GetDscPropertyNamesWithNoSetSupport()
+    hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
     {
         return @()
     }
@@ -309,8 +309,8 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
         [Hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [Hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
-        [System.String[]]$propertyNamesWithNoSetSupport = $this.GetDscPropertyNamesWithNoSetSupport()
-        [System.String[]]$propertyNamesToCompare = $this.GetDscPropertyNames()
+        [System.String[]]$propertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
+        [System.String[]]$propertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
 
         # Update 'Id' property:
@@ -497,7 +497,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
-            [System.String[]]$unsupportedForSetPropertyNames = $this.GetDscPropertyNamesWithNoSetSupport()
+            [System.String[]]$unsupportedForSetPropertyNames = $this.GetDscResourcePropertyNamesWithNoSetSupport()
 
             if ($RequiredAction -eq [RequiredAction]::Set -and
                 $unsupportedForSetPropertyNames.Count -gt 0)
@@ -574,7 +574,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
     }
 
 
-    hidden [System.String[]]GetDscPropertyNamesWithNoSetSupport()
+    hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
     {
         return @('SourceControlType')
     }
