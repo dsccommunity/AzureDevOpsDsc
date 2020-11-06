@@ -404,14 +404,8 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
     hidden [System.Boolean]IsInDesiredState()
     {
-        if ($this.GetDscRequiredAction() -eq [RequiredAction]::None)
-        {
-            return $true
-        }
-
-        return $false
+        return ($this.GetDscRequiredAction() -eq [RequiredAction]::None)
     }
-
 
 
     hidden [Hashtable]GetDesiredStateParameters([Hashtable]$CurrentStateProperties, [Hashtable]$DesiredStateProperties, [RequiredAction]$RequiredAction)
