@@ -215,14 +215,17 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 {
     [DscProperty()]
     [Alias('Uri')]
-    [System.String]$ApiUri
+    [System.String]
+    $ApiUri
 
     [DscProperty()]
     [Alias('PersonalAccessToken')]
-    [System.String]$Pat
+    [System.String]
+    $Pat
 
     [DscProperty()]
-    [Ensure]$Ensure
+    [Ensure]
+    $Ensure
 
 
 
