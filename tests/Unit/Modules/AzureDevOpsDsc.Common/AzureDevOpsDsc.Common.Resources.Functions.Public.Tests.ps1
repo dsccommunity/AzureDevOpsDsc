@@ -50,13 +50,13 @@ InModuleScope 'AzureDevOpsDsc.Common' {
         }
 
 
-        $resourcesFunctionsPublicDirectoryPath = "$PSScriptRoot\Resources\Functions\Public"
+        $resourcesFunctionsPublicDirectoryPath = "$PSScriptRoot\..\..\..\..\source\Modules\$moduleName\Resources\Functions\Public"
 
         Context "When evaluating '$moduleName' module, function '.ps1' scripts directory ('$resourcesFunctionsPublicDirectoryPath')" {
             BeforeAll {
                 $moduleName = 'AzureDevOpsDsc.Common'
                 [string[]]$exportedFunctionNames = Get-Command -Module $moduleName
-                $resourcesFunctionsPublicDirectoryPath = "$PSScriptRoot\Resources\Functions\Public"
+                $resourcesFunctionsPublicDirectoryPath = "$PSScriptRoot\..\..\..\..\source\Modules\$moduleName\Resources\Functions\Public"
             }
 
             It "Should contain a 'Get-AzDevOps<ResourceName>.ps1' (GET) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNames {
@@ -167,13 +167,240 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                 It "Should have a 'Get-AzDevOps<ResourceName>' function with an 'Pat' parameter, with a 'PersonalAccessToken' alias" -TestCases $testCasesValidResourceNames {
                     param ([string]$ResourceName)
 
-                    'PersonalAccessToken' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName").Name | Where-Object { $_.Name -eq 'Pat' }).Aliases
+                    'PersonalAccessToken' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'Pat' }).Aliases
                 }
 
                 It "Should have a 'Get-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'ResourceId' alias" -TestCases $testCasesValidResourceNames {
                     param ([string]$ResourceName)
 
-                    'ResourceId' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName").Name | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                    'ResourceId' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                }
+
+                It "Should have a 'Get-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'Id' alias" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    'Id' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                }
+
+            }
+        }
+
+
+
+        Context "When evaluating '$moduleName' module, 'New-AzDevOps...' (NEW) functions" {
+
+            Context "When evaluating function parameters" {
+
+                It "Should have a 'New-AzDevOps<ResourceName>' function with an 'ApiUri' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'ApiUri' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "New-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'New-AzDevOps<ResourceName>' function with an 'Pat' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Pat' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "New-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'New-AzDevOps<ResourceName>' function with no '<ResourceName>Id' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    "$($ResourceName)Id" | Should -Not -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "New-AzDevOps$ResourceName").Name
+                }
+
+            }
+
+            Context "When evaluating function parameter aliases" {
+
+                It "Should have a 'New-AzDevOps<ResourceName>' function with an 'ApiUri' parameter, with a 'Uri' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Uri' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "New-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'ApiUri' }).Aliases
+                }
+
+                It "Should have a 'New-AzDevOps<ResourceName>' function with an 'Pat' parameter, with a 'PersonalAccessToken' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'PersonalAccessToken' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "New-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'Pat' }).Aliases
+                }
+
+                It "Should have a 'New-AzDevOps<ResourceName>' function with no parameter with a 'ResourceId' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'ResourceId' | Should -Not -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "New-AzDevOps$ResourceName")).Aliases
+                }
+
+                It "Should have a 'New-AzDevOps<ResourceName>' function with no parameter, with a 'Id' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Id' | Should -Not -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "New-AzDevOps$ResourceName")).Aliases
+                }
+
+            }
+        }
+
+
+
+
+        Context "When evaluating '$moduleName' module, 'Set-AzDevOps...' (SET) functions" {
+
+            Context "When evaluating function parameters" {
+
+                It "Should have a 'Set-AzDevOps<ResourceName>' function with an 'ApiUri' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'ApiUri' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Set-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'Set-AzDevOps<ResourceName>' function with an 'Pat' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Pat' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Set-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'Set-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    "$($ResourceName)Id" | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Set-AzDevOps$ResourceName").Name
+                }
+
+            }
+
+            Context "When evaluating function parameter aliases" {
+
+                It "Should have a 'Set-AzDevOps<ResourceName>' function with an 'ApiUri' parameter, with a 'Uri' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Uri' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Set-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'ApiUri' }).Aliases
+                }
+
+                It "Should have a 'Set-AzDevOps<ResourceName>' function with an 'Pat' parameter, with a 'PersonalAccessToken' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'PersonalAccessToken' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Set-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'Pat' }).Aliases
+                }
+
+                It "Should have a 'Set-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'ResourceId' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'ResourceId' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Set-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                }
+
+                It "Should have a 'Set-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'Id' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Id' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Set-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                }
+
+            }
+        }
+
+
+
+
+        Context "When evaluating '$moduleName' module, 'Remove-AzDevOps...' (REMOVE) functions" {
+
+            Context "When evaluating function parameters" {
+
+                It "Should have a 'Remove-AzDevOps<ResourceName>' function with an 'ApiUri' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'ApiUri' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Remove-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'Remove-AzDevOps<ResourceName>' function with an 'Pat' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Pat' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Remove-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'Remove-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    "$($ResourceName)Id" | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Remove-AzDevOps$ResourceName").Name
+                }
+
+            }
+
+            Context "When evaluating function parameter aliases" {
+
+                It "Should have a 'Remove-AzDevOps<ResourceName>' function with an 'ApiUri' parameter, with a 'Uri' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Uri' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Remove-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'ApiUri' }).Aliases
+                }
+
+                It "Should have a 'Remove-AzDevOps<ResourceName>' function with an 'Pat' parameter, with a 'PersonalAccessToken' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'PersonalAccessToken' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Remove-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'Pat' }).Aliases
+                }
+
+                It "Should have a 'Remove-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'ResourceId' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'ResourceId' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Remove-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                }
+
+                It "Should have a 'Remove-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'Id' alias" -TestCases $testCasesValidResourceNamesForDscResources {
+                    param ([string]$ResourceName)
+
+                    'Id' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Remove-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                }
+
+            }
+        }
+
+
+        Context "When evaluating '$moduleName' module, 'Test-AzDevOps...' (TEST) functions" {
+
+            Context "When evaluating function parameters" {
+
+                It "Should have a 'Test-AzDevOps<ResourceName>' function with an 'ApiUri' parameter" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    'ApiUri' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Test-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'Test-AzDevOps<ResourceName>' function with an 'Pat' parameter" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    'Pat' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Test-AzDevOps$ResourceName").Name
+                }
+
+                It "Should have a 'Test-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    "$($ResourceName)Id" | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Test-AzDevOps$ResourceName").Name
+                }
+
+            }
+
+            Context "When evaluating function parameter aliases" {
+
+                It "Should have a 'Test-AzDevOps<ResourceName>' function with an 'ApiUri' parameter, with a 'Uri' alias" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    'Uri' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Test-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'ApiUri' }).Aliases
+                }
+
+                It "Should have a 'Test-AzDevOps<ResourceName>' function with an 'Pat' parameter, with a 'PersonalAccessToken' alias" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    'PersonalAccessToken' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Test-AzDevOps$ResourceName") | Where-Object { $_.Name -eq 'Pat' }).Aliases
+                }
+
+                It "Should have a 'Test-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'ResourceId' alias" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    'ResourceId' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Test-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
+                }
+
+                It "Should have a 'Test-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter, with a 'Id' alias" -TestCases $testCasesValidResourceNames {
+                    param ([string]$ResourceName)
+
+                    'Id' | Should -BeIn $($(Get-CommandParameter -ModuleName $moduleName -CommandName "Test-AzDevOps$ResourceName") | Where-Object { $_.Name -eq "$($ResourceName)Id" }).Aliases
                 }
 
             }
