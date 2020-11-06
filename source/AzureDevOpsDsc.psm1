@@ -455,24 +455,6 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
     [string]$SourceControlType
 
 
-    [PSCustomObject]GetAzDevOpsResource()
-    {
-        $getParameters = @{
-            ApiUri             = $this.ApiUri
-            Pat                = $this.Pat
-
-            ProjectName        = $this.ProjectName
-        }
-
-        if (![string]::IsNullOrWhiteSpace($this.ProjectId))
-        {
-            $getParameters.ProjectId = $this.ProjectId
-        }
-
-        return Get-AzDevOpsProject @getParameters
-    }
-
-
 
 
     [void] Set()
