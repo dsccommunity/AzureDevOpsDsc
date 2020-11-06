@@ -1,0 +1,30 @@
+
+# Initialize tests
+. $PSScriptRoot\AzureDevOpsDsc.TestInitialization.ps1
+
+
+InModuleScope 'AzureDevOpsDsc' {
+
+    Describe 'DSCClassResources\AzDevOpsApiDscResource' -Tag 'AzDevOpsApiDscResource' {
+
+        $dscModuleName = 'AzureDevOpsDsc'
+        $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
+        $testCasesValidResourceNamesForDscResources = $testCasesValidResourceNames | Where-Object { $_.ResourceName -notin @('Operation')}
+
+        Context "When evaluating '$dscModuleName' module" {
+            BeforeAll {
+                $dscModuleName = 'AzureDevOpsDsc'
+                $dscResourcePrefix = 'DSC_AzDevOps'
+                [string[]]$exportedDscResources = (Get-Module $dscModuleName).ExportedDscResources
+            }
+
+            It "Should contain an exported, DSCResource specific to the 'ResourceName' - '<ResourceName>'" -TestCases $testCasesValidResourceNamesForDscResources {
+                param ([string]$ResourceName)
+
+                "$dscResourcePrefix$ResourceName" | Should -BeIn $exportedDscResources
+            }
+
+        }
+
+    }
+}
