@@ -179,19 +179,6 @@ class AzDevOpsApiDscResource : AzDevOpsDscResource
 
 
 
-    hidden [Hashtable]GetResourceProperties()
-    {
-        [Hashtable]$thisProperties = @{}
-
-        $this.GetDscResourcePropertyNames() | ForEach-Object {
-            $thisProperties."$_" = $this."$_"
-        }
-
-        return $thisProperties
-    }
-
-
-
     hidden [System.String]GetResourceFunctionName([RequiredAction]$RequiredAction)
     {
         if ($RequiredAction -in @(
@@ -229,26 +216,29 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
 
-    hidden [System.Object]GetCurrentStateResourceObject()
+    hidden [System.Management.Automation.PSObject]GetCurrentStateResourceObject()
     {
-        [System.String]$thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
-
+        # Setup a default set of parameters to pass into the object's 'Get' method
         $getParameters = @{
             ApiUri                                  = $this.ApiUri
             Pat                                     = $this.Pat
             "$($this.GetResourceKeyPropertyName())" = $this.GetResourceKey()
         }
 
+        # If there is an available 'ResourceId' value, add it to the parameters/hashtable
         if (![System.String]::IsNullOrWhiteSpace($this.GetResourceId()))
         {
             $getParameters."$($this.GetResourceIdPropertyName())" = $this.GetResourceId()
         }
 
+        # Obtain the 'Get' function name for the object, then invoke it
+        $thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
         $currentStateResourceObject = $(& $thisResourceGetFunctionName @getParameters)
 
+        # If no object was returned (i.e it does not exist), create a default/empty object
         if ($null -eq $currentStateResourceObject)
         {
-            return New-Object -TypeName 'PSObject' -Property @{
+            return New-Object -TypeName 'System.Management.Automation.PSObject' -Property @{
                 Ensure = [Ensure]::Absent
             }
         }
@@ -266,11 +256,11 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
     # This method must be overidden by inheriting class(es)
     hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
+        # Obtain the type of $this object. Throw an exception if this is being called from the base class method.
         $thisType = $this.GetType()
         if ($thisType -eq [DSC_AzDevOpsApiResource])
         {
-            throw "Method 'GetCurrentState()' in '$($thisType.Name)' must be overidden by an inheriting class."
-            return $null
+            throw "Method 'GetCurrentState()' in '$($thisType.Name)' must be overidden and called by an inheriting class."
         }
         return $null
     }
@@ -278,7 +268,14 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
     hidden [Hashtable]GetDesiredStateProperties()
     {
-        return $this.GetResourceProperties()
+        [Hashtable]$desiredStateProperties = @{}
+
+        # Obtain all DSC-related properties, and add to the hashtable output
+        $this.GetDscResourcePropertyNames() | ForEach-Object {
+                $desiredStateProperties."$_" = $this."$_"
+            }
+
+        return $desiredStateProperties
     }
 
 
