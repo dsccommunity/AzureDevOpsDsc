@@ -32,12 +32,11 @@ enum RequiredAction
 
 class AzDevOpsApiResource
 {
-    # Hidden, non-DSC properties for use in operations/comparisons
-    hidden [string]$ResourceKey = $this.GetResourceKey()
-    hidden [string]$ResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
-    hidden [string]$ResourceName = $this.GetResourceName()
-
-
+    <#
+        .SYNOPSIS
+            Returns the 'Name' of the resource (e.g. 'Project')
+    #>
+    [string]$ResourceName = $this.GetResourceName()
 
     hidden [string]GetResourceName()
     {
@@ -47,6 +46,47 @@ class AzDevOpsApiResource
     }
 
 
+
+    <#
+        .SYNOPSIS
+            Returns the 'Id' of the resource (e.g. 'ProjectId')
+
+        .NOTES
+            When creating an object via the Azure DevOps API, the ID (if provided) is ignored
+            and Azure DevOps creates/generates the Id (a GUID) which can then be used for the
+            object.
+
+            As a result, only existing resources from the API will have a ResourceId and new
+            resources to be created via the API do not need one providing.
+    #>
+    [string]$ResourceId = $this.GetResourceId()
+    [string]$ResourceIdPropertyName = $this.GetResourceIdPropertyName()
+
+    hidden [string]GetResourceId()
+    {
+        return $this."$($this.GetResourceIdPropertyName())"
+    }
+
+    hidden [string]GetResourceIdPropertyName()
+    {
+        return "$($this.GetResourceName())Id"
+    }
+
+
+
+    <#
+        .SYNOPSIS
+            Returns the 'Key' of the resource (e.g. 'ProjectName')
+
+        .NOTES
+            When creating an object via the Azure DevOps API, the 'Key' of the object will be
+            another, alternate, unique key/identifier to the 'ResourceId' but this will be
+            specific to the resource.
+
+            This 'Key' can be used to determine an 'Id' of a new resource that has been added.
+    #>
+    [string]$ResourceKey = $this.GetResourceKey()
+    [string]$ResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
 
     hidden [string]GetResourceKey()
     {
@@ -60,22 +100,10 @@ class AzDevOpsApiResource
         return $this."$keyPropertyName"
     }
 
-    hidden [string]GetResourceKeyPropertyName()
+    hidden [string]GetResourceKeyPropertyName() # TODO: Need to remove this from here...
     {
         # Uses the same value as the 'DscResourceDscKeyPropertyName()'
-        return $this.GetDscResourceDscKeyPropertyName()
-    }
-
-
-
-    hidden [string]GetResourceAlternateKeyPropertyName()
-    {
-        return "$($this.GetResourceName())Id"
-    }
-
-    hidden [string]GetResourceAlternateKey()
-    {
-        return $this."$($this.GetResourceAlternateKeyPropertyName())"
+        return $this.GetDscResourceKeyPropertyName()
     }
 
 
@@ -182,37 +210,31 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
     DSC_AzDevOpsApiResource(){}
 
 
-    # DSC-specific methods
-    hidden [System.String[]]GetDscPropertyNames()
+
+    <#
+        .NOTES
+            When creating an object via the Azure DevOps API, the 'Key' of the object will be
+            another, alternate, unique key/identifier to the 'ResourceId' but this will be
+            specific to the resource.
+
+            This 'Key' can be used to determine an 'Id' of a new resource that has been added.
+    #>
+    [string]$DscResourceKey = $this.GetDscResourceKey()
+    [string]$DscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
+
+    hidden [string]GetDscResourceKey()
     {
-        [System.String[]]$thisDscPropertyNames = @()
+        [string]$keyPropertyName = $this.GetDscResourceKeyPropertyName()
 
-        [Type]$thisType = $this.GetType()
-        [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
-
-        $thisProperties | ForEach-Object {
-            $propertyInfo = $_
-            $PropertyName = $_.Name
-
-            $propertyInfo.GetCustomAttributes($true) |
-            ForEach-Object {
-
-                if ($_.TypeId.Name -eq 'DscPropertyAttribute')
-                {
-                    $thisDscPropertyNames += $PropertyName
-                }
-            }
+        if ([string]::IsNullOrWhiteSpace($keyPropertyName))
+        {
+            return $null
         }
 
-        return $thisDscPropertyNames
+        return $this."$keyPropertyName"
     }
 
-    hidden [string[]]GetDscNoSetSupportPropertyNames()
-    {
-        return @()
-    }
-
-    hidden [string]GetDscResourceDscKeyPropertyName()
+    hidden [string]GetDscResourceKeyPropertyName()
     {
         [string[]]$thisDscKeyPropertyNames = @()
 
@@ -252,12 +274,49 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
 
 
+
+
+    # DSC-specific methods
+    hidden [System.String[]]GetDscPropertyNames()
+    {
+        [System.String[]]$thisDscPropertyNames = @()
+
+        [Type]$thisType = $this.GetType()
+        [System.Reflection.PropertyInfo[]]$thisProperties = $thisType.GetProperties()
+
+        $thisProperties | ForEach-Object {
+            $propertyInfo = $_
+            $PropertyName = $_.Name
+
+            $propertyInfo.GetCustomAttributes($true) |
+            ForEach-Object {
+
+                if ($_.TypeId.Name -eq 'DscPropertyAttribute')
+                {
+                    $thisDscPropertyNames += $PropertyName
+                }
+            }
+        }
+
+        return $thisDscPropertyNames
+    }
+
+    hidden [string[]]GetDscNoSetSupportPropertyNames()
+    {
+        return @()
+    }
+
+
+
+
+
+
     hidden [object]GetCurrentStateResourceObject()
     {
         [string]$thisResourceKey = $this.GetResourceKey()
         [string]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
-        [string]$thisResourceAlternateKey = $this.GetResourceAlternateKey()
-        [string]$thisResourceAlternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
+        [string]$thisResourceId = $this.GetResourceId()
+        [string]$thisResourceIdPropertyName = $this.GetResourceIdPropertyName()
         [string]$thisResourceGetFunctionName = $this.GetResourceGetFunctionName()
 
         $getParameters = @{
@@ -266,10 +325,10 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
             "$thisResourceKeyPropertyName" = $thisResourceKey
         }
 
-        if (![string]::IsNullOrWhiteSpace($thisResourceAlternateKey))
+        if (![string]::IsNullOrWhiteSpace($thisResourceId))
         {
-            Write-Verbose "thisResourceAlternateKey was not null or whitespace."
-            $getParameters."$thisResourceAlternateKeyPropertyName" = $thisResourceAlternateKey
+            Write-Verbose "thisResourceId was not null or whitespace."
+            $getParameters."$thisResourceIdPropertyName" = $thisResourceId
         }
 
         $currentStateResourceObject = $(& $thisResourceGetFunctionName @getParameters)
@@ -319,17 +378,17 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         [string[]]$propertyNamesToCompare = $this.GetDscPropertyNames()
 
 
-        # Update 'AlternateKey' property:
-        # Set $desiredProperties."$alternateKeyPropertyName" to $currentProperties."$alternateKeyPropertyName" if it's desired
+        # Update 'Id' property:
+        # Set $desiredProperties."$IdPropertyName" to $currentProperties."$IdPropertyName" if it's desired
         # value is blank/null but it's current/existing value is known (and can be recovered from $currentProperties).
         #
         # This ensures that alternate keys (typically ResourceIds) not provided in the DSC configuration do not flag differences
-        [string]$alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
+        [string]$IdPropertyName = $this.GetResourceIdPropertyName()
 
-        if ([string]::IsNullOrWhiteSpace($desiredProperties[$alternateKeyPropertyName]) -and
-            ![string]::IsNullOrWhiteSpace($currentProperties[$alternateKeyPropertyName]))
+        if ([string]::IsNullOrWhiteSpace($desiredProperties[$IdPropertyName]) -and
+            ![string]::IsNullOrWhiteSpace($currentProperties[$IdPropertyName]))
         {
-            $desiredProperties."$alternateKeyPropertyName" = $currentProperties."$alternateKeyPropertyName"
+            $desiredProperties."$IdPropertyName" = $currentProperties."$IdPropertyName"
         }
 
 
@@ -463,7 +522,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
     hidden [hashtable]GetDesiredStateParameters([hashtable]$CurrentStateProperties, [hashtable]$DesiredStateProperties, [RequiredAction]$RequiredAction)
     {
         [hashtable]$desiredStateParameters = $DesiredStateProperties
-        [string]$alternateKeyPropertyName = $this.GetResourceAlternateKeyPropertyName()
+        [string]$IdPropertyName = $this.GetResourceIdPropertyName()
 
 
         # If actions required are 'None' or 'Error', return a $null value
@@ -479,22 +538,22 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
                 Pat                         = $DesiredStateProperties.Pat
 
                 # Set this from the 'Current' state as we would expect this to have an existing key/ID value to use
-                "$alternateKeyPropertyName" = $CurrentStateProperties."$alternateKeyPropertyName"
+                "$IdPropertyName" = $CurrentStateProperties."$IdPropertyName"
             }
         }
         # If the desired state/action is to add/new or update/set  the resource, start with the values in the $DesiredStateProperties variable, and amend
         elseif ($RequiredAction -in @([RequiredAction]::New, [RequiredAction]::Set))
         {
-            # Set $desiredParameters."$alternateKeyPropertyName" to $CurrentStateProperties."$alternateKeyPropertyName" if it's known and can be recovered from existing resource
-            if ([string]::IsNullOrWhiteSpace($desiredStateParameters."$alternateKeyPropertyName") -and
-                ![string]::IsNullOrWhiteSpace($CurrentStateProperties."$alternateKeyPropertyName"))
+            # Set $desiredParameters."$IdPropertyName" to $CurrentStateProperties."$IdPropertyName" if it's known and can be recovered from existing resource
+            if ([string]::IsNullOrWhiteSpace($desiredStateParameters."$IdPropertyName") -and
+                ![string]::IsNullOrWhiteSpace($CurrentStateProperties."$IdPropertyName"))
             {
-                $desiredStateParameters."$alternateKeyPropertyName" = $CurrentStateProperties."$alternateKeyPropertyName"
+                $desiredStateParameters."$IdPropertyName" = $CurrentStateProperties."$IdPropertyName"
             }
-            # Alternatively, if $desiredParameters."$alternateKeyPropertyName" is null/empty, remove the key (as we don't want to pass an empty/null parameter)
-            elseif ([string]::IsNullOrWhiteSpace($desiredStateParameters."$alternateKeyPropertyName"))
+            # Alternatively, if $desiredParameters."$IdPropertyName" is null/empty, remove the key (as we don't want to pass an empty/null parameter)
+            elseif ([string]::IsNullOrWhiteSpace($desiredStateParameters."$IdPropertyName"))
             {
-                $desiredStateParameters.Remove($alternateKeyPropertyName)
+                $desiredStateParameters.Remove($IdPropertyName)
             }
 
 
