@@ -447,6 +447,11 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
         return ($this.GetDscRequiredAction() -eq [RequiredAction]::None)
     }
 
+    [System.Boolean] Test()
+    {
+        return $this.TestDesiredState()
+    }
+
 
     [void] SetToDesiredState()
     {
@@ -465,6 +470,10 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
         }
     }
 
+    [void] Set()
+    {
+        $this.SetToDesiredState()
+    }
 
 }
 
@@ -493,12 +502,12 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
         return [DSC_AzDevOpsProject]$($this.GetDscCurrentStateProperties())
     }
 
-    [System.Boolean] Test()
+    [System.Boolean] Test() # Note: Overides identical method in base class but removes linting errors
     {
         return $this.TestDesiredState()
     }
 
-    [void] Set()
+    [void] Set() # Note: Overides identical method in base class but removes linting errors
     {
         $this.SetToDesiredState()
     }
