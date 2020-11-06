@@ -442,7 +442,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
     }
 
 
-    hidden [System.Boolean]IsInDesiredState()
+    hidden [System.Boolean]TestDesiredState()
     {
         return ($this.GetDscRequiredAction() -eq [RequiredAction]::None)
     }
@@ -495,7 +495,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
 
     [System.Boolean] Test()
     {
-        return $this.IsInDesiredState()
+        return $this.TestDesiredState()
     }
 
     [void] Set()
