@@ -30,150 +30,28 @@ enum RequiredAction
 
 
 
-
-
-class AzDevOpsApiResource
+class AzDevOpsDscResource
 {
-    [System.String]$ResourceName = $this.GetResourceName()
+    [System.String]
+    $DscResourceKey = $this.GetDscResourceKey()
 
-    hidden [System.String]GetResourceName()
-    {
-        # Assumes a naming convention is followed between the DSC
-        # resource name and the name of the resource within the API
-        return $this.GetType().ToString().Replace('DSC_AzDevOps','').Replace('AzDevOps','')
-    }
+    [System.String]
+    $DscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
+    [System.String[]]
+    $DscResourcePropertyNames = $this.GetDscPropertyNames()
 
-
-    <#
-        .NOTES
-            When creating an object via the Azure DevOps API, the ID (if provided) is ignored
-            and Azure DevOps creates/generates the Id (a GUID) which can then be used for the
-            object.
-
-            As a result, only existing resources from the API will have a ResourceId and new
-            resources to be created via the API do not need one providing.
-    #>
-    [System.String]$ResourceId = $this.GetResourceId()
-    [System.String]$ResourceIdPropertyName = $this.GetResourceIdPropertyName()
-
-    hidden [System.String]GetResourceId()
-    {
-        return $this."$($this.GetResourceIdPropertyName())"
-    }
-
-    hidden [System.String]GetResourceIdPropertyName()
-    {
-        return "$($this.GetResourceName())Id"
-    }
-
-
-
-    <#
-        .NOTES
-            When creating an object via the Azure DevOps API, the 'Key' of the object will be
-            another, alternate, unique key/identifier to the 'ResourceId' but this will be
-            specific to the resource.
-
-            This 'Key' can be used to determine an 'Id' of a new resource that has been added.
-    #>
-    [System.String]$ResourceKey = $this.GetResourceKey()
-    [System.String]$ResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
-
-    hidden [System.String]GetResourceKey()
-    {
-        [System.String]$keyPropertyName = $this.GetResourceKeyPropertyName()
-
-        if ([System.String]::IsNullOrWhiteSpace($keyPropertyName))
-        {
-            return $null
-        }
-
-        return $this."$keyPropertyName"
-    }
-
-    hidden [System.String]GetResourceKeyPropertyName() # TODO: Need to remove this from here (it's DSC specific)...
-    {
-        # Uses the same value as the 'DscResourceDscKeyPropertyName()'
-        return $this.GetDscResourceKeyPropertyName()
-    }
-
-
-
-    hidden [Hashtable]GetResourceProperties()
-    {
-        [Hashtable]$thisProperties = @{}
-
-        $this.GetDscPropertyNames() | ForEach-Object {
-            $thisProperties."$_" = $this."$_"
-        }
-
-        return $thisProperties
-    }
-
-
-
-    hidden [System.String]GetResourceFunctionName([RequiredAction]$RequiredAction)
-    {
-        if ($RequiredAction -in @(
-                [RequiredAction]::Get,
-                [RequiredAction]::New,
-                [RequiredAction]::Set,
-                [RequiredAction]::Remove,
-                [RequiredAction]::Test))
-        {
-            $thisResourceName = $this.GetResourceName()
-            return "$($RequiredAction)-AzDevOps$thisResourceName"
-        }
-
-        return $null
-    }
-
-}
-
-
-
-class DSC_AzDevOpsApiResource : AzDevOpsApiResource
-{
-    # DSC-specific properties for use in operations/comparisons
-    [DscProperty()]
-    [Alias('Uri')]
-    [System.String]$ApiUri
-
-    [DscProperty()]
-    [Alias('PersonalAccessToken')]
-    [System.String]$Pat
-
-    [DscProperty()]
-    [Ensure]$Ensure
-
-
-    # Constructor(s)
-    DSC_AzDevOpsApiResource(){}
-
-
-
-    <#
-        .NOTES
-            When creating an object via the Azure DevOps API, the 'Key' of the object will be
-            another, alternate, unique key/identifier to the 'ResourceId' but this will be
-            specific to the resource.
-
-            This 'Key' can be used to determine an 'Id' of a new resource that has been added.
-    #>
-    [System.String]$DscResourceKey = $this.GetDscResourceKey()
-    [System.String]$DscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
     hidden [System.String]GetDscResourceKey()
     {
-        [System.String]$keyPropertyName = $this.GetDscResourceKeyPropertyName()
+        [System.String]$thisDscKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
-        if ([System.String]::IsNullOrWhiteSpace($keyPropertyName))
+        if ([System.String]::IsNullOrWhiteSpace($thisDscKeyPropertyName))
         {
             return $null
         }
 
-        return $this."$keyPropertyName"
+        return $this."$thisDscKeyPropertyName"
     }
 
     hidden [System.String]GetDscResourceKeyPropertyName()
@@ -212,13 +90,6 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
     }
 
 
-
-
-
-
-
-
-    # DSC-specific methods
     hidden [System.String[]]GetDscPropertyNames()
     {
         [System.String[]]$thisDscPropertyNames = @()
@@ -247,6 +118,128 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
     {
         return @()
     }
+
+}
+
+class AzDevOpsApiDscResource : AzDevOpsDscResource
+{
+    [System.String]$ResourceName = $this.GetResourceName()
+
+    hidden [System.String]GetResourceName()
+    {
+        # Assumes a naming convention is followed between the DSC
+        # resource name and the name of the resource within the API
+        return $this.GetType().ToString().Replace('DSC_AzDevOps','')
+    }
+
+
+
+    <#
+        .NOTES
+            When creating an object via the Azure DevOps API, the ID (if provided) is ignored
+            and Azure DevOps creates/generates the Id (a GUID) which can then be used for the
+            object.
+
+            As a result, only existing resources from the API will have a ResourceId and new
+            resources to be created via the API do not need one providing.
+    #>
+    [System.String]$ResourceId = $this.GetResourceId()
+    [System.String]$ResourceIdPropertyName = $this.GetResourceIdPropertyName()
+
+    hidden [System.String]GetResourceId()
+    {
+        return $this."$($this.ResourceIdPropertyName)"
+    }
+
+    hidden [System.String]GetResourceIdPropertyName()
+    {
+        return "$($this.ResourceName)Id"
+    }
+
+
+
+    <#
+        .NOTES
+            When creating an object via the Azure DevOps API, the 'Key' of the object will be
+            another, alternate, unique key/identifier to the 'ResourceId' but this will be
+            specific to the resource.
+
+            This 'Key' can be used to determine an 'Id' of a new resource that has been added.
+    #>
+    [System.String]$ResourceKey = $this.GetResourceKey()
+    [System.String]$ResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
+
+    hidden [System.String]GetResourceKey()
+    {
+        [System.String]$keyPropertyName = $this.ResourceKeyPropertyName
+
+        if ([System.String]::IsNullOrWhiteSpace($keyPropertyName))
+        {
+            return $null
+        }
+
+        return $this."$keyPropertyName"
+    }
+
+    hidden [System.String]GetResourceKeyPropertyName() # TODO: Need to remove this from here (it's DSC specific)...
+    {
+        # Uses the same value as the 'DscResourceDscKeyPropertyName()'
+        return $this.GetDscResourceKeyPropertyName()
+    }
+
+
+
+    hidden [Hashtable]GetResourceProperties()
+    {
+        [Hashtable]$thisProperties = @{}
+
+        $this.DscResourcePropertyNames | ForEach-Object {
+            $thisProperties."$_" = $this."$_"
+        }
+
+        return $thisProperties
+    }
+
+
+
+    hidden [System.String]GetResourceFunctionName([RequiredAction]$RequiredAction)
+    {
+        if ($RequiredAction -in @(
+                [RequiredAction]::Get,
+                [RequiredAction]::New,
+                [RequiredAction]::Set,
+                [RequiredAction]::Remove,
+                [RequiredAction]::Test))
+        {
+            return "$($RequiredAction)-AzDevOps$($this.ResourceName)"
+        }
+
+        return $null
+    }
+
+}
+
+
+
+class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
+{
+    # DSC-specific properties for use in operations/comparisons
+    [DscProperty()]
+    [Alias('Uri')]
+    [System.String]$ApiUri
+
+    [DscProperty()]
+    [Alias('PersonalAccessToken')]
+    [System.String]$Pat
+
+    [DscProperty()]
+    [Ensure]$Ensure
+
+
+    # Constructor(s)
+    DSC_AzDevOpsApiResource(){}
+
+
 
 
 
