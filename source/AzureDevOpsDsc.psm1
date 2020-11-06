@@ -216,7 +216,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
 
 
-    hidden [System.Management.Automation.PSObject]GetDscResourceCurrentStateObject()
+    hidden [System.Management.Automation.PSObject]GetDscCurrentStateObject()
     {
         # Setup a default set of parameters to pass into the object's 'Get' method
         $getParameters = @{
@@ -233,24 +233,24 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
         # Obtain the 'Get' function name for the object, then invoke it
         $thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
-        $currentStateResourceObject = $(& $thisResourceGetFunctionName @getParameters)
+        $dscCurrentStateResourceObject = $(& $thisResourceGetFunctionName @getParameters)
 
         # If no object was returned (i.e it does not exist), create a default/empty object
-        if ($null -eq $currentStateResourceObject)
+        if ($null -eq $dscCurrentStateResourceObject)
         {
             return New-Object -TypeName 'System.Management.Automation.PSObject' -Property @{
                 Ensure = [Ensure]::Absent
             }
         }
 
-        return $currentStateResourceObject
+        return $dscCurrentStateResourceObject
     }
 
 
     hidden [Hashtable]GetDscCurrentStateProperties()
     {
         # Obtain 'CurrentStateResourceObject' and pass into overidden function of inheriting class
-        return $this.GetDscCurrentStateProperties($this.GetDscResourceCurrentStateObject())
+        return $this.GetDscCurrentStateProperties($this.GetDscCurrentStateObject())
     }
 
     # This method must be overidden by inheriting class(es)
@@ -268,14 +268,14 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
     hidden [Hashtable]GetDscDesiredStateProperties()
     {
-        [Hashtable]$desiredStateProperties = @{}
+        [Hashtable]$dscDesiredStateProperties = @{}
 
-        # Obtain all DSC-related properties, and add to the hashtable output
+        # Obtain all DSC-related properties, and add them and their values to the hashtable output
         $this.GetDscResourcePropertyNames() | ForEach-Object {
-                $desiredStateProperties."$_" = $this."$_"
+                $dscDesiredStateProperties."$_" = $this."$_"
             }
 
-        return $desiredStateProperties
+        return $dscDesiredStateProperties
     }
 
 
