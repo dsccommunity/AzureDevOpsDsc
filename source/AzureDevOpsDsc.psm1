@@ -514,6 +514,23 @@ class DSC_AzDevOpsResource
     }
 
 
+    [void] SetToDesiredState()
+    {
+        [RequiredAction]$requiredAction = $this.GetRequiredAction()
+
+        if ($requiredAction -in @([RequiredAction]::'New', [RequiredAction]::'Set', [RequiredAction]::'Remove'))
+        {
+            $currentStateProperties = $this.GetCurrentStateProperties()
+            $desiredStateProperties = $this.GetDesiredStateProperties()
+
+            $requiredActionFunctionName = $this.GetResourceFunctionName($requiredAction)
+            $desiredStateParameters = $this.GetDesiredStateParameters($currentStateProperties, $desiredStateProperties, $requiredAction)
+
+            & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
+            Start-Sleep -Seconds 5
+        }
+    }
+
 
 }
 
@@ -537,7 +554,6 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
     [string]$SourceControlType
 
 
-
     [DSC_AzDevOpsProject] Get()
     {
         return [DSC_AzDevOpsProject]$($this.GetCurrentStateProperties())
@@ -550,21 +566,8 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
 
     [void] Set()
     {
-        [RequiredAction]$requiredAction = $this.GetRequiredAction()
-
-        if ($requiredAction -in @([RequiredAction]::'New', [RequiredAction]::'Set', [RequiredAction]::'Remove'))
-        {
-            $currentStateProperties = $this.GetCurrentStateProperties()
-            $desiredStateProperties = $this.GetDesiredStateProperties()
-
-            $requiredActionFunctionName = $this.GetResourceFunctionName($requiredAction)
-            $desiredStateParameters = $this.GetDesiredStateParameters($currentStateProperties, $desiredStateProperties, $requiredAction)
-
-            & $requiredActionFunctionName @desiredStateParameters -Force | Out-Null
-            Start-Sleep -Seconds 5
-        }
+        $this.SetToDesiredState()
     }
-
 
 
     hidden [string[]]GetDscResourceDscUnsupportedForSetPropertyNames()
