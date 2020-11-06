@@ -196,6 +196,46 @@ class DSC_AzDevOpsResource
         return "Test-AzDevOps$thisResourceName"
     }
 
+    hidden [string]GetResourceFunctionName([RequiredAction]$RequiredAction)
+    {
+        switch ($RequiredAction)
+        {
+            ([RequiredAction]::Get) {
+                return $this.GetResourceGetFunctionName()
+                break
+            }
+
+            ([RequiredAction]::New) {
+                return $this.GetResourceNewFunctionName()
+                break
+            }
+
+            ([RequiredAction]::Set) {
+                return $this.GetResourceSetFunctionName()
+                break
+            }
+
+            ([RequiredAction]::Remove) {
+                return $this.GetResourceRemoveFunctionName()
+                break
+            }
+
+            ([RequiredAction]::Test) {
+                return $this.GetResourceTestFunctionName()
+                break
+            }
+
+            default {
+                throw "Cannot obtain a function name within 'GetResourceFunctionName()' for RequiredAction of '$($RequiredAction)'."
+            }
+
+        }
+
+
+        $thisResourceName = $this.GetResourceName()
+        return "Get-AzDevOps$thisResourceName"
+    }
+
 
     hidden [object]GetCurrentStateResourceObject()
     {
@@ -466,6 +506,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
         Write-Verbose "Set()..."
 
         [RequiredAction]$requiredAction = $this.GetRequiredAction()
+        $requiredActionFunctionName = $this.GetResourceFunctionName($requiredAction)
 
         $current = $this.GetCurrentStateProperties()
         $desired = $this.GetDesiredStateProperties()
@@ -508,11 +549,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 break
             }
             ([RequiredAction]::'New') {
-                $thisResourceNewFunctionName = $this.GetResourceNewFunctionName()
-
-                Write-Verbose "Calling '$thisResourceNewFunctionName'..."
-                Write-Verbose $($desiredParameters | ConvertTo-Json)
-                & $thisResourceNewFunctionName @desiredParameters -Force | Out-Null
+                & $requiredActionFunctionName @desiredParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
@@ -520,11 +557,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                 # Remove any not supported
                 $desiredParameters.Remove('SourceControlType')
 
-
-                $thisResourceSetFunctionName = $this.GetResourceSetFunctionName()
-                Write-Verbose "Calling '$thisResourceSetFunctionName'..."
-                Write-Verbose $($desiredParameters | ConvertTo-Json)
-                & $thisResourceSetFunctionName @desiredParameters -Force | Out-Null
+                & $requiredActionFunctionName @desiredParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
@@ -536,9 +569,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsResource
                     "$alternateKeyPropertyName" = $desiredParameters."$alternateKeyPropertyName"
                 }
 
-                $thisResourceRemoveFunctionName = $this.GetResourceRemoveFunctionName()
-                Write-Verbose "Calling '$thisResourceRemoveFunctionName'..."
-                & $thisResourceRemoveFunctionName @removeParameters -Force | Out-Null
+                & $requiredActionFunctionName @removeParameters -Force | Out-Null
                 Start-Sleep -Seconds 5
                 break
             }
