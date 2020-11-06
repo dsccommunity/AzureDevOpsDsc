@@ -231,22 +231,17 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
     hidden [System.Object]GetCurrentStateResourceObject()
     {
-        [System.String]$thisResourceKey = $this.GetResourceKey()
-        [System.String]$thisResourceKeyPropertyName = $this.GetResourceKeyPropertyName()
-        [System.String]$thisResourceId = $this.GetResourceId()
-        [System.String]$thisResourceIdPropertyName = $this.GetResourceIdPropertyName()
         [System.String]$thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
 
         $getParameters = @{
-            ApiUri                         = $this.ApiUri
-            Pat                            = $this.Pat
-            "$thisResourceKeyPropertyName" = $thisResourceKey
+            ApiUri                                  = $this.ApiUri
+            Pat                                     = $this.Pat
+            "$($this.GetResourceKeyPropertyName())" = $this.GetResourceKey()
         }
 
-        if (![System.String]::IsNullOrWhiteSpace($thisResourceId))
+        if (![System.String]::IsNullOrWhiteSpace($this.GetResourceId()))
         {
-            Write-Verbose "thisResourceId was not null or whitespace."
-            $getParameters."$thisResourceIdPropertyName" = $thisResourceId
+            $getParameters."$($this.GetResourceIdPropertyName())" = $this.GetResourceId()
         }
 
         $currentStateResourceObject = $(& $thisResourceGetFunctionName @getParameters)
