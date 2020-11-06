@@ -184,9 +184,9 @@ class AzDevOpsApiDscResource : AzDevOpsDscResource
         return $this."$keyPropertyName"
     }
 
-    hidden [System.String]GetResourceKeyPropertyName() # TODO: Need to remove this from here (it's DSC specific)...
+    hidden [System.String]GetResourceKeyPropertyName()
     {
-        # Uses the same value as the 'DscResourceDscKeyPropertyName()'
+        # Use same property as the DSC Resource 'Key'
         return $this.GetDscResourceKeyPropertyName()
     }
 
@@ -226,7 +226,6 @@ class AzDevOpsApiDscResource : AzDevOpsDscResource
 
 class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 {
-    # DSC-specific properties for use in operations/comparisons
     [DscProperty()]
     [Alias('Uri')]
     [System.String]$ApiUri
@@ -237,15 +236,6 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
     [DscProperty()]
     [Ensure]$Ensure
-
-
-    # Constructor(s)
-    DSC_AzDevOpsApiResource(){}
-
-
-
-
-
 
 
 
