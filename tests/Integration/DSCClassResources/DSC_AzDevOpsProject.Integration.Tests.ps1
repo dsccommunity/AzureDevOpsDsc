@@ -1,9 +1,9 @@
 #Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-#if (-not (Test-BuildCategory -Type 'Integration'))
-#{
-#    return
-#}
+if (-not (Test-BuildCategory -Type 'Integration'))
+{
+    return
+}
 
 $script:dscModuleName = 'AzureDevOpsDsc'
 $script:dscResourceFriendlyName = 'DSC_AzDevOpsProject'
