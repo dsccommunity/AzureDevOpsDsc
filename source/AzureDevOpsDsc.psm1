@@ -207,7 +207,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         return $thisDscPropertyNames
     }
 
-    hidden [string[]]GetDscResourceDscUnsupportedForSetPropertyNames()
+    hidden [string[]]GetDscNoSetSupportPropertyNames()
     {
         return @()
     }
@@ -315,7 +315,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
         [hashtable]$currentProperties = $this.GetCurrentStateProperties()
         [hashtable]$desiredProperties = $this.GetDesiredStateProperties()
 
-        [string[]]$propertyNamesUnsupportedForSet = $this.GetDscResourceDscUnsupportedForSetPropertyNames()
+        [string[]]$propertyNamesWithNoSetSupport = $this.GetDscNoSetSupportPropertyNames()
         [string[]]$propertyNamesToCompare = $this.GetDscPropertyNames()
 
 
@@ -362,9 +362,9 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
                 }
 
                 # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
-                if ($propertyNamesUnsupportedForSet.Count -gt 0)
+                if ($propertyNamesWithNoSetSupport.Count -gt 0)
                 {
-                    $propertyNamesUnsupportedForSet | ForEach-Object {
+                    $propertyNamesWithNoSetSupport | ForEach-Object {
 
                         Write-Verbose "Comparing UNSUPPORTED: $_"
                         Write-Verbose $("Current: "+ $($currentProperties."$_"))
@@ -503,7 +503,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
-            [string[]]$unsupportedForSetPropertyNames = $this.GetDscResourceDscUnsupportedForSetPropertyNames()
+            [string[]]$unsupportedForSetPropertyNames = $this.GetDscNoSetSupportPropertyNames()
 
             if ($RequiredAction -eq [RequiredAction]::Set -and
                 $unsupportedForSetPropertyNames.Count -gt 0)
@@ -580,7 +580,7 @@ class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
     }
 
 
-    hidden [string[]]GetDscResourceDscUnsupportedForSetPropertyNames()
+    hidden [string[]]GetDscNoSetSupportPropertyNames()
     {
         return @('SourceControlType')
     }
