@@ -163,7 +163,7 @@ class AzDevOpsApiResource
 
 
 
-class DSC_AzDevOpsResource : AzDevOpsApiResource
+class DSC_AzDevOpsApiResource : AzDevOpsApiResource
 {
     # DSC-specific properties for use in operations/comparisons
     [DscProperty()]
@@ -179,7 +179,7 @@ class DSC_AzDevOpsResource : AzDevOpsApiResource
 
 
     # Constructor(s)
-    DSC_AzDevOpsResource(){}
+    DSC_AzDevOpsApiResource(){}
 
 
     # DSC-specific methods
@@ -295,7 +295,7 @@ class DSC_AzDevOpsResource : AzDevOpsApiResource
     hidden [Hashtable]GetCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $thisType = $this.GetType()
-        if ($thisType -eq [DSC_AzDevOpsResource])
+        if ($thisType -eq [DSC_AzDevOpsApiResource])
         {
             throw "Method 'GetCurrentState()' in '$($thisType.Name)' must be overidden by an inheriting class."
             return $null
@@ -546,7 +546,7 @@ class DSC_AzDevOpsResource : AzDevOpsApiResource
 
 
 [DscResource()]
-class DSC_AzDevOpsProject : DSC_AzDevOpsResource
+class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
 {
     [DscProperty()]
     [Alias('Id')]
