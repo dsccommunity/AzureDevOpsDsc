@@ -284,8 +284,8 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
         [Hashtable]$currentProperties = $this.GetDscCurrentStateProperties()
         [Hashtable]$desiredProperties = $this.GetDscDesiredStateProperties()
 
-        [System.String[]]$propertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
-        [System.String[]]$propertyNamesToCompare = $this.GetDscResourcePropertyNames()
+        [System.String[]]$dscPropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
+        [System.String[]]$dscPropertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
 
         # Update 'Id' property:
@@ -322,27 +322,24 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                 if ($null -eq $currentProperties -or $($currentProperties.Ensure) -ne [Ensure]::Present)
                 {
                     $dscRequiredAction = [RequiredAction]::New
+                    break
                 }
 
                 # Return if not [RequiredAction]::None
                 if ($dscRequiredAction -ne [RequiredAction]::None)
                 {
                     return $dscRequiredAction
+                    break
                 }
 
                 # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
-                if ($propertyNamesWithNoSetSupport.Count -gt 0)
+                if ($dscPropertyNamesWithNoSetSupport.Count -gt 0)
                 {
-                    $propertyNamesWithNoSetSupport | ForEach-Object {
-
-                        Write-Verbose "Comparing UNSUPPORTED: $_"
-                        Write-Verbose $("Current: "+ $($currentProperties."$_"))
-                        Write-Verbose $("Desired: "+ $($desiredProperties."$_"))
+                    $dscPropertyNamesWithNoSetSupport | ForEach-Object {
 
                         if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
                             throw "The '$($this.GetType().Name)', DSC resource does not support changes for/to the '$_' property."
-                            $dscRequiredAction = [RequiredAction]::Error
                         }
                     }
                 }
@@ -354,18 +351,10 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                     break
                 }
 
-                Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetDscRequiredAction RequiredAction  : Passed [RequiredAction]::Error"
-                Write-Verbose "-----------------------------------------------------"
-
-                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
-                if ($propertyNamesToCompare.Count -gt 0)
+                # Compare all properties ('Current' vs 'Desired')
+                if ($dscPropertyNamesToCompare.Count -gt 0)
                 {
-                    $propertyNamesToCompare | ForEach-Object {
-
-                        Write-Verbose "Comparing OK: $_"
-                        Write-Verbose $("Current: "+ $($currentProperties."$_"))
-                        Write-Verbose $("Desired: "+ $($desiredProperties."$_"))
+                    $dscPropertyNamesToCompare | ForEach-Object {
 
                         if ($($currentProperties."$_") -ne $($desiredProperties."$_"))
                         {
@@ -380,10 +369,6 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
                     return $dscRequiredAction
                     break
                 }
-
-                Write-Verbose "-----------------------------------------------------"
-                Write-Verbose "GetDscRequiredAction RequiredAction  : Passed [RequiredAction]::Set"
-                Write-Verbose "-----------------------------------------------------"
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
                 return $dscRequiredAction
