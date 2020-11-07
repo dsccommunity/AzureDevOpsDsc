@@ -27,6 +27,14 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                 $testCasesValidResourcePublicFunctionNames = Get-TestCase -ScopeName 'ResourcePublicFunctionName' -TestCaseName 'Valid'
                 $testCasesValidDscResourcePublicFunctionNames = Get-TestCase -ScopeName 'DscResourcePublicFunctionName' -TestCaseName 'Valid'
 
+                $testCasesValidApiResourcePublicFunctionRequiredParameterNames = Get-TestCase -ScopeName 'ApiResourcePublicFunctionRequiredParameterName' -TestCaseName 'Valid'
+
+                $testCasesValidDscResourcePublicFunctionRequiredParameterNames = Join-TestCaseArray -Expand -TestCaseArray @(
+                    $testCasesValidDscResourcePublicFunctionNames,
+                    $testCasesValidApiResourcePublicFunctionRequiredParameterNames
+                )
+
+                $testCasesValidParameterAliasNames = Get-TestCase -ScopeName 'ParameterAliasName' -TestCaseName 'Valid'
 
 
                 Context "When evaluating functions required for DSC resources" {
@@ -35,28 +43,42 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         param ([string]$DscResourcePublicFunctionName)
 
                         $DscResourcePublicFunctionName | Should -BeIn $exportedFunctionNames
-                   }
+                    }
 
-                   It "Should return a '<DscResourcePublicFunctionName>' function/command (specific to the 'ResourceName') from 'Get-Command' - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
-                       param ([string]$DscResourcePublicFunctionName)
+                    It "Should return a '<DscResourcePublicFunctionName>' function/command (specific to the 'ResourceName') from 'Get-Command' - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
+                        param ([string]$DscResourcePublicFunctionName)
 
-                       Get-Command -Module $moduleName -Name $DscResourcePublicFunctionName | Should -Not -BeNullOrEmpty
-                   }
+                        Get-Command -Module $moduleName -Name $DscResourcePublicFunctionName | Should -Not -BeNullOrEmpty
+                    }
 
-                   It "Should have a '<DscResourcePublicFunctionName>' script ('.ps1') file (specific to the 'ResourceName') - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
-                       param ([string]$DscResourcePublicFunctionName)
+                    It "Should have a '<DscResourcePublicFunctionName>' script ('.ps1') file (specific to the 'ResourceName') - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
+                        param ([string]$DscResourcePublicFunctionName)
 
-                       $functionScriptPath = Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath $($DscResourcePublicFunctionName + ".ps1")
-                       Test-Path $functionScriptPath | Should -BeTrue
-                   }
+                        $functionScriptPath = Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath $($DscResourcePublicFunctionName + ".ps1")
+                        Test-Path $functionScriptPath | Should -BeTrue
+                    }
 
-                   It "Should have a '<DscResourcePublicFunctionName>' test fixture/script ('.Tests.ps1') file (specific to the 'ResourceName') - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
-                       param ([string]$DscResourcePublicFunctionName)
+                    It "Should have a '<DscResourcePublicFunctionName>' test fixture/script ('.Tests.ps1') file (specific to the 'ResourceName') - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
+                        param ([string]$DscResourcePublicFunctionName)
 
-                       $functionTestsScriptPath = Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath $($DscResourcePublicFunctionName + ".Tests.ps1")
-                       Test-Path $functionTestsScriptPath | Should -BeTrue
-                   }
+                        $functionTestsScriptPath = Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath $($DscResourcePublicFunctionName + ".Tests.ps1")
+                        Test-Path $functionTestsScriptPath | Should -BeTrue
+                    }
 
+                    Context "When evaluating function parameters required for DSC resource functions" {
+
+                        It "Should have a '<DscResourcePublicFunctionName>' function with required, '<ApiResourcePublicFunctionRequiredParameterName>' parameter - '<DscResourcePublicFunctionName>', '<ApiResourcePublicFunctionRequiredParameterName>'" -TestCases $testCasesValidDscResourcePublicFunctionRequiredParameterNames {
+                            param ([string]$DscResourcePublicFunctionName,
+                                   [string]$ApiResourcePublicFunctionRequiredParameterName)
+
+                            $ApiResourcePublicFunctionRequiredParameterName |
+                                Should -BeIn $((Get-CommandParameter -CommandName $DscResourcePublicFunctionName -ModuleName $moduleName).Name)
+                        }
+
+                        Context "When evaluating function parameter, aliases required for DSC resource functions" {
+                            # TODO
+                        }
+                    }
                 }
 
                 Context "When evaluating functions required for non-DSC resources" {
@@ -99,28 +121,6 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             }
 
             Context "When evaluating '$moduleName' module, 'Get-AzDevOps...' (GET) functions" {
-
-                Context "When evaluating function parameters" {
-
-                    It "Should have a 'Get-AzDevOps<ResourceName>' function with an 'ApiUri' parameter" -TestCases $testCasesValidResourceNames {
-                        param ([string]$ResourceName)
-
-                        'ApiUri' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName").Name
-                    }
-
-                    It "Should have a 'Get-AzDevOps<ResourceName>' function with an 'Pat' parameter" -TestCases $testCasesValidResourceNames {
-                        param ([string]$ResourceName)
-
-                        'Pat' | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName").Name
-                    }
-
-                    It "Should have a 'Get-AzDevOps<ResourceName>' function with a/an '<ResourceName>Id' parameter" -TestCases $testCasesValidResourceNames {
-                        param ([string]$ResourceName)
-
-                        "$($ResourceName)Id" | Should -BeIn $(Get-CommandParameter -ModuleName $moduleName -CommandName "Get-AzDevOps$ResourceName").Name
-                    }
-
-                }
 
                 Context "When evaluating function parameter aliases" {
 
