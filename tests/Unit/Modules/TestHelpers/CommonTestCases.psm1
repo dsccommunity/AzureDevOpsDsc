@@ -17,12 +17,6 @@ function Get-TestCaseValue
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
-                     'ResourceName',`
-                     'ResourcePublicFunctionName','ResourcePublicGetFunctionName','ResourcePublicNewFunctionName',`
-                     'ResourcePublicSetFunctionName','ResourcePublicRemoveFunctionName','ResourcePublicTestFunctionName',`
-                     'ProjectDescription','ProjectName','OrganizationName',`
-                     'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
 
@@ -371,6 +365,7 @@ function Get-TestCaseValue
     }
 
     # ResourcePublicFunctionName
+    # Combination of all the 'Get', 'New', 'Set', 'Remove' and 'Test' functions for the 'Resource'
     $testCaseValues.ResourcePublicFunctionName = @{
 
         Valid = $testCaseValues.ResourcePublicGetFunctionName.Valid +
@@ -380,6 +375,92 @@ function Get-TestCaseValue
                 $testCaseValues.ResourcePublicTestFunctionName.Valid
 
     }
+
+
+
+    # NonDscResourceName
+    # The 'ResourceName' values that are to be excluded from being used as part of a DSC resource (typically treated differently to 'DscResourceName' values)
+    $testCaseValues.NonDscResourceName = @{
+
+        Valid = @(
+            'Operation'
+        )
+
+        Invalid = $testCaseValues
+
+    }
+    $testCaseValues.NonDscResourceName.Invalid = $testCaseValues.ResourceName.Valid | Where-Object {
+        $_ -notin $testCaseValues.NonDscResourceName.Valid
+    }
+
+
+
+    # DscResourceName
+    # Use 'ResourceName' values, but remove valid 'NonDscResourceName' from 'Valid' array, and add them to the 'Invalid' array
+    $testCaseValues.DscResourceName = $testCaseValues.ResourceName
+    $testCaseValues.DscResourceName.Valid = $testCaseValues.DscResourceName | Where-Object { $_ -notin $testCaseValues.NonDscResourceName.Valid }
+    $testCaseValues.DscResourceName.Invalid = $testCaseValues.NonDscResourceName.Valid
+
+
+
+    # DscResourcePublicGetFunctionName
+    $testCaseValues.DscResourcePublicGetFunctionName = @{
+
+        Valid = $testCaseValues.DscResourceName.Valid | ForEach-Object {
+            "Get-AzDevOps$_"
+        }
+
+    }
+
+    # DscResourcePublicNewFunctionName
+    $testCaseValues.DscResourcePublicNewFunctionName = @{
+
+        Valid = $testCaseValues.DscResourceName.Valid | ForEach-Object {
+            "New-AzDevOps$_"
+        }
+
+    }
+
+    # DscResourcePublicSetFunctionName
+    $testCaseValues.DscResourcePublicSetFunctionName = @{
+
+        Valid = $testCaseValues.DscResourceName.Valid | ForEach-Object {
+            "Set-AzDevOps$_"
+        }
+
+    }
+
+    # DscResourcePublicRemoveFunctionName
+    $testCaseValues.DscResourcePublicRemoveFunctionName = @{
+
+        Valid = $testCaseValues.DscResourceName.Valid | ForEach-Object {
+            "Remove-AzDevOps$_"
+        }
+
+    }
+
+    # DscResourcePublicTestFunctionName
+    $testCaseValues.DscResourcePublicTestFunctionName = @{
+
+        Valid = $testCaseValues.DscResourceName.Valid | ForEach-Object {
+            "Test-AzDevOps$_"
+        }
+
+    }
+
+    # DscResourcePublicFunctionName
+    # Combination of all the 'Get', 'New', 'Set', 'Remove' and 'Test' functions for the 'DscResource
+    $testCaseValues.DscResourcePublicFunctionName = @{
+
+        Valid = $testCaseValues.DscResourcePublicGetFunctionName.Valid +
+                $testCaseValues.DscResourcePublicNewFunctionName.Valid +
+                $testCaseValues.DscResourcePublicSetFunctionName.Valid +
+                $testCaseValues.DscResourcePublicRemoveFunctionName.Valid +
+                $testCaseValues.DscResourcePublicTestFunctionName.Valid
+
+    }
+
+
 
 
     # OperationId (derived from ResourceId)
@@ -413,12 +494,6 @@ function Get-TestCase
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
-                     'ResourceName',`
-                     'ResourcePublicFunctionName','ResourcePublicGetFunctionName','ResourcePublicNewFunctionName',`
-                     'ResourcePublicSetFunctionName','ResourcePublicRemoveFunctionName','ResourcePublicTestFunctionName',`
-                     'ProjectDescription','ProjectName','OrganizationName',`
-                     'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
 
