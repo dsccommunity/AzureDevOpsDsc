@@ -437,7 +437,7 @@ function Get-TestCaseValue
 
 
     # ApiResourcePublicFunctionRequiredParameterName
-    # Parameter names that must be present on a public, function for an Azure DevOps, API resource
+    # Parameter names that must be present on a public, function for an Azure DevOps, API resource - Note: different to 'ApiResourcePublicFunctionMandatoryParameterName'
     $testCaseValues.ApiResourcePublicFunctionRequiredParameterName = @{
 
         Valid = @(
@@ -446,10 +446,19 @@ function Get-TestCaseValue
         )
     }
 
-
     # DscResourcePublicFunctionRequiredParameterName
-    # Parameter names that must be present on a public, function for a DSC resource (same as for an API resource)
+    # Parameter names that must be present on a public, function for a DSC resource (same as for an API resource) - Note: different to 'DscResourcePublicFunctionMandatoryParameterName'
     $testCaseValues.DscResourcePublicFunctionRequiredParameterName = $testCaseValues.ApiResourcePublicFunctionRequiredParameterName
+
+
+
+    # ApiResourcePublicFunctionMandatoryParameterName
+    # Parameter names that must be present AND set as 'Mandatory' on a public, function for an Azure DevOps, API resource
+    $testCaseValues.ApiResourcePublicFunctionMandatoryParameterName = $testCaseValues.ApiResourcePublicFunctionRequiredParameterName
+
+    # DscResourcePublicFunctionMandatoryParameterName
+    # Parameter names that must be present AND set as 'Mandatory' on a public, function for a DSC resource (same as for an API resource)
+    $testCaseValues.DscResourcePublicFunctionMandatoryParameterName = $testCaseValues.ApiResourcePublicFunctionMandatoryParameterName
 
 
 
