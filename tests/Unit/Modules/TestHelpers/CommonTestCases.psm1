@@ -279,7 +279,8 @@ function Get-TestCaseValue
 
         Valid = @(
             'Operation',
-            'Project'
+            'Project'#,
+            #'Team'
         )
 
         Invalid = @(
@@ -328,33 +329,6 @@ function Get-TestCaseValue
 
     }
 
-    # ResourcePublicNewFunctionName
-    $testCaseValues.ResourcePublicNewFunctionName = @{
-
-        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
-            "New-AzDevOps$_"
-        }
-
-    }
-
-    # ResourcePublicSetFunctionName
-    $testCaseValues.ResourcePublicSetFunctionName = @{
-
-        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
-            "Set-AzDevOps$_"
-        }
-
-    }
-
-    # ResourcePublicRemoveFunctionName
-    $testCaseValues.ResourcePublicRemoveFunctionName = @{
-
-        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
-            "Remove-AzDevOps$_"
-        }
-
-    }
-
     # ResourcePublicTestFunctionName
     $testCaseValues.ResourcePublicTestFunctionName = @{
 
@@ -368,11 +342,11 @@ function Get-TestCaseValue
     # Combination of all the 'Get', 'New', 'Set', 'Remove' and 'Test' functions for the 'Resource'
     $testCaseValues.ResourcePublicFunctionName = @{
 
-        Valid = $testCaseValues.ResourcePublicGetFunctionName.Valid +
-                $testCaseValues.ResourcePublicNewFunctionName.Valid +
-                $testCaseValues.ResourcePublicSetFunctionName.Valid +
-                $testCaseValues.ResourcePublicRemoveFunctionName.Valid +
-                $testCaseValues.ResourcePublicTestFunctionName.Valid
+        Valid = [string[]]$testCaseValues.ResourcePublicGetFunctionName.Valid +
+                #$testCaseValues.ResourcePublicNewFunctionName.Valid +     # Not needed/wanted for 'NonDscResource' functions (use 'NonDscResource' for this )
+                #$testCaseValues.ResourcePublicSetFunctionName.Valid +     # Not needed/wanted for 'NonDscResource' functions (use 'NonDscResource' for this )
+                #$testCaseValues.ResourcePublicRemoveFunctionName.Valid +  # Not needed/wanted for 'NonDscResource' functions (use 'NonDscResource' for this )
+                [string[]]$testCaseValues.ResourcePublicTestFunctionName.Valid
 
     }
 
@@ -398,7 +372,7 @@ function Get-TestCaseValue
     # DscResourceName
     # Use 'ResourceName' values, but remove valid 'NonDscResourceName' from 'Valid' array, and add them to the 'Invalid' array
     $testCaseValues.DscResourceName = $testCaseValues.ResourceName
-    $testCaseValues.DscResourceName.Valid = $testCaseValues.DscResourceName | Where-Object { $_ -notin $testCaseValues.NonDscResourceName.Valid }
+    $testCaseValues.DscResourceName.Valid = $testCaseValues.DscResourceName.Valid | Where-Object { $_ -notin $testCaseValues.NonDscResourceName.Valid }
     $testCaseValues.DscResourceName.Invalid = $testCaseValues.NonDscResourceName.Valid
 
 
@@ -452,11 +426,11 @@ function Get-TestCaseValue
     # Combination of all the 'Get', 'New', 'Set', 'Remove' and 'Test' functions for the 'DscResource
     $testCaseValues.DscResourcePublicFunctionName = @{
 
-        Valid = $testCaseValues.DscResourcePublicGetFunctionName.Valid +
-                $testCaseValues.DscResourcePublicNewFunctionName.Valid +
-                $testCaseValues.DscResourcePublicSetFunctionName.Valid +
-                $testCaseValues.DscResourcePublicRemoveFunctionName.Valid +
-                $testCaseValues.DscResourcePublicTestFunctionName.Valid
+        Valid = [string[]]$testCaseValues.DscResourcePublicGetFunctionName.Valid +
+                [string[]]$testCaseValues.DscResourcePublicNewFunctionName.Valid +
+                [string[]]$testCaseValues.DscResourcePublicSetFunctionName.Valid +
+                [string[]]$testCaseValues.DscResourcePublicRemoveFunctionName.Valid +
+                [string[]]$testCaseValues.DscResourcePublicTestFunctionName.Valid
 
     }
 
