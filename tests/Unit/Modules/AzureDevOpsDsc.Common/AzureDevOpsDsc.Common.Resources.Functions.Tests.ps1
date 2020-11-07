@@ -12,18 +12,21 @@ InModuleScope 'AzureDevOpsDsc.Common' {
         $testCasesValidResourceNamesForDscResources = $testCasesValidResourceNames | Where-Object { $_.ResourceName -notin @('Operation')}
 
         Context "When evaluating 'AzureDevOpsDsc.Common' module functions" {
-            BeforeAll {
+            BeforeEach {
                 $moduleName = 'AzureDevOpsDsc.Common'
             }
 
             Context "When evaluating public, 'ExportedFunctions'" {
 
-                BeforeAll {
+                BeforeEach {
                     [string[]]$exportedFunctionNames = Get-Command -Module $moduleName
+                    $resourcesFunctionsPublicDirectoryPath = "$PSScriptRoot\..\..\..\..\source\Modules\$moduleName\Resources\Functions\Public"
+                    $resourcesFunctionsPublicTestsDirectoryPath = "$PSScriptRoot\Resources\Functions\Public"
                 }
 
                 $testCasesValidResourcePublicFunctionNames = Get-TestCase -ScopeName 'ResourcePublicFunctionName' -TestCaseName 'Valid'
                 $testCasesValidDscResourcePublicFunctionNames = Get-TestCase -ScopeName 'DscResourcePublicFunctionName' -TestCaseName 'Valid'
+
 
 
                 Context "When evaluating functions required for DSC resources" {
@@ -38,6 +41,20 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                        param ([string]$DscResourcePublicFunctionName)
 
                        Get-Command -Module $moduleName -Name $DscResourcePublicFunctionName | Should -Not -BeNullOrEmpty
+                   }
+
+                   It "Should have a '<DscResourcePublicFunctionName>' script ('.ps1') file (specific to the 'ResourceName') - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
+                       param ([string]$DscResourcePublicFunctionName)
+
+                       $functionScriptPath = Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath $($DscResourcePublicFunctionName + ".ps1")
+                       Test-Path $functionScriptPath | Should -BeTrue
+                   }
+
+                   It "Should have a '<DscResourcePublicFunctionName>' test fixture/script ('.Tests.ps1') file (specific to the 'ResourceName') - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
+                       param ([string]$DscResourcePublicFunctionName)
+
+                       $functionTestsScriptPath = Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath $($DscResourcePublicFunctionName + ".Tests.ps1")
+                       Test-Path $functionTestsScriptPath | Should -BeTrue
                    }
 
                 }
@@ -56,6 +73,20 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         Get-Command -Module $moduleName -Name $ResourcePublicFunctionName | Should -Not -BeNullOrEmpty
                     }
 
+                    It "Should have a '<ResourcePublicFunctionName>' script ('.ps1') file (specific to the 'ResourceName') - '<ResourcePublicFunctionName>'" -TestCases $testCasesValidResourcePublicFunctionNames {
+                        param ([string]$ResourcePublicFunctionName)
+
+                        $functionScriptPath = Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath $($ResourcePublicFunctionName + ".ps1")
+                        Test-Path $functionScriptPath | Should -BeTrue
+                    }
+
+                    It "Should have a '<ResourcePublicFunctionName>' test fixture/script ('.Tests.ps1') file (specific to the 'ResourceName') - '<ResourcePublicFunctionName>'" -TestCases $testCasesValidResourcePublicFunctionNames {
+                        param ([string]$ResourcePublicFunctionName)
+
+                        $functionTestsScriptPath = Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath $($ResourcePublicFunctionName + ".Tests.ps1")
+                        Test-Path $functionTestsScriptPath | Should -BeTrue
+                    }
+
                 }
 
             }
@@ -64,88 +95,6 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 # TODO:
                 # Should be a 'Test-<ResourceName>Id' function
-
-            }
-
-            $resourcesFunctionsPublicDirectoryPath = "$PSScriptRoot\..\..\..\..\source\Modules\$moduleName\Resources\Functions\Public"
-
-            Context "When evaluating '$moduleName' module, function '.ps1' scripts directory ('$resourcesFunctionsPublicDirectoryPath')" {
-                BeforeAll {
-                    $moduleName = 'AzureDevOpsDsc.Common'
-                    [string[]]$exportedFunctionNames = Get-Command -Module $moduleName
-                    $resourcesFunctionsPublicDirectoryPath = "$PSScriptRoot\..\..\..\..\source\Modules\$moduleName\Resources\Functions\Public"
-                }
-
-                It "Should contain a 'Get-AzDevOps<ResourceName>.ps1' (GET) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNames {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath "Get-AzDevOps$ResourceName.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'New-AzDevOps<ResourceName>.ps1' (NEW) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNamesForDscResources {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath "New-AzDevOps$ResourceName.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'Set-AzDevOps<ResourceName>.ps1' (SET) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNamesForDscResources {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath "Set-AzDevOps$ResourceName.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'Remove-AzDevOps<ResourceName>.ps1' (REMOVE) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNamesForDscResources {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath "Remove-AzDevOps$ResourceName.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'Test-AzDevOps<ResourceName>.ps1' (TEST) function (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNames {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicDirectoryPath -ChildPath "Test-AzDevOps$ResourceName.ps1") | Should -BeTrue
-                }
-
-            }
-
-            $resourcesFunctionsPublicTestsDirectoryPath = "$PSScriptRoot\Resources\Functions\Public"
-
-            Context "When evaluating '$moduleName' module, public, function, tests directory ('$resourcesFunctionsPublicTestsDirectoryPath')" {
-                BeforeAll {
-                    $moduleName = 'AzureDevOpsDsc.Common'
-                    [string[]]$exportedFunctionNames = Get-Command -Module $moduleName
-                    $resourcesFunctionsPublicTestsDirectoryPath = "$PSScriptRoot\Resources\Functions\Public"
-                }
-
-                It "Should contain a 'Get-AzDevOps<ResourceName>.Tests.ps1' (GET) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNames {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath "Get-AzDevOps$ResourceName.Tests.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'New-AzDevOps<ResourceName>.Tests.ps1' (NEW) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNamesForDscResources {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath "New-AzDevOps$ResourceName.Tests.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'Set-AzDevOps<ResourceName>.Tests.ps1' (SET) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNamesForDscResources {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath "Set-AzDevOps$ResourceName.Tests.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'Remove-AzDevOps<ResourceName>.Tests.ps1' (REMOVE) function script (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNamesForDscResources {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath "Remove-AzDevOps$ResourceName.Tests.ps1") | Should -BeTrue
-                }
-
-                It "Should contain a 'Test-AzDevOps<ResourceName>.ps1' (TEST) function (specific to the 'ResourceName') - '<ResourceName>'" -TestCases $testCasesValidResourceNames {
-                    param ([string]$ResourceName)
-
-                    Test-Path $(Join-Path $resourcesFunctionsPublicTestsDirectoryPath -ChildPath "Test-AzDevOps$ResourceName.Tests.ps1") | Should -BeTrue
-                }
 
             }
 
