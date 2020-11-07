@@ -436,6 +436,41 @@ function Get-TestCaseValue
 
 
 
+    # ApiResourcePublicFunctionRequiredParameterName
+    # Parameter names that must be present on a public, function for an Azure DevOps, API resource
+    $testCaseValues.ApiResourcePublicFunctionRequiredParameterName = @{
+
+        Valid = @(
+            'ApiUri',
+            'Pat'
+        )
+    }
+
+
+    # DscResourcePublicFunctionRequiredParameterName
+    # Parameter names that must be present on a public, function for a DSC resource (same as for an API resource)
+    $testCaseValues.DscResourcePublicFunctionRequiredParameterName = $testCaseValues.ApiResourcePublicFunctionRequiredParameterName
+
+
+
+
+    # ParameterAliasName
+    # Parameter names that must be present on a public, function for an Azure DevOps, API resource
+    $testCaseValues.ParameterAliasName = @{
+
+        Valid = @(
+            @{
+                ParameterName='ApiUri'
+                AliasName=@('Uri')
+            },
+            @{
+                ParameterName='Pat'
+                AliasName=@('PersonalAccessToken')
+            }
+        )
+    }
+
+
 
     # OperationId (derived from ResourceId)
     $testCaseValues.OperationId = $testCaseValues.ResourceId
