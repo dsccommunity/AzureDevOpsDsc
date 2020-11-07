@@ -105,7 +105,6 @@ function Test-ContinuousIntegrationTaskCategory
 
     .PARAMETER ModuleName
         The name of the module the command belongs to.
-
 #>
 function Get-CommandParameter
 {
@@ -119,10 +118,46 @@ function Get-CommandParameter
         [Parameter()]
         [System.String]
         $ModuleName = '*'
-
     )
 
     Get-Command -Module $ModuleName -Name $CommandName |
         ForEach-Object { if ($_.Parameters) {$_.Parameters.Values }}
 
 }
+
+<#
+    .SYNOPSIS
+        Returns the aliases relating to a command and it's parameters.
+
+    .PARAMETER CommandName
+        The name of the command to retrieve the parameter aliases.
+
+    .PARAMETER ParameterName
+        The name of the parameter to retrieve the aliases of.
+
+    .PARAMETER ModuleName
+        The name of the module the command belongs to.
+#>
+function Get-CommandParameterAlias
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter( Mandatory = $true)]
+        [System.String]
+        $CommandName,
+
+        [Parameter()]
+        [System.String]
+        $ParameterName = '*',
+
+        [Parameter()]
+        [System.String]
+        $ModuleName = '*'
+    )
+
+    Get-CommandParameter -CommandName $CommandName -ModuleName $ModuleName |
+        ForEach-Object { if ($_.Name -ilike $ParameterName -and $_.Aliases) {$_.Aliases }}
+
+}
+
