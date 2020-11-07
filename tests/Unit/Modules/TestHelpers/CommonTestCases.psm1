@@ -18,7 +18,10 @@ function Get-TestCaseValue
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
-                     'ResourceName','ProjectDescription','ProjectName','OrganizationName',`
+                     'ResourceName',`
+                     'ResourcePublicFunctionName','ResourcePublicGetFunctionName','ResourcePublicNewFunctionName',`
+                     'ResourcePublicSetFunctionName','ResourcePublicRemoveFunctionName','ResourcePublicTestFunctionName',`
+                     'ProjectDescription','ProjectName','OrganizationName',`
                      'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
@@ -322,6 +325,63 @@ function Get-TestCaseValue
     }
 
 
+    # ResourcePublicGetFunctionName
+    $testCaseValues.ResourcePublicGetFunctionName = @{
+
+        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
+            "Get-AzDevOps$_"
+        }
+
+    }
+
+    # ResourcePublicNewFunctionName
+    $testCaseValues.ResourcePublicNewFunctionName = @{
+
+        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
+            "New-AzDevOps$_"
+        }
+
+    }
+
+    # ResourcePublicSetFunctionName
+    $testCaseValues.ResourcePublicSetFunctionName = @{
+
+        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
+            "Set-AzDevOps$_"
+        }
+
+    }
+
+    # ResourcePublicRemoveFunctionName
+    $testCaseValues.ResourcePublicRemoveFunctionName = @{
+
+        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
+            "Remove-AzDevOps$_"
+        }
+
+    }
+
+    # ResourcePublicTestFunctionName
+    $testCaseValues.ResourcePublicTestFunctionName = @{
+
+        Valid = $testCaseValues.ResourceName.Valid | ForEach-Object {
+            "Test-AzDevOps$_"
+        }
+
+    }
+
+    # ResourcePublicFunctionName
+    $testCaseValues.ResourcePublicFunctionName = @{
+
+        Valid = $testCaseValues.ResourcePublicGetFunctionName.Valid +
+                $testCaseValues.ResourcePublicNewFunctionName.Valid +
+                $testCaseValues.ResourcePublicSetFunctionName.Valid +
+                $testCaseValues.ResourcePublicRemoveFunctionName.Valid +
+                $testCaseValues.ResourcePublicTestFunctionName.Valid
+
+    }
+
+
     # OperationId (derived from ResourceId)
     $testCaseValues.OperationId = $testCaseValues.ResourceId
 
@@ -354,7 +414,10 @@ function Get-TestCase
     (
         [Parameter(Mandatory = $true)]
         [ValidateSet('String','ApiUri','ApiUriAreaName','ApiUriResourceName','ApiVersion','Pat',`
-                     'ResourceName','ProjectDescription','ProjectName','OrganizationName',`
+                     'ResourceName',`
+                     'ResourcePublicFunctionName','ResourcePublicGetFunctionName','ResourcePublicNewFunctionName',`
+                     'ResourcePublicSetFunctionName','ResourcePublicRemoveFunctionName','ResourcePublicTestFunctionName',`
+                     'ProjectDescription','ProjectName','OrganizationName',`
                      'ResourceId','OperationId','ProjectId')]
         [System.String]
         $ScopeName,
