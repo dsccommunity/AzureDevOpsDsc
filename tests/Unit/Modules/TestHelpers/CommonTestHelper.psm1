@@ -161,3 +161,74 @@ function Get-CommandParameterAlias
 
 }
 
+
+
+<#
+    .SYNOPSIS
+        Returns the parameter sets relating to a command.
+
+    .PARAMETER CommandName
+        The name of the command to retrieve the parameter sets.
+
+    .PARAMETER ModuleName
+        The name of the module the command belongs to.
+
+#>
+function Get-CommandParameterSet
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter( Mandatory = $true)]
+        [Alias('TestAlias')]
+        [System.String]
+        $CommandName,
+
+        [Parameter()]
+        [System.String]
+        $ModuleName = '*'
+
+    )
+
+    $(Get-Command -Module $ModuleName -Name $CommandName).ParameterSets
+
+}
+
+<#
+    .SYNOPSIS
+        Returns the parameter sets relating to a parameter set of a command.
+
+    .PARAMETER CommandName
+        The name of the command to retrieve the parameter sets.
+
+    .PARAMETER ParameterSetName
+        The name of the parameter set of the command to retrieve the parameters for.
+
+    .PARAMETER ModuleName
+        The name of the module the command belongs to.
+
+#>
+function Get-CommandParameterSetParameter
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter( Mandatory = $true)]
+        [Alias('TestAlias')]
+        [System.String]
+        $CommandName,
+
+        [Parameter()]
+        [System.String]
+        $ParameterSetName = '*',
+
+        [Parameter()]
+        [System.String]
+        $ModuleName = '*'
+
+    )
+
+    $($(Get-CommandParameterSet -CommandName $CommandName -ModuleName $ModuleName) |
+        Where-Object { $_.Name -like $ParameterSetName}).Parameters
+
+}
