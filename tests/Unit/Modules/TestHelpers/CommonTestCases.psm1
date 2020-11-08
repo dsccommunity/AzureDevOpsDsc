@@ -227,7 +227,8 @@ function Get-TestCaseValue
             'ProjectDescription',
             'Project Description',
             'Project-Description',
-            'Project_Description'
+            'Project_Description',
+            ''
         )
 
         Invalid = @(
@@ -238,7 +239,7 @@ function Get-TestCaseValue
             ' ProjectDescription',                   # Leading ' ' (whitespace)
             'ProjectDescription ',                   # Trailing ' ' (whitespace)
             ' ProjectDescription '                   # Leading and trailing ' ' (whitespace)
-        ) + $testCaseValues.String.Whitespace        # Any that are just whitespace characters
+        )
 
         Empty            = $testCaseValues.String.Empty
         Null             = $testCaseValues.String.Null

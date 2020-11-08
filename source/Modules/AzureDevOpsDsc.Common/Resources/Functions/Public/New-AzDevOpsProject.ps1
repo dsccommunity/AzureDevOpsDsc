@@ -57,11 +57,11 @@ function New-AzDevOpsProject
         [System.String]
         $ProjectName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectDescription -ProjectDescription $_ -IsValid })]
         [Alias('Description')]
         [System.String]
-        $ProjectDescription,
+        $ProjectDescription = '',
 
         [Parameter()]
         [ValidateSet('Git','Tfvc')]
