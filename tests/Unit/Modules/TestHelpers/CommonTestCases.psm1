@@ -352,6 +352,35 @@ function Get-TestCaseValue
 
 
 
+
+    # SourceControlType
+    $testCaseValues.SourceControlType = @{
+
+        Valid = @(
+            'Git',
+            'Tfvc'
+        )
+
+        Invalid = @(
+            '%',                                     # Just '%' character
+            '*',                                     # Just '*' character
+            ' Git',                                  # Leading ' ' (whitespace)
+            ' Tfvc',                                 # Leading ' ' (whitespace)
+            'Git ',                                  # Trailing ' ' (whitespace)
+            'Tfvc ',                                 # Trailing ' ' (whitespace)
+            ' Git '                                  # Leading and trailing ' ' (whitespace)
+            ' Tfvc '                                 # Leading and trailing ' ' (whitespace)
+        ) + $testCaseValues.String.Whitespace        # Any that are just whitespace characters
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
+
+
     # NonDscResourceName
     # The 'ResourceName' values that are to be excluded from being used as part of a DSC resource (typically treated differently to 'DscResourceName' values)
     $testCaseValues.NonDscResourceName = @{
