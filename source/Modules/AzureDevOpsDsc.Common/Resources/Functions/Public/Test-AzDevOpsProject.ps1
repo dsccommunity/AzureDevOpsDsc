@@ -61,15 +61,26 @@ function Test-AzDevOpsProject
 
         [Parameter(Mandatory = $true, ParameterSetName='ProjectName')]
         [Parameter(Mandatory = $true, ParameterSetName='ProjectIdAndProjectName')]
-        [ValidateScript({ Test-AzDevOpsProjectName -ProjectId $_ -IsValid })]
+        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid })]
         [Alias('Name')]
         [System.String]
         $ProjectName
     )
 
-    [object[]]$project = Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat `
-                                             -ProjectId $ProjectId `
-                                             -ProjectName $ProjectName
+    $azDevOpsProjectParameters = @{
+        ApiUri = $ApiUri;
+        Pat = $Pat
+    }
+
+    If(![string]::IsNullOrWhiteSpace($ProjectId)){
+        $azDevOpsProjectParameters.ProjectId = $ProjectId
+    }
+
+    If(![string]::IsNullOrWhiteSpace($ProjectName)){
+        $azDevOpsProjectParameters.ProjectName = $ProjectName
+    }
+
+    [object[]]$project = Get-AzDevOpsProject @azDevOpsProjectParameters
 
 
     return $($null -ne $project.id)
