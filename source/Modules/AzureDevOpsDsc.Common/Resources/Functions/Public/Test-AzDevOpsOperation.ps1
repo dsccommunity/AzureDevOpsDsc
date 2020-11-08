@@ -93,12 +93,12 @@ function Test-AzDevOpsOperation
 
 
     [object[]]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
-                                                   -OperationId $OperationId
+                                                 -OperationId $OperationId
 
 
     # Reference: https://docs.microsoft.com/en-us/rest/api/azure/devops/operations/operations/get?view=azure-devops-rest-6.0#operationstatus
-    if (($IsSuccessful -and $operation.status -eq 'succeeded') -or
-        ($IsComplete -and $operation.status -in 'succeeded', 'cancelled', 'failed'))
+    if (($IsSuccessful -and ($operation.status -eq 'succeeded')) -or
+        ($IsComplete -and ($operation.status -in @('succeeded', 'cancelled', 'failed'))))
     {
         return $true
     }
