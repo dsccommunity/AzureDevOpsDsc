@@ -63,15 +63,14 @@ function Set-AzDevOpsProject
         [System.String]
         $ProjectName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectDescription -ProjectDescription $_ -IsValid })]
         [AllowEmptyString()]
         [Alias('Description')]
         [System.String]
-        $ProjectDescription,
+        $ProjectDescription = '',
 
-
-        # $SourceControlType = 'Git', # Not supported
+        # $SourceControlType - Not supported for updates/set
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
