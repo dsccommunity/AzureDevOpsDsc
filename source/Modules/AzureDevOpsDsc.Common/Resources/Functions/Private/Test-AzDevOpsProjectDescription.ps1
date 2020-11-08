@@ -27,6 +27,7 @@ function Test-AzDevOpsProjectDescription
     param
     (
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [System.String]
         $ProjectDescription,
 
