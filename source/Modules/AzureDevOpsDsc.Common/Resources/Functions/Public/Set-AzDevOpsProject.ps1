@@ -65,6 +65,7 @@ function Set-AzDevOpsProject
 
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-AzDevOpsProjectDescription -ProjectDescription $_ -IsValid })]
+        [AllowEmptyString()]
         [Alias('Description')]
         [System.String]
         $ProjectDescription,
