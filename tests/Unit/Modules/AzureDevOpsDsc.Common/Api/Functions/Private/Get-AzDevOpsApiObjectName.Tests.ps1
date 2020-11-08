@@ -9,11 +9,7 @@ InModuleScope $script:subModuleName {
 
         Context 'When called with valid parameters' {
 
-
-            BeforeAll {
-
-                $testCasesValidResourceName = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
-            }
+            $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
 
             It 'Should not throw' {
                 param ()
@@ -28,11 +24,10 @@ InModuleScope $script:subModuleName {
                 $result.GetType() | Should -Be @('ResourceName1','ResourceName2').GetType()
             }
 
-            It 'Should return all resources that are present in $testCasesValidResourceName variable'{
-                param ()
+            It "Should return all resources that are present in $testCasesValidResourceName variable - '<ResourceName>'" -TestCases $testCasesValidResourceNames {
+                param ($ResourceName)
 
-                $result = Get-AzDevOpsApiResourceName
-                $result.Count | Should -Be $($testCasesValidResourceName.Count)
+                $ResourceName | Should -BeIn $(Get-AzDevOpsApiResourceName)
             }
 
         }
