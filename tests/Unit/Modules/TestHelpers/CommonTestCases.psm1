@@ -280,8 +280,7 @@ function Get-TestCaseValue
 
         Valid = @(
             'Operation',
-            'Project'#,
-            #'Team'
+            'Project'
         )
 
         Invalid = @(
@@ -401,9 +400,12 @@ function Get-TestCaseValue
 
     # DscResourceName
     # Use 'ResourceName' values, but remove valid 'NonDscResourceName' from 'Valid' array, and add them to the 'Invalid' array
-    $testCaseValues.DscResourceName = $testCaseValues.ResourceName
-    $testCaseValues.DscResourceName.Valid = $testCaseValues.DscResourceName.Valid | Where-Object { $_ -notin $testCaseValues.NonDscResourceName.Valid }
-    $testCaseValues.DscResourceName.Invalid = $testCaseValues.NonDscResourceName.Valid
+    $testCaseValues.DscResourceName = @{
+
+        Valid = $testCaseValues.ResourceName.Valid | Where-Object { $_ -notin $testCaseValues.NonDscResourceName.Valid } | ForEach-Object { $_ }
+
+        Invalid = $testCaseValues.NonDscResourceName.Valid | ForEach-Object { $_ }
+    }
 
 
 
