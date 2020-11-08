@@ -41,7 +41,7 @@ function Test-AzDevOpsProjectDescription
         New-InvalidOperationException -Message $errorMessage
     }
 
-    if ([System.String]::IsNullOrWhiteSpace($ProjectDescription) -or
+    if ($ProjectDescription -eq $null -or
         ($ProjectDescription.Contains('%') -or $ProjectDescription.Contains('*') -or $ProjectDescription.StartsWith(' ') -or $ProjectDescription.EndsWith(' ')))
     {
         return $false
