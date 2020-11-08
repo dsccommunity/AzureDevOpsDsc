@@ -59,6 +59,7 @@ function New-AzDevOpsProject
 
         [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectDescription -ProjectDescription $_ -IsValid })]
+        [AllowEmptyString()]
         [Alias('Description')]
         [System.String]
         $ProjectDescription = '',
