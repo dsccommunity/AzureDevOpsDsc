@@ -35,12 +35,6 @@ InModuleScope $script:subModuleName {
 
                 Context 'When called with invalid "ProjectDescription" parameter' {
 
-                    It 'Should throw - "<ProjectDescription>"' -TestCases $testCasesEmptyProjectDescriptions {
-                        param ([string]$ProjectDescription)
-
-                        { Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid } | Should -Throw
-                    }
-
                     It 'Should not throw - "<ProjectDescription>"' -TestCases $testCasesInvalidProjectDescriptions {
                         param ([string]$ProjectDescription)
 
