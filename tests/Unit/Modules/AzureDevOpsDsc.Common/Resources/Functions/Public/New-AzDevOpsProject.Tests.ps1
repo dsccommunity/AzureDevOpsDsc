@@ -105,7 +105,7 @@ InModuleScope $script:subModuleName {
             $testCasesInvalidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Invalid'
             $testCasesValidApiUriPatInvalidProjectNameCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatCombined, $testCasesInvalidProjectNames
 
-            $testCasesInvalidProjectDescriptions = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Invalid'
+            $testCasesInvalidProjectDescriptions = Get-TestCase -ScopeName 'ProjectDescription' -TestCaseName 'Invalid'
             $testCasesValidApiUriPatInvalidProjectDescriptionCombined = Join-TestCaseArray -Expand -TestCases $testCasesValidApiUriPatCombined, $testCasesInvalidProjectDescriptions
 
             $testCasesInvalidSourceControlTypes = Get-TestCase -ScopeName 'SourceControlType' -TestCaseName 'Invalid'
@@ -195,7 +195,7 @@ InModuleScope $script:subModuleName {
 
             Context 'When called with invalid "ProjectDescription" parameter' {
 
-                It 'Should throw - "<ProjectDescription>"' -TestCases $testCasesValidApiUriPatInvalidProjectDescriptionCombined {
+                It "Should throw - '<ProjectDescription>'" -TestCases $testCasesValidApiUriPatInvalidProjectDescriptionCombined {
                     param ([string]$ApiUri, [string]$Pat, [string]$ProjectName, [string]$ProjectDescription)
 
                     $ValidProjectName = 'SomeProjectName'
@@ -207,7 +207,7 @@ InModuleScope $script:subModuleName {
 
             Context 'When called with invalid "SourceControlType" parameter' {
 
-                It 'Should throw - "<ProjectDescription>"' -TestCases $testCasesValidApiUriPatInvalidProjectDescriptionCombined {
+                It "Should throw - '<SourceControlType>'" -TestCases $testCasesValidApiUriPatInvalidSourceControlTypeCombined {
                     param ([string]$ApiUri, [string]$Pat, [string]$ProjectName, [string]$ProjectDescription, [string]$SourceControlType)
 
                     $ValidProjectName = 'SomeProjectName'
