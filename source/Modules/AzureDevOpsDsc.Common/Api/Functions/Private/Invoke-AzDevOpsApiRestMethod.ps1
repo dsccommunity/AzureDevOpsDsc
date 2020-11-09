@@ -72,6 +72,12 @@ function Invoke-AzDevOpsApiRestMethod
         $HttpBody = '',
 
         [Parameter()]
+        [System.String]
+        [Alias('ContentType')]
+        [ValidateSet('application/json')]
+        $HttpContentType = 'application/json',
+
+        [Parameter()]
         [Int32]
         $RetryAttempts = 5,
 
@@ -87,7 +93,15 @@ function Invoke-AzDevOpsApiRestMethod
     {
         try
         {
-            return Invoke-RestMethod -Uri $ApiUri -Method $HttpMethod -Headers $HttpHeaders -Body $HttpBody
+            $invokeRestMethodParameters = @{
+                Uri         = $ApiUri
+                Method      = $HttpMethod
+                Headers     = $HttpHeaders
+                Body        = $HttpBody
+                ContentType = $HttpContentType
+            }
+
+            return Invoke-RestMethod @invokeRestMethodParameters
         }
         catch
         {
