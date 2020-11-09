@@ -67,7 +67,7 @@ function Invoke-AzDevOpsApiRestMethod
         $HttpHeaders,
 
         [Parameter()]
-        [Hashtable]
+        [System.String]
         [Alias('Body')]
         $HttpBody = '',
 
