@@ -98,7 +98,7 @@ Configuration DSC_AzDevOpsProject_EnsureTfvcProjectPresent_Config
 
 <#
     .SYNOPSIS
-        Attempts to ensure an Azure DevOps 'Project' is updated.
+        Attempts to ensure an Azure DevOps 'Project' is present/added.
 
     .NOTES
 
@@ -110,6 +110,37 @@ Configuration DSC_AzDevOpsProject_EnsureProjectPresent_Config
     node $AllNodes.NodeName
     {
         DSC_AzDevOpsProject Integration_Test_EnsureProjectPresent
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = $Node.ProjectName
+            ProjectDescription  = $Node.ProjectDescription
+
+            SourceControlType   = $Node.SourceControlType
+
+            Ensure              = $Node.Ensure
+        }
+    }
+}
+
+
+<#
+    .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' is present (and remains
+        identical to previous state).
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureProjectIdentical_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureProjectIdentical
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
