@@ -23,7 +23,11 @@ function Get-TestCaseValue
         [Parameter(Mandatory = $true)]
         [ValidateSet('Valid','Invalid','Empty','Null','Whitespace','NullOrWhitespace')]
         [System.String]
-        $TestCaseName
+        $TestCaseName,
+
+        [Parameter()]
+        [Int32]
+        $First = -1
     )
 
 
@@ -521,6 +525,13 @@ function Get-TestCaseValue
     $testCaseValues.ProjectId = $testCaseValues.ResourceId
 
 
+    if ($null -ne $First -and $First -gt -1)
+    {
+        return $testCaseValues[$ScopeName][$TestCaseName] |
+            Select-Object -First $First
+    }
+
+
     return $testCaseValues[$ScopeName][$TestCaseName]
 
 }
@@ -550,10 +561,14 @@ function Get-TestCase
         [Parameter(Mandatory = $true)]
         [ValidateSet('Valid','Invalid','Empty','Null','Whitespace','NullOrWhitespace')]
         [System.String]
-        $TestCaseName
+        $TestCaseName,
+
+        [Parameter()]
+        [Int32]
+        $First = -1
     )
 
-    $testCaseValues = Get-TestCaseValue -ScopeName $ScopeName -TestCaseName $TestCaseName
+    $testCaseValues = Get-TestCaseValue -ScopeName $ScopeName -TestCaseName $TestCaseName -First $First
     [hashtable[]]$testCases = @()
 
     $testCaseValues | ForEach-Object {
