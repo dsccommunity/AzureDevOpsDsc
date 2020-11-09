@@ -582,6 +582,243 @@ function Get-TestCase
 }
 
 
+
+<#
+    .SYNOPSIS
+        Returns arrays of test cases (hashtables) to be used within tests.
+
+    .PARAMETER ScopeName
+        Name of the scope for which the test cases are to be returned.
+
+    .PARAMETER TestCaseName
+        The name of the test cases within the scope determined by the 'ScopeName'
+        parameter.
+#>
+function Get-ParameterSetTestCase
+{
+    [OutputType([hashtable[]])]
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        [Alias('FunctionName','MethodName')]
+        $CommandName,
+
+        [Parameter()]
+        [System.String]
+        $ParameterSetName = "__AllParameterSets",
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Valid','Invalid')]
+        [System.String]
+        $TestCaseName,
+
+        [Parameter()]
+        [Int32]
+        $First = -1
+    )
+
+    $ParameterSetTestCases = @{}
+
+
+    # Invoke-AzDevOpsApiRestMethod
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validHttpMethod = 'Get' #Get-TestCaseValue -ScopeName '' -TestCaseName 'Valid' -First 1
+    $validHttpHeaders = @{} #Get-TestCaseValue -ScopeName '' -TestCaseName 'Valid' -First 1
+    $validHttpBody = @{} | ConvertTo-Json -Depth 10 #Get-TestCaseValue -ScopeName '' -TestCaseName 'Valid' -First 1
+    $validHttpContentType = 'application/json'
+    $validRetryAttempts = 3
+    $validRetryIntervalMs = 10
+
+    $ParameterSetTestCases."Invoke-AzDevOpsApiRestMethod" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    #HttpBody = $validHttpBody
+                    #HttpContentType = $validHttpContentType
+                    #RetryAttempts = $validRetryAttempts
+                    #RetryIntervalMs = $validRetryIntervalMs
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                }
+            )
+        }
+    }
+
+    [int]$testCaseOffset = 0
+    $testCases = $ParameterSetTestCases[$CommandName][$ParameterSetName][$TestCaseName] | ForEach-Object {
+        @{
+            ParameterSetValuesOffset = $testCaseOffset
+            ParameterSetValuesKey = $_.Keys -join ','
+            ParameterSetValues = $_
+        }
+        $testCaseOffset++
+    }
+
+    return $testCases
+}
+
+
 <#
     .SYNOPSIS
         Combines/joins 2, input hashtables into 1 output hashtable.
