@@ -123,6 +123,48 @@ function Get-TestCaseValue
     }
 
 
+
+    # HttpContentType
+    $testCaseValues.HttpContentType = @{
+
+        Valid = @(
+            'application/json'
+        )
+
+        Invalid = @(
+
+            'someInvalidHttpContentType'
+        ) + $testCaseValues.String.NullOrWhitespace
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+    # HttpBody
+    $testCaseValues.HttpBody = @{
+
+        Valid = @(
+            $(@{
+                id='someExampleId'
+            } | ConvertTo-Json -Compress),
+            $(@{
+                name='someExampleName'
+            } | ConvertTo-Json -Compress)
+        ) + $testCaseValues.String.Empty
+
+        Invalid = @(
+        )
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
+
     # ApiUriResourceName
     $testCaseValues.ApiUriResourceName = @{
 
@@ -195,6 +237,86 @@ function Get-TestCaseValue
         NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
 
     }
+
+
+    # HttpHeaders
+    $testCaseValues.HttpHeaders = @{
+
+        Valid = $testCaseValues.Pat.Valid | ForEach-Object {
+            @{
+                Authorization = 'Basic ' +
+                    [Convert]::ToBase64String(
+                        [Text.Encoding]::ASCII.GetBytes(":$_"))
+            }
+        }
+
+        Invalid = @(
+            @{} # Nothing in it
+        )
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+    # RetryAttempts
+    $testCaseValues.RetryAttempts = @{
+
+        Valid = @(
+            0,1,2,3,4,5
+        )
+
+        Invalid = @(
+            6,-1,-10
+        ) + $testCaseValues.String.NullOrWhitespace
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+    # RetryIntervalMs
+    $testCaseValues.RetryIntervalMs = @{
+
+        Valid = @(
+            250, 251, 10000
+        )
+
+        Invalid = @(
+            249, 10001, -1, 0
+        ) + $testCaseValues.String.NullOrWhitespace
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+    # HttpMethod
+    $testCaseValues.HttpMethod = @{
+
+        Valid = @(
+            'Get',
+            'Post',
+            'Put',
+            'Patch',
+            'Delete'
+        )
+
+        Invalid = @(
+           'Unknown', 'Invalid'
+        ) + $testCaseValues.String.NullOrWhitespace
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
+
 
 
     # OrganizationName
@@ -624,12 +746,12 @@ function Get-ParameterSetTestCase
 
     # Invoke-AzDevOpsApiRestMethod
     $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
-    $validHttpMethod = 'Get' #Get-TestCaseValue -ScopeName '' -TestCaseName 'Valid' -First 1
-    $validHttpHeaders = @{} #Get-TestCaseValue -ScopeName '' -TestCaseName 'Valid' -First 1
-    $validHttpBody = @{} | ConvertTo-Json -Depth 10 #Get-TestCaseValue -ScopeName '' -TestCaseName 'Valid' -First 1
-    $validHttpContentType = 'application/json'
-    $validRetryAttempts = 3
-    $validRetryIntervalMs = 10
+    $validHttpMethod = Get-TestCaseValue -ScopeName 'HttpMethod' -TestCaseName 'Valid' -First 1
+    $validHttpHeaders = Get-TestCaseValue -ScopeName 'HttpHeaders' -TestCaseName 'Valid' -First 1
+    $validHttpBody = Get-TestCaseValue -ScopeName 'HttpBody' -TestCaseName 'Valid' -First 1
+    $validHttpContentType = Get-TestCaseValue -ScopeName 'HttpContentType' -TestCaseName 'Valid' -First 1
+    $validRetryAttempts = Get-TestCaseValue -ScopeName 'RetryAttempts' -TestCaseName 'Valid' -First 1
+    $validRetryIntervalMs = Get-TestCaseValue -ScopeName 'RetryIntervalMs' -TestCaseName 'Valid' -First 1
 
     $ParameterSetTestCases."Invoke-AzDevOpsApiRestMethod" = @{
 
@@ -800,7 +922,79 @@ function Get-ParameterSetTestCase
                     HttpContentType = $validHttpContentType
                     RetryAttempts = $validRetryAttempts
                     RetryIntervalMs = $validRetryIntervalMs
+                },
+
+                @{
+                    ApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Invalid' -First 1
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = Get-TestCaseValue -ScopeName 'HttpMethod' -TestCaseName 'Invalid' -First 1
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = Get-TestCaseValue -ScopeName 'HttpHeaders' -TestCaseName 'Invalid' -First 1
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+
+                # @{ # No validation for 'HttpBody' to deem it invalid at present.
+                #     ApiUri = $validApiUri
+                #     HttpMethod = $validHttpMethod
+                #     HttpHeaders = $validHttpHeaders
+                #     HttpBody = Get-TestCaseValue -ScopeName 'HttpBody' -TestCaseName 'Invalid' -First 1
+                #     HttpContentType = $validHttpContentType
+                #     RetryAttempts = $validRetryAttempts
+                #     RetryIntervalMs = $validRetryIntervalMs
+                # },
+
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = Get-TestCaseValue -ScopeName 'HttpContentType' -TestCaseName 'Invalid' -First 1
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = Get-TestCaseValue -ScopeName 'RetryAttempts' -TestCaseName 'Invalid' -First 1
+                    RetryIntervalMs = $validRetryIntervalMs
+                },
+
+                @{
+                    ApiUri = $validApiUri
+                    HttpMethod = $validHttpMethod
+                    HttpHeaders = $validHttpHeaders
+                    HttpBody = $validHttpBody
+                    HttpContentType = $validHttpContentType
+                    RetryAttempts = $validRetryAttempts
+                    RetryIntervalMs = Get-TestCaseValue -ScopeName 'RetryIntervalMs' -TestCaseName 'Invalid' -First 1
                 }
+
+
             )
         }
     }
