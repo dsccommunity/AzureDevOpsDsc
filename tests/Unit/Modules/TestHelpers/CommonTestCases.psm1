@@ -647,6 +647,20 @@ function Get-TestCaseValue
     $testCaseValues.ProjectId = $testCaseValues.ResourceId
 
 
+    if (!$testCaseValues.ContainsKey($ScopeName))
+    {
+        throw "'Get-TestCaseValue' does not contain/define a scope of '$ScopeName'."
+        return
+    }
+
+    if (!$testCaseValues[$ScopeName].ContainsKey($TestCaseName))
+    {
+        throw "'Get-TestCaseValue' does not contain/define test cases for '$TestCaseName' within the '$ScopeName' scope."
+        return
+    }
+
+
+
     if ($null -ne $First -and $First -gt -1)
     {
         return $testCaseValues[$ScopeName][$TestCaseName] |
@@ -742,6 +756,393 @@ function Get-ParameterSetTestCase
     )
 
     $ParameterSetTestCases = @{}
+
+
+    # Get-AzDevOpsApiHttpRequestHeader
+    $ParameterSetTestCases."Get-AzDevOpsApiHttpRequestHeader" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    Pat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+                }
+            )
+
+            Invalid = @(
+                @{
+                    Pat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Invalid' -First 1
+                }
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiResource
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validResourceName = Get-TestCaseValue -ScopeName 'ResourceName' -TestCaseName 'Valid' -First 1
+    $validResourceId = Get-TestCaseValue -ScopeName 'ResourceId' -TestCaseName 'Valid' -First 1
+
+    $ParameterSetTestCases."Get-AzDevOpsApiResource" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    #ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    #ResourceId = $validResourceId
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceId = $validResourceId
+                }
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiResourceName
+    $ParameterSetTestCases."Get-AzDevOpsApiResourceName" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{}
+            )
+
+            Invalid = @(
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiResourceUri
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
+    $validResourceName = Get-TestCaseValue -ScopeName 'ResourceName' -TestCaseName 'Valid' -First 1
+    $validResourceId = Get-TestCaseValue -ScopeName 'ResourceId' -TestCaseName 'Valid' -First 1
+
+    $ParameterSetTestCases."Get-AzDevOpsApiResourceUri" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    ResourceName = $validResourceName
+                    #ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    ResourceName = $validResourceName
+                    #ResourceId = $validResourceId
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ApiVersion = $validApiVersion
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    ResourceName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceId = $validResourceId
+                }
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiUriAreaName
+    $ParameterSetTestCases."Get-AzDevOpsApiUriAreaName" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    ResourceName = Get-TestCaseValue -ScopeName 'ResourceName' -TestCaseName 'Valid' -First 1
+                },
+                @{}
+            )
+
+            Invalid = @(
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiUriResourceName
+    $ParameterSetTestCases."Get-AzDevOpsApiUriResourceName" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    ResourceName = Get-TestCaseValue -ScopeName 'ResourceName' -TestCaseName 'Valid' -First 1
+                },
+                @{}
+            )
+
+            Invalid = @(
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiVersion
+    $ParameterSetTestCases."Get-AzDevOpsApiVersion" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    Default = $true
+                },
+                @{}
+            )
+
+            Invalid = @(
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiWaitIntervalMs
+    $ParameterSetTestCases."Get-AzDevOpsApiWaitIntervalMs" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{}
+            )
+
+            Invalid = @(
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsApiWaitTimeoutMs
+    $ParameterSetTestCases."Get-AzDevOpsApiWaitTimeoutMs" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{}
+            )
+
+            Invalid = @(
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsOperation
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validOperationId = Get-TestCaseValue -ScopeName 'OperationId' -TestCaseName 'Valid' -First 1
+
+    $ParameterSetTestCases."Get-AzDevOpsOperation" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    #OperationId = $validOperationId
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    OperationId = $validOperationId
+                },
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    OperationId = $validOperationId
+                }
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsProject
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validProjectId = Get-TestCaseValue -ScopeName 'ProjectId' -TestCaseName 'Valid' -First 1
+    $validProjectName = Get-TestCaseValue -ScopeName 'ProjectName' -TestCaseName 'Valid' -First 1
+
+    $ParameterSetTestCases."Get-AzDevOpsProject" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    #ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    #ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    #ProjectId = $validProjectId
+                    #ProjectName = $validProjectName
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                }
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsServicesApiUri
+    $ParameterSetTestCases."Get-AzDevOpsServicesApiUri" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    OrganizationName = Get-TestCaseValue -ScopeName 'OrganizationName' -TestCaseName 'Valid' -First 1
+                }
+            )
+
+            Invalid = @(
+                @{
+                    OrganizationName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                }
+            )
+        }
+    }
+
+
+    # Get-AzDevOpsServicesUri
+    $ParameterSetTestCases."Get-AzDevOpsServicesUri" = @{
+
+        "__AllParameterSets" = @{
+
+            Valid = @(
+                @{
+                    OrganizationName = Get-TestCaseValue -ScopeName 'OrganizationName' -TestCaseName 'Valid' -First 1
+                }
+            )
+
+            Invalid = @(
+                @{
+                    OrganizationName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                }
+            )
+        }
+    }
 
 
     # Invoke-AzDevOpsApiRestMethod
