@@ -62,6 +62,7 @@ function Invoke-AzDevOpsApiRestMethod
         $HttpMethod,
 
         [Parameter(Mandatory=$true)]
+        [ValidateScript( { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $_ -IsValid })]
         [Hashtable]
         [Alias('Headers')]
         $HttpHeaders,
@@ -78,10 +79,12 @@ function Invoke-AzDevOpsApiRestMethod
         $HttpContentType = 'application/json',
 
         [Parameter()]
+        [ValidateRange(0,5)]
         [Int32]
         $RetryAttempts = 5,
 
         [Parameter()]
+        [ValidateRange(250,10000)]
         [Int32]
         $RetryIntervalMs = 250
     )
