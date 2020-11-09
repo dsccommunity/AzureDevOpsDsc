@@ -39,6 +39,12 @@ try
         }
 
 
+        # TODO:
+        #   Add test for 'EnsureGitProjectAbsent'
+        #   Add test for 'EnsureTfvcProjectAbsent'
+        #   Add test for 'EnsureSourceControlTypeChangeInvalid'
+
+
         Context ("When compiling, applying and testing the MOF - '$($script:dscResourceName)_EnsureGitProjectPresent_Config'") {
 
             BeforeAll {
@@ -217,6 +223,66 @@ try
                 Test-DscConfiguration -Verbose | Should -Be 'True'
             }
 
+        }
+
+
+
+        Context ("When compiling, applying and testing the MOF - '$($script:dscResourceName)_EnsureProjectIdentical_Config'") {
+
+            BeforeAll {
+                $configurationName = "$($script:dscResourceName)_EnsureProjectIdentical_Config"
+                $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test_EnsureProjectIdentical"
+            }
+
+
+            It 'Should not throw when compiling MOF and when calling "Start-DscConfiguration"' {
+                {
+                    $configurationParameters = @{
+                        OutputPath           = $TestDrive
+                        # The variable $ConfigurationData was dot-sourced above.
+                        ConfigurationData    = $ConfigurationData
+                    }
+
+                    . $configFile
+                    & $configurationName @configurationParameters
+
+                    $startDscConfigurationParameters = @{
+                        Path         = $TestDrive
+                        ComputerName = 'localhost'
+                        Wait         = $true
+                        Verbose      = $true
+                        Force        = $true
+                        ErrorAction  = 'Stop'
+                    }
+
+                    Start-DscConfiguration @startDscConfigurationParameters
+                } | Should -Not -Throw
+            }
+
+
+            It 'Should not throw when calling "Get-DscConfiguration"' {
+                {
+                    $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+
+            It 'Should have set the resource and all the parameters should match' {
+                $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq $configurationName `
+                    -and $_.ResourceId -eq $resourceId
+                }
+
+                $resourceCurrentState.Ensure | Should -Be 'Present'
+                $resourceCurrentState.ProjectName | Should -Be 'TestProjectName'
+                $resourceCurrentState.ProjectDescription | Should -Be 'TestProjectDescription'
+                $resourceCurrentState.SourceControlType | Should -Be 'Git' # Must be the same (change not supported with this)
+            }
+
+
+            It 'Should return $true when Test-DscConfiguration is run' {
+                Test-DscConfiguration -Verbose | Should -Be 'True'
+            }
         }
 
 
