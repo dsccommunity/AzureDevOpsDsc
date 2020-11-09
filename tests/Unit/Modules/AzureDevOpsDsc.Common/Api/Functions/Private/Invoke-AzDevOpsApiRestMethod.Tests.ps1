@@ -42,6 +42,33 @@ InModuleScope $script:subModuleName {
                                 { Invoke-AzDevOpsApiRestMethod @ParameterSetValues } | Should -Not -Throw
                             }
 
+                            $testCasesValidParameterSetValues | ForEach-Object {
+
+                                $_.ParameterSetValues.Keys | ForEach-Object {
+
+                                    $parameterName = $_
+                                    $testCasesValidParameterValues = Get-TestCase -ScopeName $parameterName -TestCaseName 'Valid'
+                                    $testCasesValidParameterSetValuesByParameterName = Join-TestCaseArray -Expand -TestCaseArray @($testCasesValidParameterSetValues, $testCasesValidParameterValues)
+
+                                    It "Should not throw - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('$parameterName' = '<$parameterName>')" -TestCases $testCasesValidParameterSetValuesByParameterName {
+                                        param([Hashtable]$ParameterSetValues)
+
+                                        { Invoke-AzDevOpsApiRestMethod @ParameterSetValues } | Should -Not -Throw
+                                    }
+
+                                }
+                            }
+
+                        }
+
+                        Context "When invoking with 'Valid', parameter set values, per" {
+
+                            It "Should not throw - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $testCasesValidParameterSetValues {
+                                param([Hashtable]$ParameterSetValues)
+
+                                { Invoke-AzDevOpsApiRestMethod @ParameterSetValues } | Should -Not -Throw
+                            }
+
                         }
 
                         Context "When invoking with 'Invalid', parameter set values" {
