@@ -13,4 +13,6 @@ ConvertFrom-StringData @'
 
     AzDevOpsOperationWaitTimeoutExceeded = The '{0}' function (using OperationId of '{1}') exceeded specified, maximum timeout ({2} milliseconds). (AZDEVOPSCOMMON0702)
 
+    AzDevOpsApiRestMethodException = The '{0}' function returned an error when trying to send a HTTP request to the Azure DevOps API (after {1} unsuccessful, retry attempts): "{2}". (AZDEVOPSCOMMON0802)
+
 '@
