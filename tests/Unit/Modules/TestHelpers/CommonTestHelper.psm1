@@ -190,7 +190,24 @@ function Get-CommandParameterSet
 
     )
 
-    $(Get-Command -Module $ModuleName -Name $CommandName).ParameterSets
+
+    [hashtable]$command = $(Get-Command -Module $ModuleName -Name $CommandName -ErrorAction SilentlyContinue)
+    if ($null -eq $command)
+    {
+        $Module = Get-Module -Name $ModuleName -ListAvailable
+        If ($null -ne $Module)
+        {
+            $allCommands = $Module.Invoke({Get-Command -Module $ModuleName})
+            $exportedCommands = Get-Command -Module $ModuleName
+            $command = $(Compare-Object -ReferenceObject $allCommands -DifferenceObject $exportedCommands |
+                Select-Object -ExpandProperty InputObject)
+        }
+    }
+
+    if ($null -ne $command -and $null -ne $command.ParameterSets)
+    {
+        return $command.ParameterSets
+    }
 
 }
 
