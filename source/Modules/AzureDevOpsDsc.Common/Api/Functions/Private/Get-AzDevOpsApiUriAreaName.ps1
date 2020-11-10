@@ -28,6 +28,7 @@ function Get-AzDevOpsApiUriAreaName
     [hashtable]$resourceNameToApiUriAreaName = @{
 
         Operation = 'core' # Note: Not explicitly listed here in documentation
+        Profile = 'profile'
         Project = 'core'
     }
 
