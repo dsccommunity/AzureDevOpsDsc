@@ -31,6 +31,7 @@ function Test-AzDevOpsOperationId
         $OperationId,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
