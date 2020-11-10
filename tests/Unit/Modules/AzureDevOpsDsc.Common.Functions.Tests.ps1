@@ -127,7 +127,7 @@ InModuleScope $script:subModuleName {
     }
 
 
-    Describe "GENERIC $subModuleName\AzureDevOpsDsc.Common\*\Functions\Public" {
+    Describe "$subModuleName\AzureDevOpsDsc.Common\*\Functions" {
 
 
         Context "When validating function/command parameter sets" {
