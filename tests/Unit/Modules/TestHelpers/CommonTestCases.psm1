@@ -580,6 +580,37 @@ function Get-TestCaseValue
     $testCaseValues.Force = $testCaseValues.Default
 
 
+    # IsValid
+    $testCaseValues.IsValid = @{
+
+        Valid = @(
+            $true
+        )
+
+        Invalid = @(
+            $false
+        ) + $testCaseValues.String.NullOrWhitespace
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+    # IsPresent
+    $testCaseValues.IsPresent = $testCaseValues.IsValid
+
+    # IsAbsent
+    $testCaseValues.IsAbsent = $testCaseValues.IsValid
+
+    # IsComplete
+    $testCaseValues.IsComplete = $testCaseValues.IsValid
+
+    # IsSuccessful
+    $testCaseValues.IsSuccessful = $testCaseValues.IsValid
+
+
+
 
     # SourceControlType
     $testCaseValues.SourceControlType = @{
