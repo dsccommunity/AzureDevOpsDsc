@@ -68,11 +68,13 @@ function Wait-AzDevOpsOperation
         $OperationId,
 
         [Parameter()]
+        [ValidateRange(250,10000)]
         [Alias('Interval','IntervalMilliseconds')]
         [System.UInt32]
         $WaitIntervalMilliseconds = $(Get-AzDevOpsApiWaitIntervalMs),
 
         [Parameter()]
+        [ValidateRange(250,10000)]
         [Alias('Timeout','TimeoutMilliseconds')]
         [System.UInt32]
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
