@@ -2775,7 +2775,7 @@ function Get-ParameterSetTestCase
         "__AllParameterSets" = @{
             Valid = @(
                 # IsPresent
-                # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
+                # TODO: Following 3 need moving to their own 'IsPresent' parameter set (and out of '__AllParameterSets')
                 @{
                     ApiUri = $validApiUri
                     ApiVersion = $validApiVersion
@@ -2859,7 +2859,7 @@ function Get-ParameterSetTestCase
 
 
                 # IsAbsent
-                # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
+                # TODO: Following 3 need moving to their own 'IsAbsent' parameter set (and out of '__AllParameterSets')
                 @{
                     ApiUri = $validApiUri
                     ApiVersion = $validApiVersion
@@ -3058,6 +3058,267 @@ function Get-ParameterSetTestCase
 
         }
     }
+
+
+
+
+    # Wait-AzDevOpsOperation
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validOperationId = Get-TestCaseValue -ScopeName 'OperationId' -TestCaseName 'Valid' -First 1
+    $validWaitIntervalMilliseconds = Get-TestCaseValue -ScopeName 'WaitIntervalMilliseconds' -TestCaseName 'Valid' -First 1
+    $validWaitTimeoutMilliseconds = Get-TestCaseValue -ScopeName 'WaitTimeoutMilliseconds' -TestCaseName 'Valid' -First 1
+
+    $ParameterSetTestCases."Wait-AzDevOpsOperation" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                # IsComplete
+                # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+
+
+                # IsSuccessful
+                # TODO: Following 3 need moving to their own 'IsSuccessful' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                }
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                }
+            )
+
+            Invalid = @(
+
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    # Must use only 1 of the two, below switches (neither being provided/used is invalid)
+                    IsComplete = $false
+                    IsSuccessful = $false
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    # Must use only 1 of the two, below switches (both being provided/used is invalid)
+                    IsComplete = $true
+                    IsSuccessful = $true
+                },
+
+                # IsComplete
+                # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsComplete = $true
+                }
+
+                # IsSuccessful
+                # TODO: Following 3 need moving to their own 'IsSuccessful' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    OperationId = $validOperationId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    OperationId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsSuccessful = $true
+                }
+            )
+
+        }
+    }
+
+
+
+
+
 
 
 
