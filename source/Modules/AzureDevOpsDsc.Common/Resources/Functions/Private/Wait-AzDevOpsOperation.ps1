@@ -103,9 +103,23 @@ function Wait-AzDevOpsOperation
 
     [System.DateTime]$waitStartDateTime = [System.DateTime]::UtcNow
 
-    while (!(Test-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
-                                    -OperationId $OperationId `
-                                    -IsComplete:$IsComplete -IsSuccessful:$IsSuccessful))
+    $testOperationParameters = @{
+        ApiUri      = $ApiUri
+        Pat         = $Pat
+        OperationId = $OperationId
+    }
+
+    if ($IsComplete)
+    {
+        $testOperationParameters.IsComplete = $IsComplete
+    }
+
+    if ($IsSuccessful)
+    {
+        $testOperationParameters.IsSuccessful = $IsSuccessful
+    }
+
+    while (!(Test-AzDevOpsOperation @testOperationParameters))
     {
         Start-Sleep -Milliseconds $WaitIntervalMilliseconds
 
