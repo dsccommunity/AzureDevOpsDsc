@@ -2511,6 +2511,37 @@ function Get-ParameterSetTestCase
 
 
 
+    # Test-AzDevOpsOperationId
+    $validOperationId = Get-TestCaseValue -ScopeName 'OperationId' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsOperationId" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    OperationId = $validOperationId
+                    IsValid = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    OperationId = $validOperationId
+                    #IsValid = $false
+                },
+                @{
+                    OperationId = $validOperationId
+                    IsValid = $false
+                }
+            )
+
+        }
+    }
+
+
+
+
 
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
