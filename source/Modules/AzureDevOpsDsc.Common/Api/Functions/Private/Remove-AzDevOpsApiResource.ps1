@@ -10,6 +10,9 @@
 
           https://dev.azure.com/someOrganizationName/_apis/
 
+    .PARAMETER ApiVersion
+        The version of the Azure DevOps API to use. Defaults to value suppored by the module.
+
     .PARAMETER Pat
         The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
         against the Azure DevOps API. This PAT must have the relevant permissions assigned
@@ -20,6 +23,13 @@
 
     .PARAMETER ResourceId
         The 'ResourceId' of the resource being created (typically provided by another function (e.g. 'Remove-AzDevOpsApiProject')).
+
+    .PARAMETER Wait
+        Using this switch ensures that the execution will run synchronously and wait for the resource to be removed before
+        continuing. By not using this switch, execution will run asynchronously.
+
+    .PARAMETER Force
+        Using this switch will override any confirmations prior to the deletion/removal of the resource.
 
     .EXAMPLE
         Remove-AzDevOpsApiResource -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ResourceName 'Project' -ResourceId $YourResourceId -Wait
