@@ -31,6 +31,7 @@ function Test-AzDevOpsApiResourceName
         $ResourceName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
