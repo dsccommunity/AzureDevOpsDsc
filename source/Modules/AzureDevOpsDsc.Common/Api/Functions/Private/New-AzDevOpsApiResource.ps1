@@ -10,6 +10,9 @@
 
           https://dev.azure.com/someOrganizationName/_apis/
 
+    .PARAMETER ApiVersion
+        The version of the Azure DevOps API to use in the call/execution to/against the API.
+
     .PARAMETER Pat
         The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
         against the Azure DevOps API. This PAT must have the relevant permissions assigned
