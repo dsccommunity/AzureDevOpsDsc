@@ -1570,6 +1570,117 @@ function Get-ParameterSetTestCase
 
 
 
+    # New-AzDevOpsProject
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validProjectName = Get-TestCaseValue -ScopeName 'ProjectName' -TestCaseName 'Valid' -First 1
+    $validProjectDescription = Get-TestCaseValue -ScopeName 'ProjectDescription' -TestCaseName 'Valid' -First 1
+    $validSourceControlType = Get-TestCaseValue -ScopeName 'SourceControlType' -TestCaseName 'Valid' -First 1
+    $validForce = Get-TestCaseValue -ScopeName 'Force' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."New-AzDevOpsProject" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    ProjectDescription = $validProjectDescription
+                    SourceControlType = $validSourceControlType
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    #ProjectDescription = $validProjectDescription
+                    SourceControlType = $validSourceControlType
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    ProjectDescription = $validProjectDescription
+                    #SourceControlType = $validSourceControlType
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    #ProjectDescription = $validProjectDescription
+                    #SourceControlType = $validSourceControlType
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    ProjectDescription = $validProjectDescription
+                    SourceControlType = $validSourceControlType
+                    #Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    #ProjectDescription = $validProjectDescription
+                    SourceControlType = $validSourceControlType
+                    #Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    ProjectDescription = $validProjectDescription
+                    #SourceControlType = $validSourceControlType
+                    #Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    #ProjectDescription = $validProjectDescription
+                    #SourceControlType = $validSourceControlType
+                    #Force = $validForce
+                }
+            )
+
+            Inalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $validPat
+                    ProjectName = $validProjectName
+                    ProjectDescription = $validProjectDescription
+                    SourceControlType = $validSourceControlType
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ProjectName = $validProjectName
+                    ProjectDescription = $validProjectDescription
+                    SourceControlType = $validSourceControlType
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ProjectDescription = $validProjectDescription
+                    SourceControlType = $validSourceControlType
+                    Force = $validForce
+                }
+            )
+
+        }
+    }
+
+
+
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
         throw "'Get-ParameterSetTestCase' does not contain/define any parameter set values for the '$CommandName' command/function. Add some parameter set, test case values (typically, for both 'Valid' and 'Invalid' test cases) for the '$CommandName' command/function in the 'Get-ParameterSetTestCase', helper function."
