@@ -71,11 +71,11 @@ function Test-AzDevOpsOperation
         [System.String]
         $OperationId,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName='IsComplete')]
         [System.Management.Automation.SwitchParameter]
         $IsComplete,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName='IsSuccessful')]
         [System.Management.Automation.SwitchParameter]
         $IsSuccessful
     )
