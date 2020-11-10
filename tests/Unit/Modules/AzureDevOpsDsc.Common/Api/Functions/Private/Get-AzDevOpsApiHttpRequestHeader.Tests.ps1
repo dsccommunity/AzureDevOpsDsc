@@ -13,6 +13,7 @@ InModuleScope $script:subModuleName {
         $testCasesValidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Valid'
         $testCasesInvalidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Invalid'
 
+
         Context 'When input parameters are valid' {
 
             It 'Should not throw - "<Pat>"' -TestCases $testCasesValidPats {
@@ -63,6 +64,7 @@ InModuleScope $script:subModuleName {
             }
 
         }
+
 
         Context "When input parameters are invalid" {
 
