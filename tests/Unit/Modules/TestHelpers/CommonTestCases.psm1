@@ -2267,6 +2267,37 @@ function Get-ParameterSetTestCase
 
 
 
+
+    # Test-AzDevOpsApiResourceName
+    $validResourceName = Get-TestCaseValue -ScopeName 'ResourceName' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsApiResourceName" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ResourceName = $validResourceName
+                    IsValid = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ResourceName = $validResourceName
+                    #IsValid = $false
+                },
+                @{
+                    ResourceName = $validResourceName
+                    IsValid = $false
+                }
+            )
+
+        }
+    }
+
+
+
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
         throw "'Get-ParameterSetTestCase' does not contain/define any parameter set values for the '$CommandName' command/function. Add some parameter set, test case values (typically, for both 'Valid' and 'Invalid' test cases) for the '$CommandName' command/function in the 'Get-ParameterSetTestCase', helper function."
