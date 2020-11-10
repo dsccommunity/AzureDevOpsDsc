@@ -9,6 +9,9 @@
 
           https://dev.azure.com/someOrganizationName/_apis/
 
+    .PARAMETER ApiVersion
+        The version of the Azure DevOps API to use in the call/execution to/against the API.
+
     .PARAMETER Pat
         The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
         against the Azure DevOps API. This PAT must have the relevant permissions assigned
@@ -62,6 +65,11 @@ function Wait-AzDevOpsApiResource
         [System.String]
         $ApiUri,
 
+        [Parameter()]
+        [ValidateScript( { Test-AzDevOpsApiVersion -ApiVersion $_ -IsValid })]
+        [System.String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
+
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
         [Alias('PersonalAccessToken')]
@@ -80,11 +88,13 @@ function Wait-AzDevOpsApiResource
         $ResourceId,
 
         [Parameter()]
+        [ValidateRange(250,10000)]
         [Alias('Interval','IntervalMilliseconds')]
         [System.UInt32]
         $WaitIntervalMilliseconds = $(Get-AzDevOpsApiWaitIntervalMs),
 
         [Parameter()]
+        [ValidateRange(250,10000)]
         [Alias('Timeout','TimeoutMilliseconds')]
         [System.UInt32]
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
