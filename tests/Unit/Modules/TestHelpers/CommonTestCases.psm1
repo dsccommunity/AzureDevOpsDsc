@@ -1681,6 +1681,57 @@ function Get-ParameterSetTestCase
 
 
 
+    # Remove-AzDevOpsProject
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validProjectId = Get-TestCaseValue -ScopeName 'ProjectId' -TestCaseName 'Valid' -First 1
+    $validForce = Get-TestCaseValue -ScopeName 'Force' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Remove-AzDevOpsProject" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    #Force = $validForce
+                }
+            )
+
+            Inalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ProjectId = $validProjectId
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Force = $validForce
+                }
+            )
+
+        }
+    }
+
+
+
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
         throw "'Get-ParameterSetTestCase' does not contain/define any parameter set values for the '$CommandName' command/function. Add some parameter set, test case values (typically, for both 'Valid' and 'Invalid' test cases) for the '$CommandName' command/function in the 'Get-ParameterSetTestCase', helper function."
