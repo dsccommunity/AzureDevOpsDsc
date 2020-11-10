@@ -32,6 +32,7 @@ function Test-AzDevOpsPatCredential
         $PatCredential,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
