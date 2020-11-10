@@ -346,6 +346,12 @@ function Get-TestCaseValue
 
     }
 
+    # WaitIntervalMilliseconds
+    $testCaseValues.WaitIntervalMilliseconds = $testCaseValues.RetryIntervalMs
+
+    # WaitTimeoutMilliseconds
+    $testCaseValues.WaitTimeoutMilliseconds = $testCaseValues.RetryIntervalMs
+
     # HttpMethod
     $testCaseValues.HttpMethod = @{
 
@@ -572,7 +578,6 @@ function Get-TestCaseValue
 
     # Force
     $testCaseValues.Force = $testCaseValues.Default
-
 
 
 
@@ -2752,6 +2757,308 @@ function Get-ParameterSetTestCase
 
         }
     }
+
+
+
+
+    # Wait-AzDevOpsApiResource
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validResourceName = Get-TestCaseValue -ScopeName 'ResourceName' -TestCaseName 'Valid' -First 1
+    $validResourceId = Get-TestCaseValue -ScopeName 'ResourceId' -TestCaseName 'Valid' -First 1
+    $validWaitIntervalMilliseconds = Get-TestCaseValue -ScopeName 'WaitIntervalMilliseconds' -TestCaseName 'Valid' -First 1
+    $validWaitTimeoutMilliseconds = Get-TestCaseValue -ScopeName 'WaitTimeoutMilliseconds' -TestCaseName 'Valid' -First 1
+
+    $ParameterSetTestCases."Wait-AzDevOpsApiResource" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                # IsPresent
+                # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+
+
+                # IsAbsent
+                # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                }
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                }
+            )
+
+            Invalid = @(
+
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    # Must use only 1 of the two, below switches (neither being provided/used is invalid)
+                    IsPresent = $false
+                    IsAbsent = $false
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    # Must use only 1 of the two, below switches (both being provided/used is invalid)
+                    IsPresent = $true
+                    IsAbsent = $true
+                },
+
+                # IsPresent
+                # TODO: Following 3 need moving to their own 'IsPresent' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsPresent = $true
+                },
+
+                # IsAbsent
+                # TODO: Following 3 need moving to their own 'IsAbsent' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceName = $validResourceName
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceId = $validResourceId
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    ResourceId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
+                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
+                    IsAbsent = $true
+                }
+            )
+
+        }
+    }
+
 
 
 
