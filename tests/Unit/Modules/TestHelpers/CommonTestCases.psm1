@@ -1550,7 +1550,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     ApiVersion = $validApiVersion
@@ -1673,7 +1673,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     Pat = $validPat
@@ -1730,7 +1730,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     Pat = $validPat
@@ -1844,7 +1844,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     ApiVersion = $validApiVersion
@@ -1985,7 +1985,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     ApiVersion = $validApiVersion
@@ -2091,7 +2091,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     ApiUri = $validApiUri
                     Pat = $validPat
@@ -2155,7 +2155,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     HttpRequestHeader = $validRequestHeader
                     #IsValid = $false
@@ -2200,7 +2200,7 @@ function Get-ParameterSetTestCase
                 }
             )
 
-            Inalid = @(
+            Invalid = @(
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     ApiVersion = $validApiVersion
@@ -2228,6 +2228,37 @@ function Get-ParameterSetTestCase
                     Pat = $validPat
                     ResourceName = $validResourceName
                     ResourceId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                }
+            )
+
+        }
+    }
+
+
+
+
+    # Test-AzDevOpsApiResourceId
+    $validResourceId = Get-TestCaseValue -ScopeName 'ResourceId' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsApiResourceId" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ResourceId = $validResourceId
+                    IsValid = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ResourceId = $validResourceId
+                    #IsValid = $false
+                },
+                @{
+                    ResourceId = $validResourceId
+                    IsValid = $false
                 }
             )
 
