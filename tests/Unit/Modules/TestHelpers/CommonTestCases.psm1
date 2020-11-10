@@ -400,6 +400,26 @@ function Get-TestCaseValue
 
     }
 
+    # Resource
+    $testCaseValues.Resource = @{
+
+        Valid = @(
+            @{
+                id = '7149493c-74a4-4496-bdaa-a1b4f24e691d'
+                someProperty = 'abc'
+                someOtherProperty = 123
+            },
+            @{}
+        )
+
+        Invalid = @(
+        )
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
 
     # ResourceName
     $testCaseValues.ResourceName = @{
@@ -493,6 +513,13 @@ function Get-TestCaseValue
         NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
 
     }
+
+
+    # Wait
+    $testCaseValues.Wait = $testCaseValues.Default
+
+    # Force
+    $testCaseValues.Force = $testCaseValues.Default
 
 
 
@@ -1417,6 +1444,130 @@ function Get-ParameterSetTestCase
             )
         }
     }
+
+
+
+    # New-AzDevOpsApiResource
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validResourceName = Get-TestCaseValue -ScopeName 'HttpBody' -TestCaseName 'Valid' -First 1
+    $validResource = Get-TestCaseValue -ScopeName 'Resource' -TestCaseName 'Valid' -First 1
+    $validWait = Get-TestCaseValue -ScopeName 'Wait' -TestCaseName 'Valid' -First 1
+    $validForce = Get-TestCaseValue -ScopeName 'Force' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."New-AzDevOpsApiResource" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    Wait = $validWait
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    Wait = $validWait
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    #Wait = $validWait
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    #Wait = $validWait
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    Wait = $validWait
+                    #Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    Wait = $validWait
+                    #Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    #ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    #Wait = $validWait
+                    #Force = $validForce
+                }
+            )
+
+            Inalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    Wait = $validWait
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ResourceName = $validResourceName
+                    Resource = $validResource
+                    Wait = $validWait
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Resource = $validResource
+                    Wait = $validWait
+                    Force = $validForce
+                },
+                @{
+                    ApiUri = $validApiUri
+                    ApiVersion = $validApiVersion
+                    Pat = $validPat
+                    ResourceName = $validResourceName
+                    Resource = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Wait = $validWait
+                    Force = $validForce
+                }
+            )
+
+        }
+    }
+
 
 
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
