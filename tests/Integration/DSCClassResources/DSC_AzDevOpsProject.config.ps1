@@ -97,6 +97,39 @@ Configuration DSC_AzDevOpsProject_EnsureGitProjectPresent_Config
 }
 
 
+
+<#
+    .SYNOPSIS
+        Attempts to update an Azure DevOps 'Project' (that uses 'Git' for source control) tp
+        use 'Tfvc' (Team Foundation Version Control). Note that this is an invalid/unsupported
+        operation.
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_UpdateGitProjectToTfvc_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_UpdateGitProjectToTfvc
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestGitProjectName'
+            ProjectDescription  = 'TestGitProjectDescription'
+
+            SourceControlType   = 'Vsts'
+
+            Ensure              = $Node.Ensure
+        }
+    }
+}
+
+
 <#
     .SYNOPSIS
         Attempts to ensure an Azure DevOps 'Project' (that uses 'Git' for source control) is absent (after it's been added).
@@ -182,6 +215,38 @@ Configuration DSC_AzDevOpsProject_EnsureTfvcProjectPresent_Config
             ProjectDescription  = 'TestTfvcProjectDescription'
 
             SourceControlType   = 'Tfvc'
+
+            Ensure              = $Node.Ensure
+        }
+    }
+}
+
+
+
+<#
+    .SYNOPSIS
+        Attempts to update an Azure DevOps 'Project' (that uses 'Tfvc' (Team Foundation Version Control)) to
+        use 'Git' for source control. Note that this is an invalid/unsupported operation.
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_UpdateTfvcProjectToGit_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_UpdateTfvcProjectToGit
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestTfvcProjectName'
+            ProjectDescription  = 'TestTfvcProjectDescription'
+
+            SourceControlType   = 'Vsts'
 
             Ensure              = $Node.Ensure
         }
