@@ -13,7 +13,9 @@ InModuleScope $script:subModuleName {
         $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
         $testCasesInvalidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Invalid'
 
+
         Context 'When input parameters are valid' {
+
 
             Context 'When called with no parameter values' {
 
@@ -66,6 +68,7 @@ InModuleScope $script:subModuleName {
                 #}
             }
 
+
             Context 'When called with a "ResourceName" parameter value' {
 
                 It 'Should not throw - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
@@ -99,6 +102,7 @@ InModuleScope $script:subModuleName {
                 }
             }
         }
+
 
         Context "When input parameters are invalid" {
 
