@@ -16,7 +16,7 @@
 function Get-AzDevOpsApiUriResourceName
 {
     [CmdletBinding()]
-    [OutputType([System.Object[]])]
+    [OutputType([System.String[]])]
     param
     (
         [Parameter()]
@@ -35,5 +35,5 @@ function Get-AzDevOpsApiUriResourceName
         return $apiResourceNameToApiUriResourceName[$ResourceName]
     }
 
-    return $apiResourceNameToApiUriResourceName.Values
+    return [System.String[]]$($apiResourceNameToApiUriResourceName.Values)
 }
