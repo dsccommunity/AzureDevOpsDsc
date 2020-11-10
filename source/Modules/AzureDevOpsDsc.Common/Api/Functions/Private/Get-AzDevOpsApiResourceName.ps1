@@ -1,6 +1,7 @@
 <#
     .SYNOPSIS
-        Returns an array of all the Azure DevOps API, 'Resource' names that can used/managed.
+        Returns an array of all the Azure DevOps API, 'Resource' names that can used/managed
+        in the Azure DevOps API (and supported by the 'AzureDevOpsDsc' module).
 
     .EXAMPLE
         Get-AzDevOpsApiResourceName
@@ -10,13 +11,11 @@
 function Get-AzDevOpsApiResourceName
 {
     [CmdletBinding()]
-    [OutputType([System.Object[]])]
+    [OutputType([System.String[]])]
     param ()
 
-    [string[]]$resourceNames = @(
+    return [System.String[]]@(
         'Operation',
         'Project'
     )
-
-    return $resourceNames
 }
