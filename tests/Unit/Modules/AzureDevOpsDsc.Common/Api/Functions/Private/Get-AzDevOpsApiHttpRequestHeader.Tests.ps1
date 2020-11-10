@@ -21,7 +21,7 @@ InModuleScope $script:subModuleName {
                 { Get-AzDevOpsApiHttpRequestHeader -Pat $Pat } | Should -Not -Throw
             }
 
-            It 'Should output a "Hashtable" - "<Pat>"' -TestCases $testCasesValidPats {
+            It 'Should output a "Hashtable" type - "<Pat>"' -TestCases $testCasesValidPats {
                 param ([System.String]$Pat)
 
                 $httpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
@@ -29,7 +29,7 @@ InModuleScope $script:subModuleName {
                 $httpRequestHeader.GetType() | Should -Be $(@{}.GetType())
             }
 
-            It 'Should output a "Hashtable" with an "Authorization" key - "<Pat>"' -TestCases $testCasesValidPats {
+            It 'Should output a "Hashtable" type containing an "Authorization" key - "<Pat>"' -TestCases $testCasesValidPats {
                 param ([System.String]$Pat)
 
                 $httpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
@@ -37,7 +37,7 @@ InModuleScope $script:subModuleName {
                 $httpRequestHeader.ContainsKey('Authorization') | Should -BeTrue
             }
 
-            It 'Should output a "Hashtable" with an "Authorization" key that has a value beginning with "Basic " - "<Pat>"' -TestCases $testCasesValidPats {
+            It 'Should output a "Hashtable" type containing an "Authorization" key that has a value beginning with "Basic " - "<Pat>"' -TestCases $testCasesValidPats {
                 param ([System.String]$Pat)
 
                 $httpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
@@ -45,7 +45,7 @@ InModuleScope $script:subModuleName {
                 $httpRequestHeader.Authorization | Should -BeLike "Basic *"
             }
 
-            It 'Should output a "Hashtable" with an "Authorization" key that has a value as expected - "<Pat>" ' -TestCases $testCasesValidPats {
+            It 'Should output a "Hashtable" type containing an "Authorization" key that has a value as expected - "<Pat>" ' -TestCases $testCasesValidPats {
                 param ([System.String]$Pat)
 
                 $Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$Pat"))
@@ -54,7 +54,7 @@ InModuleScope $script:subModuleName {
                 $httpRequestHeader.Authorization | Should -BeExactly $Authorization
             }
 
-            It 'Should output a "Hashtable" that is successfully validated by "Test-AzDevOpsApiHttpRequestHeader"' -TestCases $testCasesValidPats {
+            It 'Should output a "Hashtable" type that is successfully validated by "Test-AzDevOpsApiHttpRequestHeader" - "<Pat>"' -TestCases $testCasesValidPats {
                 param ([System.String]$Pat)
 
                 $httpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
