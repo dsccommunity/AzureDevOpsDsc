@@ -2573,6 +2573,37 @@ function Get-ParameterSetTestCase
 
 
 
+    # Test-AzDevOpsPat
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsPat" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    Pat = $validPat
+                    IsValid = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    Pat = $validPat
+                    #IsValid = $false
+                },
+                @{
+                    Pat = $validPat
+                    IsValid = $false
+                }
+            )
+
+        }
+    }
+
+
+
+
 
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
