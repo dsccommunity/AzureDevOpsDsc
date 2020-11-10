@@ -10,7 +10,6 @@ InModuleScope $script:subModuleName {
 
     Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
-
         Context 'When input parameters are valid' {
 
             It 'Should not throw' {
@@ -61,7 +60,6 @@ InModuleScope $script:subModuleName {
             }
 
         }
-
 
         Context "When input parameters are invalid" {
 
