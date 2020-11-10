@@ -124,6 +124,30 @@ function Get-TestCaseValue
 
 
 
+    # HttpRequestHeader
+    $testCaseValues.HttpRequestHeader = @{
+
+        Valid = $testCaseValues.Pat.Valid | ForEach-Object {
+            $Pat = $_
+            @{
+                Authorization = 'Basic ' +
+                        [Convert]::ToBase64String(
+                            [Text.Encoding]::ASCII.GetBytes(":$Pat"))
+            }
+        }
+
+        Invalid = @(
+            @{}
+        ) + $testCaseValues.String.NullOrWhitespace
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
+
     # HttpContentType
     $testCaseValues.HttpContentType = @{
 
@@ -2108,6 +2132,37 @@ function Get-ParameterSetTestCase
                     ProjectName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     ProjectDescription = $validProjectDescription
                     Force = $validForce
+                }
+            )
+
+        }
+    }
+
+
+
+
+    # Test-AzDevOpsApiHttpRequestHeader
+    $validRequestHeader = Get-TestCaseValue -ScopeName 'HttpRequestHeader' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsApiHttpRequestHeader" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    HttpRequestHeader = $validRequestHeader
+                    IsValid = $true
+                }
+            )
+
+            Inalid = @(
+                @{
+                    HttpRequestHeader = $validRequestHeader
+                    #IsValid = $false
+                },
+                @{
+                    HttpRequestHeader = $validRequestHeader
+                    IsValid = $false
                 }
             )
 
