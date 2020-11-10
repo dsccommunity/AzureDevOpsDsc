@@ -12,7 +12,7 @@
 function Get-AzDevOpsApiWaitTimeoutMs
 {
     [CmdletBinding()]
-    [OutputType([int])]
+    [OutputType([Int32])]
     param ()
 
     return 10000
