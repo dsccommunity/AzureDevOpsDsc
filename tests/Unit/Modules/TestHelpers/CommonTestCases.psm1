@@ -2542,6 +2542,37 @@ function Get-ParameterSetTestCase
 
 
 
+    # Test-AzDevOpsOrganizationName
+    $validOrganizationName = Get-TestCaseValue -ScopeName 'OrganizationName' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsOrganizationName" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    OrganizationName = $validOrganizationName
+                    IsValid = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    OrganizationName = $validOrganizationName
+                    #IsValid = $false
+                },
+                @{
+                    OrganizationName = $validOrganizationName
+                    IsValid = $false
+                }
+            )
+
+        }
+    }
+
+
+
+
 
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
