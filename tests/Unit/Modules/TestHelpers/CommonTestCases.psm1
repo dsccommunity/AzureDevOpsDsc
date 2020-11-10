@@ -2604,6 +2604,65 @@ function Get-ParameterSetTestCase
 
 
 
+    # Test-AzDevOpsProject
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validProjectId = Get-TestCaseValue -ScopeName 'ProjectId' -TestCaseName 'Valid' -First 1
+    $validProjectName = Get-TestCaseValue -ScopeName 'ProjectName' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsProject" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    #ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    #ProjectName = $validProjectName
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $validPat
+                    ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ProjectId = $validProjectId
+                    ProjectName = $validProjectName
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    # Must provide atleast 1 of the below parameters
+                    ProjectId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    ProjectName = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                }
+            )
+
+        }
+    }
+
+
+
+
 
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
