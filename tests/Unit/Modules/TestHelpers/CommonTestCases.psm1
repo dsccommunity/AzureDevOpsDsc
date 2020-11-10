@@ -1539,7 +1539,7 @@ function Get-ParameterSetTestCase
     $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
     $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
     $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
-    $validResourceName = Get-TestCaseValue -ScopeName 'HttpBody' -TestCaseName 'Valid' -First 1
+    $validResourceName = Get-TestCaseValue -ScopeName 'ResourceName' -TestCaseName 'Valid' -First 1
     $validResource = Get-TestCaseValue -ScopeName 'Resource' -TestCaseName 'Valid' -First 1
     $validWait = Get-TestCaseValue -ScopeName 'Wait' -TestCaseName 'Valid' -First 1
     $validForce = Get-TestCaseValue -ScopeName 'Force' -TestCaseName 'Valid' -First 1
