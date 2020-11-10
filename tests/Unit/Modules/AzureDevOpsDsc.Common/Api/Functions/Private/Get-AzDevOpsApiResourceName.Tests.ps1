@@ -38,6 +38,13 @@ InModuleScope $script:subModuleName {
                 $null | Should -Not -BeIn $resourceNames
             }
 
+            It 'Should output a "System.String[]" type containing unique values' {
+
+                [System.String[]]$resourceNames = Get-AzDevOpsApiResourceName
+
+                $resourceNames.Count | Should -Be $($resourceNames | Select-Object -Unique).Count
+            }
+
             # Create test cases for each 'ResourceName' returned by 'Get-AzDevOpsApiResourceName'
             [Hashtable[]]$testCasesResourceNames = Get-AzDevOpsApiResourceName |
                 ForEach-Object {
