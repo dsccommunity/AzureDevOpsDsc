@@ -124,30 +124,6 @@ function Get-TestCaseValue
 
 
 
-    # HttpRequestHeader
-    $testCaseValues.HttpRequestHeader = @{
-
-        Valid = $testCaseValues.Pat.Valid | ForEach-Object {
-            $Pat = $_
-            @{
-                Authorization = 'Basic ' +
-                        [Convert]::ToBase64String(
-                            [Text.Encoding]::ASCII.GetBytes(":$Pat"))
-            }
-        }
-
-        Invalid = @(
-            @{}
-        ) + $testCaseValues.String.NullOrWhitespace
-
-        Empty            = $testCaseValues.String.Empty
-        Null             = $testCaseValues.String.Null
-        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
-
-    }
-
-
-
     # HttpContentType
     $testCaseValues.HttpContentType = @{
 
@@ -261,6 +237,58 @@ function Get-TestCaseValue
         NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
 
     }
+
+
+    # PatCredential
+    $testCaseValues.PatCredential = @{
+
+        Valid = $testCaseValues.Pat.Valid | ForEach-Object {
+
+            $PatCredentialUsername = 'PAT'
+            [String]$Pat = $_.ToString()
+            [SecureString]$PatSecure = ConvertTo-SecureString $Pat -AsPlainText -Force
+            New-Object System.Management.Automation.PSCredential ($PatCredentialUsername, $PatSecure)
+
+        }
+
+        Invalid = $testCaseValues.Pat.Invalid | ForEach-Object {
+
+            $PatCredentialUsername = 'NotPAT'
+            [String]$Pat = $_.ToString()
+            [SecureString]$PatSecure = ConvertTo-SecureString $Pat -AsPlainText -Force
+            New-Object System.Management.Automation.PSCredential ($PatCredentialUsername, $PatSecure)
+        }
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
+
+    # HttpRequestHeader
+    $testCaseValues.HttpRequestHeader = @{
+
+        Valid = $testCaseValues.Pat.Valid | ForEach-Object {
+            $Pat = $_
+            @{
+                Authorization = 'Basic ' +
+                        [Convert]::ToBase64String(
+                            [Text.Encoding]::ASCII.GetBytes(":$Pat"))
+            }
+        }
+
+        Invalid = @(
+            @{}
+        ) + $testCaseValues.String.NullOrWhitespace
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
 
 
     # HttpHeaders
@@ -2351,6 +2379,37 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiVersion = $validApiVersion
+                    IsValid = $false
+                }
+            )
+
+        }
+    }
+
+
+
+
+    # Test-AzDevOpsPatCredential
+    $validPatCredential = Get-TestCaseValue -ScopeName 'PatCredential' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsPatCredential" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    PatCredential = $validPatCredential
+                    IsValid = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    PatCredential = $validPatCredential
+                    #IsValid = $false
+                },
+                @{
+                    PatCredential = $validPatCredential
                     IsValid = $false
                 }
             )
