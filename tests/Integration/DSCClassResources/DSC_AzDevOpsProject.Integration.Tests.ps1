@@ -158,6 +158,52 @@ try
         }
 
 
+
+        Context ("When compiling, applying and testing the MOF - '$($script:dscResourceName)_UpdateGitProjectToTfvc_Config'") {
+
+            BeforeAll {
+                $configurationName = "$($script:dscResourceName)_UpdateGitProjectToTfvc_Config"
+                $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test_UpdateGitProjectToTfvc"
+            }
+
+
+            It 'Should throw when compiling MOF and when calling "Start-DscConfiguration"' {
+                {
+                    $configurationParameters = @{
+                        OutputPath           = $TestDrive
+                        # The variable $ConfigurationData was dot-sourced above.
+                        ConfigurationData    = $ConfigurationData
+                    }
+
+                    . $configFile
+                    & $configurationName @configurationParameters
+
+                    $startDscConfigurationParameters = @{
+                        Path         = $TestDrive
+                        ComputerName = 'localhost'
+                        Wait         = $true
+                        Verbose      = $true
+                        Force        = $true
+                        ErrorAction  = 'Stop'
+                    }
+
+                    Start-DscConfiguration @startDscConfigurationParameters
+                } | Should -Throw # Note: This operation is unsupported so we expect it to throw an exception
+            }
+
+
+            It 'Should not throw when calling "Get-DscConfiguration"' {
+                {
+                    $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return $false or $null when Test-DscConfiguration is run' {
+                 Test-DscConfiguration -Verbose  | Should -BeIn @('False',$null)
+            }
+        }
+
+
         Context ("When compiling, applying and testing the MOF - '$($script:dscResourceName)_EnsureGitProjectAbsent2_Config'") {
 
             BeforeAll {
@@ -327,6 +373,52 @@ try
 
             It 'Should return $true when Test-DscConfiguration is run' {
                 Test-DscConfiguration -Verbose | Should -Be 'True'
+            }
+        }
+
+
+
+        Context ("When compiling, applying and testing the MOF - '$($script:dscResourceName)_UpdateTfvcProjectToGit_Config'") {
+
+            BeforeAll {
+                $configurationName = "$($script:dscResourceName)_UpdateTfvcProjectToGit_Config"
+                $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test_UpdateTfvcProjectToGit"
+            }
+
+
+            It 'Should throw when compiling MOF and when calling "Start-DscConfiguration"' {
+                {
+                    $configurationParameters = @{
+                        OutputPath           = $TestDrive
+                        # The variable $ConfigurationData was dot-sourced above.
+                        ConfigurationData    = $ConfigurationData
+                    }
+
+                    . $configFile
+                    & $configurationName @configurationParameters
+
+                    $startDscConfigurationParameters = @{
+                        Path         = $TestDrive
+                        ComputerName = 'localhost'
+                        Wait         = $true
+                        Verbose      = $true
+                        Force        = $true
+                        ErrorAction  = 'Stop'
+                    }
+
+                    Start-DscConfiguration @startDscConfigurationParameters
+                } | Should -Throw # Note: This operation is unsupported so we expect it to throw an exception
+            }
+
+
+            It 'Should not throw when calling "Get-DscConfiguration"' {
+                {
+                    $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return $false or $null when Test-DscConfiguration is run' {
+                 Test-DscConfiguration -Verbose  | Should -BeIn @('False',$null)
             }
         }
 
