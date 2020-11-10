@@ -99,11 +99,11 @@ function Wait-AzDevOpsApiResource
         [System.UInt32]
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName='IsPresent')]
         [System.Management.Automation.SwitchParameter]
         $IsPresent,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName='IsAbsent')]
         [System.Management.Automation.SwitchParameter]
         $IsAbsent
     )
