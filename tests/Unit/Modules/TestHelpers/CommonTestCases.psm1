@@ -3095,7 +3095,6 @@ function Get-ParameterSetTestCase
 
     # Wait-AzDevOpsOperation
     $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
-    $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
     $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
     $validOperationId = Get-TestCaseValue -ScopeName 'OperationId' -TestCaseName 'Valid' -First 1
     $validWaitIntervalMilliseconds = Get-TestCaseValue -ScopeName 'WaitIntervalMilliseconds' -TestCaseName 'Valid' -First 1
@@ -3109,43 +3108,22 @@ function Get-ParameterSetTestCase
                 # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
                     WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
                     IsComplete = $true
-                },
+                }
                 @{
                     ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsComplete = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
                     WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
                     IsComplete = $true
-                },
+                }
                 @{
                     ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsComplete = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3154,25 +3132,6 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsComplete = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsComplete = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3185,7 +3144,6 @@ function Get-ParameterSetTestCase
                 # TODO: Following 3 need moving to their own 'IsSuccessful' parameter set (and out of '__AllParameterSets')
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3194,34 +3152,14 @@ function Get-ParameterSetTestCase
                 }
                 @{
                     ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsSuccessful = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
                     WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
                     IsSuccessful = $true
-                },
+                }
                 @{
                     ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsSuccessful = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3230,25 +3168,6 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsSuccessful = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
-                    Pat = $validPat
-                    OperationId = $validOperationId
-                    #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
-                    #WaitTimeoutMilliseconds = $validWaitTimeoutMilliseconds
-                    IsSuccessful = $true
-                },
-                @{
-                    ApiUri = $validApiUri
-                    #ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     #WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3261,7 +3180,6 @@ function Get-ParameterSetTestCase
 
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3272,7 +3190,6 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3286,7 +3203,6 @@ function Get-ParameterSetTestCase
                 # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3295,7 +3211,6 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3304,7 +3219,6 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3316,7 +3230,6 @@ function Get-ParameterSetTestCase
                 # TODO: Following 3 need moving to their own 'IsSuccessful' parameter set (and out of '__AllParameterSets')
                 @{
                     ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3325,7 +3238,6 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     OperationId = $validOperationId
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
@@ -3334,7 +3246,6 @@ function Get-ParameterSetTestCase
                 },
                 @{
                     ApiUri = $validApiUri
-                    ApiVersion = $validApiVersion
                     Pat = $validPat
                     OperationId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
                     WaitIntervalMilliseconds = $validWaitIntervalMilliseconds
