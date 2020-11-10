@@ -338,7 +338,7 @@ function Get-TestCaseValue
 
         Invalid = @(
             249, 10001, -1, 0
-        ) + $testCaseValues.String.NullOrWhitespace
+        )
 
         Empty            = $testCaseValues.String.Empty
         Null             = $testCaseValues.String.Null
@@ -584,12 +584,12 @@ function Get-TestCaseValue
     $testCaseValues.IsValid = @{
 
         Valid = @(
-            $true
+            $true,
+            $false
         )
 
         Invalid = @(
-            $false
-        ) + $testCaseValues.String.NullOrWhitespace
+        )
 
         Empty            = $testCaseValues.String.Empty
         Null             = $testCaseValues.String.Null
@@ -2222,10 +2222,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     HttpRequestHeader = $validRequestHeader
-                    #IsValid = $false
-                },
-                @{
-                    HttpRequestHeader = $validRequestHeader
                     IsValid = $false
                 }
             )
@@ -2318,10 +2314,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     ResourceId = $validResourceId
-                    #IsValid = $false
-                },
-                @{
-                    ResourceId = $validResourceId
                     IsValid = $false
                 }
             )
@@ -2347,10 +2339,6 @@ function Get-ParameterSetTestCase
             )
 
             Invalid = @(
-                @{
-                    ResourceName = $validResourceName
-                    #IsValid = $false
-                },
                 @{
                     ResourceName = $validResourceName
                     IsValid = $false
@@ -2380,10 +2368,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     ApiUri = $validApiUri
-                    #IsValid = $false
-                },
-                @{
-                    ApiUri = $validApiUri
                     IsValid = $false
                 }
             )
@@ -2411,10 +2395,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     ApiVersion = $validApiVersion
-                    #IsValid = $false
-                },
-                @{
-                    ApiVersion = $validApiVersion
                     IsValid = $false
                 }
             )
@@ -2440,10 +2420,6 @@ function Get-ParameterSetTestCase
             )
 
             Invalid = @(
-                @{
-                    PatCredential = $validPatCredential
-                    #IsValid = $false
-                },
                 @{
                     PatCredential = $validPatCredential
                     IsValid = $false
@@ -2564,10 +2540,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     OperationId = $validOperationId
-                    #IsValid = $false
-                },
-                @{
-                    OperationId = $validOperationId
                     IsValid = $false
                 }
             )
@@ -2595,10 +2567,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     OrganizationName = $validOrganizationName
-                    #IsValid = $false
-                },
-                @{
-                    OrganizationName = $validOrganizationName
                     IsValid = $false
                 }
             )
@@ -2624,10 +2592,6 @@ function Get-ParameterSetTestCase
             )
 
             Invalid = @(
-                @{
-                    Pat = $validPat
-                    #IsValid = $false
-                },
                 @{
                     Pat = $validPat
                     IsValid = $false
@@ -2716,10 +2680,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     ProjectDescription = $validProjectDescription
-                    #IsValid = $false
-                },
-                @{
-                    ProjectDescription = $validProjectDescription
                     IsValid = $false
                 }
             )
@@ -2747,10 +2707,6 @@ function Get-ParameterSetTestCase
             Invalid = @(
                 @{
                     ProjectId = $validProjectId
-                    #IsValid = $false
-                },
-                @{
-                    ProjectId = $validProjectId
                     IsValid = $false
                 }
             )
@@ -2776,10 +2732,6 @@ function Get-ParameterSetTestCase
             )
 
             Invalid = @(
-                @{
-                    ProjectName = $validProjectName
-                    #IsValid = $false
-                },
                 @{
                     ProjectName = $validProjectName
                     IsValid = $false
