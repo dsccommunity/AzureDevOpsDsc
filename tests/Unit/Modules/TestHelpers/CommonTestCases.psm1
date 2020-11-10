@@ -2420,6 +2420,98 @@ function Get-ParameterSetTestCase
 
 
 
+    # Test-AzDevOpsOperation
+    $validApiUri = Get-TestCaseValue -ScopeName 'ApiUri' -TestCaseName 'Valid' -First 1
+    $validPat = Get-TestCaseValue -ScopeName 'Pat' -TestCaseName 'Valid' -First 1
+    $validOperationId = Get-TestCaseValue -ScopeName 'OperationId' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsOperation" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    IsSuccessful = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    # Parameters provided must set only one of the following (not neither, nor both)
+                    IsComplete = $false
+                    IsSuccessful = $false
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    # Parameters provided must set only one of the following (not neither, nor both)
+                    IsComplete = $true
+                    IsSuccessful = $true
+                },
+
+                # IsComplete
+                # TODO: Following 3 need moving to their own 'IsComplete' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    OperationId = $validOperationId
+                    IsComplete = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    OperationId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    IsComplete = $true
+                },
+
+                # IsSuccessful
+                # TODO: Following 3 need moving to their own 'IsSuccessful' parameter set (and out of '__AllParameterSets')
+                @{
+                    ApiUri = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    Pat = $validPat
+                    OperationId = $validOperationId
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    OperationId = $validOperationId
+                    IsSuccessful = $true
+                },
+                @{
+                    ApiUri = $validApiUri
+                    Pat = $validPat
+                    OperationId = $null # Mandatory (Set as $null to avoid Pester prompting for value)
+                    IsSuccessful = $true
+                }
+            )
+
+        }
+    }
+
+
+
+
+
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
         throw "'Get-ParameterSetTestCase' does not contain/define any parameter set values for the '$CommandName' command/function. Add some parameter set, test case values (typically, for both 'Valid' and 'Invalid' test cases) for the '$CommandName' command/function in the 'Get-ParameterSetTestCase', helper function."
