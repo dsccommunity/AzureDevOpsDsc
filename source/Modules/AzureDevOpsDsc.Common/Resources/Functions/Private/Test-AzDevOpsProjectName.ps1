@@ -31,6 +31,7 @@ function Test-AzDevOpsProjectName
         $ProjectName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
