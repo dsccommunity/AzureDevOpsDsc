@@ -48,10 +48,10 @@ InModuleScope $script:subModuleName {
             It 'Should output a "Hashtable" type containing an "Authorization" key that has a value as expected - "<Pat>" ' -TestCases $testCasesValidPats {
                 param ([System.String]$Pat)
 
-                $Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$Pat"))
+                $authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$Pat"))
                 $httpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
 
-                $httpRequestHeader.Authorization | Should -BeExactly $Authorization
+                $httpRequestHeader.Authorization | Should -BeExactly $authorization
             }
 
             It 'Should output a "Hashtable" type that is successfully validated by "Test-AzDevOpsApiHttpRequestHeader" - "<Pat>"' -TestCases $testCasesValidPats {
