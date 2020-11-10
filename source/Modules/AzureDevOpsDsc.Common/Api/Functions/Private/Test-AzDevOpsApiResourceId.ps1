@@ -31,6 +31,7 @@ function Test-AzDevOpsApiResourceId
         $ResourceId,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
