@@ -130,6 +130,37 @@ Configuration DSC_AzDevOpsProject_EnsureGitProjectAbsent2_Config
 
 <#
     .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' (that uses 'TFVC' for source control) is absent (before it gets added).
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureTfvcProjectAbsent1_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureTfvcProjectAbsent1
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestTfvcProjectName'
+            #ProjectDescription  = 'TestTfvcProjectDescription'
+
+            #SourceControlType   = 'Tfvc'
+
+            Ensure              = 'Absent'
+        }
+    }
+}
+
+
+
+<#
+    .SYNOPSIS
         Attempts to ensure an Azure DevOps 'Project' (that uses 'TFVC' for source control) is present.
 
     .NOTES
@@ -156,6 +187,38 @@ Configuration DSC_AzDevOpsProject_EnsureTfvcProjectPresent_Config
         }
     }
 }
+
+
+
+<#
+    .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' (that uses 'TFVC' for source control) is absent (after it's previously been added).
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureTfvcProjectAbsent2_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureTfvcProjectAbsent2
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestTfvcProjectName'
+            #ProjectDescription  = 'TestTfvcProjectDescription'
+
+            #SourceControlType   = 'Tfvc'
+
+            Ensure              = 'Absent'
+        }
+    }
+}
+
 
 
 <#
