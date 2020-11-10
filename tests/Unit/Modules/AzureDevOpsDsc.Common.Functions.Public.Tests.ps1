@@ -166,18 +166,14 @@ InModuleScope $script:subModuleName {
 
                 Context "When 'IsValid' parameter name is not present" {
 
-                    It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $($testCasesInvalidCommandParameterSetNames |
-                        Where-Object { $_.ParameterSetValuesKey -notlike '*IsValid*' })
-                    {
+                    It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $($testCasesInvalidCommandParameterSetNames | Where-Object { $_.ParameterSetValuesKey -notlike '*IsValid*' }) {
                         param([string]$CommandName, [Hashtable]$ParameterSetValues)
 
                         Mock -CommandName $CommandName -MockWith {}
                         { & $CommandName @ParameterSetValues } | Should -Throw
                     }
 
-                    It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $($testCasesInvalidCommandParameterSetNames |
-                        Where-Object { $_.ParameterSetValuesKey -notlike '*IsValid*' })
-                    {
+                    It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $($testCasesInvalidCommandParameterSetNames | Where-Object { $_.ParameterSetValuesKey -notlike '*IsValid*' }){
                         param([string]$CommandName, [Hashtable]$ParameterSetValues)
 
                         Mock -CommandName $CommandName -MockWith {}
@@ -189,18 +185,14 @@ InModuleScope $script:subModuleName {
 
                     # Don't want this to throw an exception - Typically they need to return a $false return value if input parameters are invalid.
 
-                    It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $($testCasesValidCommandParameterSetNameInvalidParameterValues |
-                        Where-Object { $_.ParameterSetValuesKey -like '*IsValid*' })
-                    {
+                    It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $($testCasesValidCommandParameterSetNameInvalidParameterValues | Where-Object { $_.ParameterSetValuesKey -like '*IsValid*' }) {
                         param([string]$CommandName, [Hashtable]$ParameterSetValues)
 
                         Mock -CommandName $CommandName -MockWith {}
                         { & $CommandName @ParameterSetValues } | Should -Not -Throw
                     }
 
-                    It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $($testCasesValidCommandParameterSetNameInvalidParameterValues |
-                        Where-Object { $_.ParameterSetValuesKey -like '*IsValid*' })
-                    {
+                    It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $($testCasesValidCommandParameterSetNameInvalidParameterValues | Where-Object { $_.ParameterSetValuesKey -like '*IsValid*' }) {
                         param([string]$CommandName, [Hashtable]$ParameterSetValues)
 
                         Mock -CommandName $CommandName -MockWith {}
