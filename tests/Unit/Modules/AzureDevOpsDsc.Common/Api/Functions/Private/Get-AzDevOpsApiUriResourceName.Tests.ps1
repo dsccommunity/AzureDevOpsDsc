@@ -1,83 +1,115 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Get-AzDevOpsApiUriResourceName' -Tag 'GetAzDevOpsApiUriResourceName' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
-        Context 'When called with valid parameters' {
+        $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
+        $testCasesInvalidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Invalid'
 
-            Context 'When called without "-ResourceName" parameter' {
+        Context 'When input parameters are valid' {
 
-                BeforeAll {
-
-                    $testCasesValidApiUriResourceName = Get-TestCase -ScopeName 'ApiUriResourceName' -TestCaseName 'Valid'
-                }
+            Context 'When called with no parameter values' {
 
                 It 'Should not throw' {
-                    param ()
 
                     { Get-AzDevOpsApiUriResourceName } | Should -Not -Throw
                 }
 
-                It 'Should return "object[]" or "string"' {
-                    param ()
+                It 'Should output a "System.String[]" type containing more than 1 value' {
 
-                    $result = Get-AzDevOpsApiUriResourceName
-                    $result.GetType() | Should -BeIn @(@('ApiUriResourceName1','ApiUriResourceName2').GetType(),'ApiUriResourceName1'.GetType())
+                    [System.String[]]$uriResourceNames = Get-AzDevOpsApiUriResourceName
+
+                    $uriResourceNames.Count | Should -BeGreaterThan 1
                 }
 
-                It 'Should return all resources that are present in $testCasesValidApiUriResourceName variable'{
-                    param ()
+                It 'Should output a "System.String[]" type containing no empty values' {
 
-                    [string[]]$result = Get-AzDevOpsApiUriResourceName
-                    $result.Count | Should -Be $($testCasesValidApiUriResourceName.Count)
+                    [System.String[]]$uriResourceNames = Get-AzDevOpsApiUriResourceName
+
+                    [System.String]::Empty | Should -Not -BeIn $uriResourceNames
                 }
+
+                It 'Should output a "System.String[]" type containing no $null values' {
+
+                    [System.String[]]$uriResourceNames = Get-AzDevOpsApiUriResourceName
+
+                    $null | Should -Not -BeIn $uriResourceNames
+                }
+
+                It 'Should output a "System.String[]" type containing unique values' {
+
+                    [System.String[]]$uriResourceNames = Get-AzDevOpsApiUriResourceName
+
+                    $uriResourceNames.Count | Should -Be $($uriResourceNames | Select-Object -Unique).Count
+                }
+
+                # Create test cases for each 'UriResourceName' returned by 'Get-AzDevOpsApiUriResourceName'
+                #[Hashtable[]]$testCasesUriResourceNames = Get-AzDevOpsApiUriResourceName |
+                #    ForEach-Object {
+                #        @{
+                #            UriResourceName = $_
+                #        }
+                #    }
+
+                # TODO: Uncomment this test once 'Test-AzDevOpsApiUriResourceName' function available
+                #It 'Should output values that are all validated by "Test-AzDevOpsApiUriResourceName" - "<UriResourceName>"' -TestCases $testCasesUriResourceNames {
+                #    param ([System.String]$UriResourceName)
+                #
+                #    Test-AzDevOpsApiUriResourceName -UriResourceName $UriResourceName -IsValid | Should -BeTrue
+                #}
             }
 
-            Context 'When called with valid "-ResourceName" parameter' {
+            Context 'When called with a "ResourceName" parameter value' {
 
-                $testCasesValidResourceName = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
+                It 'Should not throw - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
+                    param ([System.String]$ResourceName)
 
-                BeforeAll {
+                    { Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName } | Should -Not -Throw
                 }
 
-                It 'Should not throw - "<ResourceName>"' -TestCases $testCasesValidResourceName {
-                    param ([string]$ResourceName)
-                    Write-Verbose $ResourceName
+                It 'Should output a "System.String[]" type containing exactly 1 value - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
+                    param ([System.String]$ResourceName)
 
-                    { Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName} | Should -Not -Throw
+                    [System.String[]]$uriResourceNames = Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName
+
+                    $uriResourceNames.Count | Should -BeExactly 1
                 }
 
-                It 'Should return "string" - "<ResourceName>"' -TestCases $testCasesValidResourceName {
-                    param ([string]$ResourceName)
+                It 'Should output a "System.String" type that is not null or empty - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
+                    param ([System.String]$ResourceName)
 
-                    [string]$result = Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName
-                    $result.GetType() | Should -Be @('ApiUriResourceName1'.GetType())
+                    [System.String]$uriResourceName = Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName
+
+                    $uriResourceName | Should -Not -BeNullOrEmpty
                 }
 
+                It 'Should output a "System.String" type that is lowercase - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
+                    param ([System.String]$ResourceName)
+
+                    [System.String]$uriResourceName = Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName
+
+                    $uriResourceName | Should -BeExactly $($uriResourceName.ToLower())
+                }
             }
-
-            Context 'When called with invalid "-ResourceName" parameter' {
-
-                $testCasesInvalidResourceName = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Invalid'
-
-                BeforeAll {
-                }
-
-                It 'Should throw - "<ResourceName>"' -TestCases $testCasesInvalidResourceName {
-                    param ([string]$ResourceName)
-                    Write-Verbose $ResourceName
-
-                    { Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName} | Should -Throw
-                }
-
-            }
-
         }
 
-    }
+        Context "When input parameters are invalid" {
 
+            Context 'When called with a "ResourceName" parameter value' {
+
+                It 'Should throw - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
+                    param ([System.String]$ResourceName)
+
+                    { Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName } | Should -Throw
+                }
+            }
+        }
+    }
 }
