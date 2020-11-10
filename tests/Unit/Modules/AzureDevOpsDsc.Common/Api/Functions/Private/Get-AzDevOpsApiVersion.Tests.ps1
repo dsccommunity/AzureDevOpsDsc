@@ -1,72 +1,133 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Get-AzDevOpsApiVersion' -Tag 'GetAzDevOpsApiVersion' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
-        Context 'When called with valid parameters' {
+        $testCasesValidApiVersions = Get-TestCase -ScopeName 'ApiVersion' -TestCaseName 'Valid'
+        $testCasesInvalidApiVersions = Get-TestCase -ScopeName 'ApiVersion' -TestCaseName 'Invalid'
+        $supportedApiVersion = '6.0'
 
-            Context 'When called without "-Default" switch' {
 
-                BeforeAll {
+        Context 'When input parameters are valid' {
 
-                    $testCasesValidApiVersion = Get-TestCase -ScopeName 'ApiVersion' -TestCaseName 'Valid'
-                }
+
+            Context 'When called with no parameter values' {
 
                 It 'Should not throw' {
-                    param ()
 
                     { Get-AzDevOpsApiVersion } | Should -Not -Throw
                 }
 
-                It 'Should return "object[]" or "string"' {
-                    param ()
+                # Note: Only applicable if only 1 'ApiVersion' is supported
+                It "Should output a 'System.String' type containing an 'ApiVersion' of '$supportedApiVersion'" {
 
-                    $result = Get-AzDevOpsApiVersion
-                    $result.GetType() | Should -BeIn @(@('ApiVersion1','ApiVersion2').GetType(),'ApiVersion1'.GetType())
+                    [System.String]$apiVersion = Get-AzDevOpsApiVersion
+
+                    $apiVersion | Should -BeExactly $supportedApiVersion
                 }
 
-                It 'Should return all resources that are present in $testCasesValidApiVersion variable'{
-                    param ()
+                # Note: Only applicable if only 1 'ApiVersion' is supported
+                It 'Should output a "System.String[]" type containing no empty values' {
 
-                    [string[]]$result = Get-AzDevOpsApiVersion
-                    $result.Count | Should -Be $($testCasesValidApiVersion.Count)
+                    [System.String[]]$apiVersions = Get-AzDevOpsApiVersion
+
+                    [System.String]::Empty | Should -Not -BeIn $apiVersions
+                }
+
+                It 'Should output a "System.String[]" type containing no $null values' {
+
+                    [System.String[]]$apiVersions = Get-AzDevOpsApiVersion
+
+                    $null | Should -Not -BeIn $apiVersions
+                }
+
+                It 'Should output a "System.String[]" type containing unique values' {
+
+                    [System.String[]]$apiVersions = Get-AzDevOpsApiVersion
+
+                    $apiVersions.Count | Should -Be $($apiVersions | Select-Object -Unique).Count
+                }
+
+                #Create test cases for each 'ApiVersion' returned by 'Get-AzDevOpsApiVersion'
+                [Hashtable[]]$testCasesApiVersions = Get-AzDevOpsApiVersion |
+                   ForEach-Object {
+                       @{
+                           ApiVersion = $_
+                       }
+                   }
+
+                It 'Should output values that are all validated by "Test-AzDevOpsApiVersion" - "<ApiVersion>"' -TestCases $testCasesApiVersions {
+                   param ([System.String]$ApiVersion)
+
+                   Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid | Should -BeTrue
+                }
+
+                It 'Should output values that are in the valid, "ApiVersion" test cases - "<ApiVersion>"' -TestCases $testCasesValidApiVersions {
+                    param ([System.String]$ApiVersion)
+
+                    $ApiVersion | Should -BeIn $([System.String[]]$(Get-AzDevOpsApiVersion))
+                }
+
+                It 'Should not output values that are in the invalid, "ApiVersion" test cases - "<ApiVersion>"' -TestCases $testCasesInvalidApiVersions {
+                    param ([System.String]$ApiVersion)
+
+                    $ApiVersion | Should -Not -BeIn $([System.String[]]$(Get-AzDevOpsApiVersion))
                 }
             }
 
-            Context 'When called with "-Default" switch' {
 
-                BeforeAll {
-                    $defaultApiVersion = '6.0' # Note: This will need changing if the API version supported is updated
-                    $testCasesValidApiVersion = Get-TestCase -ScopeName 'ApiVersion' -TestCaseName 'Valid'
-                }
+            Context 'When called with the "Default" switch parameter' {
 
                 It 'Should not throw' {
-                    param ()
 
                     { Get-AzDevOpsApiVersion -Default } | Should -Not -Throw
                 }
 
-                It 'Should return "string"' {
-                    param ()
+                It 'Should output a "System.String[]" type containing exactly 1 value' {
 
-                    [string]$result = Get-AzDevOpsApiVersion -Default
-                    $result.GetType() | Should -Be @('ApiVersion1'.GetType())
+                    [System.String[]]$apiVersions = Get-AzDevOpsApiVersion -Default
+
+                    $apiVersions.Count | Should -BeExactly 1
                 }
 
-                It "Should return the 'default' version ($defaultApiVersion)"{
-                    param ()
+                It 'Should output a "System.String" type that is not null or empty' {
 
-                    [string]$result = Get-AzDevOpsApiVersion -Default
-                    $result | Should -Be $defaultApiVersion
+                    [System.String]$uriResourceName = Get-AzDevOpsApiVersion -Default
+
+                    $uriResourceName | Should -Not -BeNullOrEmpty
+                }
+
+                It "Should output a 'System.String' type containing an 'ApiVersion' of '$supportedApiVersion'" {
+
+                    [System.String]$apiVersion = Get-AzDevOpsApiVersion -Default
+
+                    $apiVersion | Should -BeExactly $supportedApiVersion
                 }
             }
 
+
+            # Effectively identical to 'When called with no parameter values' context (with test cases above)
+            Context 'When called with a "Default" switch parameter value of $false' {
+
+                It 'Should not throw' {
+
+                    { Get-AzDevOpsApiVersion -Default:$false } | Should -Not -Throw
+                }
+            }
         }
 
-    }
 
+        Context "When input parameters are invalid" {
+
+            # N/A - Only the 'Default' switch parameter on this function/commands
+
+        }
+    }
 }
