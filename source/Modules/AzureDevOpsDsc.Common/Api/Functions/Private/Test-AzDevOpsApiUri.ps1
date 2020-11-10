@@ -31,6 +31,7 @@ function Test-AzDevOpsApiUri
         $ApiUri,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
