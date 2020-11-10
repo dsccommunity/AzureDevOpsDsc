@@ -59,7 +59,7 @@ function Test-AzDevOpsApiResource
         $ResourceName,
 
         [Parameter(Mandatory = $true)]
-        [ValidateScript({ Test-AzDevOpsResourceId -ResourceId $_ -IsValid })]
+        [ValidateScript({ Test-AzDevOpsApiResourceId -ResourceId $_ -IsValid })]
         [Alias('Id')]
         [System.String]
         $ResourceId
