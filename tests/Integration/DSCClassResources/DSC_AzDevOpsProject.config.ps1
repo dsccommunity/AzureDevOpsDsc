@@ -38,6 +38,37 @@
 
 <#
     .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' (that uses 'Git' for source control) is absent (before it's added again).
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureGitProjectAbsent1_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureGitProjectAbsent1
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestGitProjectName'
+            #ProjectDescription  = 'TestGitProjectDescription'
+
+            #SourceControlType   = 'Git'
+
+            Ensure              = 'Absent'
+        }
+    }
+}
+
+
+
+<#
+    .SYNOPSIS
         Attempts to ensure an Azure DevOps 'Project' (that uses 'Git' for source control) is present.
 
     .NOTES
@@ -64,6 +95,37 @@ Configuration DSC_AzDevOpsProject_EnsureGitProjectPresent_Config
         }
     }
 }
+
+
+<#
+    .SYNOPSIS
+        Attempts to ensure an Azure DevOps 'Project' (that uses 'Git' for source control) is absent (after it's been added).
+
+    .NOTES
+
+#>
+Configuration DSC_AzDevOpsProject_EnsureGitProjectAbsent2_Config
+{
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+
+    node $AllNodes.NodeName
+    {
+        DSC_AzDevOpsProject Integration_Test_EnsureGitProjectAbsent2
+        {
+            ApiUri              = $Node.ApiUri
+            Pat                 = $Node.Pat
+
+            #ProjectId           = $Node.ProjectId
+            ProjectName         = 'TestGitProjectName'
+            #ProjectDescription  = 'TestGitProjectDescription'
+
+            #SourceControlType   = 'Git'
+
+            Ensure              = 'Absent'
+        }
+    }
+}
+
 
 
 <#
