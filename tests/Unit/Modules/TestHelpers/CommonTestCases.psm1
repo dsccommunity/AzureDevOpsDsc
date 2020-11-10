@@ -2725,6 +2725,37 @@ function Get-ParameterSetTestCase
 
 
 
+    # Test-AzDevOpsProjectName
+    $validProjectName = Get-TestCaseValue -ScopeName 'ProjectName' -TestCaseName 'Valid' -First 1
+
+
+    $ParameterSetTestCases."Test-AzDevOpsProjectName" = @{
+
+        "__AllParameterSets" = @{
+            Valid = @(
+                @{
+                    ProjectName = $validProjectName
+                    IsValid = $true
+                }
+            )
+
+            Invalid = @(
+                @{
+                    ProjectName = $validProjectName
+                    #IsValid = $false
+                },
+                @{
+                    ProjectName = $validProjectName
+                    IsValid = $false
+                }
+            )
+
+        }
+    }
+
+
+
+
 
     if (!$ParameterSetTestCases.ContainsKey($CommandName))
     {
