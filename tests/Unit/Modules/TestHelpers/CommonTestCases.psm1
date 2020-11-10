@@ -477,6 +477,24 @@ function Get-TestCaseValue
     }
 
 
+    # Default
+    $testCaseValues.Default = @{
+
+        Valid = @(
+            $true,
+            $false
+        )
+
+        Invalid = @(
+        )
+
+        Empty            = $testCaseValues.String.Empty
+        Null             = $testCaseValues.String.Null
+        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
+
+    }
+
+
 
 
     # SourceControlType
