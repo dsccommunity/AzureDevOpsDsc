@@ -63,6 +63,7 @@ function Wait-AzDevOpsOperation
         $Pat,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-AzDevOpsOperationId -OperationId $_ -IsValid })]
         [Alias('Id')]
         [System.String]
         $OperationId,
@@ -79,11 +80,11 @@ function Wait-AzDevOpsOperation
         [System.UInt32]
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName='IsComplete')]
         [System.Management.Automation.SwitchParameter]
         $IsComplete,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName='IsSuccessful')]
         [System.Management.Automation.SwitchParameter]
         $IsSuccessful
     )
