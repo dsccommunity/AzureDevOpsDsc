@@ -667,13 +667,13 @@ function Get-TestCaseValue
 
     if (!$testCaseValues.ContainsKey($ScopeName))
     {
-        throw "'Get-TestCaseValue' does not contain/define a scope of '$ScopeName'."
+        throw "'Get-TestCaseValue' does not contain/define a scope of '$ScopeName'. Add some test case values (for any required/relevant '$TestCaseName' test cases, if applicable/correct) for the '$ScopeName' scope in the 'Get-TestCaseValue', helper function."
         return
     }
 
     if (!$testCaseValues[$ScopeName].ContainsKey($TestCaseName))
     {
-        throw "'Get-TestCaseValue' does not contain/define test cases for '$TestCaseName' within the '$ScopeName' scope."
+        throw "'Get-TestCaseValue' does not contain/define test cases for '$TestCaseName' within the '$ScopeName' scope. Add some '$TestCaseName', test case values for the '$ScopeName' scope in the 'Get-TestCaseValue', helper function."
         return
     }
 
@@ -1417,6 +1417,27 @@ function Get-ParameterSetTestCase
             )
         }
     }
+
+
+    if (!$ParameterSetTestCases.ContainsKey($CommandName))
+    {
+        throw "'Get-ParameterSetTestCase' does not contain/define any parameter set values for the '$CommandName' command/function. Add some parameter set, test case values (typically, for both 'Valid' and 'Invalid' test cases) for the '$CommandName' command/function in the 'Get-ParameterSetTestCase', helper function."
+        return
+    }
+
+
+    if (!$ParameterSetTestCases[$CommandName].ContainsKey($ParameterSetName))
+    {
+        throw "'Get-ParameterSetTestCase' does not contain/define any parameter set values for the '$ParameterSetName' parameter set of the '$CommandName' command/function. Add some parameter set, test case values (typically, for both 'Valid' and 'Invalid' test cases) for the '$ParameterSetName' parameter set, for the '$CommandName' command/function in the 'Get-ParameterSetTestCase', helper function."
+        return
+    }
+
+    if (!$ParameterSetTestCases[$CommandName][$ParameterSetName].ContainsKey($TestCaseName))
+    {
+        throw "'Get-ParameterSetTestCase' does not contain/define any parameter set values for the '$ParameterSetName' parameter set for the '$CommandName' command/function, specifically for the '$TestCaseName' test cases. Add some parameter set, test case values for '$TestCaseName' test cases (for the '$ParameterSetName' parameter set for the '$CommandName' command/function) in the 'Get-ParameterSetTestCase', helper function."
+        return
+    }
+
 
     [int]$testCaseOffset = 0
     $testCases = $ParameterSetTestCases[$CommandName][$ParameterSetName][$TestCaseName] | ForEach-Object {
