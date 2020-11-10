@@ -6,7 +6,7 @@
 InModuleScope $script:subModuleName {
 
     $script:subModuleName = 'AzureDevOpsDsc.Common'
-    $script:publicCommandNames = $($(Get-Command -Module $script:subModuleName).Name) | Where-Object { $_ -ilike 'Get-*'} #| Select-Object -First 2
+    $script:publicCommandNames = $($(Get-Command -Module $script:subModuleName).Name)
 
     [hashtable[]]$testCasesValidCommandParameterSetNames = $script:publicCommandNames | ForEach-Object {
 
@@ -38,27 +38,29 @@ InModuleScope $script:subModuleName {
                     $parameterNames | ForEach-Object {
 
                         $parameterName = $_
-                        $parameterValues = $(Get-TestCaseValue -ScopeName $parameterName -TestCaseName 'Valid')
+                        $parameterValues = $(Get-TestCaseValue -ScopeName $parameterName -TestCaseName 'Valid' -First 1)
 
                         $parameterValues | ForEach-Object {
 
                             $parameterValue = $_
 
-                            $newTestCase = @{}
-                            $testCase.Keys | ForEach-Object {
-                                $newTestCase[$_] = $testCase[$_]
-                            }
-                            $newTestCase.Remove('ParameterSetValues')
-                            $newTestCase.Add('ParameterSetValues',@{})
-                            $testCase.ParameterSetValues.Keys | ForEach-Object {
-                                $newTestCase.ParameterSetValues[$_] = $testCase.ParameterSetValues[$_]
-                            }
-                            $newTestCase.ParameterSetValues[$parameterName] = $parameterValue
-                            $newTestCase.Add('ParameterValue',$parameterValue)
-                            $newTestCase.Add('ParameterName',$parameterName)
+                            if ($testCase.ParameterSetValues.ContainsKey($parameterName)) # Only want to generate new records if 'ParameterName' is in the set of 'ParameterSetValues' keys
+                            {
+                                $newTestCase = @{}
+                                $testCase.Keys | ForEach-Object {
+                                    $newTestCase[$_] = $testCase[$_]
+                                }
+                                $newTestCase.Remove('ParameterSetValues')
+                                $newTestCase.Add('ParameterSetValues',@{})
+                                $testCase.ParameterSetValues.Keys | ForEach-Object {
+                                    $newTestCase.ParameterSetValues[$_] = $testCase.ParameterSetValues[$_]
+                                }
+                                $newTestCase.ParameterSetValues[$parameterName] = $parameterValue
+                                $newTestCase.Add('ParameterValue',$parameterValue)
+                                $newTestCase.Add('ParameterName',$parameterName)
 
-                            $newTestCase
-
+                                $newTestCase
+                            }
                         }
                     }
             }
@@ -96,27 +98,29 @@ InModuleScope $script:subModuleName {
                 $parameterNames | ForEach-Object {
 
                     $parameterName = $_
-                    $parameterValues = $(Get-TestCaseValue -ScopeName $parameterName -TestCaseName 'Invalid')
+                    $parameterValues = $(Get-TestCaseValue -ScopeName $parameterName -TestCaseName 'Invalid' -First 1)
 
                     $parameterValues | ForEach-Object {
 
-                        $parameterValue = $_
+                        if ($testCase.ParameterSetValues.ContainsKey($parameterName)) # Only want to generate new records if 'ParameterName' is in the set of 'ParameterSetValues' keys
+                        {
+                            $parameterValue = $_
 
-                        $newTestCase = @{}
-                        $testCase.Keys | ForEach-Object {
-                            $newTestCase[$_] = $testCase[$_]
+                            $newTestCase = @{}
+                            $testCase.Keys | ForEach-Object {
+                                $newTestCase[$_] = $testCase[$_]
+                            }
+                            $newTestCase.Remove('ParameterSetValues')
+                            $newTestCase.Add('ParameterSetValues',@{})
+                            $testCase.ParameterSetValues.Keys | ForEach-Object {
+                                $newTestCase.ParameterSetValues[$_] = $testCase.ParameterSetValues[$_]
+                            }
+                            $newTestCase.ParameterSetValues[$parameterName] = $parameterValue
+                            $newTestCase.Add('ParameterValue',$parameterValue)
+                            $newTestCase.Add('ParameterName',$parameterName)
+
+                            $newTestCase
                         }
-                        $newTestCase.Remove('ParameterSetValues')
-                        $newTestCase.Add('ParameterSetValues',@{})
-                        $testCase.ParameterSetValues.Keys | ForEach-Object {
-                            $newTestCase.ParameterSetValues[$_] = $testCase.ParameterSetValues[$_]
-                        }
-                        $newTestCase.ParameterSetValues[$parameterName] = $parameterValue
-                        $newTestCase.Add('ParameterValue',$parameterValue)
-                        $newTestCase.Add('ParameterName',$parameterName)
-
-                        $newTestCase
-
                     }
                 }
         }
@@ -129,9 +133,15 @@ InModuleScope $script:subModuleName {
         Context "When validating function/command parameter sets" {
 
             BeforeEach {
-                Mock Invoke-RestMethod {}
+
+                Mock Invoke-RestMethod {
+                    return @{
+                        id = '14c15b78-b85d-401f-8095-504c57bbd79e'
+                    }
+                }
+
                 Mock Start-Sleep {}
-                Mock New-InvalidOperationException {}
+                #Mock New-InvalidOperationException {} # Don't mock this. Want exception to be thrown by it.
             }
 
             Context "When invoking function/command with 'Valid', parameter set values" {
@@ -139,12 +149,14 @@ InModuleScope $script:subModuleName {
                 It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $testCasesValidCommandParameterSetNames {
                     param([string]$CommandName, [Hashtable]$ParameterSetValues)
 
+                    Mock -CommandName $CommandName -MockWith {}
                     { & $CommandName @ParameterSetValues } | Should -Not -Throw
                 }
 
                 It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $testCasesValidCommandParameterSetNameValidParameterValues {
                     param([string]$CommandName, [Hashtable]$ParameterSetValues)
 
+                    Mock -CommandName $CommandName -MockWith {}
                     { & $CommandName @ParameterSetValues } | Should -Not -Throw
                 }
             }
@@ -152,17 +164,51 @@ InModuleScope $script:subModuleName {
 
             Context "When invoking function/command with 'Invalid', parameter set values" {
 
-                It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $testCasesInvalidCommandParameterSetNames {
-                    param([string]$CommandName, [Hashtable]$ParameterSetValues)
+                Context "When 'IsValid' parameter name is not present" {
 
-                    { & $CommandName @ParameterSetValues } | Should -Throw
+                    It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $($testCasesInvalidCommandParameterSetNames |
+                        Where-Object { $_.ParameterSetValuesKey -notlike '*IsValid*' })
+                    {
+                        param([string]$CommandName, [Hashtable]$ParameterSetValues)
+
+                        Mock -CommandName $CommandName -MockWith {}
+                        { & $CommandName @ParameterSetValues } | Should -Throw
+                    }
+
+                    It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset>" -TestCases $($testCasesInvalidCommandParameterSetNames |
+                        Where-Object { $_.ParameterSetValuesKey -notlike '*IsValid*' })
+                    {
+                        param([string]$CommandName, [Hashtable]$ParameterSetValues)
+
+                        Mock -CommandName $CommandName -MockWith {}
+                        { & $CommandName @ParameterSetValues } | Should -Throw
+                    }
                 }
 
-                It "Should throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $testCasesValidCommandParameterSetNameInvalidParameterValues {
-                    param([string]$CommandName, [Hashtable]$ParameterSetValues)
+                Context "When 'IsValid' parameter name is present" {
 
-                    { & $CommandName @ParameterSetValues } | Should -Throw
+                    # Don't want this to throw an exception - Typically they need to return a $false return value if input parameters are invalid.
+
+                    It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $($testCasesValidCommandParameterSetNameInvalidParameterValues |
+                        Where-Object { $_.ParameterSetValuesKey -like '*IsValid*' })
+                    {
+                        param([string]$CommandName, [Hashtable]$ParameterSetValues)
+
+                        Mock -CommandName $CommandName -MockWith {}
+                        { & $CommandName @ParameterSetValues } | Should -Not -Throw
+                    }
+
+                    It "Should not throw - '<CommandName>' - '<ParameterSetValuesKey>' - <ParameterSetValuesOffset> ('<ParameterName>' = '<ParameterValue>')" -TestCases $($testCasesValidCommandParameterSetNameInvalidParameterValues |
+                        Where-Object { $_.ParameterSetValuesKey -like '*IsValid*' })
+                    {
+                        param([string]$CommandName, [Hashtable]$ParameterSetValues)
+
+                        Mock -CommandName $CommandName -MockWith {}
+                        { & $CommandName @ParameterSetValues } | Should -Not -Throw
+                    }
+
                 }
+
 
             }
         }
