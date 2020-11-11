@@ -1,98 +1,100 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiResourceId' -Tag 'TestAzDevOpsApiResourceId' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
         $testCasesValidResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Valid'
-        $testCasesEmptyResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Empty'
         $testCasesInvalidResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Invalid'
 
-        Context 'When called with valid parameters' {
-            BeforeAll {
-            }
 
-            Context 'When called using "-IsValid" switch' {
+        Context 'When input parameters are valid' {
 
-                Context 'When called with valid "ResourceId" parameter' {
+
+            Context 'When called with "ResourceId" parameter value and the "IsValid" switch' {
+
+
+                Context 'When "ResourceId" parameter value is a valid "ResourceId"' {
 
                     It 'Should not throw - "<ResourceId>"' -TestCases $testCasesValidResourceIds {
-                        param ([string]$ResourceId)
+                        param ([System.String]$ResourceId)
 
                         { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ResourceId>"' -TestCases $testCasesValidResourceIds {
-                        param ([string]$ResourceId)
+                    It 'Should return $true' -TestCases $testCasesValidResourceIds {
+                        param ([System.String]$ResourceId)
 
-                        $result = Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid
-                        $result | Should -Be $true
+                        Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid | Should -BeTrue
                     }
                 }
 
-                Context 'When called with invalid "ResourceId" parameter' {
 
-                    It 'Should throw - "<ResourceId>"' -TestCases $testCasesEmptyResourceIds {
-                        param ([string]$ResourceId)
-
-                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid } | Should -Throw
-                    }
+                Context 'When "ResourceId" parameter value is an invalid "ResourceId"' {
 
                     It 'Should not throw - "<ResourceId>"' -TestCases $testCasesInvalidResourceIds {
-                        param ([string]$ResourceId)
+                        param ([System.String]$ResourceId)
 
                         { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ResourceId>"' -TestCases $testCasesInvalidResourceIds {
-                        param ([string]$ResourceId)
+                    It 'Should return $false' -TestCases $testCasesInvalidResourceIds {
+                        param ([System.String]$ResourceId)
 
-                        $result = Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid
-                        $result | Should -Be $false
+                        Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid | Should -BeFalse
                     }
                 }
-
             }
-
         }
 
-        Context 'When called with invalid parameters' {
-            BeforeAll {
+
+        Context "When input parameters are invalid" {
+
+
+            Context 'When called with no/null parameter values/switches' {
+
+                It 'Should throw' {
+                    param ([System.String]$ResourceId)
+
+                    { Test-AzDevOpsApiResourceId -ResourceId:$null } | Should -Throw
+                }
             }
 
-            Context 'When called without using "-IsValid" switch' {
 
-                Context 'When called with valid "ResourceId" parameter' {
+            Context 'When "ResourceId" parameter value is a valid "ResourceId"' {
+
+
+                Context 'When called with "ResourceId" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ResourceId>"' -TestCases $testCasesValidResourceIds {
-                        param ([string]$ResourceId)
+                        param ([System.String]$ResourceId)
 
                         { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid:$false } | Should -Throw
                     }
-
                 }
+            }
 
-                Context 'When called with invalid "ResourceId" parameter' {
 
-                    It 'Should throw - "<ResourceId>"' -TestCases $testCasesEmptyResourceIds {
-                        param ([string]$ResourceId)
+            Context 'When "ResourceId" parameter value is an invalid "ResourceId"' {
 
-                        { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid:$false } | Should -Throw
-                    }
+
+                Context 'When called with "ResourceId" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ResourceId>"' -TestCases $testCasesInvalidResourceIds {
-                        param ([string]$ResourceId)
+                        param ([System.String]$ResourceId)
 
                         { Test-AzDevOpsApiResourceId -ResourceId $ResourceId -IsValid:$false } | Should -Throw
                     }
-
                 }
-
             }
-        }
 
+
+        }
     }
 }
