@@ -90,13 +90,13 @@ function Wait-AzDevOpsApiResource
         [Parameter()]
         [ValidateRange(250,10000)]
         [Alias('Interval','IntervalMilliseconds')]
-        [System.UInt32]
+        [System.Int32]
         $WaitIntervalMilliseconds = $(Get-AzDevOpsApiWaitIntervalMs),
 
         [Parameter()]
         [ValidateRange(250,10000)]
         [Alias('Timeout','TimeoutMilliseconds')]
-        [System.UInt32]
+        [System.Int32]
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
 
         [Parameter(Mandatory = $true, ParameterSetName='IsPresent')]
