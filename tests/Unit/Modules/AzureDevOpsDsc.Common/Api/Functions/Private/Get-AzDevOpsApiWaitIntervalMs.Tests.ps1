@@ -3,14 +3,14 @@
 . $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
-InModuleScope $script:subModuleName {
+InModuleScope 'AzureDevOpsDsc.Common' {
 
     $script:dscModuleName = 'AzureDevOpsDsc'
     $script:moduleVersion = $(Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1).Version
     $script:subModuleName = 'AzureDevOpsDsc.Common'
     $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
     $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Resources\Functions\Private\$($script:commandName).ps1"
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Api\Functions\Private\$($script:commandName).ps1"
     $script:tag = @($($script:commandName -replace '-'))
 
     . $script:commandScriptPath
