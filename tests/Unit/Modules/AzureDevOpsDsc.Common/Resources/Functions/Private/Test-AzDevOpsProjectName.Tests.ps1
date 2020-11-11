@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidProjectNames {
+                    It 'Should return $true - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
                         param ([System.String]$ProjectName)
 
                         Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidProjectNames {
+                    It 'Should return $false - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
                         param ([System.String]$ProjectName)
 
                         Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeFalse

@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsPatCredential -PatCredential $PatCredential -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidPatCredentials {
+                    It 'Should return $true - "<PatCredential>"' -TestCases $testCasesValidPatCredentials {
                         param ([PSCredential]$PatCredential)
 
                         Test-AzDevOpsPatCredential -PatCredential $PatCredential -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsPatCredential -PatCredential $PatCredential -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidPatCredentials {
+                    It 'Should return $false - "<PatCredential>"' -TestCases $testCasesInvalidPatCredentials {
                         param ([PSCredential]$PatCredential)
 
                         Test-AzDevOpsPatCredential -PatCredential $PatCredential -IsValid | Should -BeFalse

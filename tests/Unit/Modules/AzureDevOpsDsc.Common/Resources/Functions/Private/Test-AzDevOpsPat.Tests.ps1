@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsPat -Pat $Pat -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidPats {
+                    It 'Should return $true - "<Pat>"' -TestCases $testCasesValidPats {
                         param ([System.String]$Pat)
 
                         Test-AzDevOpsPat -Pat $Pat -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsPat -Pat $Pat -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidPats {
+                    It 'Should return $false - "<Pat>"' -TestCases $testCasesInvalidPats {
                         param ([System.String]$Pat)
 
                         Test-AzDevOpsPat -Pat $Pat -IsValid | Should -BeFalse

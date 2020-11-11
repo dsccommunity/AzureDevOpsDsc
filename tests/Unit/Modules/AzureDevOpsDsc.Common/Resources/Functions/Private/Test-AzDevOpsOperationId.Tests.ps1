@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsOperationId -OperationId $OperationId -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidOperationIds {
+                    It 'Should return $true - "<OperationId>"' -TestCases $testCasesValidOperationIds {
                         param ([System.String]$OperationId)
 
                         Test-AzDevOpsOperationId -OperationId $OperationId -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsOperationId -OperationId $OperationId -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidOperationIds {
+                    It 'Should return $false - "<OperationId>"' -TestCases $testCasesInvalidOperationIds {
                         param ([System.String]$OperationId)
 
                         Test-AzDevOpsOperationId -OperationId $OperationId -IsValid | Should -BeFalse
