@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidApiVersions {
+                    It 'Should return $true - "<ApiVersion>"' -TestCases $testCasesValidApiVersions {
                         param ([System.String]$ApiVersion)
 
                         Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidApiVersions {
+                    It 'Should return $false - "<ApiVersion>"' -TestCases $testCasesInvalidApiVersions {
                         param ([System.String]$ApiVersion)
 
                         Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid | Should -BeFalse

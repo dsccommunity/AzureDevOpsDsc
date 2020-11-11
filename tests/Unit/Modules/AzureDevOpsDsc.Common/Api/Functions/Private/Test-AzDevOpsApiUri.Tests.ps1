@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidApiUris {
+                    It 'Should return $true - "<ApiUri>"' -TestCases $testCasesValidApiUris {
                         param ([System.String]$ApiUri)
 
                         Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidApiUris {
+                    It 'Should return $false - "<ApiUri>"' -TestCases $testCasesInvalidApiUris {
                         param ([System.String]$ApiUri)
 
                         Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid | Should -BeFalse

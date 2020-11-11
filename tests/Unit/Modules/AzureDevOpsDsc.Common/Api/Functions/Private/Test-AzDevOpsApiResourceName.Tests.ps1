@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidResourceNames {
+                    It 'Should return $true - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
                         param ([System.String]$ResourceName)
 
                         Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidResourceNames {
+                    It 'Should return $false - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
                         param ([System.String]$ResourceName)
 
                         Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid | Should -BeFalse

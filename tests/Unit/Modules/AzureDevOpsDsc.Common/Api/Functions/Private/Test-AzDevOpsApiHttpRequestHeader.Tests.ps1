@@ -28,7 +28,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $HttpRequestHeader -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true' -TestCases $testCasesValidHttpRequestHeaders {
+                    It 'Should return $true - "<HttpRequestHeader>"' -TestCases $testCasesValidHttpRequestHeaders {
                         param ([Hashtable]$HttpRequestHeader)
 
                         Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $HttpRequestHeader -IsValid | Should -BeTrue
@@ -44,7 +44,7 @@ InModuleScope $script:subModuleName {
                         { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $HttpRequestHeader -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false' -TestCases $testCasesInvalidHttpRequestHeaders {
+                    It 'Should return $false - "<HttpRequestHeader>"' -TestCases $testCasesInvalidHttpRequestHeaders {
                         param ([Hashtable]$HttpRequestHeader)
 
                         Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $HttpRequestHeader -IsValid | Should -BeFalse
