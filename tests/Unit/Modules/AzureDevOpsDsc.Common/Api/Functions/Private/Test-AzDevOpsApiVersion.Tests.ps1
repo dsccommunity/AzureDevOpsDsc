@@ -1,98 +1,100 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiVersion' -Tag 'TestAzDevOpsApiVersion' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
         $testCasesValidApiVersions = Get-TestCase -ScopeName 'ApiVersion' -TestCaseName 'Valid'
-        $testCasesEmptyApiVersions = Get-TestCase -ScopeName 'ApiVersion' -TestCaseName 'Empty'
         $testCasesInvalidApiVersions = Get-TestCase -ScopeName 'ApiVersion' -TestCaseName 'Invalid'
 
-        Context 'When called with valid parameters' {
-            BeforeAll {
-            }
 
-            Context 'When called using "-IsValid" switch' {
+        Context 'When input parameters are valid' {
 
-                Context 'When called with valid "ApiVersion" parameter' {
+
+            Context 'When called with "ApiVersion" parameter value and the "IsValid" switch' {
+
+
+                Context 'When "ApiVersion" parameter value is a valid "ApiVersion"' {
 
                     It 'Should not throw - "<ApiVersion>"' -TestCases $testCasesValidApiVersions {
-                        param ([string]$ApiVersion)
+                        param ([System.String]$ApiVersion)
 
                         { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ApiVersion>"' -TestCases $testCasesValidApiVersions {
-                        param ([string]$ApiVersion)
+                    It 'Should return $true' -TestCases $testCasesValidApiVersions {
+                        param ([System.String]$ApiVersion)
 
-                        $result = Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid
-                        $result | Should -Be $true
+                        Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid | Should -BeTrue
                     }
                 }
 
-                Context 'When called with invalid "ApiVersion" parameter' {
 
-                    It 'Should throw - "<ApiVersion>"' -TestCases $testCasesEmptyApiVersions {
-                        param ([string]$ApiVersion)
-
-                        { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid } | Should -Throw
-                    }
+                Context 'When "ApiVersion" parameter value is an invalid "ApiVersion"' {
 
                     It 'Should not throw - "<ApiVersion>"' -TestCases $testCasesInvalidApiVersions {
-                        param ([string]$ApiVersion)
+                        param ([System.String]$ApiVersion)
 
                         { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ApiVersion>"' -TestCases $testCasesInvalidApiVersions {
-                        param ([string]$ApiVersion)
+                    It 'Should return $false' -TestCases $testCasesInvalidApiVersions {
+                        param ([System.String]$ApiVersion)
 
-                        $result = Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid
-                        $result | Should -Be $false
+                        Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid | Should -BeFalse
                     }
                 }
-
             }
-
         }
 
-        Context 'When called with invalid parameters' {
-            BeforeAll {
+
+        Context "When input parameters are invalid" {
+
+
+            Context 'When called with no/null parameter values/switches' {
+
+                It 'Should throw' {
+                    param ([System.String]$ApiVersion)
+
+                    { Test-AzDevOpsApiVersion -ApiVersion:$null } | Should -Throw
+                }
             }
 
-            Context 'When called without using "-IsValid" switch' {
 
-                Context 'When called with valid "ApiVersion" parameter' {
+            Context 'When "ApiVersion" parameter value is a valid "ApiVersion"' {
+
+
+                Context 'When called with "ApiVersion" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ApiVersion>"' -TestCases $testCasesValidApiVersions {
-                        param ([string]$ApiVersion)
+                        param ([System.String]$ApiVersion)
 
                         { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid:$false } | Should -Throw
                     }
-
                 }
+            }
 
-                Context 'When called with invalid "ApiVersion" parameter' {
 
-                    It 'Should throw - "<ApiVersion>"' -TestCases $testCasesEmptyApiVersions {
-                        param ([string]$ApiVersion)
+            Context 'When "ApiVersion" parameter value is an invalid "ApiVersion"' {
 
-                        { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid:$false } | Should -Throw
-                    }
+
+                Context 'When called with "ApiVersion" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ApiVersion>"' -TestCases $testCasesInvalidApiVersions {
-                        param ([string]$ApiVersion)
+                        param ([System.String]$ApiVersion)
 
                         { Test-AzDevOpsApiVersion -ApiVersion $ApiVersion -IsValid:$false } | Should -Throw
                     }
-
                 }
-
             }
-        }
 
+
+        }
     }
 }
