@@ -42,8 +42,8 @@ function Test-AzDevOpsApiUri
         New-InvalidOperationException -Message $errorMessage
     }
 
-    if(($ApiUri -inotlike 'http://*' -and $ApiUri -inotlike 'https://*') -or
-       $ApiUri -inotlike '*/_apis/')
+    if (($ApiUri -inotlike 'http://*' -and $ApiUri -inotlike 'https://*') -or
+         $ApiUri -inotlike '*/_apis/')
        {
            return $false
        }

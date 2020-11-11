@@ -1,98 +1,100 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiUri' -Tag 'TestAzDevOpsApiUri' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
         $testCasesValidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Valid'
-        $testCasesEmptyApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Empty'
         $testCasesInvalidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Invalid'
 
-        Context 'When called with valid parameters' {
-            BeforeAll {
-            }
 
-            Context 'When called using "-IsValid" switch' {
+        Context 'When input parameters are valid' {
 
-                Context 'When called with valid "ApiUri" parameter' {
+
+            Context 'When called with "ApiUri" parameter value and the "IsValid" switch' {
+
+
+                Context 'When "ApiUri" parameter value is a valid "ApiUri"' {
 
                     It 'Should not throw - "<ApiUri>"' -TestCases $testCasesValidApiUris {
-                        param ([string]$ApiUri)
+                        param ([System.String]$ApiUri)
 
                         { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ApiUri>"' -TestCases $testCasesValidApiUris {
-                        param ([string]$ApiUri)
+                    It 'Should return $true' -TestCases $testCasesValidApiUris {
+                        param ([System.String]$ApiUri)
 
-                        $result = Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid
-                        $result | Should -Be $true
+                        Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid | Should -BeTrue
                     }
                 }
 
-                Context 'When called with invalid "ApiUri" parameter' {
 
-                    It 'Should throw - "<ApiUri>"' -TestCases $testCasesEmptyApiUris {
-                        param ([string]$ApiUri)
-
-                        { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid } | Should -Throw
-                    }
+                Context 'When "ApiUri" parameter value is an invalid "ApiUri"' {
 
                     It 'Should not throw - "<ApiUri>"' -TestCases $testCasesInvalidApiUris {
-                        param ([string]$ApiUri)
+                        param ([System.String]$ApiUri)
 
                         { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ApiUri>"' -TestCases $testCasesInvalidApiUris {
-                        param ([string]$ApiUri)
+                    It 'Should return $false' -TestCases $testCasesInvalidApiUris {
+                        param ([System.String]$ApiUri)
 
-                        $result = Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid
-                        $result | Should -Be $false
+                        Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid | Should -BeFalse
                     }
                 }
-
             }
-
         }
 
-        Context 'When called with invalid parameters' {
-            BeforeAll {
+
+        Context "When input parameters are invalid" {
+
+
+            Context 'When called with no/null parameter values/switches' {
+
+                It 'Should throw' {
+                    param ([System.String]$ApiUri)
+
+                    { Test-AzDevOpsApiUri -ApiUri:$null } | Should -Throw
+                }
             }
 
-            Context 'When called without using "-IsValid" switch' {
 
-                Context 'When called with valid "ApiUri" parameter' {
+            Context 'When "ApiUri" parameter value is a valid "ApiUri"' {
+
+
+                Context 'When called with "ApiUri" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ApiUri>"' -TestCases $testCasesValidApiUris {
-                        param ([string]$ApiUri)
+                        param ([System.String]$ApiUri)
 
                         { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid:$false } | Should -Throw
                     }
-
                 }
+            }
 
-                Context 'When called with invalid "ApiUri" parameter' {
 
-                    It 'Should throw - "<ApiUri>"' -TestCases $testCasesEmptyApiUris {
-                        param ([string]$ApiUri)
+            Context 'When "ApiUri" parameter value is an invalid "ApiUri"' {
 
-                        { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid:$false } | Should -Throw
-                    }
+
+                Context 'When called with "ApiUri" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ApiUri>"' -TestCases $testCasesInvalidApiUris {
-                        param ([string]$ApiUri)
+                        param ([System.String]$ApiUri)
 
                         { Test-AzDevOpsApiUri -ApiUri $ApiUri -IsValid:$false } | Should -Throw
                     }
-
                 }
-
             }
-        }
 
+
+        }
     }
 }
