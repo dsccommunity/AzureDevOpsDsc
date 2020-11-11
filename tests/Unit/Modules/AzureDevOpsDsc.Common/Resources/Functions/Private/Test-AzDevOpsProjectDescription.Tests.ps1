@@ -1,94 +1,99 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsProjectDescription' -Tag 'TestAzDevOpsProjectDescription' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
         $testCasesValidProjectDescriptions = Get-TestCase -ScopeName 'ProjectDescription' -TestCaseName 'Valid'
-        $testCasesEmptyProjectDescriptions = Get-TestCase -ScopeName 'ProjectDescription' -TestCaseName 'Empty'
         $testCasesInvalidProjectDescriptions = Get-TestCase -ScopeName 'ProjectDescription' -TestCaseName 'Invalid'
 
-        Context 'When called with valid parameters' {
-            BeforeAll {
-            }
 
-            Context 'When called using "-IsValid" switch' {
+        Context 'When input parameters are valid' {
 
-                Context 'When called with valid "ProjectDescription" parameter' {
+
+            Context 'When called with "ProjectDescription" parameter value and the "IsValid" switch' {
+
+
+                Context 'When "ProjectDescription" parameter value is a valid "ProjectDescription"' {
 
                     It 'Should not throw - "<ProjectDescription>"' -TestCases $testCasesValidProjectDescriptions {
-                        param ([string]$ProjectDescription)
+                        param ([System.String]$ProjectDescription)
 
                         { Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ProjectDescription>"' -TestCases $testCasesValidProjectDescriptions {
-                        param ([string]$ProjectDescription)
+                    It 'Should return $true' -TestCases $testCasesValidProjectDescriptions {
+                        param ([System.String]$ProjectDescription)
 
-                        $result = Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid
-                        $result | Should -Be $true
+                        Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid | Should -BeTrue
                     }
                 }
 
-                Context 'When called with invalid "ProjectDescription" parameter' {
+
+                Context 'When "ProjectDescription" parameter value is an invalid "ProjectDescription"' {
 
                     It 'Should not throw - "<ProjectDescription>"' -TestCases $testCasesInvalidProjectDescriptions {
-                        param ([string]$ProjectDescription)
+                        param ([System.String]$ProjectDescription)
 
                         { Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ProjectDescription>"' -TestCases $testCasesInvalidProjectDescriptions {
-                        param ([string]$ProjectDescription)
+                    It 'Should return $false' -TestCases $testCasesInvalidProjectDescriptions {
+                        param ([System.String]$ProjectDescription)
 
-                        $result = Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid
-                        $result | Should -Be $false
+                        Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid | Should -BeFalse
                     }
                 }
-
             }
-
         }
 
-        Context 'When called with invalid parameters' {
-            BeforeAll {
+
+        Context "When input parameters are invalid" {
+
+
+            Context 'When called with no/null parameter values/switches' {
+
+                It 'Should throw' {
+
+                    { Test-AzDevOpsProjectDescription -ProjectDescription:$null -IsValid:$false } | Should -Throw
+                }
             }
 
-            $testCasesValidProjectDescriptions = Get-TestCase -ScopeName 'ProjectDescription' -TestCaseName 'Valid'
 
-            Context 'When called without using "-IsValid" switch' {
+            Context 'When "ProjectDescription" parameter value is a valid "ProjectDescription"' {
 
-                Context 'When called with valid "ProjectDescription" parameter' {
+
+                Context 'When called with "ProjectDescription" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ProjectDescription>"' -TestCases $testCasesValidProjectDescriptions {
-                        param ([string]$ProjectDescription)
+                        param ([System.String]$ProjectDescription)
 
                         { Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid:$false } | Should -Throw
                     }
-
                 }
+            }
 
-                Context 'When called with invalid "ProjectDescription" parameter' {
 
-                    It 'Should throw - "<ProjectDescription>"' -TestCases $testCasesEmptyProjectDescriptions {
-                        param ([string]$ProjectDescription)
+            Context 'When "ProjectDescription" parameter value is an invalid "ProjectDescription"' {
 
-                        { Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid:$false } | Should -Throw
-                    }
+
+                Context 'When called with "ProjectDescription" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ProjectDescription>"' -TestCases $testCasesInvalidProjectDescriptions {
-                        param ([string]$ProjectDescription)
+                        param ([System.String]$ProjectDescription)
 
                         { Test-AzDevOpsProjectDescription -ProjectDescription $ProjectDescription -IsValid:$false } | Should -Throw
                     }
-
                 }
-
             }
-        }
 
+
+        }
     }
 }

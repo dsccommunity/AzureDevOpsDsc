@@ -1,100 +1,99 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsProjectName' -Tag 'TestAzDevOpsProjectName' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
         $testCasesValidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Valid'
-        $testCasesEmptyProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Empty'
         $testCasesInvalidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Invalid'
 
-        Context 'When called with valid parameters' {
-            BeforeAll {
-            }
 
-            Context 'When called using "-IsValid" switch' {
+        Context 'When input parameters are valid' {
 
-                Context 'When called with valid "ProjectName" parameter' {
+
+            Context 'When called with "ProjectName" parameter value and the "IsValid" switch' {
+
+
+                Context 'When "ProjectName" parameter value is a valid "ProjectName"' {
 
                     It 'Should not throw - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
-                        param ([string]$ProjectName)
+                        param ([System.String]$ProjectName)
 
                         { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
-                        param ([string]$ProjectName)
+                    It 'Should return $true' -TestCases $testCasesValidProjectNames {
+                        param ([System.String]$ProjectName)
 
-                        $result = Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid
-                        $result | Should -Be $true
+                        Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeTrue
                     }
                 }
 
-                Context 'When called with invalid "ProjectName" parameter' {
 
-                    It 'Should throw - "<ProjectName>"' -TestCases $testCasesEmptyProjectNames {
-                        param ([string]$ProjectName)
-
-                        { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Throw
-                    }
+                Context 'When "ProjectName" parameter value is an invalid "ProjectName"' {
 
                     It 'Should not throw - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
-                        param ([string]$ProjectName)
+                        param ([System.String]$ProjectName)
 
                         { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
-                        param ([string]$ProjectName)
+                    It 'Should return $false' -TestCases $testCasesInvalidProjectNames {
+                        param ([System.String]$ProjectName)
 
-                        $result = Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid
-                        $result | Should -Be $false
+                        Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeFalse
                     }
                 }
-
             }
-
         }
 
-        Context 'When called with invalid parameters' {
-            BeforeAll {
+
+        Context "When input parameters are invalid" {
+
+
+            Context 'When called with no/null parameter values/switches' {
+
+                It 'Should throw' {
+
+                    { Test-AzDevOpsProjectName -ProjectName:$null -IsValid:$false } | Should -Throw
+                }
             }
 
-            $testCasesValidProjectNames = Get-TestCase -ScopeName 'ProjectName' -TestCaseName 'Valid'
 
-            Context 'When called without using "-IsValid" switch' {
+            Context 'When "ProjectName" parameter value is a valid "ProjectName"' {
 
-                Context 'When called with valid "ProjectName" parameter' {
+
+                Context 'When called with "ProjectName" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
-                        param ([string]$ProjectName)
+                        param ([System.String]$ProjectName)
 
                         { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid:$false } | Should -Throw
                     }
-
                 }
+            }
 
-                Context 'When called with invalid "ProjectName" parameter' {
 
-                    It 'Should throw - "<ProjectName>"' -TestCases $testCasesEmptyProjectNames {
-                        param ([string]$ProjectName)
+            Context 'When "ProjectName" parameter value is an invalid "ProjectName"' {
 
-                        { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid:$false } | Should -Throw
-                    }
+
+                Context 'When called with "ProjectName" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
-                        param ([string]$ProjectName)
+                        param ([System.String]$ProjectName)
 
                         { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid:$false } | Should -Throw
                     }
-
                 }
-
             }
-        }
 
+
+        }
     }
 }
