@@ -71,13 +71,13 @@ function Wait-AzDevOpsOperation
         [Parameter()]
         [ValidateRange(250,10000)]
         [Alias('Interval','IntervalMilliseconds')]
-        [System.UInt32]
+        [System.Int32]
         $WaitIntervalMilliseconds = $(Get-AzDevOpsApiWaitIntervalMs),
 
         [Parameter()]
         [ValidateRange(250,10000)]
         [Alias('Timeout','TimeoutMilliseconds')]
-        [System.UInt32]
+        [System.Int32]
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
 
         [Parameter(Mandatory = $true, ParameterSetName='IsComplete')]
@@ -101,7 +101,7 @@ function Wait-AzDevOpsOperation
     }
 
 
-    [System.DateTime]$waitStartDateTime = [System.DateTime]::UtcNow
+    [System.DateTime]$waitStartDateTime = $(Get-Date).ToUniversalTime()
 
     $testOperationParameters = @{
         ApiUri      = $ApiUri
@@ -123,7 +123,7 @@ function Wait-AzDevOpsOperation
     {
         Start-Sleep -Milliseconds $WaitIntervalMilliseconds
 
-        if ($(New-TimeSpan -Start $waitStartDateTime -End $([System.DateTime]::UtcNow)).Milliseconds -gt $WaitTimeoutMilliseconds)
+        if (Test-AzDevOpsTimeoutExceeded -StartTime $waitStartDateTime -End $($(Get-Date).ToUniversalTime()) -TimeoutMs $WaitTimeoutMilliseconds )
         {
             $errorMessage = $script:localizedData.AzDevOpsOperationWaitTimeoutExceeded -f $MyInvocation.MyCommand, $OperationId, $WaitTimeoutMilliseconds
             New-InvalidOperationException -Message $errorMessage
