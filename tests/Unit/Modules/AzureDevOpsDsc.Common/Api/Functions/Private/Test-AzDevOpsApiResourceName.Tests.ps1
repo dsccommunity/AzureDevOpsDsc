@@ -1,110 +1,100 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsApiResourceName' -Tag 'TestAzDevOpsApiResourceName' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
         $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
-        $testCasesEmptyResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Empty'
         $testCasesInvalidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Invalid'
 
-        Context 'When validating, valid "ResourceName" test cases' {
 
-            It 'Should also be returned from "Get-AzDevOpsApiResourceName" function - <ResourceName>' -TestCases $testCasesValidResourceNames {
-                param ([string]$ResourceName)
+        Context 'When input parameters are valid' {
 
-                $($(Get-AzDevOpsApiResourceName |
-                    Where-Object { $_ -ceq $ResourceName})) | Should -Be $ResourceName
 
-            }
+            Context 'When called with "ResourceName" parameter value and the "IsValid" switch' {
 
-        }
 
-        Context 'When called with valid parameters' {
-            BeforeAll {
-            }
-
-            Context 'When called using "-IsValid" switch' {
-
-                Context 'When called with valid "ResourceName" parameter' {
+                Context 'When "ResourceName" parameter value is a valid "ResourceName"' {
 
                     It 'Should not throw - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
-                        param ([string]$ResourceName)
+                        param ([System.String]$ResourceName)
 
                         { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
-                        param ([string]$ResourceName)
+                    It 'Should return $true' -TestCases $testCasesValidResourceNames {
+                        param ([System.String]$ResourceName)
 
-                        $result = Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid
-                        $result | Should -Be $true
+                        Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid | Should -BeTrue
                     }
                 }
 
-                Context 'When called with invalid "ResourceName" parameter' {
 
-                    It 'Should throw - "<ResourceName>"' -TestCases $testCasesEmptyResourceNames {
-                        param ([string]$ResourceName)
-
-                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Throw
-                    }
+                Context 'When "ResourceName" parameter value is an invalid "ResourceName"' {
 
                     It 'Should not throw - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
-                        param ([string]$ResourceName)
+                        param ([System.String]$ResourceName)
 
                         { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
-                        param ([string]$ResourceName)
+                    It 'Should return $false' -TestCases $testCasesInvalidResourceNames {
+                        param ([System.String]$ResourceName)
 
-                        $result = Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid
-                        $result | Should -Be $false
+                        Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid | Should -BeFalse
                     }
                 }
-
             }
-
         }
 
-        Context 'When called with invalid parameters' {
-            BeforeAll {
+
+        Context "When input parameters are invalid" {
+
+
+            Context 'When called with no/null parameter values/switches' {
+
+                It 'Should throw' {
+                    param ([System.String]$ResourceName)
+
+                    { Test-AzDevOpsApiResourceName -ResourceName:$null } | Should -Throw
+                }
             }
 
-            Context 'When called without using "-IsValid" switch' {
 
-                Context 'When called with valid "ResourceName" parameter' {
+            Context 'When "ResourceName" parameter value is a valid "ResourceName"' {
+
+
+                Context 'When called with "ResourceName" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ResourceName>"' -TestCases $testCasesValidResourceNames {
-                        param ([string]$ResourceName)
+                        param ([System.String]$ResourceName)
 
                         { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid:$false } | Should -Throw
                     }
-
                 }
+            }
 
-                Context 'When called with invalid "ResourceName" parameter' {
 
-                    It 'Should throw - "<ResourceName>"' -TestCases $testCasesEmptyResourceNames {
-                        param ([string]$ResourceName)
+            Context 'When "ResourceName" parameter value is an invalid "ResourceName"' {
 
-                        { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid:$false } | Should -Throw
-                    }
+
+                Context 'When called with "ResourceName" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<ResourceName>"' -TestCases $testCasesInvalidResourceNames {
-                        param ([string]$ResourceName)
+                        param ([System.String]$ResourceName)
 
                         { Test-AzDevOpsApiResourceName -ResourceName $ResourceName -IsValid:$false } | Should -Throw
                     }
-
                 }
-
             }
-        }
 
+
+        }
     }
 }
