@@ -60,9 +60,8 @@ InModuleScope $script:subModuleName {
             Context 'When called with no/null parameter values/switches' {
 
                 It 'Should throw' {
-                    param ([System.String]$ApiVersion)
 
-                    { Test-AzDevOpsApiVersion -ApiVersion:$null } | Should -Throw
+                    { Test-AzDevOpsApiVersion -ApiVersion:$null -IsValid:$false } | Should -Throw
                 }
             }
 
