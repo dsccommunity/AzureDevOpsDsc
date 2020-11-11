@@ -1,100 +1,99 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
 InModuleScope $script:subModuleName {
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:tag = @($($script:commandName -replace '-'))
 
-    Describe 'AzureDevOpsDsc.Common\Test-AzDevOpsOrganizationName' -Tag 'TestAzDevOpsOrganizationName' {
+    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
         $testCasesValidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Valid'
-        $testCasesEmptyOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Empty'
         $testCasesInvalidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Invalid'
 
-        Context 'When called with valid parameters' {
-            BeforeAll {
-            }
 
-            Context 'When called using "-IsValid" switch' {
+        Context 'When input parameters are valid' {
 
-                Context 'When called with valid "OrganizationName" parameter' {
+
+            Context 'When called with "OrganizationName" parameter value and the "IsValid" switch' {
+
+
+                Context 'When "OrganizationName" parameter value is a valid "OrganizationName"' {
 
                     It 'Should not throw - "<OrganizationName>"' -TestCases $testCasesValidOrganizationNames {
-                        param ([string]$OrganizationName)
+                        param ([System.String]$OrganizationName)
 
                         { Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $true - "<OrganizationName>"' -TestCases $testCasesValidOrganizationNames {
-                        param ([string]$OrganizationName)
+                    It 'Should return $true' -TestCases $testCasesValidOrganizationNames {
+                        param ([System.String]$OrganizationName)
 
-                        $result = Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid
-                        $result | Should -Be $true
+                        Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid | Should -BeTrue
                     }
                 }
 
-                Context 'When called with invalid "OrganizationName" parameter' {
 
-                    It 'Should throw - "<OrganizationName>"' -TestCases $testCasesEmptyOrganizationNames {
-                        param ([string]$OrganizationName)
-
-                        { Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid } | Should -Throw
-                    }
+                Context 'When "OrganizationName" parameter value is an invalid "OrganizationName"' {
 
                     It 'Should not throw - "<OrganizationName>"' -TestCases $testCasesInvalidOrganizationNames {
-                        param ([string]$OrganizationName)
+                        param ([System.String]$OrganizationName)
 
                         { Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid } | Should -Not -Throw
                     }
 
-                    It 'Should return $false - "<OrganizationName>"' -TestCases $testCasesInvalidOrganizationNames {
-                        param ([string]$OrganizationName)
+                    It 'Should return $false' -TestCases $testCasesInvalidOrganizationNames {
+                        param ([System.String]$OrganizationName)
 
-                        $result = Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid
-                        $result | Should -Be $false
+                        Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid | Should -BeFalse
                     }
                 }
-
             }
-
         }
 
-        Context 'When called with invalid parameters' {
-            BeforeAll {
+
+        Context "When input parameters are invalid" {
+
+
+            Context 'When called with no/null parameter values/switches' {
+
+                It 'Should throw' {
+
+                    { Test-AzDevOpsOrganizationName -OrganizationName:$null -IsValid:$false } | Should -Throw
+                }
             }
 
-            $testCasesValidOrganizationNames = Get-TestCase -ScopeName 'OrganizationName' -TestCaseName 'Valid'
 
-            Context 'When called without using "-IsValid" switch' {
+            Context 'When "OrganizationName" parameter value is a valid "OrganizationName"' {
 
-                Context 'When called with valid "OrganizationName" parameter' {
+
+                Context 'When called with "OrganizationName" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<OrganizationName>"' -TestCases $testCasesValidOrganizationNames {
-                        param ([string]$OrganizationName)
+                        param ([System.String]$OrganizationName)
 
                         { Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid:$false } | Should -Throw
                     }
-
                 }
+            }
 
-                Context 'When called with invalid "OrganizationName" parameter' {
 
-                    It 'Should throw - "<OrganizationName>"' -TestCases $testCasesEmptyOrganizationNames {
-                        param ([string]$OrganizationName)
+            Context 'When "OrganizationName" parameter value is an invalid "OrganizationName"' {
 
-                        { Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid:$false } | Should -Throw
-                    }
+
+                Context 'When called with "OrganizationName" parameter value but a $false "IsValid" switch value' {
 
                     It 'Should throw - "<OrganizationName>"' -TestCases $testCasesInvalidOrganizationNames {
-                        param ([string]$OrganizationName)
+                        param ([System.String]$OrganizationName)
 
                         { Test-AzDevOpsOrganizationName -OrganizationName $OrganizationName -IsValid:$false } | Should -Throw
                     }
-
                 }
-
             }
-        }
 
+
+        }
     }
 }
