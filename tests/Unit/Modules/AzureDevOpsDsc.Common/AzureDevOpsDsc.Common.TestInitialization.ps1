@@ -12,18 +12,11 @@ if (-not (Test-BuildCategory -Type 'Unit'))
 }
 
 $script:dscModuleName = 'AzureDevOpsDsc'
+$script:dscModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
+$script:dscModuleFile = $($script:dscModule.ModuleBase +'\'+ $script:dscModuleName + ".psd1")
 $script:subModuleName = 'AzureDevOpsDsc.Common'
+Import-Module -Name $script:dscModuleFile -Force -Verbose
 
-#region HEADER
-Remove-Module -Name $script:subModuleName -Force -ErrorAction 'SilentlyContinue'
-
-$script:parentModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
-$script:subModulesFolder = Join-Path -Path $script:parentModule.ModuleBase -ChildPath 'Modules'
-
-$script:subModulePath = Join-Path -Path $script:subModulesFolder -ChildPath $script:subModuleName
-
-Import-Module -Name $script:subModulePath -Force -ErrorAction 'Stop'
-#endregion HEADER
-
-# Loading mocked classes
-#Add-Type -Path (Join-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Stubs') -ChildPath 'SomeExampleMockedClass.cs')
+$script:subModulesFolder = Join-Path -Path $script:dscModule.ModuleBase -ChildPath 'Modules'
+$script:subModuleFile = Join-Path $script:subModulesFolder "$($script:subModuleName)/$($script:subModuleName).psd1"
+Import-Module -Name $script:subModuleFile -Force -Verbose
