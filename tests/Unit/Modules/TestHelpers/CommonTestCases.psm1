@@ -259,9 +259,8 @@ function Get-TestCaseValue
             New-Object System.Management.Automation.PSCredential ($PatCredentialUsername, $PatSecure)
         }
 
-        Empty            = $testCaseValues.String.Empty
+        Empty            = @([PSCredential]::Empty)
         Null             = $testCaseValues.String.Null
-        NullOrWhitespace = $testCaseValues.String.NullOrWhitespace
 
     }
 
@@ -274,14 +273,20 @@ function Get-TestCaseValue
             $Pat = $_
             @{
                 Authorization = 'Basic ' +
-                        [Convert]::ToBase64String(
-                            [Text.Encoding]::ASCII.GetBytes(":$Pat"))
+                    [Convert]::ToBase64String(
+                        [Text.Encoding]::ASCII.GetBytes(":$Pat"))
             }
         }
 
         Invalid = @(
-            @{}
-        ) + $testCaseValues.String.NullOrWhitespace
+            @{},
+            @{
+                # Note: Spelled with an 's'
+                Authorisation = 'Basic ' +
+                    [Convert]::ToBase64String(
+                        [Text.Encoding]::ASCII.GetBytes(":$Pat"))
+            }
+        )
 
         Empty            = $testCaseValues.String.Empty
         Null             = $testCaseValues.String.Null
