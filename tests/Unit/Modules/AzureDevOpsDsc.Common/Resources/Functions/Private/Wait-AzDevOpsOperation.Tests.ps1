@@ -3,7 +3,7 @@
 . $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
-InModuleScope $script:subModuleName {
+InModuleScope 'AzureDevOpsDsc.Common' {
 
     $script:dscModuleName = 'AzureDevOpsDsc'
     $script:moduleVersion = $(Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1).Version
