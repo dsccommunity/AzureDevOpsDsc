@@ -60,9 +60,8 @@ InModuleScope $script:subModuleName {
             Context 'When called with no/null parameter values/switches' {
 
                 It 'Should throw' {
-                    param ([Hashtable]$HttpRequestHeader)
 
-                    { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader:$null } | Should -Throw
+                    { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader:$null -IsValid:$false } | Should -Throw
                 }
             }
 

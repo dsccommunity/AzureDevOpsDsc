@@ -60,9 +60,8 @@ InModuleScope $script:subModuleName {
             Context 'When called with no/null parameter values/switches' {
 
                 It 'Should throw' {
-                    param ([System.String]$ResourceId)
 
-                    { Test-AzDevOpsApiResourceId -ResourceId:$null } | Should -Throw
+                    { Test-AzDevOpsApiResourceId -ResourceId:$null -IsValid:$false } | Should -Throw
                 }
             }
 
