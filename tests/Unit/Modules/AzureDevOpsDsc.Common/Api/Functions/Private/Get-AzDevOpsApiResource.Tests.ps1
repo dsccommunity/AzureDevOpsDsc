@@ -128,31 +128,35 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                 It 'Should invoke "Get-AzDevOpsApiResourceUri" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
                     param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
 
-                    Mock Get-AzDevOpsApiResourceUri {} -Verifiable
+                    Mock Get-AzDevOpsApiResourceUri {
+                        return "http://someUri.api/"
+                    } -Verifiable
 
                     $resources = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
 
-                    Assert-MockCalled 'Get-AzDevOpsApiResourceUri' -Times 1 -Exactly
+                    Assert-MockCalled 'Get-AzDevOpsApiResourceUri' -Times 1 -Exactly -Scope 'It'
                 }
 
-                It 'Should invoke "Get-AzDevOpsApiResourceUri" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                It 'Should invoke "Get-AzDevOpsApiHttpRequestHeader" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
                     param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
 
-                    Mock Get-AzDevOpsApiHttpRequestHeader {} -Verifiable
+                    Mock Get-AzDevOpsApiHttpRequestHeader {
+                        Get-TestCaseValue -ScopeName 'HttpRequestHeader' -TestCaseName 'Valid' -First 1
+                    } -Verifiable
 
-                    $resources = Get-AzDevOpsApiHttpRequestHeader -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
+                    $resources = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
 
-                    Assert-MockCalled 'Get-AzDevOpsApiHttpRequestHeader' -Times 1 -Exactly
+                    Assert-MockCalled 'Get-AzDevOpsApiHttpRequestHeader' -Times 1 -Exactly -Scope 'It'
                 }
 
-                It 'Should invoke "Get-AzDevOpsApiResourceUri" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                It 'Should invoke "Invoke-RestMethod" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
                     param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
 
                     Mock Invoke-RestMethod {} -Verifiable
 
-                    $resources = Invoke-RestMethod -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
+                    $resources = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
 
-                    Assert-MockCalled 'Invoke-RestMethod' -Times 1 -Exactly
+                    Assert-MockCalled 'Invoke-RestMethod' -Times 1 -Exactly -Scope 'It'
                 }
 
             }
