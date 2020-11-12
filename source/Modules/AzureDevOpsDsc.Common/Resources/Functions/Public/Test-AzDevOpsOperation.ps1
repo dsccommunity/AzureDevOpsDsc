@@ -72,10 +72,12 @@ function Test-AzDevOpsOperation
         $OperationId,
 
         [Parameter(Mandatory = $true, ParameterSetName='IsComplete')]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsComplete,
 
         [Parameter(Mandatory = $true, ParameterSetName='IsSuccessful')]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsSuccessful
     )
@@ -92,8 +94,8 @@ function Test-AzDevOpsOperation
     }
 
 
-    [object[]]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
-                                                 -OperationId $OperationId
+    [System.Management.Automation.PSObject]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
+                                                                              -OperationId $OperationId
 
 
     # Reference: https://docs.microsoft.com/en-us/rest/api/azure/devops/operations/operations/get?view=azure-devops-rest-6.0#operationstatus
