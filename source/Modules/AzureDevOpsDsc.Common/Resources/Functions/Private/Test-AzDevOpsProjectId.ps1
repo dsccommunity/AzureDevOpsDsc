@@ -36,10 +36,5 @@ function Test-AzDevOpsProjectId
         $IsValid
     )
 
-    if (!(Test-AzDevOpsApiResourceId -ResourceId $ProjectId -IsValid:$IsValid))
-    {
-        return $false
-    }
-
-    return $true
+    return $(Test-AzDevOpsApiResourceId -ResourceId $ProjectId -IsValid:$IsValid)
 }

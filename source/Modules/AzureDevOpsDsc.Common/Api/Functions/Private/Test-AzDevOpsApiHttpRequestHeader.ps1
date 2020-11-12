@@ -36,12 +36,7 @@ function Test-AzDevOpsApiHttpRequestHeader
         $IsValid
     )
 
-    if ($null -eq $HttpRequestHeader -or
-        $null -eq $HttpRequestHeader.Authorization -or
-        $HttpRequestHeader.Authorization -inotlike 'Basic *')
-    {
-        return $false
-    }
-
-    return $true
+    return !($null -eq $HttpRequestHeader -or
+             $null -eq $HttpRequestHeader.Authorization -or
+             $HttpRequestHeader.Authorization -inotlike 'Basic *')
 }

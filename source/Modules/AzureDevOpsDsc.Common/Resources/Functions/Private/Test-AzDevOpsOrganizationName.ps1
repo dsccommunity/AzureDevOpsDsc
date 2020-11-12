@@ -36,11 +36,10 @@ function Test-AzDevOpsOrganizationName
         $IsValid
     )
 
-    if ([System.String]::IsNullOrWhiteSpace($OrganizationName) -or
-        ($OrganizationName.Contains(' ') -or $OrganizationName.Contains('%') -or $OrganizationName.Contains('*') -or $OrganizationName.StartsWith(' ') -or $OrganizationName.EndsWith(' ')))
-    {
-        return $false
-    }
-
-    return $true
+    return !([System.String]::IsNullOrWhiteSpace($OrganizationName) -or
+             ($OrganizationName.Contains(' ') -or
+             $OrganizationName.Contains('%') -or
+             $OrganizationName.Contains('*') -or
+             $OrganizationName.StartsWith(' ') -or
+             $OrganizationName.EndsWith(' ')))
 }
