@@ -100,10 +100,12 @@ function Wait-AzDevOpsApiResource
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
 
         [Parameter(Mandatory = $true, ParameterSetName='IsPresent')]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsPresent,
 
         [Parameter(Mandatory = $true, ParameterSetName='IsAbsent')]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsAbsent
     )
@@ -120,7 +122,7 @@ function Wait-AzDevOpsApiResource
     }
 
 
-    [System.DateTime]$waitStartDateTime = [System.DateTime]::UtcNow
+    [System.DateTime]$waitStartDateTime = $(Get-Date).ToUniversalTime()
 
     [bool]$testAzDevOpsApiResource = Test-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
                                                               -ResourceName $ResourceName `
@@ -134,7 +136,7 @@ function Wait-AzDevOpsApiResource
     {
         Start-Sleep -Milliseconds $WaitIntervalMilliseconds
 
-        if ($(New-TimeSpan -Start $waitStartDateTime -End $([System.DateTime]::UtcNow)).Milliseconds -gt $WaitTimeoutMilliseconds)
+        if (Test-AzDevOpsApiTimeoutExceeded -StartTime $waitStartDateTime -End $($(Get-Date).ToUniversalTime()) -TimeoutMs $WaitTimeoutMilliseconds )
         {
             $errorMessage = $script:localizedData.AzDevOpsApiResourceWaitTimeoutExceeded -f $MyInvocation.MyCommand, $ResourceName, $ResourceId, $WaitTimeoutMilliseconds
             New-InvalidOperationException -Message $errorMessage
