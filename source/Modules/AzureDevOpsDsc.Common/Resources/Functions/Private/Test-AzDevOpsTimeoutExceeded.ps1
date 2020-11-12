@@ -42,9 +42,10 @@ function Test-AzDevOpsTimeoutExceeded
         $EndTime,
 
         [Parameter(Mandatory = $true)]
+        [ValidateRange(250,10000)]
         [Int32]
         $TimeoutMs
     )
 
-    return $($(New-TimeSpan -Start $StartTime -End $EndTime).Milliseconds -gt $TimeoutMs)
+    return $($(New-TimeSpan -Start $StartTime -End $EndTime).TotalMilliseconds -gt $TimeoutMs)
 }
