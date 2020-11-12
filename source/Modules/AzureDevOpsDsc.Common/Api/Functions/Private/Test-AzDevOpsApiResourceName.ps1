@@ -36,12 +36,6 @@ function Test-AzDevOpsApiResourceName
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
 
     if (!($(Get-AzDevOpsApiResourceName).Contains($ResourceName)))
     {

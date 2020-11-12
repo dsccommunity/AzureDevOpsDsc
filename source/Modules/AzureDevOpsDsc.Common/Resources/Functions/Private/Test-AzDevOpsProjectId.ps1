@@ -36,12 +36,6 @@ function Test-AzDevOpsProjectId
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
     if (!(Test-AzDevOpsApiResourceId -ResourceId $ProjectId -IsValid:$IsValid))
     {
         return $false

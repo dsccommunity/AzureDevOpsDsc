@@ -36,12 +36,6 @@ function Test-AzDevOpsProjectName
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
     if ([System.String]::IsNullOrWhiteSpace($ProjectName) -or
         ($ProjectName.Contains('%') -or $ProjectName.Contains('*') -or $ProjectName.StartsWith(' ') -or $ProjectName.EndsWith(' ')))
     {

@@ -36,12 +36,6 @@ function Test-AzDevOpsApiResourceId
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
 
     if (![guid]::TryParse($ResourceId, $([ref][guid]::Empty)))
     {
