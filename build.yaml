@@ -61,12 +61,14 @@ BuildWorkflow:
 Pester:
   OutputFormat: NUnitXML
   ExcludeFromCodeCoverage:
+    - Modules/DscResource.Common
   Script:
     - tests/Unit
-    - tests/Integration
   ExcludeTag:
   Tag:
   CodeCoverageThreshold: 85
+  CodeCoverageOutputFile: JaCoCo_coverage.xml
+  CodeCoverageOutputFileEncoding: ascii
 
 DscTest:
   ExcludeTag:
