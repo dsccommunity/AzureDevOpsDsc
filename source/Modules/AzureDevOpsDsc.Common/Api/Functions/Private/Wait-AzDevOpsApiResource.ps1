@@ -110,18 +110,6 @@ function Wait-AzDevOpsApiResource
         $IsAbsent
     )
 
-    if (!$IsPresent -and !$IsAbsent)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsPresentAndIsAbsentSwitchesNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-    elseif ($IsPresent -and $IsAbsent)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsPresentAndIsAbsentSwitchesBothUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
-
     [System.DateTime]$waitStartDateTime = $(Get-Date).ToUniversalTime()
 
     [bool]$testAzDevOpsApiResource = Test-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
