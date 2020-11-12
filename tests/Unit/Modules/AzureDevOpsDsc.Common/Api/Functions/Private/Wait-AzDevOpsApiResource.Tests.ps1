@@ -41,6 +41,8 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             $testCasesValidResourceIds) -Expand
         $testCasesValidApiUriPatResourceIds3 = $testCasesValidApiUriPatResourceIds | Select-Object -First 3
 
+        $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid'
+
         # Generate invalid, test cases
         $testCasesInvalidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Invalid'
         $testCasesInvalidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Invalid'
@@ -50,6 +52,8 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             $testCasesInvalidPats,
             $testCasesInvalidResourceIds) -Expand
         $testCasesInvalidApiUriPatResourceIds3 = $testCasesInvalidApiUriPatResourceIds | Select-Object -First 3
+
+        $invalidApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Invalid'
 
 
         Context 'When input parameters are valid' {
@@ -103,6 +107,23 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         Assert-MockCalled 'Get-AzDevOpsApiWaitTimeoutMs' -Times 1 -Exactly -Scope It
                     }
 
+                    Context "When also called with valid 'ApiVersion' parameter value" {
+
+                        It "Should not throw - '<ApiUri>', '<Pat>', '<ResourceId>'" -TestCases $testCasesValidApiUriPatResourceIds3 {
+                            param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceId )
+
+                            { Wait-AzDevOpsApiResource -ApiUri $ApiUri -ApiVersion $validApiVersion -Pat $Pat -ResourceName 'Project' -ResourceId $ResourceId -IsPresent } | Should -Not -Throw
+                        }
+                    }
+
+                    Context "When also called with invalid 'ApiVersion' parameter value" {
+
+                        It "Should throw - '<ApiUri>', '<Pat>', '<ResourceId>'" -TestCases $testCasesValidApiUriPatResourceIds3 {
+                            param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceId )
+
+                            { Wait-AzDevOpsApiResource -ApiUri $ApiUri -ApiVersion $invalidApiVersion -Pat $Pat -ResourceName 'Project' -ResourceId $ResourceId -IsPresent } | Should -Throw
+                        }
+                    }
 
                     Context "When 'Test-AzDevOpsApiResource' returns true" {
 
@@ -346,6 +367,26 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         Wait-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName 'Project' -ResourceId $ResourceId -IsAbsent
 
                         Assert-MockCalled 'Get-AzDevOpsApiWaitTimeoutMs' -Times 1 -Exactly -Scope It
+                    }
+
+
+                    Context "When also called with valid 'ApiVersion' parameter value" {
+
+                        It "Should not throw - '<ApiUri>', '<Pat>', '<ResourceId>'" -TestCases $testCasesValidApiUriPatResourceIds3 {
+                            param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceId )
+
+                            { Wait-AzDevOpsApiResource -ApiUri $ApiUri -ApiVersion $validApiVersion -Pat $Pat -ResourceName 'Project' -ResourceId $ResourceId -IsAbsent } | Should -Not -Throw
+                        }
+                    }
+
+
+                    Context "When also called with invalid 'ApiVersion' parameter value" {
+
+                        It "Should throw - '<ApiUri>', '<Pat>', '<ResourceId>'" -TestCases $testCasesValidApiUriPatResourceIds3 {
+                            param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceId )
+
+                            { Wait-AzDevOpsApiResource -ApiUri $ApiUri -ApiVersion $invalidApiVersion -Pat $Pat -ResourceName 'Project' -ResourceId $ResourceId -IsAbsent } | Should -Throw
+                        }
                     }
 
 
