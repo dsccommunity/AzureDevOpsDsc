@@ -24,48 +24,49 @@ InModuleScope 'AzureDevOpsDsc.Common' {
         # Helper function for generating fake resource, JSON response
         Function Get-MockResourceJson
         {
-            param
-            (
-                [System.String]
-                $ResourceId
-            )
-
             return '{
-                        "count": 2,
+                        "count": 3,
                         "value": [
                             {
-                                "id": "$ResourceId",
+                                "id": "8d4bff8d-6169-45cf-b085-fe12ad67e76b",
                                 "name": "Test Resource 1",
                                 "description": "Test Resource Description 1",
-                                "url": "https://dev.azure.com/fabrikam/_apis/resources/$ResourceId",
+                                "url": "https://dev.azure.com/fabrikam/_apis/resources/8d4bff8d-6169-45cf-b085-fe12ad67e76b",
                                 "state": "wellFormed"
                             },
                             {
-                                "id": "8d4bff8d-6169-45cf-b085-fe12ad67e76b",
+                                "id": "114bff8d-6169-45cf-b085-fe121267e7aa",
                                 "name": "Test Resource 2",
                                 "description": "Test Resource Description 2",
-                                "url": "https://dev.azure.com/fabrikam/_apis/resources/8d4bff8d-6169-45cf-b085-fe12ad67e76b",
+                                "url": "https://dev.azure.com/fabrikam/_apis/resources/114bff8d-6169-45cf-b085-fe121267e7aa",
+                                "state": "wellFormed"
+                            },
+                            {
+                                "id": "a654b805-6be9-477b-a00c-bd76949192c3",
+                                "name": "Test Resource 3",
+                                "description": "Test Resource Description 3",
+                                "url": "https://dev.azure.com/fabrikam/_apis/resources/a654b805-6be9-477b-a00c-bd76949192c3",
                                 "state": "wellFormed"
                             }
                         ]
                     }'
         }
-        $noOfMockResources = $(Get-MockResourceJson -ResourceId $([GUID]::NewGuid()) | ConvertFrom-Json).Count
-        $resourceIdThatExists = '8d4bff8d-6169-45cf-b085-fe12ad67e76b'
-        $resourceIdThatDoesNotExist = '114bff8d-6169-45cf-b085-fe121267e7aa'
+        $noOfMockResources = $((Get-MockResourceJson | ConvertFrom-Json).value).Count
+        $resourceIdThatExists = '8d4bff8d-6169-45cf-b085-fe12ad67e76b'       # Same as 'Test Resource 1' in 'Get-MockResourceJson', JSON output
+        $resourceIdThatDoesNotExist = '7f5a49c8-9424-4ec5-b4b7-1dc76cd05149'
         $resourceIdThatIsInvalid = Get-TestCaseValue -ScopeName 'ResourceId' -TestCaseName 'Invalid'
 
         # Mock functions called in function
         Mock Invoke-RestMethod {
 
-            $resources = Get-MockResourceJson -ResourceId $ResourceId | ConvertFrom-Json
-            $nonPresentResourceId = $resourceIdThatDoesNotExist
+            #$resourceIdThatExists = '8d4bff8d-6169-45cf-b085-fe12ad67e76b'
+            [PSObject]$resources = Get-MockResourceJson | ConvertFrom-Json
 
             if (![string]::IsNullOrWhiteSpace($ResourceId))
             {
-                $resources = $resources.value |
-                    Where-Object { $_.id -eq $ResourceId} |
-                    Where-Object { $_.id -ne $nonPresentResourceId}
+                [PSObject[]]$resources = $resources.value
+                [PSObject]$resources = $resources |
+                    Where-Object { $_.id -eq $ResourceId}
             }
 
             return $resources
@@ -123,6 +124,37 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                     $resources.Count | Should -Be $noOfMockResources
                 }
+
+                It 'Should invoke "Get-AzDevOpsApiResourceUri" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                    param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
+
+                    Mock Get-AzDevOpsApiResourceUri {} -Verifiable
+
+                    $resources = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
+
+                    Assert-MockCalled 'Get-AzDevOpsApiResourceUri' -Times 1 -Exactly
+                }
+
+                It 'Should invoke "Get-AzDevOpsApiResourceUri" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                    param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
+
+                    Mock Get-AzDevOpsApiHttpRequestHeader {} -Verifiable
+
+                    $resources = Get-AzDevOpsApiHttpRequestHeader -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
+
+                    Assert-MockCalled 'Get-AzDevOpsApiHttpRequestHeader' -Times 1 -Exactly
+                }
+
+                It 'Should invoke "Get-AzDevOpsApiResourceUri" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                    param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
+
+                    Mock Invoke-RestMethod {} -Verifiable
+
+                    $resources = Invoke-RestMethod -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
+
+                    Assert-MockCalled 'Invoke-RestMethod' -Times 1 -Exactly
+                }
+
             }
 
 
@@ -153,12 +185,20 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         $true | Should -Be $true # Note: Will always evaluate true (but strong-typing of $resources variable would fail this test anyway)
                     }
 
-                    It 'Should return only 1 resource - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                    It 'Should not return a $null - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
                         param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
 
-                        [System.Management.Automation.PsObject[]]$resources = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName -ResourceId $resourceIdThatExists
+                        [System.Management.Automation.PsObject]$resource = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName -ResourceId $resourceIdThatExists
 
-                        $resources.Count | Should -Be 1
+                        $resource | Should -Not -BeNullOrEmpty
+                    }
+
+                    It 'Should return a resource with the correct "id"/"ResourceId" - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                        param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
+
+                        [System.Management.Automation.PsObject]$resource = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName -ResourceId $resourceIdThatExists
+
+                        $resource.id | Should -Be $resourceIdThatExists
                     }
                 }
 
