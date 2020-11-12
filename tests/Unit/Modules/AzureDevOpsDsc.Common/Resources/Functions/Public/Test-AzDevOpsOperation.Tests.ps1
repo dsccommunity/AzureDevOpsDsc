@@ -231,54 +231,5 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             }
 
         }
-
-
-
-
-
-
-
-
-        Context "When input parameters are invalid" {
-
-
-            Context 'When called with no/null parameter values/switches' {
-
-                It 'Should throw' {
-
-                    { Test-AzDevOpsProjectName -ProjectName:$null -IsValid:$false } | Should -Throw
-                }
-            }
-
-
-            Context 'When "ProjectName" parameter value is a valid "ProjectName"' {
-
-
-                Context 'When called with "ProjectName" parameter value but a $false "IsValid" switch value' {
-
-                    It 'Should throw - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
-                        param ([System.String]$ProjectName)
-
-                        { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid:$false } | Should -Throw
-                    }
-                }
-            }
-
-
-            Context 'When "ProjectName" parameter value is an invalid "ProjectName"' {
-
-
-                Context 'When called with "ProjectName" parameter value but a $false "IsValid" switch value' {
-
-                    It 'Should throw - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
-                        param ([System.String]$ProjectName)
-
-                        { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid:$false } | Should -Throw
-                    }
-                }
-            }
-
-
-        }
     }
 }
