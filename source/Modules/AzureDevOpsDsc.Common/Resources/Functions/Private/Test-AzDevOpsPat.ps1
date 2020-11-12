@@ -36,11 +36,6 @@ function Test-AzDevOpsPat
         $IsValid
     )
 
-    if ([System.String]::IsNullOrWhiteSpace($Pat) -or
-        $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
-    {
-        return $false
-    }
-
-    return $true
+    return !([System.String]::IsNullOrWhiteSpace($Pat) -or
+             $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
 }

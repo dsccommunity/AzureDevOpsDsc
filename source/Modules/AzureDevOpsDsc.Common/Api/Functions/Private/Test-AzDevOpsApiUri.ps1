@@ -36,11 +36,7 @@ function Test-AzDevOpsApiUri
         $IsValid
     )
 
-    if (($ApiUri -inotlike 'http://*' -and $ApiUri -inotlike 'https://*') -or
-         $ApiUri -inotlike '*/_apis/')
-       {
-           return $false
-       }
-
-    return $true
+    return !(($ApiUri -inotlike 'http://*' -and
+              $ApiUri -inotlike 'https://*') -or
+             $ApiUri -inotlike '*/_apis/')
 }

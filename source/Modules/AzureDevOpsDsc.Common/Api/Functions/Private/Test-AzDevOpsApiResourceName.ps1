@@ -37,11 +37,5 @@ function Test-AzDevOpsApiResourceName
     )
 
 
-    if (!($(Get-AzDevOpsApiResourceName).Contains($ResourceName)))
-    {
-        return $false
-    }
-
-
-    return $true
+    return !(!($(Get-AzDevOpsApiResourceName).Contains($ResourceName)))
 }

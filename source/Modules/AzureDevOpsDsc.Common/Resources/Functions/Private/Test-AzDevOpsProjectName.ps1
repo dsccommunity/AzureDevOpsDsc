@@ -36,11 +36,9 @@ function Test-AzDevOpsProjectName
         $IsValid
     )
 
-    if ([System.String]::IsNullOrWhiteSpace($ProjectName) -or
-        ($ProjectName.Contains('%') -or $ProjectName.Contains('*') -or $ProjectName.StartsWith(' ') -or $ProjectName.EndsWith(' ')))
-    {
-        return $false
-    }
-
-    return $true
+    return !([System.String]::IsNullOrWhiteSpace($ProjectName) -or
+             ($ProjectName.Contains('%') -or
+              $ProjectName.Contains('*') -or
+              $ProjectName.StartsWith(' ') -or
+              $ProjectName.EndsWith(' ')))
 }

@@ -41,10 +41,5 @@ function Test-AzDevOpsApiVersion
         '6.0'
     )
 
-    if (!$supportedApiVersions.Contains($ApiVersion))
-    {
-        return $false
-    }
-
-    return $true
+    return !(!$supportedApiVersions.Contains($ApiVersion))
 }

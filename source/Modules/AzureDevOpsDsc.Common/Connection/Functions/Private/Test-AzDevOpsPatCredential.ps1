@@ -37,11 +37,6 @@ function Test-AzDevOpsPatCredential
         $IsValid
     )
 
-    if ($null -eq $PatCredential -or
-        'PAT' -ne $PatCredential.UserName)
-    {
-            return $false
-    }
-
-    return $true
+    return !($null -eq $PatCredential -or
+             'PAT' -ne $PatCredential.UserName)
 }
