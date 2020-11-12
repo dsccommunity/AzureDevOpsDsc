@@ -89,18 +89,6 @@ function Wait-AzDevOpsOperation
         $IsSuccessful
     )
 
-    if (!$IsComplete -and !$IsSuccessful)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-    elseif ($IsComplete -and $IsSuccessful)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesBothUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
-
     [System.DateTime]$waitStartDateTime = $(Get-Date).ToUniversalTime()
 
     $testOperationParameters = @{
