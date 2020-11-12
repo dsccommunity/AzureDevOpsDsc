@@ -27,6 +27,12 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
             Context 'When called with "OperationId" parameter value and the "IsValid" switch' {
 
+                It 'Should return identical value to "Test-AzDevOpsApiResourceId" - "<OperationId>"' -TestCases $testCasesValidOperationIds {
+                    param ([System.String]$OperationId)
+
+                    Test-AzDevOpsOperationId -OperationId $OperationId -IsValid | Should -Be $(Test-AzDevOpsApiResourceId -ResourceId $OperationId -IsValid)
+                }
+
 
                 Context 'When "OperationId" parameter value is a valid "OperationId"' {
 
