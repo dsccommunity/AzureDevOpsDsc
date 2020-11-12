@@ -65,9 +65,9 @@ function Test-AzDevOpsApiResource
         $ResourceId
     )
 
-    [object[]]$apiResource = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
-                                                     -ResourceName $ResourceName `
-                                                     -ResourceId $ResourceId
+    [System.Management.Automation.PSObject[]]$apiResource = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
+                                                                                    -ResourceName $ResourceName `
+                                                                                    -ResourceId $ResourceId
 
     return ($apiResource.Count -gt 0)
 }
