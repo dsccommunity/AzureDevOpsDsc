@@ -82,28 +82,10 @@ function Test-AzDevOpsOperation
         $IsSuccessful
     )
 
-    if (!$IsComplete -and !$IsSuccessful)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-    elseif ($IsComplete -and $IsSuccessful)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsCompleteAndIsSuccessfulSwitchesBothUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
-
     [System.Management.Automation.PSObject]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat `
                                                                               -OperationId $OperationId
 
-
     # Reference: https://docs.microsoft.com/en-us/rest/api/azure/devops/operations/operations/get?view=azure-devops-rest-6.0#operationstatus
-    if (($IsSuccessful -and ($operation.status -eq 'succeeded')) -or
-        ($IsComplete -and ($operation.status -in @('succeeded', 'cancelled', 'failed'))))
-    {
-        return $true
-    }
-
-    return $false
+    return (($IsSuccessful -and ($operation.status -eq 'succeeded')) -or
+            ($IsComplete -and ($operation.status -in @('succeeded', 'cancelled', 'failed'))))
 }
