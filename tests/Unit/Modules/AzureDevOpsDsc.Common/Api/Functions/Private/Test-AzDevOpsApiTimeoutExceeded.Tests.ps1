@@ -10,7 +10,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
     $script:subModuleName = 'AzureDevOpsDsc.Common'
     $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
     $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Resources\Functions\Private\$($script:commandName).ps1"
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Api\Functions\Private\$($script:commandName).ps1"
     $script:tag = @($($script:commandName -replace '-'))
 
     . $script:commandScriptPath
@@ -109,13 +109,13 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     It 'Should not throw - "<StartTime>","<EndTime>","<TimeoutMs>"' -TestCases $testCasesTimeoutExceeded {
                         param ([Datetime]$StartTime, [Datetime]$EndTime, [Int32]$TimeoutMs)
 
-                        { Test-AzDevOpsTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs } | Should -Not -Throw
+                        { Test-AzDevOpsApiTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs } | Should -Not -Throw
                     }
 
                     It 'Should return $true - "<StartTime>","<EndTime>","<TimeoutMs>"' -TestCases $testCasesTimeoutExceeded {
                         param ([Datetime]$StartTime, [Datetime]$EndTime, [Int32]$TimeoutMs)
 
-                        Test-AzDevOpsTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs | Should -BeTrue
+                        Test-AzDevOpsApiTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs | Should -BeTrue
                     }
                 }
 
@@ -124,13 +124,13 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     It 'Should not throw - "<StartTime>","<EndTime>","<TimeoutMs>"' -TestCases $testCasesTimeoutNotExceeded {
                         param ([Datetime]$StartTime, [Datetime]$EndTime, [Int32]$TimeoutMs)
 
-                        { Test-AzDevOpsTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs } | Should -Not -Throw
+                        { Test-AzDevOpsApiTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs } | Should -Not -Throw
                     }
 
                     It 'Should return $false - "<StartTime>","<EndTime>","<TimeoutMs>"' -TestCases $testCasesTimeoutNotExceeded {
                         param ([Datetime]$StartTime, [Datetime]$EndTime, [Int32]$TimeoutMs)
 
-                        Test-AzDevOpsTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs | Should -BeFalse
+                        Test-AzDevOpsApiTimeoutExceeded -StartTime $StartTime -EndTime $EndTime -TimeoutMs $TimeoutMs | Should -BeFalse
                     }
                 }
             }
@@ -146,7 +146,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 It 'Should throw' {
 
-                    { Test-AzDevOpsTimeoutExceeded -StartTime $null -EndTime $null -TimeoutMs $null } | Should -Throw
+                    { Test-AzDevOpsApiTimeoutExceeded -StartTime $null -EndTime $null -TimeoutMs $null } | Should -Throw
                 }
             }
 
@@ -154,7 +154,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 It 'Should throw' {
 
-                    { Test-AzDevOpsTimeoutExceeded -StartTime $null -EndTime $testTime -TimeoutMs $testTimeoutMs } | Should -Throw
+                    { Test-AzDevOpsApiTimeoutExceeded -StartTime $null -EndTime $testTime -TimeoutMs $testTimeoutMs } | Should -Throw
                 }
             }
 
@@ -162,7 +162,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 It 'Should throw' {
 
-                    { Test-AzDevOpsTimeoutExceeded -StartTime $testTime -EndTime $null -TimeoutMs $testTimeoutMs } | Should -Throw
+                    { Test-AzDevOpsApiTimeoutExceeded -StartTime $testTime -EndTime $null -TimeoutMs $testTimeoutMs } | Should -Throw
                 }
             }
 
@@ -170,7 +170,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 It 'Should throw' {
 
-                    { Test-AzDevOpsTimeoutExceeded -StartTime $null -EndTime $null -TimeoutMs $testTimeoutMs } | Should -Throw
+                    { Test-AzDevOpsApiTimeoutExceeded -StartTime $null -EndTime $null -TimeoutMs $testTimeoutMs } | Should -Throw
                 }
             }
 
@@ -178,7 +178,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 It 'Should throw' {
 
-                    { Test-AzDevOpsTimeoutExceeded -StartTime $testTime -EndTime $testTime -TimeoutMs $null } | Should -Throw
+                    { Test-AzDevOpsApiTimeoutExceeded -StartTime $testTime -EndTime $testTime -TimeoutMs $null } | Should -Throw
                 }
             }
 
@@ -186,7 +186,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 It 'Should throw' {
 
-                    { Test-AzDevOpsTimeoutExceeded -StartTime $null -EndTime $testTime -TimeoutMs $null } | Should -Throw
+                    { Test-AzDevOpsApiTimeoutExceeded -StartTime $null -EndTime $testTime -TimeoutMs $null } | Should -Throw
                 }
             }
 
@@ -194,7 +194,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 It 'Should throw' {
 
-                    { Test-AzDevOpsTimeoutExceeded -StartTime $testTime -EndTime $null -TimeoutMs $null } | Should -Throw
+                    { Test-AzDevOpsApiTimeoutExceeded -StartTime $testTime -EndTime $null -TimeoutMs $null } | Should -Throw
                 }
             }
         }

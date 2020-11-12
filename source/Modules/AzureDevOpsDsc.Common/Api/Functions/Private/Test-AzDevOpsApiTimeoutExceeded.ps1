@@ -20,14 +20,14 @@
         The number of milliseconds set as the timeout to evaluate against.
 
     .EXAMPLE
-        Test-AzDevOpsTimeoutExceeded -StartTime $someStartTime -EndTime $someEndTime -TimeoutMs 1000
+        Test-AzDevOpsApiTimeoutExceeded -StartTime $someStartTime -EndTime $someEndTime -TimeoutMs 1000
 
         Returns $true if the duration between the value of $someStartTime and $someEndTime is greater than
         1000 milliseconds (1 second).
 
         Returns $false if it is not.
 #>
-function Test-AzDevOpsTimeoutExceeded
+function Test-AzDevOpsApiTimeoutExceeded
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]

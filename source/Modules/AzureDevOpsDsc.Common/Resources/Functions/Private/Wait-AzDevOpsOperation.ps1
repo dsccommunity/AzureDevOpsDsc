@@ -111,7 +111,7 @@ function Wait-AzDevOpsOperation
     {
         Start-Sleep -Milliseconds $WaitIntervalMilliseconds
 
-        if (Test-AzDevOpsTimeoutExceeded -StartTime $waitStartDateTime -End $($(Get-Date).ToUniversalTime()) -TimeoutMs $WaitTimeoutMilliseconds )
+        if (Test-AzDevOpsApiTimeoutExceeded -StartTime $waitStartDateTime -End $($(Get-Date).ToUniversalTime()) -TimeoutMs $WaitTimeoutMilliseconds )
         {
             $errorMessage = $script:localizedData.AzDevOpsOperationWaitTimeoutExceeded -f $MyInvocation.MyCommand, $OperationId, $WaitTimeoutMilliseconds
             New-InvalidOperationException -Message $errorMessage
