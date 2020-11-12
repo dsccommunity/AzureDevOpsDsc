@@ -84,7 +84,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             $testCasesValidResourceNames) -Expand
         $testCasesValidApiUriPatResourceNames3 = $testCasesValidApiUriPatResourceNames | Select-Object -First 3
 
-        $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid'
+        $validApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Valid' -First 1
 
         # Generate invalid, test cases
         $testCasesInvalidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Invalid'
@@ -96,7 +96,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             $testCasesInvalidResourceNames) -Expand
         $testCasesInvalidApiUriPatResourceNames3 = $testCasesInvalidApiUriPatResourceNames | Select-Object -First 3
 
-        $invalidApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Invalid'
+        $invalidApiVersion = Get-TestCaseValue -ScopeName 'ApiVersion' -TestCaseName 'Invalid' -First 1
 
 
         Context 'When input parameters are valid' {
