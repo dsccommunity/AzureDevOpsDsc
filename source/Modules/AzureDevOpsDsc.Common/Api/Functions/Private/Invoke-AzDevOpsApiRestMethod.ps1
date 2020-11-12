@@ -64,7 +64,7 @@ function Invoke-AzDevOpsApiRestMethod
         [Parameter(Mandatory=$true)]
         [ValidateScript( { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $_ -IsValid })]
         [Hashtable]
-        [Alias('Headers')]
+        [Alias('Headers','HttpRequestHeader')]
         $HttpHeaders,
 
         [Parameter()]
@@ -92,7 +92,7 @@ function Invoke-AzDevOpsApiRestMethod
     # Intially set this value to -1, as the first attempt does not want to be classes as a "RetryAttempt"
     $CurrentNoOfRetryAttempts = -1
 
-    while ($CurrentNoOfRetryAttempts -le $RetryAttempts)
+    while ($CurrentNoOfRetryAttempts -lt $RetryAttempts)
     {
         try
         {
