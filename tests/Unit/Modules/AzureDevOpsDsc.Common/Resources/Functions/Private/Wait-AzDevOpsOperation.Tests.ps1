@@ -551,6 +551,16 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     }
 
                 }
+
+
+                Context "When also called with both mandatory, 'IsComplete' and 'IsSuccessful', switch parameters" {
+
+                    It "Should throw - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
+                        param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$OperationId )
+
+                        { Wait-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $OperationId -IsComplete -IsSuccessful } | Should -Throw
+                    }
+                }
             }
 
 
