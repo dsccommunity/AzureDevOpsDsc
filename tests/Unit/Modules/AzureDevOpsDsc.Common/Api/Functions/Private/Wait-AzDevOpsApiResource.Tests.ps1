@@ -35,20 +35,20 @@ InModuleScope 'AzureDevOpsDsc.Common' {
         $testCasesValidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Valid'
         $testCasesValidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Valid'
         $testCasesValidResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Valid'
-        $testCasesValidApiUriPatResourceIds3 = Join-TestCaseArray -TestCaseArray @(
+        $testCasesValidApiUriPatResourceIds = Join-TestCaseArray -TestCaseArray @(
             $testCasesValidApiUris,
             $testCasesValidPats,
             $testCasesValidResourceIds) -Expand
-        $testCasesValidApiUriPatResourceIds3 = $testCasesValidApiUriPatResourceIds3 | Select-Object -First 3
+        $testCasesValidApiUriPatResourceIds3 = $testCasesValidApiUriPatResourceIds | Select-Object -First 3
 
         # Generate invalid, test cases
         $testCasesInvalidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Invalid'
         $testCasesInvalidPats = Get-TestCase -ScopeName 'Pat' -TestCaseName 'Invalid'
         $testCasesInvalidResourceIds = Get-TestCase -ScopeName 'ResourceId' -TestCaseName 'Invalid'
         $testCasesInvalidApiUriPatResourceIds = Join-TestCaseArray -TestCaseArray @(
-            $testCasesValidApiUris,
-            $testCasesValidPats,
-            $testCasesValidResourceIds) -Expand
+            $testCasesInvalidApiUris,
+            $testCasesInvalidPats,
+            $testCasesInvalidResourceIds) -Expand
         $testCasesInvalidApiUriPatResourceIds3 = $testCasesInvalidApiUriPatResourceIds | Select-Object -First 3
 
 
