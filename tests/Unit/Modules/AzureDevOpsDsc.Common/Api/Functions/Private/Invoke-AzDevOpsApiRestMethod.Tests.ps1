@@ -93,7 +93,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     }
 
 
-                    It 'Should invoke "Start-Sleep"number of times equal to "RetryAttempts" parameter value + 1 - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
+                    It 'Should invoke "Start-Sleep" number of times equal to "RetryAttempts" parameter value + 1 - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
                         param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
 
                         Mock Start-Sleep { } -Verifiable
