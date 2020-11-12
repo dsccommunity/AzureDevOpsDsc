@@ -81,10 +81,12 @@ function Wait-AzDevOpsOperation
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),
 
         [Parameter(Mandatory = $true, ParameterSetName='IsComplete')]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsComplete,
 
         [Parameter(Mandatory = $true, ParameterSetName='IsSuccessful')]
+        [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsSuccessful
     )
