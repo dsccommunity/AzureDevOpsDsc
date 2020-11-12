@@ -40,7 +40,7 @@
 function Get-AzDevOpsApiResource
 {
     [CmdletBinding()]
-    [OutputType([System.Object[]])]
+    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
         [Parameter(Mandatory=$true)]
@@ -71,35 +71,37 @@ function Get-AzDevOpsApiResource
         $ResourceId
     )
 
-    if ($ResourceId -contains '*')
-    {
-        $ResourceId = $null
-    }
 
+    # Prepare 'Get-AzDevOpsApiResourceUri' method parameters
     $apiResourceUriParameters = @{
         ApiUri = $ApiUri
         ApiVersion = $ApiVersion
         ResourceName = $ResourceName
     }
-    if (![string]::IsNullOrWhiteSpace($ResourceId))
+
+    if (![System.String]::IsNullOrWhiteSpace($ResourceId))
     {
         $apiResourceUriParameters.ResourceId = $ResourceId
     }
-    [string]$apiResourceUri = Get-AzDevOpsApiResourceUri @apiResourceUriParameters
 
 
-    [Hashtable]$apiHttpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
+    # Prepare 'Invoke-RestMethod' method parameters
+    $invokeRestMethodParameters = @{
+        Uri = $(Get-AzDevOpsApiResourceUri @apiResourceUriParameters)
+        Method = 'Get'
+        Headers = $(Get-AzDevOpsApiHttpRequestHeader -Pat $Pat)
+    }
 
 
-    [System.Object[]]$apiResources = @()
-    $apiResources += Invoke-RestMethod -Uri $apiResourceUri -Method 'Get' -Headers $apiHttpRequestHeader
+    [System.Management.Automation.PSObject]$apiResources = Invoke-RestMethod @invokeRestMethodParameters
 
 
     # If not a single, resource request, set from the resource(s) in the 'value' property within the response
-    if ([System.String]::IsNullOrWhiteSpace($ResourceId))
+    if ($null -ne $apiResources.value)
     {
-        [System.Object[]]$apiResources = $apiResources.value
+        [System.Management.Automation.PSObject[]]$apiResources = $apiResources.value
     }
+
 
     return $apiResources
 }
