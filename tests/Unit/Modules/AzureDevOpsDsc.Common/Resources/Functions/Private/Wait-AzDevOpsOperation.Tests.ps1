@@ -29,7 +29,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
         # Mock New-InvalidOperationException {} # Do not mock
         Mock Start-Sleep {}
         Mock Test-AzDevOpsOperation {}
-        Mock Test-AzDevOpsTimeoutExceeded {}
+        Mock Test-AzDevOpsApiTimeoutExceeded {}
 
         # Generate valid, test cases
         $testCasesValidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Valid'
@@ -136,14 +136,14 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                             Assert-MockCalled 'Start-Sleep' -Times 0 -Exactly -Scope It
                         }
 
-                        It "Should not invoke 'Test-AzDevOpsTimeoutExceeded' - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
+                        It "Should not invoke 'Test-AzDevOpsApiTimeoutExceeded' - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
                             param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$OperationId )
 
-                            Mock Test-AzDevOpsTimeoutExceeded {} -Verifiable
+                            Mock Test-AzDevOpsApiTimeoutExceeded {} -Verifiable
 
                             Wait-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $OperationId -IsComplete
 
-                            Assert-MockCalled 'Test-AzDevOpsTimeoutExceeded' -Times 0 -Exactly -Scope It
+                            Assert-MockCalled 'Test-AzDevOpsApiTimeoutExceeded' -Times 0 -Exactly -Scope It
                         }
                     }
 
@@ -157,7 +157,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                                 $script:mockTestAzDevOpsOperationInvoked = !($script:mockTestAzDevOpsOperationInvoked)
                                 return !($script:mockTestAzDevOpsOperationInvoked)
                             }
-                            Mock Test-AzDevOpsTimeoutExceeded { return $false }
+                            Mock Test-AzDevOpsApiTimeoutExceeded { return $false }
 
                             It "Should invoke 'Test-AzDevOpsOperation' exactly twice - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
                                 param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$OperationId )
@@ -194,24 +194,24 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                                 Assert-MockCalled 'Start-Sleep' -Times 1 -Exactly -Scope It
                             }
 
-                            It "Should invoke 'Test-AzDevOpsTimeoutExceeded' exactly once - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
+                            It "Should invoke 'Test-AzDevOpsApiTimeoutExceeded' exactly once - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
                                 param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$OperationId )
 
                                 $script:mockTestAzDevOpsOperationInvoked = $false # for 'Test-AzDevOpsOperation' mock
-                                Mock Test-AzDevOpsTimeoutExceeded { return $false } -Verifiable
+                                Mock Test-AzDevOpsApiTimeoutExceeded { return $false } -Verifiable
 
                                 Wait-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $OperationId -IsComplete
 
-                                Assert-MockCalled 'Test-AzDevOpsTimeoutExceeded' -Times 1 -Exactly -Scope It
+                                Assert-MockCalled 'Test-AzDevOpsApiTimeoutExceeded' -Times 1 -Exactly -Scope It
                             }
 
                         }
                     }
 
 
-                    Context "When 'Test-AzDevOpsOperation' returns false, and exceeds timeout (i.e. 'Test-AzDevOpsTimeoutExceeded' returns true)" {
+                    Context "When 'Test-AzDevOpsOperation' returns false, and exceeds timeout (i.e. 'Test-AzDevOpsApiTimeoutExceeded' returns true)" {
                         Mock Get-AzDevOpsApiWaitTimeoutMs {250} # 250ms
-                        Mock Test-AzDevOpsTimeoutExceeded { return $true } # i.e. Timeout exceeded
+                        Mock Test-AzDevOpsApiTimeoutExceeded { return $true } # i.e. Timeout exceeded
                         Mock Test-AzDevOpsOperation { return $false } # i.e. Operation has not completed
 
                         It "Should throw - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
@@ -381,14 +381,14 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                             Assert-MockCalled 'Start-Sleep' -Times 0 -Exactly -Scope It
                         }
 
-                        It "Should not invoke 'Test-AzDevOpsTimeoutExceeded' - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
+                        It "Should not invoke 'Test-AzDevOpsApiTimeoutExceeded' - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
                             param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$OperationId )
 
-                            Mock Test-AzDevOpsTimeoutExceeded {} -Verifiable
+                            Mock Test-AzDevOpsApiTimeoutExceeded {} -Verifiable
 
                             Wait-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $OperationId -IsSuccessful
 
-                            Assert-MockCalled 'Test-AzDevOpsTimeoutExceeded' -Times 0 -Exactly -Scope It
+                            Assert-MockCalled 'Test-AzDevOpsApiTimeoutExceeded' -Times 0 -Exactly -Scope It
                         }
                     }
 
@@ -402,7 +402,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                                 $script:mockTestAzDevOpsOperationInvoked = !($script:mockTestAzDevOpsOperationInvoked)
                                 return !($script:mockTestAzDevOpsOperationInvoked)
                             }
-                            Mock Test-AzDevOpsTimeoutExceeded { return $false }
+                            Mock Test-AzDevOpsApiTimeoutExceeded { return $false }
 
                             It "Should invoke 'Test-AzDevOpsOperation' exactly twice - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
                                 param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$OperationId )
@@ -439,24 +439,24 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                                 Assert-MockCalled 'Start-Sleep' -Times 1 -Exactly -Scope It
                             }
 
-                            It "Should invoke 'Test-AzDevOpsTimeoutExceeded' exactly once - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
+                            It "Should invoke 'Test-AzDevOpsApiTimeoutExceeded' exactly once - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
                                 param( [System.String]$ApiUri, [System.String]$Pat, [System.String]$OperationId )
 
                                 $script:mockTestAzDevOpsOperationInvoked = $false # for 'Test-AzDevOpsOperation' mock
-                                Mock Test-AzDevOpsTimeoutExceeded { return $false } -Verifiable
+                                Mock Test-AzDevOpsApiTimeoutExceeded { return $false } -Verifiable
 
                                 Wait-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $OperationId -IsSuccessful
 
-                                Assert-MockCalled 'Test-AzDevOpsTimeoutExceeded' -Times 1 -Exactly -Scope It
+                                Assert-MockCalled 'Test-AzDevOpsApiTimeoutExceeded' -Times 1 -Exactly -Scope It
                             }
 
                         }
                     }
 
 
-                    Context "When 'Test-AzDevOpsOperation' returns false, and exceeds timeout (i.e. 'Test-AzDevOpsTimeoutExceeded' returns true)" {
+                    Context "When 'Test-AzDevOpsOperation' returns false, and exceeds timeout (i.e. 'Test-AzDevOpsApiTimeoutExceeded' returns true)" {
                         Mock Get-AzDevOpsApiWaitTimeoutMs {250} # 250ms
-                        Mock Test-AzDevOpsTimeoutExceeded { return $true } # i.e. Timeout exceeded
+                        Mock Test-AzDevOpsApiTimeoutExceeded { return $true } # i.e. Timeout exceeded
                         Mock Test-AzDevOpsOperation { return $false } # i.e. Operation has not completed
 
                         It "Should throw - '<ApiUri>', '<Pat>', '<OperationId>'" -TestCases $testCasesValidApiUriPatOperationIds3 {
