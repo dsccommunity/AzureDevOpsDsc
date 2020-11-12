@@ -36,12 +36,6 @@ function Test-AzDevOpsOrganizationName
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
     if ([System.String]::IsNullOrWhiteSpace($OrganizationName) -or
         ($OrganizationName.Contains(' ') -or $OrganizationName.Contains('%') -or $OrganizationName.Contains('*') -or $OrganizationName.StartsWith(' ') -or $OrganizationName.EndsWith(' ')))
     {

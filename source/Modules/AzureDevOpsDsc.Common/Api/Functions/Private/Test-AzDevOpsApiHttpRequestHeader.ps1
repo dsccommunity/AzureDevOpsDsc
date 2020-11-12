@@ -36,13 +36,6 @@ function Test-AzDevOpsApiHttpRequestHeader
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
-
     if ($null -eq $HttpRequestHeader -or
         $null -eq $HttpRequestHeader.Authorization -or
         $HttpRequestHeader.Authorization -inotlike 'Basic *')

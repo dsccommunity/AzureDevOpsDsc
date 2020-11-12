@@ -36,12 +36,6 @@ function Test-AzDevOpsApiUri
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
     if (($ApiUri -inotlike 'http://*' -and $ApiUri -inotlike 'https://*') -or
          $ApiUri -inotlike '*/_apis/')
        {

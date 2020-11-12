@@ -37,12 +37,6 @@ function Test-AzDevOpsApiVersion
         $IsValid
     )
 
-    if (!$IsValid)
-    {
-        $errorMessage = $script:localizedData.MandatoryIsValidSwitchNotUsed -f $MyInvocation.MyCommand
-        New-InvalidOperationException -Message $errorMessage
-    }
-
     $supportedApiVersions = @(
         '6.0'
     )
