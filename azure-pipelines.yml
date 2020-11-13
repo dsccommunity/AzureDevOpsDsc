@@ -46,8 +46,9 @@ stages:
   - stage: Test
     dependsOn: Build
     jobs:
-      - job: test_linux
-        displayName: 'Linux'
+      - job: test_unit_linux
+        condition: failed()
+        displayName: 'Linux - Unit Tests'
         timeoutInMinutes: 0
         pool:
           vmImage: 'ubuntu 16.04'
@@ -69,7 +70,7 @@ stages:
 
           - task: PowerShell@2
             name: test
-            displayName: 'Run Tests'
+            displayName: 'Run Unit Tests'
             inputs:
               filePath: './build.ps1'
               arguments: '-tasks test'
@@ -90,8 +91,8 @@ stages:
               summaryFileLocation: 'output/testResults/CodeCov*.xml'
               pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
-      - job: test_windows_core
-        displayName: 'Windows (PowerShell Core)'
+      - job: test_unit_windows_core
+        displayName: 'Windows (PowerShell Core) - Unit Tests'
         timeoutInMinutes: 0
         pool:
           vmImage: 'windows-2019'
@@ -113,7 +114,7 @@ stages:
 
           - task: PowerShell@2
             name: test
-            displayName: 'Run Tests'
+            displayName: 'Run Unit Tests'
             inputs:
               filePath: './build.ps1'
               arguments: '-tasks test'
@@ -135,8 +136,66 @@ stages:
               summaryFileLocation: 'output/testResults/CodeCov*.xml'
               pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
-      - job: test_windows_ps
-        displayName: 'Windows (Windows PowerShell)'
+      - job: test_integration_windows_core
+        displayName: 'Windows (PowerShell Core) - Integration Tests'
+        timeoutInMinutes: 0
+        variables:
+          # This sets environment variable $env:CI.
+          CI: true
+          # This sets environment variable $env:CONFIGURATION.
+          configuration: Integration
+        pool:
+          vmImage: 'windows-2019'
+        steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Build Artifact'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'output'
+              downloadPath: '$(Build.SourcesDirectory)'
+
+          - task: PowerShell@2
+            name: configureWinRM
+            displayName: 'Configure WinRM'
+            inputs:
+              targetType: 'inline'
+              script: 'winrm quickconfig -quiet'
+              pwsh: false
+
+          - powershell: |
+              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterScript @(
+                'tests/Integration/'
+              )
+            name: test
+            displayName: 'Run Integration Tests'
+
+          - task: PowerShell@2
+            name: test
+            displayName: 'Run Unit Tests'
+            inputs:
+              filePath: './build.ps1'
+              arguments: '-tasks test'
+              pwsh: true
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'NUnit'
+              testResultsFiles: 'output/testResults/NUnit*.xml'
+              testRunTitle: 'Windows Server Core (PowerShell Core)'
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 'Publish Code Coverage'
+            condition: succeededOrFailed()
+            inputs:
+              codeCoverageTool: 'JaCoCo'
+              summaryFileLocation: 'output/testResults/CodeCov*.xml'
+              pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
+
+      - job: test_unit_windows_ps
+        displayName: 'Windows (Windows PowerShell) - Unit Tests'
         timeoutInMinutes: 0
         pool:
           vmImage: 'windows-2019'
@@ -158,7 +217,7 @@ stages:
 
           - task: PowerShell@2
             name: test
-            displayName: 'Run Tests'
+            displayName: 'Run Unit Tests'
             inputs:
               filePath: './build.ps1'
               arguments: '-tasks test -CodeCoverageThreshold 0'
@@ -180,7 +239,8 @@ stages:
           #    summaryFileLocation: 'output/testResults/CodeCov*.xml'
           #    pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
-      - job: test_macos
+      - job: test_unit_macos
+        condition: failed()
         displayName: 'macOS'
         timeoutInMinutes: 0
         pool:
@@ -203,7 +263,7 @@ stages:
 
           - task: PowerShell@2
             name: test
-            displayName: 'Run Tests'
+            displayName: 'Run Unit Tests'
             inputs:
               filePath: './build.ps1'
               arguments: '-tasks test'
