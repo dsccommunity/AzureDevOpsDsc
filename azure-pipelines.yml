@@ -92,6 +92,7 @@ stages:
               pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
       - job: test_unit_windows_core
+        condition: failed()
         displayName: 'Windows (PowerShell Core) - Unit Tests'
         timeoutInMinutes: 0
         pool:
@@ -187,6 +188,7 @@ stages:
               pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
       - job: test_unit_windows_ps
+        condition: failed()
         displayName: 'Windows (Windows PowerShell) - Unit Tests'
         timeoutInMinutes: 0
         pool:
