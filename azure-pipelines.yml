@@ -161,7 +161,7 @@ stages:
             displayName: 'Run Tests'
             inputs:
               filePath: './build.ps1'
-              arguments: '-tasks test'
+              arguments: '-tasks test -CodeCoverageThreshold 0'
               pwsh: false
 
           - task: PublishTestResults@2
@@ -172,13 +172,13 @@ stages:
               testResultsFiles: 'output/testResults/NUnit*.xml'
               testRunTitle: 'Windows Server Core (Windows PowerShell)'
 
-          - task: PublishCodeCoverageResults@1
-            displayName: 'Publish Code Coverage'
-            condition: succeededOrFailed()
-            inputs:
-              codeCoverageTool: 'JaCoCo'
-              summaryFileLocation: 'output/testResults/CodeCov*.xml'
-              pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
+          #- task: PublishCodeCoverageResults@1
+          #  displayName: 'Publish Code Coverage'
+          #  condition: succeededOrFailed()
+          #  inputs:
+          #    codeCoverageTool: 'JaCoCo'
+          #    summaryFileLocation: 'output/testResults/CodeCov*.xml'
+          #    pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
       - job: test_macos
         displayName: 'macOS'
