@@ -34,7 +34,6 @@ Configuration Example
             ProjectName          = 'A New Test Project Name'
             ProjectDescription   = 'A test project'
 
-            #PsDscRunAsCredential = $SqlAdministratorCredential
         }
 
     }
