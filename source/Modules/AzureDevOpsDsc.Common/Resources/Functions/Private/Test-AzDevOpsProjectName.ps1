@@ -33,12 +33,16 @@ function Test-AzDevOpsProjectName
         [Parameter(Mandatory = $true)]
         [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
-        $IsValid
+        $IsValid,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $AllowWildcard
     )
 
     return !([System.String]::IsNullOrWhiteSpace($ProjectName) -or
              ($ProjectName.Contains('%') -or
-              $ProjectName.Contains('*') -or
+              (!$AllowWildcard -and $ProjectName.Contains('*')) -or
               $ProjectName.StartsWith(' ') -or
               $ProjectName.EndsWith(' ')))
 }
