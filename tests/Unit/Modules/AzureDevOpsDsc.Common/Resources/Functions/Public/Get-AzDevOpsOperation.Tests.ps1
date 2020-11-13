@@ -164,14 +164,14 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                             )
                         }
 
-                        It 'Should return exactly 1 "Operation" resource - "<ApiUri>", "<Pat>", "<OperationId>"' -TestCases $testCasesValidApiUriPats3 {
+                        It 'Should return exactly 1 "Operation" resource - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPats3 {
                             param ([string]$ApiUri, [string]$Pat)
 
                             [System.Management.Automation.PSObject[]]$operations = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $validOperationIdThatExists
                             $operations.Count | Should -Be 1
                         }
 
-                        It 'Should return exactly 1 "Operation" resource - "<ApiUri>", "<Pat>", "<OperationId>"' -TestCases $testCasesValidApiUriPats3 {
+                        It 'Should return exactly 1 "Operation" resource with identical "id" - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPats3 {
                             param ([string]$ApiUri, [string]$Pat)
 
                             [System.Management.Automation.PSObject]$operation = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $validOperationIdThatExists
@@ -184,14 +184,14 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                     Context 'When an "Operation" resource does not exist' {
 
-                        It 'Should return $null - "<ApiUri>", "<Pat>", "<OperationId>"' -TestCases $testCasesValidApiUriPats3 {
+                        It 'Should return $null - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPats3 {
                             param ([string]$ApiUri, [string]$Pat)
 
                             $operations = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $validOperationIdThatDoesNotExist
                             $operations | Should -BeNullOrEmpty
                         }
 
-                        It 'Should return no "Operation" resources - "<ApiUri>", "<Pat>", "<OperationId>"' -TestCases $testCasesValidApiUriPats3 {
+                        It 'Should return no "Operation" resources - "<ApiUri>", "<Pat>"' -TestCases $testCasesValidApiUriPats3 {
                             param ([string]$ApiUri, [string]$Pat)
 
                             [System.Management.Automation.PSObject[]]$operations = Get-AzDevOpsOperation -ApiUri $ApiUri -Pat $Pat -OperationId $validOperationIdThatDoesNotExist
