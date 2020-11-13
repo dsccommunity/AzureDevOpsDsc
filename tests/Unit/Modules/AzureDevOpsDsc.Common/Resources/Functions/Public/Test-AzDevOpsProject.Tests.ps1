@@ -115,7 +115,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 Context 'When "Get-AzDevOpsProject" does not return a record (with no "id" property)' {
 
-                    It 'Should return $true - "<ApiUri>", "<Pat>", "<ProjectId>"' -TestCases $testCasesValidApiUriPatProjectIds {
+                    It 'Should return $false - "<ApiUri>", "<Pat>", "<ProjectId>"' -TestCases $testCasesValidApiUriPatProjectIds {
                         param ([string]$ApiUri, [string]$Pat, [string]$ProjectId)
 
                         Mock Get-AzDevOpsProject {}
@@ -163,7 +163,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 Context 'When "Get-AzDevOpsProject" does not return a record (with no "id" property)' {
 
-                    It 'Should return $true - "<ApiUri>", "<Pat>", "<ProjectName>"' -TestCases $testCasesValidApiUriPatProjectNames {
+                    It 'Should return $false - "<ApiUri>", "<Pat>", "<ProjectName>"' -TestCases $testCasesValidApiUriPatProjectNames {
                         param ([string]$ApiUri, [string]$Pat, [string]$ProjectName)
 
                         Mock Get-AzDevOpsProject {}
@@ -212,7 +212,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 Context 'When "Get-AzDevOpsProject" does not return a record (with no "id" property)' {
 
-                    It 'Should return $true - "<ApiUri>", "<Pat>", "<ProjectId>", "<ProjectName>"' -TestCases $testCasesValidApiUriPatProjectIdProjectNames {
+                    It 'Should return $false - "<ApiUri>", "<Pat>", "<ProjectId>", "<ProjectName>"' -TestCases $testCasesValidApiUriPatProjectIdProjectNames {
                         param ([string]$ApiUri, [string]$Pat, [string]$ProjectId, [string]$ProjectName)
 
                         Mock Get-AzDevOpsProject {}
