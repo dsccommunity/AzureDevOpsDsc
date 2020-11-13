@@ -12,7 +12,6 @@
 #>
 function Get-AzDevOpsServicesUri
 {
-
     [CmdletBinding()]
     [OutputType([System.String])]
     param
@@ -23,9 +22,5 @@ function Get-AzDevOpsServicesUri
         $OrganizationName
     )
 
-    $OrganizationName = $OrganizationName.ToLower()
-
-    [System.String]$uri = "https://dev.azure.com/$OrganizationName/"
-
-    return $uri
+    return "https://dev.azure.com/$($OrganizationName.ToLower())/"
 }
