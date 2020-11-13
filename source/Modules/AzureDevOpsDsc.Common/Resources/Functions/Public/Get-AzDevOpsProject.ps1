@@ -13,7 +13,7 @@
         for the subsequent operations being performed.
 
     .PARAMETER ProjectId
-        The 'id' of the 'Project' being obtained/requested. Wildcards (e.g. '*') are allowed.
+        The 'id' of the 'Project' being obtained/requested.
 
     .PARAMETER ProjectName
         The 'name' of the 'Project' being obtained/requested. Wildcards (e.g. '*') are allowed.
@@ -46,7 +46,7 @@
 function Get-AzDevOpsProject
 {
     [CmdletBinding()]
-    [OutputType([System.Object[]])]
+    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -74,46 +74,40 @@ function Get-AzDevOpsProject
         $ProjectName
     )
 
-
+    # Prepare initial 'Get-AzDevOpsApiResource' function parameters
     $azDevOpsApiResourceParameters = @{
-        ApiUri = $ApiUri;
-        Pat = $Pat;
-        ResourceName = 'Project'}
-
-
-    If(![string]::IsNullOrWhiteSpace($ProjectId)){
+        ApiUri = $ApiUri
+        Pat = $Pat
+        ResourceName = 'Project'
+    }
+    If(![System.String]::IsNullOrWhiteSpace($ProjectId)){
         $azDevOpsApiResourceParameters.ResourceId = $ProjectId
     }
 
+    # Obtain all 'Projects' (Note: This returns a limited set of properties, hence why subsequent calls are made)
+    [System.Management.Automation.PSObject[]]$apiListResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
+    [System.Management.Automation.PSObject[]]$projects = @()
 
-    [object[]]$apiListResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
-
-
-    If(![string]::IsNullOrWhiteSpace($ProjectId)){
+    # Filter projects by 'ProjectId'
+    If(![System.String]::IsNullOrWhiteSpace($ProjectId)){
         $apiListResources = $apiListResources |
-            Where-Object id -ilike $ProjectId
+            Where-Object id -eq $ProjectId
     }
 
-
-    If(![string]::IsNullOrWhiteSpace($ProjectName)){
+    # Filter projects by 'ProjectName' (using 'ilike')
+    If(![System.String]::IsNullOrWhiteSpace($ProjectName)){
         $apiListResources = $apiListResources |
             Where-Object name -ilike $ProjectName
     }
 
-    [object[]]$projects = @()
-
+    # For each project (if any), call 'Get-AzDevOpsApiResource' again to obtain all 'Project' properties
     if ($apiListResources.Count -gt 0)
     {
-        $apiListResources |
-            ForEach-Object {
-
-                $azDevOpsProjectParameters = @{
-                    ApiUri = $ApiUri;
-                    Pat = $Pat;
-                    ResourceName = 'Project'
-                    ResourceId = $_.id}
-                $projects += $(Get-AzDevOpsApiResource @azDevOpsProjectParameters)
-            }
+        $apiListResources | ForEach-Object {
+            $azDevOpsApiResourceParameters.ResourceId = $_.id
+            $projects += $(Get-AzDevOpsApiResource @azDevOpsApiResourceParameters)
+        }
     }
-    return [object[]]$projects
+
+    return [System.Management.Automation.PSObject[]]$projects
 }
