@@ -40,7 +40,8 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
             Context 'When called with uppercase "OrganizationName" parameter value  - "<OrganizationName>"' {
 
-                It 'Should return URI in lowercase' {
+                It 'Should return URI in lowercase' -TestCases $testCasesValidOrganizationNames {
+                    param ([string]$OrganizationName)
 
                     Get-AzDevOpsServicesUri -OrganizationName $($OrganizationName.ToUpper()) |
                         Should -BeExactly $($(Get-AzDevOpsServicesUri -OrganizationName $OrganizationName).ToLower())
