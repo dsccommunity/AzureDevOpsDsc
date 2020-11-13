@@ -2,6 +2,7 @@
 # Initialize tests for module function
 . $PSScriptRoot\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
+return
 
 InModuleScope $script:subModuleName {
 
