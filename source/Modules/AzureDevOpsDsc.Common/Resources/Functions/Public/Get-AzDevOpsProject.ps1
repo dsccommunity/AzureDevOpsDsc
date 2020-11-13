@@ -68,7 +68,7 @@ function Get-AzDevOpsProject
         $ProjectId,
 
         [Parameter()]
-        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid })]
+        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid -AllowWildcard })]
         [Alias('Name')]
         [System.String]
         $ProjectName
