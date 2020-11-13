@@ -233,7 +233,7 @@ stages:
 
       - job: test_unit_macos
         condition: failed()
-        displayName: 'macOS'
+        displayName: 'macOS - Unit Tests'
         timeoutInMinutes: 0
         pool:
           vmImage: 'macos-latest'
