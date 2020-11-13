@@ -23,7 +23,7 @@
 function Get-AzDevOpsOperation
 {
     [CmdletBinding()]
-    [OutputType([System.Object[]])]
+    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -45,26 +45,23 @@ function Get-AzDevOpsOperation
         $OperationId
     )
 
-
+    # Prepare parameters for 'Get-AzDevOpsApiResource' invocation
     $azDevOpsApiResourceParameters = @{
         ApiUri = $ApiUri;
         Pat = $Pat;
-        ResourceName = 'Operation'}
-
-
-    If(![string]::IsNullOrWhiteSpace($OperationId)){
+        ResourceName = 'Operation'
+    }
+    If(![System.String]::IsNullOrWhiteSpace($OperationId)){
         $azDevOpsApiResourceParameters.ResourceId = $OperationId
     }
 
+    # Obtain "Operation" resources
+    [System.Management.Automation.PSObject[]]$apiResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
 
-    [System.Object[]]$apiResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
-
-
-    If(![string]::IsNullOrWhiteSpace($OperationId)){
-        $apiResources = $apiResources |
-            Where-Object id -ilike $OperationId
+    # Filter "Operation" resources
+    If(![System.String]::IsNullOrWhiteSpace($OperationId)){
+        $apiResources = $apiResources | Where-Object { $_.id -eq $OperationId }
     }
 
-
-    return [object[]]$apiResources
+    return [System.Management.Automation.PSObject[]]$apiResources
 }
