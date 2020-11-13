@@ -28,34 +28,84 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             Context 'When called with "ProjectName" parameter value and the "IsValid" switch' {
 
 
-                Context 'When "ProjectName" parameter value is a valid "ProjectName"' {
+                Context 'When called without additional "AllowWildcard" switch' {
 
-                    It 'Should not throw - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
-                        param ([System.String]$ProjectName)
 
-                        { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
+                    Context 'When "ProjectName" contains a wildcard character (*)' {
+
+                        It 'Should return $false - "*<ProjectName>*"' -TestCases $testCasesValidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            Test-AzDevOpsProjectName -ProjectName $('*'+$ProjectName+'*') -IsValid | Should -BeFalse
+                        }
                     }
 
-                    It 'Should return $true - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
-                        param ([System.String]$ProjectName)
 
-                        Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeTrue
+                    Context 'When "ProjectName" parameter value is a valid "ProjectName"' {
+
+                        It 'Should not throw - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
+                        }
+
+                        It 'Should return $true - "<ProjectName>"' -TestCases $testCasesValidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeTrue
+                        }
+                    }
+
+
+                    Context 'When "ProjectName" parameter value is an invalid "ProjectName"' {
+
+                        It 'Should not throw - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
+                        }
+
+                        It 'Should return $false - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeFalse
+                        }
                     }
                 }
 
 
-                Context 'When "ProjectName" parameter value is an invalid "ProjectName"' {
+                Context 'When called with additional "AllowWildcard" switch' {
 
-                    It 'Should not throw - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
-                        param ([System.String]$ProjectName)
 
-                        { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
+                    Context 'When "ProjectName" parameter value is a valid "ProjectName"' {
+
+                        It 'Should not throw - "*<ProjectName>*"' -TestCases $testCasesValidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            { Test-AzDevOpsProjectName -ProjectName $('*'+$ProjectName+'*') -IsValid -AllowWildcard } | Should -Not -Throw
+                        }
+
+                        It 'Should return $true - "*<ProjectName>*"' -TestCases $testCasesValidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            Test-AzDevOpsProjectName -ProjectName $('*'+$ProjectName+'*') -IsValid -AllowWildcard | Should -BeTrue
+                        }
                     }
 
-                    It 'Should return $false - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
-                        param ([System.String]$ProjectName)
 
-                        Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeFalse
+                    Context 'When "ProjectName" parameter value is an invalid "ProjectName"' {
+
+                        It 'Should not throw - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            { Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid } | Should -Not -Throw
+                        }
+
+                        It 'Should return $false - "<ProjectName>"' -TestCases $testCasesInvalidProjectNames {
+                            param ([System.String]$ProjectName)
+
+                            Test-AzDevOpsProjectName -ProjectName $ProjectName -IsValid | Should -BeFalse
+                        }
                     }
                 }
             }
