@@ -81,7 +81,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: 'output/testResults/NUnit*.xml'
-              testRunTitle: 'Linux'
+              testRunTitle: 'Linux - Unit'
 
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish Code Coverage'
@@ -126,7 +126,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: 'output/testResults/NUnit*.xml'
-              testRunTitle: 'Windows Server Core (PowerShell Core)'
+              testRunTitle: 'Windows Server Core (PowerShell Core) - Unit'
 
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish Code Coverage'
@@ -170,21 +170,13 @@ stages:
             name: test
             displayName: 'Run Integration Tests'
 
-          - task: PowerShell@2
-            name: test
-            displayName: 'Run Unit Tests'
-            inputs:
-              filePath: './build.ps1'
-              arguments: '-tasks test'
-              pwsh: true
-
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
             condition: succeededOrFailed()
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: 'output/testResults/NUnit*.xml'
-              testRunTitle: 'Windows Server Core (PowerShell Core)'
+              testRunTitle: 'Windows Server Core (PowerShell Core) - Integration'
 
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish Code Coverage'
@@ -229,7 +221,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: 'output/testResults/NUnit*.xml'
-              testRunTitle: 'Windows Server Core (Windows PowerShell)'
+              testRunTitle: 'Windows Server Core (Windows PowerShell) - Unit'
 
           #- task: PublishCodeCoverageResults@1
           #  displayName: 'Publish Code Coverage'
@@ -275,7 +267,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: 'output/testResults/NUnit*.xml'
-              testRunTitle: 'MacOS'
+              testRunTitle: 'MacOS - Unit'
 
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish Code Coverage'
