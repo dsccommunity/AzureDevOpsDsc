@@ -2,6 +2,23 @@
 # Integration Test Config Template Version: 1.2.0
 #endregion
 
+# Attempt to obtain 'ApiUri' and 'PAT' from AzureDevOps build pipeline
+# (NOTE: The Organisation/ApiUri used will be updated/changed as part of
+#  the tests and any projects, teams etc. are likely to be removed/lost)
+Write-Output "INTEGRATION-AZUREDEVOPS-APIURI: $(${env:AZUREDEVOPS_INTEGRATION_APIURI})"
+if ([String]::IsNullOrWhitespace(${env:AZUREDEVOPS_INTEGRATION_APIURI}) -or [String]::IsNullOrWhitespace(${env:AZUREDEVOPS_INTEGRATION_PAT}))
+{
+    $IntegrationApiUri = ${env:AZUREDEVOPS_INTEGRATION_APIURI}
+    $IntegrationPat = ${env:AZUREDEVOPS_INTEGRATION_PAT}
+}
+else
+{
+    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests."
+    return
+}
+
+
+
 #$configFile = [System.IO.Path]::ChangeExtension($MyInvocation.MyCommand.Path, 'json')
 #if (Test-Path -Path $configFile)
 #{
@@ -18,8 +35,8 @@
             @{
                 NodeName                   = 'localhost'
 
-                ApiUri                     = 'InsertApiUriHere'
-                Pat                        = 'InsertPatHere'
+                ApiUri                     = $IntegrationApiUri
+                Pat                        = $IntegrationPat
 
                 #ProjectId                  = 'ac6c91cc-a07f-4b8d-b146-aa6929d2882c'
                 ProjectName                = 'TestProjectName'
