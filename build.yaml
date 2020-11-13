@@ -63,6 +63,7 @@ Pester:
   ExcludeFromCodeCoverage:
     - Modules/DscResource.Common
   Script:
+    - tests/Integration
     - tests/Unit
   ExcludeTag:
   Tag:
