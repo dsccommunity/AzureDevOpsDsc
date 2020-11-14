@@ -1,7 +1,7 @@
 # AzureDevOpsDsc
 
-The **AzureDevOpsDsc** module contains DSC resources for deployment and configuration 
-of Azure DevOps and Azure DevOps Server.
+The **AzureDevOpsDsc** module contains DSC Resources for deployment and
+configuration of Azure DevOps and Azure DevOps Server.
 
 [![Build Status](https://dev.azure.com/dsccommunity/AzureDevOpsDsc/_apis/build/status/dsccommunity.AzureDevOpsDsc?branchName=master)](https://dev.azure.com/dsccommunity/AzureDevOpsDsc/_build/latest?definitionId=41&branchName=master)
 ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/AzureDevOpsDsc/41/master)
@@ -31,7 +31,7 @@ A full list of changes in each version can be found in the [change log](CHANGELO
 ## Documentation
 
 The documentation can be found in the [AzureDevOpsDsc Wiki](https://github.com/dsccommunity/AzureDevOpsDsc/wiki).
-The DSC resources schema files is used to automatically update the
+The DSC Resource`s schema files are used to automatically update the
 documentation on each PR merge.
 
 ### Examples

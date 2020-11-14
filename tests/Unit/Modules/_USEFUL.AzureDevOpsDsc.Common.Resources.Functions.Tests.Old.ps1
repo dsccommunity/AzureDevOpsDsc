@@ -58,7 +58,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     #    Get-Command "$ExportedFunctionName" | Should -Not -BeNullOrEmpty
                     #}
 
-                    It "When evaluating function parameter, aliases required for DSC resource functions" {
+                    It "When evaluating function parameter, aliases required for DSC Resource functions" {
                         # TODO
                     }
 
@@ -66,7 +66,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
 
 
-                Context "When evaluating all public, functions required for DSC resources" {
+                Context "When evaluating all public, functions required for DSC Resources" {
 
                     It "Should contain an exported, '<DscResourcePublicFunctionName>' function (specific to the 'ResourceName') - '<DscResourcePublicFunctionName>'" -TestCases $testCasesValidDscResourcePublicFunctionNames {
                         param ([string]$DscResourcePublicFunctionName)
@@ -94,7 +94,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         Test-Path $functionTestsScriptPath | Should -BeTrue
                     }
 
-                    Context "When evaluating function parameters required for DSC resource functions" {
+                    Context "When evaluating function parameters required for DSC Resource functions" {
 
                         It "Should have a '<DscResourcePublicFunctionName>' function with required, '<ApiResourcePublicFunctionRequiredParameterName>' parameter - '<DscResourcePublicFunctionName>', '<ApiResourcePublicFunctionRequiredParameterName>'" -TestCases $testCasesValidDscResourcePublicFunctionRequiredParameterNames {
                             param ([string]$DscResourcePublicFunctionName,
@@ -104,7 +104,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                                 Should -BeIn $((Get-CommandParameter -CommandName $DscResourcePublicFunctionName -ModuleName $moduleName).Name)
                         }
 
-                        Context "When evaluating function parameters required for DSC resource functions that must be 'Mandatory'" {
+                        Context "When evaluating function parameters required for DSC Resource functions that must be 'Mandatory'" {
 
                             It "Should have a '<DscResourcePublicFunctionName>' function with required (and 'Mandatory'), '<ApiResourcePublicFunctionMandatoryParameterName>' parameter - '<DscResourcePublicFunctionName>', '<ApiResourcePublicFunctionMandatoryParameterName>'" -TestCases $testCasesValidDscResourcePublicFunctionMandatoryParameterNames {
                                 param ([string]$DscResourcePublicFunctionName,
@@ -117,7 +117,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     }
                 }
 
-                Context "When evaluating all public, functions required for non-DSC resources" {
+                Context "When evaluating all public, functions required for non-DSC Resources" {
 
                     It "Should contain an exported, '<ResourcePublicFunctionName>' function (specific to the 'ResourceName') - '<ResourcePublicFunctionName>'" -TestCases $testCasesValidResourcePublicFunctionNames {
                         param ([string]$ResourcePublicFunctionName)

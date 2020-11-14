@@ -226,7 +226,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
 
                         if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
-                            throw "The '$($this.GetType().Name)', DSC resource does not support changes for/to the '$_' property."
+                            throw "The '$($this.GetType().Name)', DSC Resource does not support changes for/to the '$_' property."
                             break
                         }
                     }
