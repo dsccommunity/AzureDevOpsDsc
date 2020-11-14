@@ -164,11 +164,6 @@ stages:
               script: 'winrm quickconfig -quiet'
               pwsh: false
 
-          #- powershell: |
-          #
-          #  name: integrationBuildVariable
-          #  displayName: 'Set Environment Variables'
-
           - powershell: |
               ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterScript @(
                 'tests/Integration/'
@@ -186,14 +181,6 @@ stages:
               testResultsFormat: 'NUnit'
               testResultsFiles: 'output/testResults/NUnit*.xml'
               testRunTitle: 'Windows Server Core (PowerShell Core) - Integration'
-
-          - task: PublishCodeCoverageResults@1
-            displayName: 'Publish Code Coverage'
-            condition: succeededOrFailed()
-            inputs:
-              codeCoverageTool: 'JaCoCo'
-              summaryFileLocation: 'output/testResults/CodeCov*.xml'
-              pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
       - job: test_unit_windows_ps
         condition: failed()
