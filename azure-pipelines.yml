@@ -167,17 +167,21 @@ stages:
               pwsh: false
 
           #- powershell: |
-          #    echo "##vso[task.setvariable variable=AzureDevOps.Integration.ApiUri;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_APIURI}"
-          #    echo "##vso[task.setvariable variable=AzureDevOps.Integration.Pat;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_PAT}"
+          #
           #  name: integrationBuildVariable
           #  displayName: 'Set Environment Variables'
 
           - powershell: |
+              echo "##vso[task.setvariable variable=AzureDevOps.Integration.ApiUri;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_APIURI}"
+              echo "##vso[task.setvariable variable=AzureDevOps.Integration.Pat;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_PAT}"
+
               ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterScript @(
                 'tests/Integration/'
               )
             name: test
             displayName: 'Run Integration Tests'
+            variables:
+              azureDevOpsIntegrationPat: $(AzureDevOps.Integration.Pat)
 
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
