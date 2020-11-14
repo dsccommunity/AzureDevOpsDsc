@@ -180,8 +180,6 @@ stages:
               )
             name: test
             displayName: 'Run Integration Tests'
-            variables:
-              azureDevOpsIntegrationPat: $(AzureDevOps.Integration.Pat)
 
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
