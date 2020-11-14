@@ -55,13 +55,13 @@ if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPA
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureGitProjectAbsent1_Config
+Configuration AzDevOpsProject_EnsureGitProjectAbsent1_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureGitProjectAbsent1
+        AzDevOpsProject Integration_Test_EnsureGitProjectAbsent1
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -86,13 +86,13 @@ Configuration DSC_AzDevOpsProject_EnsureGitProjectAbsent1_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureGitProjectPresent_Config
+Configuration AzDevOpsProject_EnsureGitProjectPresent_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureGitProjectPresent
+        AzDevOpsProject Integration_Test_EnsureGitProjectPresent
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -119,13 +119,13 @@ Configuration DSC_AzDevOpsProject_EnsureGitProjectPresent_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_UpdateGitProjectToTfvc_Config
+Configuration AzDevOpsProject_UpdateGitProjectToTfvc_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_UpdateGitProjectToTfvc
+        AzDevOpsProject Integration_Test_UpdateGitProjectToTfvc
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -149,13 +149,13 @@ Configuration DSC_AzDevOpsProject_UpdateGitProjectToTfvc_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureGitProjectAbsent2_Config
+Configuration AzDevOpsProject_EnsureGitProjectAbsent2_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureGitProjectAbsent2
+        AzDevOpsProject Integration_Test_EnsureGitProjectAbsent2
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -180,13 +180,13 @@ Configuration DSC_AzDevOpsProject_EnsureGitProjectAbsent2_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureTfvcProjectAbsent1_Config
+Configuration AzDevOpsProject_EnsureTfvcProjectAbsent1_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureTfvcProjectAbsent1
+        AzDevOpsProject Integration_Test_EnsureTfvcProjectAbsent1
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -211,13 +211,13 @@ Configuration DSC_AzDevOpsProject_EnsureTfvcProjectAbsent1_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureTfvcProjectPresent_Config
+Configuration AzDevOpsProject_EnsureTfvcProjectPresent_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureTfvcProjectPresent
+        AzDevOpsProject Integration_Test_EnsureTfvcProjectPresent
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -243,13 +243,13 @@ Configuration DSC_AzDevOpsProject_EnsureTfvcProjectPresent_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_UpdateTfvcProjectToGit_Config
+Configuration AzDevOpsProject_UpdateTfvcProjectToGit_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_UpdateTfvcProjectToGit
+        AzDevOpsProject Integration_Test_UpdateTfvcProjectToGit
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -274,13 +274,13 @@ Configuration DSC_AzDevOpsProject_UpdateTfvcProjectToGit_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureTfvcProjectAbsent2_Config
+Configuration AzDevOpsProject_EnsureTfvcProjectAbsent2_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureTfvcProjectAbsent2
+        AzDevOpsProject Integration_Test_EnsureTfvcProjectAbsent2
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -305,13 +305,13 @@ Configuration DSC_AzDevOpsProject_EnsureTfvcProjectAbsent2_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureProjectPresent_Config
+Configuration AzDevOpsProject_EnsureProjectPresent_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureProjectPresent
+        AzDevOpsProject Integration_Test_EnsureProjectPresent
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -336,13 +336,13 @@ Configuration DSC_AzDevOpsProject_EnsureProjectPresent_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureProjectIdentical_Config
+Configuration AzDevOpsProject_EnsureProjectIdentical_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureProjectIdentical
+        AzDevOpsProject Integration_Test_EnsureProjectIdentical
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -366,13 +366,13 @@ Configuration DSC_AzDevOpsProject_EnsureProjectIdentical_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureProjectUpdated_Config
+Configuration AzDevOpsProject_EnsureProjectUpdated_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureProjectUpdated
+        AzDevOpsProject Integration_Test_EnsureProjectUpdated
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
@@ -396,13 +396,13 @@ Configuration DSC_AzDevOpsProject_EnsureProjectUpdated_Config
     .NOTES
 
 #>
-Configuration DSC_AzDevOpsProject_EnsureProjectRemoved_Config
+Configuration AzDevOpsProject_EnsureProjectRemoved_Config
 {
-    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'DSC_AzDevOpsProject'
+    Import-DscResource -ModuleName 'AzureDevOpsDsc' -Name 'AzDevOpsProject'
 
     node $AllNodes.NodeName
     {
-        DSC_AzDevOpsProject Integration_Test_EnsureProjectRemoved
+        AzDevOpsProject Integration_Test_EnsureProjectRemoved
         {
             ApiUri              = $Node.ApiUri
             Pat                 = $Node.Pat
