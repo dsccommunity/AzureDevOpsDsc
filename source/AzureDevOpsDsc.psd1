@@ -37,7 +37,7 @@
     # Aliases to export from this module
     AliasesToExport    = @()
 
-    DscResourcesToExport = @('DSC_AzDevOpsProject')
+    DscResourcesToExport = @('AzDevOpsProject')
 
     RequiredAssemblies = @()
 

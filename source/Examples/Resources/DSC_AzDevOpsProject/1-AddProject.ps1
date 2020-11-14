@@ -22,7 +22,7 @@ Configuration Example
 
     node localhost
     {
-        DSC_AzDevOpsProject 'AddProject'
+        AzDevOpsProject 'AddProject'
         {
             Ensure               = 'Present'
 

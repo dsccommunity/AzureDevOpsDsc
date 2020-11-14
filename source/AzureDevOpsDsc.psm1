@@ -14,7 +14,7 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
-class DSC_AzDevOpsProject : AzDevOpsDscResourceBase
+class AzDevOpsProject : AzDevOpsDscResourceBase
 {
     [DscProperty()]
     [Alias('Id')]
@@ -32,9 +32,9 @@ class DSC_AzDevOpsProject : AzDevOpsDscResourceBase
     [System.String]$SourceControlType
 
 
-    [DSC_AzDevOpsProject] Get()
+    [AzDevOpsProject] Get()
     {
-        return [DSC_AzDevOpsProject]$($this.GetDscCurrentStateProperties())
+        return [AzDevOpsProject]$($this.GetDscCurrentStateProperties())
     }
 
 

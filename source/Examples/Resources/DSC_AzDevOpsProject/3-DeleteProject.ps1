@@ -24,7 +24,7 @@ Configuration Example
     {
 
         # Example: A logical delete (rename) of a project
-        DSC_AzDevOpsProject 'DeleteProject_Logical'
+        AzDevOpsProject 'DeleteProject_Logical'
         {
             Ensure               = 'Absent'
 
@@ -41,7 +41,7 @@ Configuration Example
 
 
         # Example: An unequivocal delete of a project (i.e. a strong/pure/absolute delete)
-        DSC_AzDevOpsProject 'DeleteProject_Unequivocal'
+        AzDevOpsProject 'DeleteProject_Unequivocal'
         {
             Ensure               = 'Absent'
 

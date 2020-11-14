@@ -185,7 +185,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                 break
             }
             default {
-                throw "Could not obtain a valid 'Ensure' value within 'DSC_AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
+                throw "Could not obtain a valid 'Ensure' value within 'AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
                 return [RequiredAction]::Error
             }
         }
