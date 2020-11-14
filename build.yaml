@@ -3,9 +3,11 @@
 #          ModuleBuilder Configuration             #
 ####################################################
 CopyPaths:
+  - Classes
   - DSCClassResources
   - DSCResources
   - en-US
+  - Enums
   - Examples
   - Modules
 Encoding: UTF8
