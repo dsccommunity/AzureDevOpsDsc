@@ -21,8 +21,28 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                $dscResourceBase = [DscResourceBase]::new()
+                $dscResourceBase = [AzDevOpsApiDscResourceBase]::new()
                 {$dscResourceBase.GetDscResourceKey()} | Should -Throw
+            }
+
+        }
+
+
+        Context 'When called from instance of a class with multiple DSC Resource keys' {
+
+            It 'Should throw' {
+
+                class AzDevOpsProject2 : AzDevOpsProject
+                {
+                    [DscProperty(Key)]
+                    [string]$ProjectName2
+                }
+
+                $dscResourceWith2Keys = [AzDevOpsProject2]@{
+                    ProjectName = 'SomeProjectName2'
+                }
+
+                {$dscResourceWith2Keys.GetDscResourceKey()} | Should -Throw
             }
 
         }
