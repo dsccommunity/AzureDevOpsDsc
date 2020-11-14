@@ -17,7 +17,7 @@
     Copyright = 'Copyright the DSC Community contributors. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'Functions used by the DSC resources in AzureDevOpsDsc.'
+    Description = 'Functions used by the DSC Resources in AzureDevOpsDsc.'
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport = @(

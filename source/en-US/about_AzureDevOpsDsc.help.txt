@@ -2,10 +2,10 @@ TOPIC
     about_AzureDevOpsDsc
 
 SHORT DESCRIPTION
-    DSC resources for deployment and configuration of Azure DevOps and Azure DevOps Server.
+    DSC Resources for deployment and configuration of Azure DevOps and Azure DevOps Server.
 
 LONG DESCRIPTION
-    This module contains DSC resources for deployment and configuration of Azure DevOps and Azure DevOps Server.
+    This module contains DSC Resources for deployment and configuration of Azure DevOps and Azure DevOps Server.
 
 EXAMPLES
     PS C:\> {{ add examples here }}

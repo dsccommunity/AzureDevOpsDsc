@@ -1,6 +1,6 @@
 # <#
 #     .SYNOPSIS
-#         Automated unit test for DSC_AzDevOpsProject DSC resource.
+#         Automated unit test for DSC_AzDevOpsProject DSC Resource.
 # #>
 
 # $script:dscModuleName = 'AzureDevOpsDsc'

@@ -646,7 +646,7 @@ function Get-TestCaseValue
 
 
     # NonDscResourceName
-    # The 'ResourceName' values that are to be excluded from being used as part of a DSC resource (typically treated differently to 'DscResourceName' values)
+    # The 'ResourceName' values that are to be excluded from being used as part of a DSC Resource (typically treated differently to 'DscResourceName' values)
     $testCaseValues.NonDscResourceName = @{
 
         Valid = @(
@@ -743,7 +743,7 @@ function Get-TestCaseValue
     }
 
     # DscResourcePublicFunctionRequiredParameterName
-    # Parameter names that must be present on a public, function for a DSC resource (same as for an API resource) - Note: different to 'DscResourcePublicFunctionMandatoryParameterName'
+    # Parameter names that must be present on a public, function for a DSC Resource (same as for an API resource) - Note: different to 'DscResourcePublicFunctionMandatoryParameterName'
     $testCaseValues.DscResourcePublicFunctionRequiredParameterName = $testCaseValues.ApiResourcePublicFunctionRequiredParameterName
 
 
@@ -753,7 +753,7 @@ function Get-TestCaseValue
     $testCaseValues.ApiResourcePublicFunctionMandatoryParameterName = $testCaseValues.ApiResourcePublicFunctionRequiredParameterName
 
     # DscResourcePublicFunctionMandatoryParameterName
-    # Parameter names that must be present AND set as 'Mandatory' on a public, function for a DSC resource (same as for an API resource)
+    # Parameter names that must be present AND set as 'Mandatory' on a public, function for a DSC Resource (same as for an API resource)
     $testCaseValues.DscResourcePublicFunctionMandatoryParameterName = $testCaseValues.ApiResourcePublicFunctionMandatoryParameterName
 
 
