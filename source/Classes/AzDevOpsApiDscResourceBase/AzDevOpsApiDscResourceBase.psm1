@@ -13,7 +13,7 @@ class AzDevOpsApiDscResourceBase : DscResourceBase
     {
         # Assumes a naming convention is followed between the DSC
         # resource name and the name of the resource within the API
-        return $this.GetType().ToString().Replace('DSC_AzDevOps','')
+        return $this.GetType().ToString().Replace('AzDevOps','')
     }
 
 

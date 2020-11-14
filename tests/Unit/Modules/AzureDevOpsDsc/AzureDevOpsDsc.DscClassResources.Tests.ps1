@@ -14,7 +14,7 @@ InModuleScope 'AzureDevOpsDsc' {
         Context "When evaluating '$dscModuleName' module" {
             BeforeAll {
                 $dscModuleName = 'AzureDevOpsDsc'
-                $dscResourcePrefix = 'DSC_AzDevOps'
+                $dscResourcePrefix = 'AzDevOps'
                 [string[]]$exportedDscResources = (Get-Module $dscModuleName).ExportedDscResources
             }
 
