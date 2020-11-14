@@ -9,6 +9,9 @@ $script:dscModuleName = 'AzureDevOpsDsc'
 $script:dscResourceFriendlyName = 'AzDevOpsProject'
 $script:dscResourceName = $script:dscResourceFriendlyName
 
+$script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\Source\Modules\AzureDevOpsDsc.Common'
+Import-Module -Name $script:azureDevOpsDscCommonModulePath
+
 try
 {
     Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
