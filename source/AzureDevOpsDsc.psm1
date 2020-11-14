@@ -1,6 +1,6 @@
 using module .\Enums\Ensure\Ensure.psm1
 using module .\Enums\RequiredAction\RequiredAction.psm1
-using module .\Classes\AzDevOpsDscResource\AzDevOpsDscResource.psm1
+using module .\Classes\DscResourceBase\DscResourceBase.psm1
 using module .\Classes\AzDevOpsApiDscResource\AzDevOpsApiDscResource.psm1
 
 
