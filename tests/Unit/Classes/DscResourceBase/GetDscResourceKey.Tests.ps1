@@ -15,7 +15,6 @@ InModuleScope 'AzureDevOpsDsc' {
     $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
     $script:tag = @($($script:commandName -replace '-'))
 
-    Import-Module $script:commandScriptPath -Force
 
     Describe "$script:subModuleName\Classes\DscResourceBase\Method\$script:commandName" -Tag $script:tag {
 
@@ -25,6 +24,7 @@ InModuleScope 'AzureDevOpsDsc' {
             It 'Should throw' {
 
                 $dscResourceBase = [AzDevOpsApiDscResourceBase]::new()
+
                 {$dscResourceBase.GetDscResourceKey()} | Should -Throw
             }
 
@@ -35,15 +35,15 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                class AzDevOpsProject2 : AzDevOpsProject
+                class AzDevOpsApiDscResourceBase2DscKeys : AzDevOpsApiDscResourceBase
                 {
                     [DscProperty(Key)]
-                    [string]$ProjectName2
-                }
+                    [string]$DscKey1
 
-                $dscResourceWith2Keys = [AzDevOpsProject2]@{
-                    ProjectName = 'SomeProjectName2'
+                    [DscProperty(Key)]
+                    [string]$DscKey2
                 }
+                $dscResourceWith2Keys = [AzDevOpsApiDscResourceBase2DscKeys]@{}
 
                 {$dscResourceWith2Keys.GetDscResourceKey()} | Should -Throw
             }
@@ -53,20 +53,25 @@ InModuleScope 'AzureDevOpsDsc' {
 
         Context 'When called from instance of class with a DSC key' {
 
-            $dscResourceWithKey = [AzDevOpsProject]@{
-                ProjectName = 'SomeProjectName'
+            class AzDevOpsApiDscResourceBase1DscKey : AzDevOpsApiDscResourceBase
+            {
+                [DscProperty(Key)]
+                [string]$DscKey1
+            }
+
+            $dscResourceWith1Key = [AzDevOpsApiDscResourceBase1DscKey]@{
+                DscKey1='DscKey1Value'
             }
 
             It 'Should not throw' {
 
-                {$dscResourceWithKey.GetDscResourceKey()} | Should -Not -Throw
+                {$dscResourceWith1Key.GetDscResourceKey()} | Should -Not -Throw
             }
 
             It 'Should return the value of the DSC Resource key' {
 
-                $dscResourceWithKey.GetDscResourceKey() | Should -Be 'SomeProjectName'
+                $dscResourceWith1Key.GetDscResourceKey() | Should -Be 'DscKey1Value'
             }
         }
-
     }
 }
