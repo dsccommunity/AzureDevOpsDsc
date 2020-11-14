@@ -47,7 +47,7 @@ stages:
     dependsOn: Build
     jobs:
       - job: test_unit_linux
-        condition: failed()
+        condition: succeededOrFailed()
         displayName: 'Linux - Unit Tests'
         timeoutInMinutes: 0
         pool:
@@ -92,7 +92,7 @@ stages:
               pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
       - job: test_unit_windows_core
-        condition: failed()
+        condition: succeededOrFailed()
         displayName: 'Windows (PowerShell Core) - Unit Tests'
         timeoutInMinutes: 0
         pool:
@@ -182,8 +182,16 @@ stages:
               testResultsFiles: 'output/testResults/NUnit*.xml'
               testRunTitle: 'Windows Server Core (PowerShell Core) - Integration'
 
+          - task: PublishCodeCoverageResults@1
+            displayName: 'Publish Code Coverage'
+            condition: succeededOrFailed()
+            inputs:
+              codeCoverageTool: 'JaCoCo'
+              summaryFileLocation: 'output/testResults/CodeCov*.xml'
+              pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
+
       - job: test_unit_windows_ps
-        condition: failed()
+        condition: succeededOrFailed()
         displayName: 'Windows (Windows PowerShell) - Unit Tests'
         timeoutInMinutes: 0
         pool:
@@ -229,7 +237,7 @@ stages:
           #    pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
 
       - job: test_unit_macos
-        condition: failed()
+        condition: succeededOrFailed()
         displayName: 'macOS - Unit Tests'
         timeoutInMinutes: 0
         pool:
