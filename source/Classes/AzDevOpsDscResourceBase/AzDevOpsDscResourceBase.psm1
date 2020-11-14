@@ -1,3 +1,4 @@
+using module ..\..\Enums\RequiredAction\RequiredAction.psm1
 using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
 using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 
@@ -9,18 +10,6 @@ enum Ensure
     Present
     Absent
 }
-
-enum RequiredAction
-{
-    None
-    Get
-    New
-    Set
-    Remove
-    Test
-    Error
-}
-
 
 class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 {
