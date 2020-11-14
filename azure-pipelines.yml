@@ -217,7 +217,7 @@ stages:
             displayName: 'Run Unit Tests'
             inputs:
               filePath: './build.ps1'
-              arguments: '-tasks test -CodeCoverageThreshold 0'
+              arguments: '-tasks test -CodeCoverageThreshold 0'  # See note below regarding 'CoderCoverage'
               pwsh: false
 
           - task: PublishTestResults@2
@@ -228,6 +228,8 @@ stages:
               testResultsFiles: 'output/testResults/NUnit*.xml'
               testRunTitle: 'Windows Server Core (Windows PowerShell) - Unit'
 
+          # NOTE: CodeCoverage disabled on this, specific job due to poor performance. Still runs on other jobs within build.
+          #       See: https://github.com/pester/Pester/issues/1318
           #- task: PublishCodeCoverageResults@1
           #  displayName: 'Publish Code Coverage'
           #  condition: succeededOrFailed()
