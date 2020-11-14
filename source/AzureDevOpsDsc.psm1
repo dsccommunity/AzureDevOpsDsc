@@ -2,6 +2,7 @@ using module .\Classes\DscResourceBase\DscResourceBase.psm1
 using module .\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 using module .\Classes\AzDevOpsDscResourceBase\AzDevOpsDscResourceBase.psm1
 
+
 $script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath 'Modules\AzureDevOpsDsc.Common'
 #$script:dscResourceCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath 'Modules\DscResource.Common'
 
@@ -12,9 +13,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 
 [DscResource()]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class DSC_AzDevOpsProject : AzDevOpsDscResourceBase
 {
-
     [DscProperty()]
     [Alias('Id')]
     [System.String]$ProjectId
@@ -34,16 +35,6 @@ class DSC_AzDevOpsProject : AzDevOpsDscResourceBase
     [DSC_AzDevOpsProject] Get()
     {
         return [DSC_AzDevOpsProject]$($this.GetDscCurrentStateProperties())
-    }
-
-    [System.Boolean] Test() # Note: Overides identical method in base class but removes linting errors
-    {
-        return $this.TestDesiredState()
-    }
-
-    [void] Set() # Note: Overides identical method in base class but removes linting errors
-    {
-        $this.SetToDesiredState()
     }
 
 
