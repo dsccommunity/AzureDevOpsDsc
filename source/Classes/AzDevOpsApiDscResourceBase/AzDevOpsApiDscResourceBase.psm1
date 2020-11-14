@@ -1,10 +1,6 @@
 using module ..\..\Enums\RequiredAction\RequiredAction.psm1
 using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
 
-$script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\AzureDevOpsDsc.Common'
-Import-Module -Name $script:azureDevOpsDscCommonModulePath
-
-
 class AzDevOpsApiDscResourceBase : DscResourceBase
 {
     [System.String]$ResourceName = $this.GetResourceName()
