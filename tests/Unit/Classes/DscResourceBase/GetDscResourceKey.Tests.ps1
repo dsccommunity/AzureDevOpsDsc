@@ -1,4 +1,5 @@
 using module ..\..\..\..\source\Classes\DscResourceBase\DscResourceBase.psm1
+using module ..\..\..\..\source\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 using module ..\..\..\..\source\DSCClassResources\AzDevOpsProject\AzDevOpsProject.psm1
 
 # Initialize tests for module function
