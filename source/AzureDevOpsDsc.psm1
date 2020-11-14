@@ -17,7 +17,7 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 
 
-class DSC_AzDevOpsApiResource : AzDevOpsApiDscResourceBase
+class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 {
     [DscProperty()]
     [Alias('Uri')]
@@ -77,7 +77,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResourceBase
     {
         # Obtain the type of $this object. Throw an exception if this is being called from the base class method.
         $thisType = $this.GetType()
-        if ($thisType -eq [DSC_AzDevOpsApiResource])
+        if ($thisType -eq [AzDevOpsDscResourceBase])
         {
             throw "Method 'GetCurrentState()' in '$($thisType.Name)' must be overidden and called by an inheriting class."
         }
@@ -298,7 +298,7 @@ class DSC_AzDevOpsApiResource : AzDevOpsApiDscResourceBase
 
 
 [DscResource()]
-class DSC_AzDevOpsProject : DSC_AzDevOpsApiResource
+class DSC_AzDevOpsProject : AzDevOpsDscResourceBase
 {
     [DscProperty()]
     [Alias('Id')]
