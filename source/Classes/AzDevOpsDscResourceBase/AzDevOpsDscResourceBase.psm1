@@ -1,3 +1,4 @@
+using module ..\..\Enums\Ensure\Ensure.psm1
 using module ..\..\Enums\RequiredAction\RequiredAction.psm1
 using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
 using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
@@ -5,6 +6,8 @@ using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase
 $script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\AzureDevOpsDsc.Common'
 Import-Module -Name $script:azureDevOpsDscCommonModulePath
 
+
+# Re-defined here so it is recognised by 'Import-DscResource' (which won't post-parse the 'using' statements)
 enum Ensure
 {
     Present
