@@ -145,6 +145,8 @@ stages:
           CI: true
           # This sets environment variable $env:CONFIGURATION.
           configuration: Integration
+          azureDevOpsIntegrationApiUri: $(AzureDevOps.Integration.ApiUri)
+          azureDevOpsIntegrationPat: $(AzureDevOps.Integration.Path)
         pool:
           vmImage: 'windows-2019'
         steps:
@@ -164,11 +166,11 @@ stages:
               script: 'winrm quickconfig -quiet'
               pwsh: false
 
-          - powershell: |
-              echo "##vso[task.setvariable variable=AzureDevOps.Integration.ApiUri;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_APIURI}"
-              echo "##vso[task.setvariable variable=AzureDevOps.Integration.Pat;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_PAT}"
-            name: integrationBuildVariable
-            displayName: 'Set Environment Variables'
+          #- powershell: |
+          #    echo "##vso[task.setvariable variable=AzureDevOps.Integration.ApiUri;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_APIURI}"
+          #    echo "##vso[task.setvariable variable=AzureDevOps.Integration.Pat;isOutput=true]${env:AZUREDEVOPS_INTEGRATION_PAT}"
+          #  name: integrationBuildVariable
+          #  displayName: 'Set Environment Variables'
 
           - powershell: |
               ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterScript @(

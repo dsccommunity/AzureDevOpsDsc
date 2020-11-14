@@ -5,25 +5,11 @@
 # Attempt to obtain 'ApiUri' and 'PAT' from AzureDevOps build pipeline
 # (NOTE: The Organisation/ApiUri used will be updated/changed as part of
 #  the tests and any projects, teams etc. are likely to be removed/lost)
-$IntegrationApiUri = $null
-if (![String]::IsNullOrWhitespace($env:AZUREDEVOPS_INTEGRATION_APIURI))
-{
-    $IntegrationApiUri = $env:AZUREDEVOPS_INTEGRATION_APIURI
-    Write-Verbose "Updated AzureDevOps 'ApiUri' to '$($env:AZUREDEVOPS_INTEGRATION_APIURI)'"
-}
-
-$IntegrationPat = $null
-if (![String]::IsNullOrWhitespace($env:AZUREDEVOPS_INTEGRATION_PAT))
-{
-    $IntegrationPat = $env:AZUREDEVOPS_INTEGRATION_PAT
-    Write-Verbose "Updated AzureDevOps 'Pat' (Personal Access Token)."
-}
-
 
 # Verify 'ApiUri' and 'Pat' were obtained
-if ($null -in @($IntegrationApiUri, $IntegrationPat))
+if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPAT))
 {
-    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests. `
+    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests. ApiUri='$($env:AZUREDEVOPSINTEGRATIONAPIURI))', Pat='ApiUri='$($($env:AZUREDEVOPSINTEGRATIONAPIURI).Substring(0,2)).'`
            Ensure 'AzureDevOps.Integration.ApiUri' and 'AzureDevOps.Integration.Pat' variables exist (and are populated) within the Azure DevOps, build/test pipeline. `
            IMPORTANT: Ensure these point to an organisation/environment that can be torn down and rebuilt - The Integration tests may/will remove projects etc."
     return
@@ -47,8 +33,8 @@ if ($null -in @($IntegrationApiUri, $IntegrationPat))
             @{
                 NodeName                   = 'localhost'
 
-                ApiUri                     = $IntegrationApiUri
-                Pat                        = $IntegrationPat
+                ApiUri                     = $env:AZUREDEVOPSINTEGRATIONAPIURI
+                Pat                        = $env:AZUREDEVOPSINTEGRATIONPAT
 
                 #ProjectId                  = 'ac6c91cc-a07f-4b8d-b146-aa6929d2882c'
                 ProjectName                = 'TestProjectName'
