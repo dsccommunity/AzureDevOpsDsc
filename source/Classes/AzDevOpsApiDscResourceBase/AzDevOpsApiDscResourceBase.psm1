@@ -6,7 +6,7 @@ $script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPat
 Import-Module -Name $script:azureDevOpsDscCommonModulePath
 
 
-class AzDevOpsApiDscResource : DscResourceBase
+class AzDevOpsApiDscResourceBase : DscResourceBase
 {
     [System.String]$ResourceName = $this.GetResourceName()
 

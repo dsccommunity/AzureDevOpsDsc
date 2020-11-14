@@ -1,7 +1,7 @@
 using module .\Enums\Ensure\Ensure.psm1
 using module .\Enums\RequiredAction\RequiredAction.psm1
 using module .\Classes\DscResourceBase\DscResourceBase.psm1
-using module .\Classes\AzDevOpsApiDscResource\AzDevOpsApiDscResource.psm1
+using module .\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 
 
 $script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath 'Modules\AzureDevOpsDsc.Common'
@@ -17,7 +17,7 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 
 
-class DSC_AzDevOpsApiResource : AzDevOpsApiDscResource
+class DSC_AzDevOpsApiResource : AzDevOpsApiDscResourceBase
 {
     [DscProperty()]
     [Alias('Uri')]
