@@ -1,9 +1,6 @@
-using module .\Enums\Ensure\Ensure.psm1
-using module .\Enums\RequiredAction\RequiredAction.psm1
 using module .\Classes\DscResourceBase\DscResourceBase.psm1
 using module .\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 using module .\Classes\AzDevOpsDscResourceBase\AzDevOpsDscResourceBase.psm1
-
 
 $script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath 'Modules\AzureDevOpsDsc.Common'
 #$script:dscResourceCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath 'Modules\DscResource.Common'
@@ -14,15 +11,10 @@ Import-Module -Name $script:azureDevOpsDscCommonModulePath
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 
-
-
-
-
-
-
 [DscResource()]
 class DSC_AzDevOpsProject : AzDevOpsDscResourceBase
 {
+
     [DscProperty()]
     [Alias('Id')]
     [System.String]$ProjectId
