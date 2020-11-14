@@ -8,11 +8,6 @@ class DscResourceBase
     {
         [System.String]$dscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
-        if ([System.String]::IsNullOrWhiteSpace($dscResourceKeyPropertyName))
-        {
-            return $null
-        }
-
         return $this."$dscResourceKeyPropertyName"
     }
 
