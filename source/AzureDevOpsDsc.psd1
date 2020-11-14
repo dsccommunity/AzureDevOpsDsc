@@ -37,6 +37,11 @@
     # Aliases to export from this module
     AliasesToExport    = @()
 
+    # Import all the 'DSCClassResource', modules as part of this module
+    NestedModules = @(
+        '.\DSCClassResources\AzDevOpsProject\AzDevOpsProject.psm1'
+    )
+
     DscResourcesToExport = @('AzDevOpsProject')
 
     RequiredAssemblies = @()
