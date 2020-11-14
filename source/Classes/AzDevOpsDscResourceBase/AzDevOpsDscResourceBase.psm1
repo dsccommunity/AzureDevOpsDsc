@@ -1,10 +1,25 @@
-using module ..\..\Enums\Ensure\Ensure.psm1
-using module ..\..\Enums\RequiredAction\RequiredAction.psm1
 using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
 using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 
 $script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\AzureDevOpsDsc.Common'
 Import-Module -Name $script:azureDevOpsDscCommonModulePath
+
+enum Ensure
+{
+    Present
+    Absent
+}
+
+enum RequiredAction
+{
+    None
+    Get
+    New
+    Set
+    Remove
+    Test
+    Error
+}
 
 
 class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
