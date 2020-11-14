@@ -7,14 +7,21 @@
 #  the tests and any projects, teams etc. are likely to be removed/lost)
 
 # Verify 'ApiUri' and 'Pat' were obtained
-if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPAT))
+#if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPAT))
+#{
+#    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests. ApiUri='$($env:AZUREDEVOPSINTEGRATIONAPIURI)', Pat(2)='$($($env:AZUREDEVOPSINTEGRATIONPAT).Substring(0,2)).'`
+#           Ensure 'AzureDevOps.Integration.ApiUri' and 'AzureDevOps.Integration.Pat' variables exist (and are populated) within the Azure DevOps, build/test pipeline. `
+#           IMPORTANT: Ensure these point to an organisation/environment that can be torn down and rebuilt - The Integration tests may/will remove projects etc."
+#    return
+#}
+
+if ($null -in @($env:AZUREDEVOPS_INTEGRATION_APIURI, $env:AZUREDEVOPS_INTEGRATION_PAT))
 {
-    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests. ApiUri='$($env:AZUREDEVOPSINTEGRATIONAPIURI))', Pat='ApiUri='$($($env:AZUREDEVOPSINTEGRATIONAPIURI).Substring(0,2)).'`
+    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests. ApiUri='$($env:AZUREDEVOPS_INTEGRATION_APIURI)', Pat(2)='$($($env:AZUREDEVOPS_INTEGRATION_PAT).Substring(0,2)).'`
            Ensure 'AzureDevOps.Integration.ApiUri' and 'AzureDevOps.Integration.Pat' variables exist (and are populated) within the Azure DevOps, build/test pipeline. `
            IMPORTANT: Ensure these point to an organisation/environment that can be torn down and rebuilt - The Integration tests may/will remove projects etc."
     return
 }
-
 
 
 #$configFile = [System.IO.Path]::ChangeExtension($MyInvocation.MyCommand.Path, 'json')
@@ -33,8 +40,11 @@ if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPA
             @{
                 NodeName                   = 'localhost'
 
-                ApiUri                     = $env:AZUREDEVOPSINTEGRATIONAPIURI
-                Pat                        = $env:AZUREDEVOPSINTEGRATIONPAT
+                #ApiUri                     = $env:AZUREDEVOPSINTEGRATIONAPIURI
+                #Pat                        = $env:AZUREDEVOPSINTEGRATIONPAT
+                ApiUri                     = $env:AZUREDEVOPS_INTEGRATION_APIURI
+                Pat                        = $env:AZUREDEVOPS_INTEGRATION_PAT
+
 
                 #ProjectId                  = 'ac6c91cc-a07f-4b8d-b146-aa6929d2882c'
                 ProjectName                = 'TestProjectName'
