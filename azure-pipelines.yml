@@ -146,7 +146,7 @@ stages:
           # This sets environment variable $env:CONFIGURATION.
           configuration: Integration
           azureDevOpsIntegrationApiUri: $(AzureDevOps.Integration.ApiUri)
-          azureDevOpsIntegrationPat: $(AzureDevOps.Integration.Path)
+          azureDevOpsIntegrationPat: $(AzureDevOps.Integration.Pat)
         pool:
           vmImage: 'windows-2019'
         steps:
