@@ -6,16 +6,16 @@
 # (NOTE: The Organisation/ApiUri used will be updated/changed as part of
 #  the tests and any projects, teams etc. are likely to be removed/lost)
 $IntegrationApiUri = $null
-if (![String]::IsNullOrWhitespace(${env:AZUREDEVOPS_INTEGRATION_APIURI}))
+if (![String]::IsNullOrWhitespace($env:AZUREDEVOPS_INTEGRATION_APIURI))
 {
-    $IntegrationApiUri = ${env:AZUREDEVOPS_INTEGRATION_APIURI}
-    Write-Verbose "Updated AzureDevOps 'ApiUri' to '$(${env:AZUREDEVOPS_INTEGRATION_APIURI})'"
+    $IntegrationApiUri = $env:AZUREDEVOPS_INTEGRATION_APIURI
+    Write-Verbose "Updated AzureDevOps 'ApiUri' to '$($env:AZUREDEVOPS_INTEGRATION_APIURI)'"
 }
 
 $IntegrationPat = $null
-if (![String]::IsNullOrWhitespace(${env:AZUREDEVOPS_INTEGRATION_PAT}))
+if (![String]::IsNullOrWhitespace($env:AZUREDEVOPS_INTEGRATION_PAT))
 {
-    $IntegrationPat = ${env:AZUREDEVOPS_INTEGRATION_PAT}
+    $IntegrationPat = $env:AZUREDEVOPS_INTEGRATION_PAT
     Write-Verbose "Updated AzureDevOps 'Pat' (Personal Access Token)."
 }
 
