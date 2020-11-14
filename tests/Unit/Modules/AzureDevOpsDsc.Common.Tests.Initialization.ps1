@@ -1,32 +1,22 @@
-# #region HEADER
-$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
-$ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
-        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-        $(try { Test-ModuleManifest $_.FullName -ErrorAction Stop }catch{$false}) }
-    ).BaseName
+<#
+    .SYNOPSIS
+        Automated unit test for classes in AzureDevOpsDsc.
+#>
 
-#Write-Warning "ProjectPath : $ProjectPath"
-#Write-Warning "ProjectName : $ProjectName"
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestHelper.psm1')
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestCases.psm1')
 
+$script:dscModuleName = 'AzureDevOpsDsc'
+$script:dscModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
+$script:dscModuleFile = $($script:dscModule.ModuleBase +'\'+ $script:dscModuleName + ".psd1")
+Get-Module -Name $script:dscModuleName -All |
+    Remove-Module $script:dscModuleName -Force -ErrorAction SilentlyContinue
 
-$script:ParentModule = Get-Module $ProjectName -ListAvailable | Select-Object -First 1
-#Write-Warning "ParentModule : $script:ParentModule"
-$script:SubModulesFolder = Join-Path -Path $script:ParentModule.ModuleBase -ChildPath 'Modules'
-#Write-Warning "SubModulesFolder : $script:SubModulesFolder"
+$script:subModuleName = 'AzureDevOpsDsc.Common'
+Import-Module -Name $script:dscModuleFile -Force
 
-Remove-Module $script:ParentModule -Force -ErrorAction SilentlyContinue
-
-
-
-$script:SubModuleName = (Split-Path $PSCommandPath -Leaf) -replace '\.Tests.ps1' -replace '\.Tests.Initialization.ps1'
-#Write-Warning "SubModuleName : $script:SubModuleName"
-
-$script:SubmoduleFile = Join-Path $($script:SubModulesFolder) -ChildPath "$($script:SubModuleName)\$($script:SubModuleName).psd1"
-#Write-Warning "SubmoduleFile : $script:SubmoduleFile"
-
-Remove-Module $script:SubModuleName -Force -ErrorAction SilentlyContinue
-
-
-# #endregion HEADER
-
-Import-Module $script:SubmoduleFile -Force -ErrorAction Stop
+Get-Module -Name $script:subModuleName -All |
+    Remove-Module $script:subModuleName -Force -ErrorAction SilentlyContinue
+$script:subModulesFolder = Join-Path -Path $script:dscModule.ModuleBase -ChildPath 'Modules'
+$script:subModuleFile = Join-Path $script:subModulesFolder "$($script:subModuleName)/$($script:subModuleName).psd1"
+#Import-Module -Name $script:subModuleFile -Force #-Verbose
