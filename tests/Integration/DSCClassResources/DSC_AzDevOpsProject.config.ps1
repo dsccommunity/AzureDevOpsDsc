@@ -2,18 +2,6 @@
 # Integration Test Config Template Version: 1.2.0
 #endregion
 
-# Attempt to obtain 'ApiUri' and 'PAT' from AzureDevOps build pipeline
-# (NOTE: The Organisation/ApiUri used will be updated/changed as part of
-#  the tests and any projects, teams etc. are likely to be removed/lost)
-
-# Verify 'ApiUri' and 'Pat' were obtained
-#if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPAT))
-#{
-#    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests. ApiUri='$($env:AZUREDEVOPSINTEGRATIONAPIURI)', Pat(2)='$($($env:AZUREDEVOPSINTEGRATIONPAT).Substring(0,2)).'`
-#           Ensure 'AzureDevOps.Integration.ApiUri' and 'AzureDevOps.Integration.Pat' variables exist (and are populated) within the Azure DevOps, build/test pipeline. `
-#           IMPORTANT: Ensure these point to an organisation/environment that can be torn down and rebuilt - The Integration tests may/will remove projects etc."
-#    return
-#}
 
 if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPAT))
 {
