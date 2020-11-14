@@ -15,11 +15,12 @@
 #    return
 #}
 
-if ($null -in @($env:AZUREDEVOPS_INTEGRATION_APIURI, $env:AZUREDEVOPS_INTEGRATION_PAT))
+if ($null -in @($env:AZUREDEVOPSINTEGRATIONAPIURI, $env:AZUREDEVOPSINTEGRATIONPAT))
 {
-    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests. ApiUri='$($env:AZUREDEVOPS_INTEGRATION_APIURI)', Pat(2)='$($($env:AZUREDEVOPS_INTEGRATION_PAT).Substring(0,2)).'`
+    throw "Cannot obtain 'ApiUri' and 'Pat' for integration tests.'`
            Ensure 'AzureDevOps.Integration.ApiUri' and 'AzureDevOps.Integration.Pat' variables exist (and are populated) within the Azure DevOps, build/test pipeline. `
-           IMPORTANT: Ensure these point to an organisation/environment that can be torn down and rebuilt - The Integration tests may/will remove projects etc."
+           IMPORTANT: Ensure these point to an integration organisation/environment that can be torn down and rebuilt - The Integration tests may/will remove projects `
+           and change other items/configuration etc."
     return
 }
 
@@ -40,10 +41,8 @@ if ($null -in @($env:AZUREDEVOPS_INTEGRATION_APIURI, $env:AZUREDEVOPS_INTEGRATIO
             @{
                 NodeName                   = 'localhost'
 
-                #ApiUri                     = $env:AZUREDEVOPSINTEGRATIONAPIURI
-                #Pat                        = $env:AZUREDEVOPSINTEGRATIONPAT
-                ApiUri                     = $env:AZUREDEVOPS_INTEGRATION_APIURI
-                Pat                        = $env:AZUREDEVOPS_INTEGRATION_PAT
+                ApiUri                     = $env:AZUREDEVOPSINTEGRATIONAPIURI
+                Pat                        = $env:AZUREDEVOPSINTEGRATIONPAT
 
 
                 #ProjectId                  = 'ac6c91cc-a07f-4b8d-b146-aa6929d2882c'
