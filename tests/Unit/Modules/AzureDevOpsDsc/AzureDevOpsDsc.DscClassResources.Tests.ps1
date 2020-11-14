@@ -5,7 +5,7 @@
 
 InModuleScope 'AzureDevOpsDsc' {
 
-    Describe 'DSCClassResources\AzDevOpsApiDscResource' -Tag 'AzDevOpsApiDscResource' {
+    Describe 'DSCClassResources\AzDevOpsApiDscResourceBase' -Tag 'AzDevOpsApiDscResourceBase' {
 
         $dscModuleName = 'AzureDevOpsDsc'
         $testCasesValidResourceNames = Get-TestCase -ScopeName 'ResourceName' -TestCaseName 'Valid'
