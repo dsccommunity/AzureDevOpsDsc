@@ -15,7 +15,6 @@ InModuleScope 'AzureDevOpsDsc' {
     $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
     $script:tag = @($($script:commandName -replace '-'))
 
-    Import-Module $script:commandScriptPath -Force
 
     Describe "$script:subModuleName\Classes\DscResourceBase\Method\$script:commandName" -Tag $script:tag {
 
@@ -37,6 +36,7 @@ InModuleScope 'AzureDevOpsDsc' {
             }
 
         }
+
 
         Context 'When called from instance of a class with a DSC property with no "Set" support' {
 
@@ -66,7 +66,6 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $dscResourceWithANoSetSupportProperty.GetDscResourcePropertyNamesWithNoSetSupport() | Should -Contain 'SourceControlType'
             }
-
         }
     }
 }
