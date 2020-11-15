@@ -1,3 +1,5 @@
+using module ..\..\..\..\output\AzureDevOpsDsc\0.2.0\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
+
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
@@ -16,20 +18,31 @@ InModuleScope 'AzureDevOpsDsc' {
     Describe "$script:subModuleName\Classes\DscResourceBase\Method\$script:commandName" -Tag $script:tag {
 
 
+        class AzDevOpsApiDscResourceBaseExample : AzDevOpsApiDscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
+        {
+            [DscProperty(Key)]
+            [string]$DscKey
+
+            [string]GetResourceName()
+            {
+                return 'ApiDscResourceBaseExample'
+            }
+        }
+
         Context 'When called from instance of the class with the correct/expected, DSC Resource prefix' {
 
             It 'Should not throw' {
 
-                $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBase]::new()
-                $azDevOpsApiDscResourceBase | Add-Member -Name 'ApiDscResourceBaseId' -Value 'SomeIdValue' -MemberType NoteProperty
+                $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
+                $azDevOpsApiDscResourceBase | Add-Member -Name 'ApiDscResourceBaseExampleId' -Value 'SomeIdValue' -MemberType NoteProperty
 
                 {$azDevOpsApiDscResourceBase.GetResourceId()} | Should -Not -Throw
             }
 
             It 'Should return the same name as the DSC Resource/class without the expected prefix' {
 
-                $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBase]::new()
-                $azDevOpsApiDscResourceBase | Add-Member -Name 'ApiDscResourceBaseId' -Value 'SomeIdValue' -MemberType NoteProperty
+                $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
+                $azDevOpsApiDscResourceBase | Add-Member -Name 'ApiDscResourceBaseExampleId' -Value 'SomeIdValue' -MemberType NoteProperty
 
                 $azDevOpsApiDscResourceBase.GetResourceId() | Should -Be 'SomeIdValue'
             }
