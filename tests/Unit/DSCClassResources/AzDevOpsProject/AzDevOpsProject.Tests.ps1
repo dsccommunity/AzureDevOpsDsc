@@ -15,11 +15,29 @@ InModuleScope 'AzureDevOpsDsc' {
 
     Describe "$script:subModuleName\Classes\DscResourceBase\Method\$script:commandName" -Tag $script:tag {
 
-        Context 'When creating a new instance of the class' {
+        $validDscMethodNames = @(
+            'Get',
+            'Set',
+            'Test'
+        )
+        $testCasesValidDscMethodNames = $validDscMethodNames | ForEach-Object {
+            @{
+                MethodName = $_
+            }
+        }
 
-            It 'Should not throw' {
-
-                {[AzDevOpsProject]::new()} | Should -Not -Throw
+        $validPropertyNames = @(
+            'ApiUri',
+            'Pat',
+            'ProjectId',
+            'ProjectName',
+            'ProjectDescription',
+            'SourceControlType'
+        )
+        $testCasesValidPropertyNames = $validPropertyNames | ForEach-Object {
+            @{
+                PropertyName = $_
+                PropertyValue = $_ + "Value"
             }
         }
 
@@ -29,6 +47,42 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 {[AzDevOpsProject]::new()} | Should -Not -Throw
             }
+        }
+
+
+        Context 'When evaluating properties of the class' {
+
+            It 'Should contain expected property - "<PropertyName>"' -TestCases $testCasesValidPropertyNames {
+                param ([System.String]$PropertyName)
+
+                $azDevOpsProject = [AzDevOpsProject]::new()
+
+                $azDevOpsProject.PSobject.Properties.Name | Should -Contain $PropertyName
+            }
+
+            It 'Should contain expected property value - "<PropertyName>"' -TestCases $testCasesValidPropertyNames {
+                param ([System.String]$PropertyName, [System.String]$PropertyValue)
+
+                $azDevOpsProject = [AzDevOpsProject]@{
+                    "$PropertyName" = $PropertyValue
+                }
+
+                $azDevOpsProject."$PropertyName" | Should -Be $PropertyValue
+            }
+        }
+
+
+        Context 'When evaluating DSC methods of the class' {
+
+            It 'Should contain expected method - "<MethodName>"' -TestCases $testCasesValidDscMethodNames {
+                param ([System.String]$MethodName)
+
+                $azDevOpsProject = [AzDevOpsProject]::new()
+
+                $azDevOpsProject.PSobject.Methods.Name | Should -Contain $MethodName
+            }
+
+
         }
     }
 }
