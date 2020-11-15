@@ -1,3 +1,5 @@
+using module ..\..\..\..\output\AzureDevOpsDsc\0.2.0\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
+
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
@@ -55,15 +57,21 @@ InModuleScope 'AzureDevOpsDsc' {
         )
 
 
-        Context 'When called with valid "RequiredAction" values' {
+        class AzDevOpsApiDscResourceBaseExample : AzDevOpsApiDscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
+        {
+            [DscProperty(Key)]
+            [string]$DscKey
+        }
 
+
+        Context 'When called with valid "RequiredAction" values' {
 
             Context 'When "RequiredAction" value should have a related function' {
 
                 It 'Should not throw - <RequiredAction>' -TestCases $testCasesValidRequiredActionWithFunctions {
                     param ([System.String]$RequiredAction)
 
-                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBase]::new()
+                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
 
                     {$azDevOpsApiDscResourceBase.GetResourceFunctionName($RequiredAction)} | Should -Not -Throw
                 }
@@ -71,7 +79,7 @@ InModuleScope 'AzureDevOpsDsc' {
                 It 'Should return the correct, function name - "<RequiredAction>"' -TestCases $testCasesValidRequiredActionWithFunctions {
                     param ([System.String]$RequiredAction)
 
-                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBase]::new()
+                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
 
                     $azDevOpsApiDscResourceBase.GetResourceFunctionName($RequiredAction) | Should -Be "$($RequiredAction)-AzDevOpsApiDscResourceBase"
                 }
@@ -83,7 +91,7 @@ InModuleScope 'AzureDevOpsDsc' {
                 It 'Should not throw - <RequiredAction>' -TestCases $testCasesValidRequiredActionWithoutFunctions {
                     param ([System.String]$RequiredAction)
 
-                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBase]::new()
+                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
 
                     {$azDevOpsApiDscResourceBase.GetResourceFunctionName($RequiredAction)} | Should -Not -Throw
                 }
@@ -91,7 +99,7 @@ InModuleScope 'AzureDevOpsDsc' {
                 It 'Should return the correct, function name - "<RequiredAction>"' -TestCases $testCasesValidRequiredActionWithoutFunctions {
                     param ([System.String]$RequiredAction)
 
-                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBase]::new()
+                    $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
 
                     $azDevOpsApiDscResourceBase.GetResourceFunctionName($RequiredAction) | Should -BeNullOrEmpty
                 }
@@ -104,7 +112,7 @@ InModuleScope 'AzureDevOpsDsc' {
             It 'Should not throw - <RequiredAction>' -TestCases $testCasesInvalidRequiredActions {
                 param ([System.String]$RequiredAction)
 
-                $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBase]::new()
+                $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
 
                 {$azDevOpsApiDscResourceBase.GetResourceFunctionName($RequiredAction)} | Should -Throw
             }
