@@ -13,7 +13,7 @@ InModuleScope 'AzureDevOpsDsc' {
     $script:tag = @($($script:commandName -replace '-'))
 
 
-    Describe "$script:subModuleName\Classes\DscResourceBase\Method\$script:commandName" -Tag $script:tag {
+    Describe "$script:subModuleName\Classes\AzDevOpsApiDscResourceBase\$script:commandName" -Tag $script:tag {
 
         class AzDevOpsApiDscResourceBaseExample : AzDevOpsApiDscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
         {

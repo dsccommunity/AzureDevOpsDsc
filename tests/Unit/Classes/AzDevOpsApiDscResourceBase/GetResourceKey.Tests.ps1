@@ -15,7 +15,7 @@ InModuleScope 'AzureDevOpsDsc' {
     $script:tag = @($($script:commandName -replace '-'))
 
 
-    Describe "$script:subModuleName\Classes\DscResourceBase\Method\$script:commandName" -Tag $script:tag {
+    Describe "$script:subModuleName\Classes\AzDevOpsApiDscResourceBase\$script:commandName" -Tag $script:tag {
 
 
         Context 'When called from instance of the class with the correct/expected, DSC Resource prefix' {
