@@ -26,6 +26,11 @@ InModuleScope 'AzureDevOpsDsc' {
             {
                 [DscProperty(Key)]
                 [string]$DscKey
+
+                [string]GetResourceName()
+                {
+                    return 'DscResourceWithWrongPrefix'
+                }
             }
             $dscResourceWithWrongPrefix = [DscResourceWithWrongPrefix]@{}
 
@@ -40,7 +45,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $dscResourceWithWrongPrefix = [DscResourceWithWrongPrefix]::new()
 
-                $dscResourceWithWrongPrefix.GetResourceName() | Should -Be $dscResourceWithWrongPrefix.GetType().ToString()
+                $dscResourceWithWrongPrefix.GetResourceName() | Should -Be 'DscResourceWithWrongPrefix'.GetType().ToString()
             }
         }
 
@@ -69,7 +74,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
 
-                $azDevOpsApiDscResourceBase.GetResourceName() | Should -Be $azDevOpsApiDscResourceBase.GetType().ToString().Replace('AzDevOps','')
+                $azDevOpsApiDscResourceBase.GetResourceName() | Should -Be 'AzDevOpsApiDscResourceBaseExample'.Replace('AzDevOps','')
             }
         }
     }
