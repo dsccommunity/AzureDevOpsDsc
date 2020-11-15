@@ -1,6 +1,3 @@
-using module ..\..\..\..\source\Classes\DscResourceBase\DscResourceBase.psm1
-using module ..\..\..\..\source\DSCClassResources\AzDevOpsProject\AzDevOpsProject.psm1
-
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
@@ -35,14 +32,18 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                class AzDevOpsProject2 : AzDevOpsProject
+                class AzDevOpsApiDscResourceBase2Keys : AzDevOpsApiDscResourceBase
                 {
                     [DscProperty(Key)]
-                    [string]$ProjectName2
+                    [string]$DscKey1
+
+                    [DscProperty(Key)]
+                    [string]$DscKey2
                 }
 
-                $dscResourceWith2Keys = [AzDevOpsProject2]@{
-                    ProjectName = 'SomeProjectName2'
+                $dscResourceWith2Keys = [AzDevOpsApiDscResourceBase2Keys]@{
+                    DscKey1 = 'DscKey1Value'
+                    DscKey2 = 'DscKey2Value'
                 }
 
                 $dscResourceWith2Keys.GetDscResourceKeyPropertyName() | Should -Be ''
@@ -53,18 +54,25 @@ InModuleScope 'AzureDevOpsDsc' {
 
         Context 'When called from instance of class with a DSC key' {
 
-            $dscResourceWithKey = [AzDevOpsProject]@{
-                ProjectName = 'SomeProjectName'
+            class AzDevOpsApiDscResourceBase1Key : AzDevOpsApiDscResourceBase
+            {
+                [DscProperty(Key)]
+                [string]$DscKey1
             }
+
+            $dscResourceWith1Key = [AzDevOpsApiDscResourceBase1Key]@{
+                DscKey1 = 'DscKey1Value'
+            }
+
 
             It 'Should not throw' {
 
-                {$dscResourceWithKey.GetDscResourceKeyPropertyName()} | Should -Not -Throw
+                {$dscResourceWith1Key.GetDscResourceKeyPropertyName()} | Should -Not -Throw
             }
 
             It 'Should return the value of the DSC Resource key' {
 
-                $dscResourceWithKey.GetDscResourceKeyPropertyName() | Should -Be 'ProjectName'
+                $dscResourceWith1Key.GetDscResourceKeyPropertyName() | Should -Be 'DscKey1'
             }
         }
     }
