@@ -3,7 +3,11 @@ using module ..\..\Enums\RequiredAction\RequiredAction.psm1
 using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
 using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 
-# Re-defined here so it is recognised by 'Import-DscResource' (which won't post-parse the 'using' statements)
+# This import is needed to allow this class to use the action functions (e.g. Get/New/Set/Remove/Test) for the inheriting classes
+$script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\AzureDevOpsDsc.Common'
+Import-Module -Name $script:azureDevOpsDscCommonModulePath
+
+# This enum is re-defined here so it is recognised by 'Import-DscResource' (which won't pre/post-parse the 'using' statements)
 enum Ensure
 {
     Present
