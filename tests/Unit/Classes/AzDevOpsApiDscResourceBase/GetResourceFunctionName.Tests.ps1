@@ -61,6 +61,11 @@ InModuleScope 'AzureDevOpsDsc' {
         {
             [DscProperty(Key)]
             [string]$DscKey
+
+            [string]GetResourceName()
+            {
+                return 'ApiDscResourceBaseExample'
+            }
         }
 
 
@@ -81,7 +86,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
                     $azDevOpsApiDscResourceBase = [AzDevOpsApiDscResourceBaseExample]::new()
 
-                    $azDevOpsApiDscResourceBase.GetResourceFunctionName($RequiredAction) | Should -Be "$($RequiredAction)-AzDevOpsApiDscResourceBase"
+                    $azDevOpsApiDscResourceBase.GetResourceFunctionName($RequiredAction) | Should -Be "$($RequiredAction)-AzDevOpsApiDscResourceBaseExample"
                 }
             }
 
