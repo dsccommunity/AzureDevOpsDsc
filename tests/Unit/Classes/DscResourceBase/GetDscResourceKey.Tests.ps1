@@ -27,6 +27,32 @@ InModuleScope 'AzureDevOpsDsc' {
                 {$dscResourceBase.GetDscResourceKey()} | Should -Throw
             }
 
+
+            Context 'When "GetDscResourceKeyPropertyName" returns a $null value' {
+
+                It 'Should throw' {
+
+                    $dscResourceBase = [DscResourceBase]::new()
+                    $dscResourceBase | Add-Member -MemberType ScriptMethod 'GetDscResourceKeyPropertyName' -Value { return $null } -Force
+
+                    {$dscResourceBase.GetDscResourceKey()} | Should -Throw
+                }
+            }
+
+
+            Context 'When "GetDscResourceKeyPropertyName" returns a "" (empty string) value' {
+
+                It 'Should throw' {
+
+                    $dscResourceBase = [DscResourceBase]::new()
+                    $dscResourceBase | Add-Member -MemberType ScriptMethod 'GetDscResourceKeyPropertyName' -Value { return '' } -Force
+
+                    {$dscResourceBase.GetDscResourceKey()} | Should -Throw
+                }
+            }
+
+
+
         }
 
 
