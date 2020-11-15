@@ -45,7 +45,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $dscResourceWithWrongPrefix = [DscResourceWithWrongPrefix]::new()
 
-                $dscResourceWithWrongPrefix.GetResourceName() | Should -Be 'DscResourceWithWrongPrefix'.GetType().ToString()
+                $dscResourceWithWrongPrefix.GetResourceName() | Should -Be 'DscResourceWithWrongPrefix'
             }
         }
 
