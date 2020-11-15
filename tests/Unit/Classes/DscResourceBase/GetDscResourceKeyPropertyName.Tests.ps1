@@ -1,3 +1,5 @@
+using module ..\..\..\..\source\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
+
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
