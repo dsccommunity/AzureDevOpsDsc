@@ -22,18 +22,6 @@ InModuleScope 'AzureDevOpsDsc' {
 
         Context 'When called from instance of the class without the correct/expected, DSC Resource prefix' {
 
-
-            class AzDevOpsApiDscResourceBaseExample : AzDevOpsApiDscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
-            {
-                [DscProperty(Key)]
-                [string]$DscKey
-
-                [string]GetResourceName()
-                {
-                    return 'ApiDscResourceBaseExample'
-                }
-            }
-
             class DscResourceWithWrongPrefix : AzDevOpsApiDscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
             {
                 [DscProperty(Key)]
@@ -58,6 +46,17 @@ InModuleScope 'AzureDevOpsDsc' {
 
 
         Context 'When called from instance of the class with the correct/expected, DSC Resource prefix' {
+
+            class AzDevOpsApiDscResourceBaseExample : AzDevOpsApiDscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
+            {
+                [DscProperty(Key)]
+                [string]$DscKey
+
+                [string]GetResourceName()
+                {
+                    return 'ApiDscResourceBaseExample'
+                }
+            }
 
             It 'Should not throw' {
 
