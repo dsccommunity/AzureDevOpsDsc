@@ -22,8 +22,11 @@ InModuleScope 'AzureDevOpsDsc' {
 
         Context 'When called from instance of the class without the correct/expected, DSC Resource prefix' {
 
+
             class DscResourceWithWrongPrefix : AzDevOpsApiDscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
             {
+                [DscProperty(Key)]
+                [string]$DscKey
             }
             $dscResourceWithWrongPrefix = [DscResourceWithWrongPrefix]@{}
 
