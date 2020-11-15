@@ -1,7 +1,3 @@
-using module ..\..\..\..\source\Classes\DscResourceBase\DscResourceBase.psm1
-using module ..\..\..\..\source\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
-using module ..\..\..\..\source\DSCClassResources\AzDevOpsProject\AzDevOpsProject.psm1
-
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
@@ -24,7 +20,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                $dscResourceBase = [AzDevOpsApiDscResourceBase]::new()
+                $dscResourceBase = [DscResourceBase]::new()
 
                 {$dscResourceBase.GetDscResourceKey()} | Should -Throw
             }
@@ -36,7 +32,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                class AzDevOpsApiDscResourceBase2DscKeys : AzDevOpsApiDscResourceBase
+                class DscResourceBase2DscKeys : DscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
                 {
                     [DscProperty(Key)]
                     [string]$DscKey1
@@ -44,7 +40,7 @@ InModuleScope 'AzureDevOpsDsc' {
                     [DscProperty(Key)]
                     [string]$DscKey2
                 }
-                $dscResourceWith2Keys = [AzDevOpsApiDscResourceBase2DscKeys]@{}
+                $dscResourceWith2Keys = [DscResourceBase2DscKeys]@{}
 
                 {$dscResourceWith2Keys.GetDscResourceKey()} | Should -Throw
             }
@@ -54,13 +50,13 @@ InModuleScope 'AzureDevOpsDsc' {
 
         Context 'When called from instance of class with a DSC key' {
 
-            class AzDevOpsApiDscResourceBase1DscKey : AzDevOpsApiDscResourceBase
+            class DscResourceBase1DscKey : DscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
             {
                 [DscProperty(Key)]
                 [string]$DscKey1
             }
 
-            $dscResourceWith1Key = [AzDevOpsApiDscResourceBase1DscKey]@{
+            $dscResourceWith1Key = [DscResourceBase1DscKey]@{
                 DscKey1='DscKey1Value'
             }
 

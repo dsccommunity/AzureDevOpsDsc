@@ -1,6 +1,3 @@
-using module ..\..\..\..\source\Classes\DscResourceBase\DscResourceBase.psm1
-using module ..\..\..\..\source\DSCClassResources\AzDevOpsProject\AzDevOpsProject.psm1
-
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
@@ -23,48 +20,52 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should not throw' {
 
-                $dscResourceWithNoSetSupportProperties = [AzDevOpsApiDscResourceBase]::new()
+                $dscResourceWithNoSetSupportProperties = [DscResourceBase]::new()
 
                 {$dscResourceWithNoSetSupportProperties.GetDscResourcePropertyNamesWithNoSetSupport()} | Should -Not -Throw
             }
 
             It 'Should return empty array' {
 
-                $dscResourceWithNoSetSupportProperties = [AzDevOpsApiDscResourceBase]::new()
+                $dscResourceWithNoSetSupportProperties = [DscResourceBase]::new()
 
                 $dscResourceWithNoSetSupportProperties.GetDscResourcePropertyNamesWithNoSetSupport().Count | Should -Be 0
             }
-
         }
 
 
         Context 'When called from instance of a class with a DSC property with no "Set" support' {
 
+            class DscResourceBaseWithNoSet : DscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
+            {
+                [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
+                {
+                    return @('NoSetPropertyName1', 'NoSetPropertyName2')
+                }
+            }
+
             It 'Should not throw' {
 
-                $dscResourceWithANoSetSupportProperty = [AzDevOpsProject]@{
-                    ProjectName = 'SomeProjectName'
-                }
+                $dscResourceWithANoSetSupportProperty = [DscResourceBaseWithNoSet]@{}
 
                 { $dscResourceWithANoSetSupportProperty.GetDscResourcePropertyNamesWithNoSetSupport() } | Should -Not -Throw
             }
 
             It 'Should return the correct number of DSC resource property names that do not support "SET"' {
 
-                $dscResourceWithANoSetSupportProperty = [AzDevOpsProject]@{
-                    ProjectName = 'SomeProjectName'
-                }
+                $dscResourceWithANoSetSupportProperty = [DscResourceBaseWithNoSet]@{}
 
-                $dscResourceWithANoSetSupportProperty.GetDscResourcePropertyNamesWithNoSetSupport().Count | Should -Be 1
+                $dscResourceWithANoSetSupportProperty.GetDscResourcePropertyNamesWithNoSetSupport().Count | Should -Be 2
             }
 
             It 'Should return the correct DSC resource property names that do not support "SET"' {
 
-                $dscResourceWithANoSetSupportProperty = [AzDevOpsProject]@{
-                    ProjectName = 'SomeProjectName'
-                }
+                $dscResourceWithANoSetSupportProperty = [DscResourceBaseWithNoSet]@{}
 
-                $dscResourceWithANoSetSupportProperty.GetDscResourcePropertyNamesWithNoSetSupport() | Should -Contain 'SourceControlType'
+                $propertyNames = $dscResourceWithANoSetSupportProperty.GetDscResourcePropertyNamesWithNoSetSupport()
+
+                $propertyNames | Should -Contain 'NoSetPropertyName1'
+                $propertyNames | Should -Contain 'NoSetPropertyName2'
             }
         }
     }
