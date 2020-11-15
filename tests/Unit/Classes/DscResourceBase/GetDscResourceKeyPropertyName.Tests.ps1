@@ -24,7 +24,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $dscResourceWithNoDscKey = [DscResourceBase]::new()
 
-                $dscResourceWithNoDscKey.GetDscResourceKeyPropertyName() | Should -Be ''
+                {$dscResourceWithNoDscKey.GetDscResourceKeyPropertyName()} | Should -Throw
             }
         }
 
@@ -47,7 +47,7 @@ InModuleScope 'AzureDevOpsDsc' {
                     DscKey2 = 'DscKey2Value'
                 }
 
-                $dscResourceWith2Keys.GetDscResourceKeyPropertyName() | Should -Be ''
+                {$dscResourceWith2Keys.GetDscResourceKeyPropertyName()} | Should -Throw
             }
         }
 
