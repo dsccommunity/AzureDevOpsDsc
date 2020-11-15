@@ -1,6 +1,3 @@
-using module ..\..\..\..\source\Classes\DscResourceBase\DscResourceBase.psm1
-using module ..\..\..\..\source\DSCClassResources\AzDevOpsProject\AzDevOpsProject.psm1
-
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
@@ -23,60 +20,53 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should not throw' {
 
-                $dscResourceWithNoDscProperties = [AzDevOpsApiDscResourceBase]::new()
+                $dscResourceWithNoDscProperties = [DscResourceBase]::new()
 
                 {$dscResourceWithNoDscProperties.GetDscResourcePropertyNames()} | Should -Not -Throw
             }
 
             It 'Should return empty array' {
 
-                $dscResourceWithNoDscProperties = [AzDevOpsApiDscResourceBase]::new()
+                $dscResourceWithNoDscProperties = [DscResourceBase]::new()
 
                 $dscResourceWithNoDscProperties.GetDscResourcePropertyNames().Count | Should -Be 0
             }
-
         }
 
-        Context 'When called from instance of a class with multiple DSC Resource keys' {
+
+        Context 'When called from instance of a class with multiple DSC properties' {
+
+            class DscResourceBase2Properties : DscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
+            {
+                [DscProperty()]
+                [string]$ADscProperty
+
+                [DscProperty()]
+                [string]$AnotherDscProperty
+            }
+
+            $dscResourceWith2DscProperties = [DscResourceBase2Properties]@{
+                ADscProperty = 'ADscPropertyValue'
+                AnotherDscProperty = 'AnotherDscPropertyValue'
+            }
 
             It 'Should not throw' {
-
-                class AzDevOpsApiDscResourceBase2 : AzDevOpsApiDscResourceBase
-                {
-                    [DscProperty()]
-                    [string]$ADscProperty
-
-                    [DscProperty()]
-                    [string]$AnotherDscProperty
-                }
-
-                $dscResourceWith2DscProperties = [AzDevOpsApiDscResourceBase2]@{
-                    ADscProperty = 'ADscPropertyValue'
-                    AnotherDscProperty = 'AnotherDscPropertyValue'
-                }
 
                 { $dscResourceWith2DscProperties.GetDscResourcePropertyNames() } | Should -Not -Throw
             }
 
-            It 'Should not throw' {
-
-                class AzDevOpsApiDscResourceBase2 : AzDevOpsApiDscResourceBase
-                {
-                    [DscProperty()]
-                    [string]$ADscProperty
-
-                    [DscProperty()]
-                    [string]$AnotherDscProperty
-                }
-
-                $dscResourceWith2DscProperties = [AzDevOpsApiDscResourceBase2]@{
-                    ADscProperty = 'ADscPropertyValue'
-                    AnotherDscProperty = 'AnotherDscPropertyValue'
-                }
+            It 'Should return 2 property names' {
 
                 $dscResourceWith2DscProperties.GetDscResourcePropertyNames().Count | Should -Be 2
             }
 
+            It 'Should return the correct property names' {
+
+                $propertyNames = $dscResourceWith2DscProperties.GetDscResourcePropertyNames()
+
+                $propertyNames | Should -Contain 'ADscProperty'
+                $propertyNames | Should -Contain 'AnotherDscProperty'
+            }
         }
     }
 }

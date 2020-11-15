@@ -1,5 +1,3 @@
-using module ..\..\..\..\source\Classes\DscResourceBase\DscResourceBase.psm1
-
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
 
@@ -26,7 +24,6 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $dscResourceWithNoDscKey.GetDscResourceKeyPropertyName() | Should -Be ''
             }
-
         }
 
 
@@ -34,7 +31,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                class DscResourceBase2Keys : DscResourceBase
+                class DscResourceBase2Keys : DscResourceBase # Note: Ignore 'TypeNotFound' warning (it is available at runtime)
                 {
                     [DscProperty(Key)]
                     [string]$DscKey1
@@ -50,7 +47,6 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $dscResourceWith2Keys.GetDscResourceKeyPropertyName() | Should -Be ''
             }
-
         }
 
 
@@ -65,7 +61,6 @@ InModuleScope 'AzureDevOpsDsc' {
             $dscResourceWith1Key = [DscResourceBase1Key]@{
                 DscKey1 = 'DscKey1Value'
             }
-
 
             It 'Should not throw' {
 
