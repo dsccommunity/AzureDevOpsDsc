@@ -1,10 +1,10 @@
 # <#
 #     .SYNOPSIS
-#         Automated unit test for DSC_AzDevOpsProject DSC Resource.
+#         Automated unit test for AzDevOpsProject DSC Resource.
 # #>
 
 # $script:dscModuleName = 'AzureDevOpsDsc'
-# $script:dscResourceName = 'DSC_AzDevOpsProject'
+# $script:dscResourceName = 'AzDevOpsProject'
 
 # function Invoke-TestSetup
 # {
@@ -65,7 +65,7 @@
 #                     description = $getProjectDescription
 #                 }
 
-#                 $AzDevOpsProjectResource = [DSC_AzDevOpsProject]@{
+#                 $AzDevOpsProjectResource = [AzDevOpsProject]@{
 #                     ApiUri = $getApiUri
 #                     Pat = $getPat
 #                     ProjectId = $getProjectId
