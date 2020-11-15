@@ -15,4 +15,4 @@ markdownissues.txt
 node_modules
 package-lock.json
 
-JaCoCo_coverage.xml
+CodeCoverage.JaCoCo.xml
