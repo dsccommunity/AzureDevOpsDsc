@@ -1,4 +1,4 @@
-using module ..\..\..\..\source\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
+using module ..\..\..\..\source\Classes\DscResourceBase\DscResourceBase.psm1
 
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
@@ -22,7 +22,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                $dscResourceWithNoDscKey = [AzDevOpsApiDscResourceBase]::new()
+                $dscResourceWithNoDscKey = [DscResourceBase]::new()
 
                 $dscResourceWithNoDscKey.GetDscResourceKeyPropertyName() | Should -Be ''
             }
@@ -34,7 +34,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
             It 'Should throw' {
 
-                class AzDevOpsApiDscResourceBase2Keys : AzDevOpsApiDscResourceBase
+                class DscResourceBase2Keys : DscResourceBase
                 {
                     [DscProperty(Key)]
                     [string]$DscKey1
@@ -43,7 +43,7 @@ InModuleScope 'AzureDevOpsDsc' {
                     [string]$DscKey2
                 }
 
-                $dscResourceWith2Keys = [AzDevOpsApiDscResourceBase2Keys]@{
+                $dscResourceWith2Keys = [DscResourceBase2Keys]@{
                     DscKey1 = 'DscKey1Value'
                     DscKey2 = 'DscKey2Value'
                 }
@@ -56,13 +56,13 @@ InModuleScope 'AzureDevOpsDsc' {
 
         Context 'When called from instance of class with a DSC key' {
 
-            class AzDevOpsApiDscResourceBase1Key : AzDevOpsApiDscResourceBase
+            class DscResourceBase1Key : DscResourceBase
             {
                 [DscProperty(Key)]
                 [string]$DscKey1
             }
 
-            $dscResourceWith1Key = [AzDevOpsApiDscResourceBase1Key]@{
+            $dscResourceWith1Key = [DscResourceBase1Key]@{
                 DscKey1 = 'DscKey1Value'
             }
 
