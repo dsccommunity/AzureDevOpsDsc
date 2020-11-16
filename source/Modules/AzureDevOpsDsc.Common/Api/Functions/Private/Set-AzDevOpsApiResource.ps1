@@ -103,7 +103,7 @@ function Set-AzDevOpsApiResource
         [string]$apiHttpRequestBody = $Resource | ConvertTo-Json -Depth 10 -Compress
 
         [System.Object]$apiOperation = $null
-        [System.Object]$apiOperation = Invoke-RestMethod -Uri $apiResourceUri -Method 'Patch' `
+        [System.Object]$apiOperation = Invoke-AzDevOpsApiRestMethod -Uri $apiResourceUri -Method 'Patch' `
                                                          -Headers $apiHttpRequestHeader -Body $apiHttpRequestBody `
                                                          -ContentType 'application/json'
 

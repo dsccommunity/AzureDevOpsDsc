@@ -105,7 +105,7 @@ function Remove-AzDevOpsApiResource
         [Hashtable]$apiHttpRequestHeader = Get-AzDevOpsApiHttpRequestHeader -Pat $Pat
 
         [System.Object]$apiOperation = $null
-        [System.Object]$apiOperation = Invoke-RestMethod -Uri $apiResourceUri -Method 'Delete' `
+        [System.Object]$apiOperation = Invoke-AzDevOpsApiRestMethod -Uri $apiResourceUri -Method 'Delete' `
                                                          -Headers $apiHttpRequestHeader
 
         if ($Wait)
