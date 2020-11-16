@@ -50,7 +50,6 @@ function Invoke-AzDevOpsApiRestMethod
     param
     (
         [Parameter(Mandatory=$true)]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
         [Alias('Uri')]
         [System.String]
         $ApiUri,
@@ -70,7 +69,7 @@ function Invoke-AzDevOpsApiRestMethod
         [Parameter()]
         [System.String]
         [Alias('Body')]
-        $HttpBody = '',
+        $HttpBody,
 
         [Parameter()]
         [System.String]
@@ -89,21 +88,28 @@ function Invoke-AzDevOpsApiRestMethod
         $RetryIntervalMs = 250
     )
 
-    # Intially set this value to -1, as the first attempt does not want to be classes as a "RetryAttempt"
+    $invokeRestMethodParameters = @{
+        Uri         = $ApiUri
+        Method      = $HttpMethod
+        Headers     = $HttpHeaders
+        Body        = $HttpBody
+        ContentType = $HttpContentType
+    }
+
+    # Remove the 'Body' and 'ContentType' if not relevant to request
+    if ($HttpMethod -in $('Get','Delete'))
+    {
+        $invokeRestMethodParameters.Remove('Body')
+        $invokeRestMethodParameters.Remove('ContentType')
+    }
+
+    # Intially set this value to -1, as the first attempt does not want to be classed as a "RetryAttempt"
     $CurrentNoOfRetryAttempts = -1
 
     while ($CurrentNoOfRetryAttempts -lt $RetryAttempts)
     {
         try
         {
-            $invokeRestMethodParameters = @{
-                Uri         = $ApiUri
-                Method      = $HttpMethod
-                Headers     = $HttpHeaders
-                Body        = $HttpBody
-                ContentType = $HttpContentType
-            }
-
             return Invoke-RestMethod @invokeRestMethodParameters
         }
         catch
