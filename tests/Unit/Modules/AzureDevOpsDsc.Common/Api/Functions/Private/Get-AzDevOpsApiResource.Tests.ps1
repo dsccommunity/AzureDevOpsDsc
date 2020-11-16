@@ -57,7 +57,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
         $resourceIdThatIsInvalid = Get-TestCaseValue -ScopeName 'ResourceId' -TestCaseName 'Invalid'
 
         # Mock functions called in function
-        Mock Invoke-RestMethod {
+        Mock Invoke-AzDevOpsApiRestMethod {
 
             #$resourceIdThatExists = '8d4bff8d-6169-45cf-b085-fe12ad67e76b'
             [PSObject]$resources = Get-MockResourceJson | ConvertFrom-Json
@@ -149,14 +149,14 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     Assert-MockCalled 'Get-AzDevOpsApiHttpRequestHeader' -Times 1 -Exactly -Scope 'It'
                 }
 
-                It 'Should invoke "Invoke-RestMethod" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
+                It 'Should invoke "Invoke-AzDevOpsApiRestMethod" only once - "<ApiUri>", "<Pat>", "<ResourceName>"' -TestCases $testCasesValidApiUriPatResourceNames3 {
                     param ([System.String]$ApiUri, [System.String]$Pat, [System.String]$ResourceName)
 
-                    Mock Invoke-RestMethod {} -Verifiable
+                    Mock Invoke-AzDevOpsApiRestMethod {} -Verifiable
 
                     $resources = Get-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat -ResourceName $ResourceName
 
-                    Assert-MockCalled 'Invoke-RestMethod' -Times 1 -Exactly -Scope 'It'
+                    Assert-MockCalled 'Invoke-AzDevOpsApiRestMethod' -Times 1 -Exactly -Scope 'It'
                 }
 
             }

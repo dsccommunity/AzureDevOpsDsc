@@ -85,7 +85,7 @@ function Get-AzDevOpsApiResource
     }
 
 
-    # Prepare 'Invoke-RestMethod' method parameters
+    # Prepare 'Invoke-AzDevOpsApiRestMethod' method parameters
     $invokeRestMethodParameters = @{
         Uri = $(Get-AzDevOpsApiResourceUri @apiResourceUriParameters)
         Method = 'Get'
@@ -93,7 +93,7 @@ function Get-AzDevOpsApiResource
     }
 
 
-    [System.Management.Automation.PSObject]$apiResources = Invoke-RestMethod @invokeRestMethodParameters
+    [System.Management.Automation.PSObject]$apiResources = Invoke-AzDevOpsApiRestMethod @invokeRestMethodParameters
 
 
     # If not a single, resource request, set from the resource(s) in the 'value' property within the response

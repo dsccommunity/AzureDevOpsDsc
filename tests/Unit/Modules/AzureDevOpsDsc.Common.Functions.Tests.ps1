@@ -135,7 +135,7 @@ InModuleScope $script:subModuleName {
 
             BeforeEach {
 
-                Mock Invoke-RestMethod {
+                Mock Invoke-AzDevOpsApiRestMethod {
                     return @{
                         id = '14c15b78-b85d-401f-8095-504c57bbd79e'
                     }
