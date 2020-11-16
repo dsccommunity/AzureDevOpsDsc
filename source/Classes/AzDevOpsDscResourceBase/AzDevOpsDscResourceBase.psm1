@@ -28,10 +28,9 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     $Ensure
 
 
-
-    hidden [System.Management.Automation.PSObject]GetDscCurrentStateObject()
+    hidden [Hashtable]GetDscCurrentStateObjectGetParameters()
     {
-        # Setup a default set of parameters to pass into the object's 'Get' method
+        # Setup a default set of parameters to pass into the resource/object's 'Get' method
         $getParameters = @{
             ApiUri                                  = $this.ApiUri
             Pat                                     = $this.Pat
@@ -44,9 +43,22 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             $getParameters."$($this.GetResourceIdPropertyName())" = $this.GetResourceId()
         }
 
+        return $getParameters
+    }
+
+
+    hidden [PsObject]GetDscCurrentStateResourceObject([Hashtable]$GetParameters)
+    {
         # Obtain the 'Get' function name for the object, then invoke it
         $thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
-        $dscCurrentStateResourceObject = $(& $thisResourceGetFunctionName @getParameters)
+        return $(& $thisResourceGetFunctionName @GetParameters)
+    }
+
+
+    hidden [System.Management.Automation.PSObject]GetDscCurrentStateObject()
+    {
+        $getParameters = $this.GetDscCurrentStateObjectGetParameters()
+        $dscCurrentStateResourceObject = $this.GetDscCurrentStateResourceObject($getParameters)
 
         # If no object was returned (i.e it does not exist), create a default/empty object
         if ($null -eq $dscCurrentStateResourceObject)
