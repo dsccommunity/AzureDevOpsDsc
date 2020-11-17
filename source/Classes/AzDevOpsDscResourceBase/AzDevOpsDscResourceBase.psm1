@@ -221,6 +221,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                 ApiUri                      = $DesiredStateProperties.ApiUri
                 Pat                         = $DesiredStateProperties.Pat
 
+                Force                       = $true
+
                 # Set this from the 'Current' state as we would expect this to have an existing key/ID value to use
                 "$IdPropertyName" = $CurrentStateProperties."$IdPropertyName"
             }
@@ -243,6 +245,9 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
             # Do not need/want this passing as a parameter (the action taken will determine the desired state)
             $desiredStateParameters.Remove('Ensure')
+
+            # Add this to 'Force' subsequent function call
+            $desiredStateParameters.Force = $true
 
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
@@ -278,6 +283,11 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     }
 
 
+    [Int32]GetPostSetWaitTimeMs()
+    {
+        return 2000
+    }
+
     [void] SetToDesiredState()
     {
         [RequiredAction]$dscRequiredAction = $this.GetDscRequiredAction()
@@ -290,8 +300,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             $dscRequiredActionFunctionName = $this.GetResourceFunctionName($dscRequiredAction)
             $dscDesiredStateParameters = $this.GetDesiredStateParameters($dscCurrentStateProperties, $dscDesiredStateProperties, $dscRequiredAction)
 
-            & $dscRequiredActionFunctionName @dscDesiredStateParameters -Force | Out-Null
-            Start-Sleep -Seconds 5
+            & $dscRequiredActionFunctionName @dscDesiredStateParameters | Out-Null
+            Start-Sleep -Milliseconds $($this.GetPostSetWaitTimeMs())
         }
     }
 
