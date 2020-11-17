@@ -24,6 +24,10 @@ full release to [PowerShell Gallery](https://www.powershellgallery.com/).
 
 Please check out common DSC Community [contributing guidelines](https://dsccommunity.org/guidelines/contributing).
 
+Additionally, please [`AzureDevOpsDsc` contribution guidelines](CONTRIBUTING.md)
+for more information about contributing to this module (including an overview of
+module structure, design and setup of Integration tests).
+
 ## Change log
 
 A full list of changes in each version can be found in the [change log](CHANGELOG.md).
