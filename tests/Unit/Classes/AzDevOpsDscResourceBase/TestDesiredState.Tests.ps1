@@ -89,7 +89,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
         Context 'When no "GetDscRequiredAction()" does not return "None"'{
 
-            It 'Should return $false - "<$RequiredAction>"' -TestCases $testCasesValidButNotNone {
+            It 'Should not throw - "<RequiredAction>"' -TestCases $testCasesValidButNotNone {
                 param ([RequiredAction]$RequiredAction)
 
                 $azDevOpsDscResourceBase = [AzDevOpsDscResourceBaseExample]::new()
@@ -99,7 +99,7 @@ InModuleScope 'AzureDevOpsDsc' {
                 {$azDevOpsDscResourceBase.TestDesiredState()} | Should -Not -Throw
             }
 
-            It 'Should return $false - "<$RequiredAction>"' -TestCases $testCasesValidButNotNone {
+            It 'Should return $false - "<RequiredAction>"' -TestCases $testCasesValidButNotNone {
                 param ([RequiredAction]$RequiredAction)
 
                 $azDevOpsDscResourceBase = [AzDevOpsDscResourceBaseExample]::new()
