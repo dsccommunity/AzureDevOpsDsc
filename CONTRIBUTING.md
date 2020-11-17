@@ -95,6 +95,6 @@ development), the following actions need to be performed:
 
 >**Important**: It is not recommended to store any Personal Access Token (PAT)
 >in plain text within a text file or script. Ensure no PAT token is added to
-source control commmits as part of changes made. These PATs would likely be
+source control commits as part of changes made. These PATs would likely be
 available within the public, commit history and could/would pose a security risk
 to your Azure DevOps instance.
