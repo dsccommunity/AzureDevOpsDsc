@@ -11,7 +11,7 @@ Configuration Example
     (
         [Parameter(Mandatory = $true)]
         [string]
-        $Url,
+        $ApiUri,
 
         [Parameter(Mandatory = $true)]
         [string]
@@ -32,7 +32,7 @@ Configuration Example
             ProjectName          = 'Test Project'
             ProjectDescription   = 'A Test Project'
 
-            #ProjectId            = 'TestProject'
+            SourceControlType    = 'Git'
         }
 
     }
