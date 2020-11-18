@@ -1,8 +1,7 @@
 
 <#
     .DESCRIPTION
-        This example shows both how to ensure that an Azure DevOps project
-        can be logically deleted or be unequivocally/hard deleted.
+        This example shows how to delete a project called 'Test Project'.
 #>
 
 Configuration Example
@@ -11,7 +10,7 @@ Configuration Example
     (
         [Parameter(Mandatory = $true)]
         [string]
-        $Url,
+        $ApiUri,
 
         [Parameter(Mandatory = $true)]
         [string]
@@ -23,37 +22,14 @@ Configuration Example
     node localhost
     {
 
-        # Example: A logical delete (rename) of a project
-        AzDevOpsProject 'DeleteProject_Logical'
+        AzDevOpsProject 'DeleteProject'
         {
-            Ensure               = 'Absent'
+            Ensure               = 'Absent'  # 'Absent' ensures this will be removed/deleted
 
             ApiUri               = $ApiUri
             Pat                  = $Pat
 
-            ProjectName          = 'Test Logical Delete Project'
-            ProjectDescription   = 'A test project to be logically deleted'
-
-            # An optional, prefix for logically deleted Projects (default is 'zzDel_')
-            DeletedPrefix         = 'zzDel_'
-
-        }
-
-
-        # Example: An unequivocal delete of a project (i.e. a strong/pure/absolute delete)
-        AzDevOpsProject 'DeleteProject_Unequivocal'
-        {
-            Ensure               = 'Absent'
-
-            ApiUri               = $ApiUri
-            Pat                  = $Pat
-
-            ProjectName          = 'Test Unequivocal Delete Project'
-            ProjectDescription   = 'A test project to be unequivocally deleted'
-
-            # NOTE: By specifying the Force parameter, this will perform an actual delete of the project (as opposed to a logical delete)
-            Force                = $true
-
+            ProjectName          = 'Test Project'  # Identifies the name of the project to be deleted
         }
 
     }

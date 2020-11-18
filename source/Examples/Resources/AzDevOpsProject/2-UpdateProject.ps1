@@ -2,8 +2,8 @@
 <#
     .DESCRIPTION
         This example shows how to ensure that an Azure DevOps project
-        with a ProjectId of '1aeda1ef-a16d-4118-8817-d2f85d4f05d1' can be
-        renamed to 'A New Test Project Name'.
+        with a ProjectName of 'Test Project' can have it's description
+        updated to 'A Test Project with a new description'.
 #>
 
 Configuration Example
@@ -12,7 +12,7 @@ Configuration Example
     (
         [Parameter(Mandatory = $true)]
         [string]
-        $Url,
+        $ApiUri,
 
         [Parameter(Mandatory = $true)]
         [string]
@@ -23,16 +23,18 @@ Configuration Example
 
     node localhost
     {
-        AzDevOpsProject 'RenameProject'
+        AzDevOpsProject 'UpdateProject'
         {
             Ensure               = 'Present'
 
             ApiUri               = $ApiUri
             Pat                  = $Pat
 
-            ProjectId            = '1aeda1ef-a16d-4118-8817-d2f85d4f05d1'  # Example ProjectId (NOTE: This is mandatory for renaming a project)
-            ProjectName          = 'A New Test Project Name'
-            ProjectDescription   = 'A test project'
+            ProjectName          = 'Test Project'
+            ProjectDescription   = 'A Test Project with a new description'  # Updated property
+
+
+            #SourceControlType    = 'Git'  # Note: Update of this property is not supported
 
         }
 
