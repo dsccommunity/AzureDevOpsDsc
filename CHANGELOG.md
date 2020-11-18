@@ -9,3 +9,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - AzureDevOpsDsc
   - Added GitHub issue templates and pull request template ([issue #1](https://github.com/dsccommunity/AzureDevOpsDsc/issues/1)) 
+  - Added 'wrapper' functionality around the [Azure DevOps REST API](https://docs.microsoft.com/en-us/rest/api/azure/devops/)
+  - Added the `AzDevOpsProject`, DSC Resource
