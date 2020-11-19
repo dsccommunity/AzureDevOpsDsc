@@ -13,6 +13,10 @@ CopyPaths:
 Encoding: UTF8
 VersionedOutputDirectory: true
 
+# '.psm1' Prefix and Suffixes
+Prefix: prefix.ps1
+Suffix: suffix.ps1
+
 ####################################################
 #     Dependent Modules Configuration (Sampler)    #
 ####################################################
