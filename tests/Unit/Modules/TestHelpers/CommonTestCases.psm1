@@ -3293,8 +3293,8 @@ function Join-Hashtable
         $Hashtable2
     )
 
-    $keys = $Hashtable1.getenumerator() | foreach-object {$_.key}
-    $keys | foreach-object {
+    $keys = $Hashtable1.getenumerator() | ForEach-Object {$_.key}
+    $keys | ForEach-Object {
         $key = $_
         if ($Hashtable2.containskey($key))
         {
