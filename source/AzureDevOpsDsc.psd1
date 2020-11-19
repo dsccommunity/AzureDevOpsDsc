@@ -38,9 +38,7 @@
     AliasesToExport    = @()
 
     # Import all the 'DSCClassResource', modules as part of this module
-    NestedModules = @(
-        '.\DSCClassResources\AzDevOpsProject\AzDevOpsProject.psm1'
-    )
+    NestedModules = @()
 
     DscResourcesToExport = @('AzDevOpsProject')
 

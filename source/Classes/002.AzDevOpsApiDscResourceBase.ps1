@@ -1,5 +1,3 @@
-using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
-
 class AzDevOpsApiDscResourceBase : DscResourceBase
 {
     [System.String]$ResourceName = $this.GetResourceName()

@@ -1,10 +1,3 @@
-using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
-using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
-using module ..\..\Classes\AzDevOpsDscResourceBase\AzDevOpsDscResourceBase.psm1
-
-$script:azureDevOpsDscCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\AzureDevOpsDsc.Common'
-Import-Module -Name $script:azureDevOpsDscCommonModulePath
-
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class AzDevOpsProject : AzDevOpsDscResourceBase

@@ -1,4 +1,3 @@
-
 class DscResourceBase
 {
     hidden [System.String]GetDscResourceKey()
