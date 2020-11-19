@@ -1,5 +1,3 @@
-using module ..\..\Enums\Ensure\Ensure.psm1
-using module ..\..\Enums\RequiredAction\RequiredAction.psm1
 using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
 using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
 using module ..\..\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1

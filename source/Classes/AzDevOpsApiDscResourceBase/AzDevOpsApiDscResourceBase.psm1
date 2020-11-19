@@ -1,4 +1,3 @@
-using module ..\..\Enums\RequiredAction\RequiredAction.psm1
 using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
 
 class AzDevOpsApiDscResourceBase : DscResourceBase
