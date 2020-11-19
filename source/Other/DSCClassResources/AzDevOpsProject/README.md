@@ -40,7 +40,7 @@ within Azure DevOps) for this DSC Resource.
 ## Examples
 
 Examples of usage of the `AzDevOpsProject`, DSC Resource within a DSC
-configuration can be found [here](../../Examples/Resources/AzDevOpsProject).
+configuration can be found [here](../../../Examples/Resources/AzDevOpsProject).
 
 ## Related Commands
 
