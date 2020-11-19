@@ -1,13 +1,9 @@
-using module ..\..\Classes\DscResourceBase\DscResourceBase.psm1
-using module ..\..\Classes\AzDevOpsApiDscResourceBase\AzDevOpsApiDscResourceBase.psm1
-using module ..\..\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1
-
 # This enum is re-defined here so it is recognised by 'Import-DscResource' (which won't pre/post-parse the 'using' statements)
-enum Ensure
-{
-    Present
-    Absent
-}
+#enum Ensure
+#{
+#    Present
+#    Absent
+#}
 
 class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 {
