@@ -33,7 +33,7 @@ $functions = Get-ChildItem -Path $functionSubDirectoryPaths -Recurse -Include "*
 
 
 # Loop through all PSModule functions and import/dot-source them (and export them if 'Public')
-ForEach ($function in $functions)
+foreach ($function in $functions)
 {
     Write-Verbose "Dot-sourcing '$($function.FullName)'..."
     . (
