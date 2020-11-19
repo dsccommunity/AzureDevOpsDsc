@@ -1,5 +1,4 @@
-using module ..\..\..\..\output\AzureDevOpsDsc\0.2.0\Classes\AzDevOpsDscResourceBase\AzDevOpsDscResourceBase.psm1
-using module ..\..\..\..\output\AzureDevOpsDsc\0.2.0\Enums\RequiredAction\RequiredAction.psm1
+using module ..\..\..\..\output\AzureDevOpsDsc\0.2.0\AzureDevOpsDsc.psm1
 
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
