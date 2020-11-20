@@ -10,11 +10,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 $functionSubDirectoryPaths = @(
 
     # Api
-    "$PSScriptRoot\Api\Functions\Public",
     "$PSScriptRoot\Api\Functions\Private",
 
     # Connection
-    "$PSScriptRoot\Connection\Functions\Public",
     "$PSScriptRoot\Connection\Functions\Private",
 
     # Resources
@@ -22,12 +20,9 @@ $functionSubDirectoryPaths = @(
     "$PSScriptRoot\Resources\Functions\Private",
 
     # Server
-    "$PSScriptRoot\Server\Functions\Public",
-    "$PSScriptRoot\Server\Functions\Private",
 
     # Services
-    "$PSScriptRoot\Services\Functions\Public",
-    "$PSScriptRoot\Services\Functions\Private"
+    "$PSScriptRoot\Services\Functions\Public"
 )
 $functions = Get-ChildItem -Path $functionSubDirectoryPaths -Recurse -Include "*.ps1"
 
