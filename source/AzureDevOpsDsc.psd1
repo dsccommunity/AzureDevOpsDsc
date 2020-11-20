@@ -2,7 +2,7 @@
     RootModule = 'AzureDevOpsDsc.psm1'
 
     # Version number of this module.
-    moduleVersion      = '0.0.3'
+    moduleVersion      = '0.0.0'
 
     # ID used to uniquely identify this module
     GUID               = '3f8bbada-0fa9-4d80-b3d8-f019c3c60230'
