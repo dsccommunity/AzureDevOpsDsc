@@ -228,7 +228,7 @@ Begin
         if (-not $config -or ($config -is [array] -and $config.Length -le 0)) {
             throw "No build configuration found. Specify path via -BuildConfig"
         }
-        elseIf ($config -is [array]) {
+        elseif ($config -is [array]) {
             if ($config.Length -gt 1) {
                 throw "More than one build configuration found. Specify which one to use via -BuildConfig"
             }
