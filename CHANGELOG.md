@@ -8,4 +8,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - AzureDevOpsDsc
+  - Updated pipeline files to support change of default branch to main.
   - Added GitHub issue templates and pull request template ([issue #1](https://github.com/dsccommunity/AzureDevOpsDsc/issues/1)) 
