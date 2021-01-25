@@ -96,7 +96,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -156,7 +156,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -201,9 +201,9 @@ try
                 } | Should -Not -Throw
             }
 
-            It 'Should return $false or $null when Test-DscConfiguration is run' {
-                 Test-DscConfiguration -Verbose  | Should -BeIn @('False',$null)
-            }
+             It 'Should return $false or $null when Test-DscConfiguration is run' {
+                  Test-DscConfiguration -Verbose -ErrorAction Stop  | Should -BeIn @('False',$null)
+             }
         }
 
 
@@ -258,7 +258,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -315,7 +315,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -375,7 +375,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -477,7 +477,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -538,7 +538,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
 
         }
@@ -599,7 +599,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -659,7 +659,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
@@ -716,7 +716,7 @@ try
 
 
             It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
+                Test-DscConfiguration -Verbose -ErrorAction Stop | Should -Be 'True'
             }
         }
 
