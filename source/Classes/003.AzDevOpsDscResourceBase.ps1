@@ -189,7 +189,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                 break
             }
             default {
-                $errorMessage = "Could not obtain a valid 'Ensure' value within 'AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
+                $errorMessage = "Could not obtain a valid 'Ensure' value within '$($this.GetResourceName())' Test() function. Value was '$($desiredProperties.Ensure)'."
                 New-InvalidOperationException -Message $errorMessage
             }
         }
