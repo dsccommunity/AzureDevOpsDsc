@@ -421,7 +421,7 @@ try
             }
 
             It 'Should return $false or $null when Test-DscConfiguration is run' {
-                 Test-DscConfiguration -Verbose  | Should -BeIn @('False',$null)
+                 Test-DscConfiguration -Verbose -ErrorAction Stop | Should -BeIn @('False',$null)
             }
         }
 
