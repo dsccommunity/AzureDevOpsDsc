@@ -84,13 +84,15 @@ development), the following actions need to be performed:
   initiated.
 
 * You need to set the following environment variables so the build will determine
-  it needs to execute the Integration tests, and it has the Personal Access Token
-  (PAT) and API URI
+  it needs to execute the Integration tests, and it can use the [Personal Access Token
+  (PAT)](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=preview-page)
+  and API URI
 
   ```Powershell
     $env:CI = $true
-    $env:AZUREDEVOPSINTEGRATIONAPIURI = 'YourApiUriHere'
-    $env:AZUREDEVOPSINTEGRATIONPAT = 'YourPatHere'
+    $env:CONFIGURATION = 'Integration' 
+    $env:AZUREDEVOPSINTEGRATIONAPIURI = 'YourApiUriHere'  # IMPORTANT: Ensure this is a destructable organization/collection
+    $env:AZUREDEVOPSINTEGRATIONPAT = 'YourPatHere'        # This PAT must have access to update resources
   ```
 
 >**Important**: It is not recommended to store any Personal Access Token (PAT)

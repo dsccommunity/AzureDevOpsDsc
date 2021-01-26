@@ -79,7 +79,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         $thisType = $this.GetType()
         if ($thisType -eq [AzDevOpsDscResourceBase])
         {
-            throw "Method 'GetCurrentState()' in '$($thisType.Name)' must be overidden and called by an inheriting class."
+            $errorMessage = "Method 'GetCurrentState()' in '$($thisType.Name)' must be overidden and called by an inheriting class."
+            New-InvalidOperationException -Message $errorMessage
         }
         return $null
     }
@@ -143,8 +144,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
                         if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
-                            throw "The '$($this.GetType().Name)', DSC Resource does not support changes for/to the '$_' property."
-                            break
+                            $errorMessage = "The '$($this.GetType().Name)', DSC Resource does not support changes for/to the '$_' property."
+                            New-InvalidOperationException -Message $errorMessage
                         }
                     }
                 }
@@ -188,8 +189,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                 break
             }
             default {
-                throw "Could not obtain a valid 'Ensure' value within 'AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
-                return [RequiredAction]::Error
+                $errorMessage = "Could not obtain a valid 'Ensure' value within '$($this.GetResourceName())' Test() function. Value was '$($desiredProperties.Ensure)'."
+                New-InvalidOperationException -Message $errorMessage
             }
         }
 
@@ -258,7 +259,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         }
         else
         {
-            throw "A required action of '$RequiredAction' has not been catered for in GetDesiredStateParameters() method."
+            $errorMessage = "A required action of '$RequiredAction' has not been catered for in GetDesiredStateParameters() method."
+            New-InvalidOperationException -Message $errorMessage
         }
 
 
@@ -273,7 +275,15 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     [System.Boolean] Test()
     {
-        return $this.TestDesiredState()
+        # TestDesiredState() will throw an exception in certain expected circumstances. Return $false if this occurs.
+        try
+        {
+            return $this.TestDesiredState()
+        }
+        catch
+        {
+            return $false
+        }
     }
 
 

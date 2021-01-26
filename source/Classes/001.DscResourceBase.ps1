@@ -6,7 +6,8 @@ class DscResourceBase
 
         if ([String]::IsNullOrWhiteSpace($dscResourceKeyPropertyName))
         {
-            throw "Cannot obtain a 'DscResourceKey' value for the '$($this.GetType().Name)' instance."
+            $errorMessage = "Cannot obtain a 'DscResourceKey' value for the '$($this.GetType().Name)' instance."
+            New-InvalidOperationException -Message $errorMessage
         }
 
         return $this."$dscResourceKeyPropertyName"
@@ -37,12 +38,14 @@ class DscResourceBase
 
         if ($null -eq $dscResourceKeyPropertyNames -or $dscResourceKeyPropertyNames.Count -eq 0)
         {
-            throw "Could not obtain a 'DscResourceDscKey' property for type '$($this.GetType().Name)'."
+            $errorMessage = "Could not obtain a 'DscResourceDscKey' property for type '$($this.GetType().Name)'."
+            New-InvalidOperationException -Message $errorMessage
 
         }
         elseif ($dscResourceKeyPropertyNames.Count -gt 1)
         {
-            throw "Obtained more than 1 property for type '$($this.GetType().Name)' that was marked as a 'Key'. There must only be 1 property on the class set as the 'Key' for DSC."
+            $errorMessage = "Obtained more than 1 property for type '$($this.GetType().Name)' that was marked as a 'Key'. There must only be 1 property on the class set as the 'Key' for DSC."
+            New-InvalidOperationException -Message $errorMessage
         }
 
         return $dscResourceKeyPropertyNames[0]
