@@ -79,7 +79,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         $thisType = $this.GetType()
         if ($thisType -eq [AzDevOpsDscResourceBase])
         {
-            # If all retry attempts have failed, throw an exception
             $errorMessage = "Method 'GetCurrentState()' in '$($thisType.Name)' must be overidden and called by an inheriting class."
             New-InvalidOperationException -Message $errorMessage
         }
@@ -145,10 +144,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
                         if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
                         {
-                            # If all retry attempts have failed, throw an exception
                             $errorMessage = "The '$($this.GetType().Name)', DSC Resource does not support changes for/to the '$_' property."
                             New-InvalidOperationException -Message $errorMessage
-                            break
                         }
                     }
                 }
@@ -194,8 +191,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             default {
                 $errorMessage = "Could not obtain a valid 'Ensure' value within 'AzDevOpsProject' Test() function. Value was '$($desiredProperties.Ensure)'."
                 New-InvalidOperationException -Message $errorMessage
-
-                return [RequiredAction]::Error
             }
         }
 
