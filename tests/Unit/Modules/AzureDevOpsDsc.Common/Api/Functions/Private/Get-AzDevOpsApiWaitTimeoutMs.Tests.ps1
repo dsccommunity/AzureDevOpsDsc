@@ -18,7 +18,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
     Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
 
-        [Int32]$expectedWaitTimeoutMs = 10000
+        [Int32]$expectedWaitTimeoutMs = 300000
 
 
         Context 'When input parameters are valid' {
