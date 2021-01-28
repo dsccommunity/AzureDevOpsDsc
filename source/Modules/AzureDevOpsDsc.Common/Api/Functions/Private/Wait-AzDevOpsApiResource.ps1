@@ -94,7 +94,7 @@ function Wait-AzDevOpsApiResource
         $WaitIntervalMilliseconds = $(Get-AzDevOpsApiWaitIntervalMs),
 
         [Parameter()]
-        [ValidateRange(250,10000)]
+        [ValidateRange(250,300000)]
         [Alias('Timeout','TimeoutMilliseconds')]
         [System.Int32]
         $WaitTimeoutMilliseconds = $(Get-AzDevOpsApiWaitTimeoutMs),

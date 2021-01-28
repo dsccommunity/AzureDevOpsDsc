@@ -42,7 +42,7 @@ function Test-AzDevOpsApiTimeoutExceeded
         $EndTime,
 
         [Parameter(Mandatory = $true)]
-        [ValidateRange(250,10000)]
+        [ValidateRange(250,300000)]
         [Int32]
         $TimeoutMs
     )
