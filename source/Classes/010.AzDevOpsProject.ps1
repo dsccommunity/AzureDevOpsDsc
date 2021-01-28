@@ -1,3 +1,21 @@
+<#
+    .SYNOPSIS
+        A DSC Resource for Azure DevOps that represents the 'Project' resource.
+
+    .PARAMETER ProjectId
+        The 'Id' of the Azure DevOps, 'Project' resource.
+
+    .PARAMETER ProjectName
+        The 'Name' of the Azure DevOps, 'Project' resource.
+
+    .PARAMETER ProjectDescription
+        The 'Description' of the Azure DevOps, 'Project' resource.
+
+    .PARAMETER SourceControlType
+        The 'SourceControlType' of the Azure DevOps, 'Project' resource. Valid options are 'Git' and 'Tfvc'.
+
+        If the 'Project' resource already exists in Azure DevOps, the 'SourceControlType' cannot be changed to another type.
+#>
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class AzDevOpsProject : AzDevOpsDscResourceBase
