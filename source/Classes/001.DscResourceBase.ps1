@@ -1,3 +1,7 @@
+<#
+    .SYNOPSIS
+        Defines a base class from which other DSC resources inherit from.
+#>
 class DscResourceBase
 {
     hidden [System.String]GetDscResourceKey()
