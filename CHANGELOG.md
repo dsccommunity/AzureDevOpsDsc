@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([issue #1](https://github.com/dsccommunity/AzureDevOpsDsc/issues/1))
   - Added the `AzDevOpsProject`, DSC Resource
   - Fixed non-terminating, integration tests ([issue #18](https://github.com/dsccommunity/AzureDevOpsDsc/issues/18))
+  - Increased Azure DevOps, API timeout to 5 minutes to allow for busy/slow API
+    operations ([issue #25](https://github.com/dsccommunity/AzureDevOpsDsc/issues/25)).
+  - Updated contextual help ([issue #5](https://github.com/dsccommunity/AzureDevOpsDsc/issues/5)).
+  - Removed `Classes` directory from being output in packaged module ([issue #10](https://github.com/dsccommunity/AzureDevOpsDsc/issues/10)).
+  - Removed `Examples` directory from being output in packaged module ([issue #11](https://github.com/dsccommunity/AzureDevOpsDsc/issues/11)).
+  - Moved 'Ensure' and 'RequiredAction' enums into 'Enum' directory and out of
+    'prefix.ps1' ([issue #12](https://github.com/dsccommunity/AzureDevOpsDsc/issues/12)).
 - AzureDevOpsDsc.Common
   - Added 'wrapper' functionality around the [Azure DevOps REST API](https://docs.microsoft.com/en-us/rest/api/azure/devops/)
 

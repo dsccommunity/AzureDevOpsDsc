@@ -1,3 +1,7 @@
+<#
+    .SYNOPSIS
+        Defines a base class from which other DSC resources that use the AzureDevOps API inherit from.
+#>
 class AzDevOpsApiDscResourceBase : DscResourceBase
 {
     [System.String]$ResourceName = $this.GetResourceName()

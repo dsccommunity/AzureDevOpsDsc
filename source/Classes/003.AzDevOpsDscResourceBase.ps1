@@ -1,10 +1,7 @@
-# This enum is re-defined here so it is recognised by 'Import-DscResource' (which won't pre/post-parse the 'using' statements)
-#enum Ensure
-#{
-#    Present
-#    Absent
-#}
-
+<#
+    .SYNOPSIS
+        Defines a base class from which other AzureDevOps DSC resources inherit from.
+#>
 class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 {
     [DscProperty()]

@@ -57,7 +57,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             @{
                 StartTime = [DateTime]::new(2020,11,12, 09,35,00, 0)
                 EndTime = [DateTime]::new(2021,11,12, 09,35,00, 0) # 1 year longer than timeout
-                TimeoutMs = 10000
+                TimeoutMs = 300000
             }
         )
         $testCasesTimeoutNotExceeded = @(

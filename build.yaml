@@ -3,9 +3,7 @@
 #          ModuleBuilder Configuration             #
 ####################################################
 CopyPaths:
-  - Classes
   - en-US
-  - Examples
   - Modules
 Encoding: UTF8
 VersionedOutputDirectory: true

@@ -15,5 +15,5 @@ function Get-AzDevOpsApiWaitTimeoutMs
     [OutputType([Int32])]
     param ()
 
-    return 10000
+    return 300000
 }
