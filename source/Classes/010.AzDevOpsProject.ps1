@@ -2,6 +2,9 @@
     .SYNOPSIS
         A DSC Resource for Azure DevOps that represents the 'Project' resource.
 
+    .DESCRIPTION
+        A DSC Resource for Azure DevOps that represents the 'Project' resource.
+
     .PARAMETER ProjectId
         The 'Id' of the Azure DevOps, 'Project' resource.
 

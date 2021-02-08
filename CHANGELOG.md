@@ -22,9 +22,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     'prefix.ps1' ([issue #12](https://github.com/dsccommunity/AzureDevOpsDsc/issues/12)).
 - AzureDevOpsDsc.Common
   - Added 'wrapper' functionality around the [Azure DevOps REST API](https://docs.microsoft.com/en-us/rest/api/azure/devops/)
+- Added pipeline support for publish markdown content to the GitHub repository
+  wiki ([issue #15](https://github.com/dsccommunity/AzureDevOpsDsc/issues/15)).
+  This will publish the markdown documentation that is generated bu the
+  build pipeline.
+- Added new source folder `WikiSource`. Every markdown file in the folder
+  `WikiSource` will be published to the GitHub repository wiki. The markdown
+  file `Home.md` will be updated with the correct module version on each
+  publish to gallery (including preview).
 
 ### Changed
 
 - Enabled integration tests against https://dev.azure.com/azuredevopsdsc/ (see
   comment https://github.com/dsccommunity/AzureDevOpsDsc/issues/9#issuecomment-766375424
   for more information).
+- Updated pipeline file `RequiredModules.ps1` to latest pipeline pattern.
+- Updated pipeline file `build.yaml` to latest pipeline pattern.
+
+### Fixed
+
+- AzDevOpsProject
+  - Added description to the comment-based help.

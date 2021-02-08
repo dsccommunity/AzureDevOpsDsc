@@ -1,11 +1,8 @@
 @{
-    # Set up a mini virtual environment...
     PSDependOptions             = @{
         AddToPath  = $true
         Target     = 'output\RequiredModules'
-        Parameters = @{
-           Repository = ''
-        }
+        Parameters = @{}
     }
 
     InvokeBuild                 = 'latest'
