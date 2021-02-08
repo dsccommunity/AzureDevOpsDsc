@@ -39,6 +39,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     for more information).
   - Updated pipeline file `RequiredModules.ps1` to latest pipeline pattern.
   - Updated pipeline file `build.yaml` to latest pipeline pattern.
+- AzDevOpsProject
+  - Added a validate set to the parameter `SourceControlType` to (for now)
+    limit the parameter to the values `Git` and `Tfvc`.
+  - Update comment-based help to remove text which the valid values are
+    since that is now add automatically to the documentation (conceptual
+    help and wiki documentation).
 
 ### Fixed
 

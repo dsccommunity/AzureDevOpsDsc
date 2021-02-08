@@ -15,9 +15,10 @@
         The 'Description' of the Azure DevOps, 'Project' resource.
 
     .PARAMETER SourceControlType
-        The 'SourceControlType' of the Azure DevOps, 'Project' resource. Valid options are 'Git' and 'Tfvc'.
+        The 'SourceControlType' of the Azure DevOps, 'Project' resource.
 
-        If the 'Project' resource already exists in Azure DevOps, the 'SourceControlType' cannot be changed to another type.
+        If the 'Project' resource already exists in Azure DevOps, the parameter
+        `SourceControlType` cannot be used to changed to another type.
 #>
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
@@ -36,6 +37,7 @@ class AzDevOpsProject : AzDevOpsDscResourceBase
     [System.String]$ProjectDescription
 
     [DscProperty()]
+    [ValidateSet('Git', 'Tfvc')]
     [System.String]$SourceControlType
 
 
