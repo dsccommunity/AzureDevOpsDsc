@@ -63,7 +63,7 @@ Pester:
   ExcludeFromCodeCoverage:
     - Modules/DscResource.Common
   Script:
-    - tests/Integration
+    # Only run on unit test on './build.ps1 -Task test'
     - tests/Unit
   ExcludeTag:
   Tag:
