@@ -18,7 +18,7 @@
         The 'SourceControlType' of the Azure DevOps, 'Project' resource.
 
         If the 'Project' resource already exists in Azure DevOps, the parameter
-        `SourceControlType` cannot be used to changed to another type.
+        `SourceControlType` cannot be used to change to another type.
 #>
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
