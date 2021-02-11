@@ -31,14 +31,18 @@ InModuleScope 'AzureDevOpsDsc' {
             'Pat',
             'ProjectId',
             'ProjectName',
-            'ProjectDescription',
-            'SourceControlType'
+            'ProjectDescription'
         )
         $testCasesValidPropertyNames = $validPropertyNames | ForEach-Object {
             @{
                 PropertyName = $_
                 PropertyValue = $_ + "Value"
             }
+        }
+
+        $testCasesValidPropertyNames += @{
+            PropertyName = 'SourceControlType'
+            PropertyValue = 'Git'
         }
 
         Context 'When creating a new instance of the class' {
