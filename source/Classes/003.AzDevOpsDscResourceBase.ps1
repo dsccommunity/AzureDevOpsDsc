@@ -11,8 +11,13 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     [DscProperty()]
     [Alias('PersonalAccessToken')]
+    [Alias('AccessToken')]
     [System.String]
     $Pat
+
+    [DscProperty()]
+    [Alias('UseManagedIdentity')]
+    [System.Boolean]
 
     [DscProperty()]
     [Ensure]
