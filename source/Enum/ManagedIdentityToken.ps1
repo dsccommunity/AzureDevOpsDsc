@@ -70,7 +70,8 @@ Class ManagedIdentityToken {
     }
 
     [Bool]isExpired() {
-        if ($this.expires_on -lt (Get-Date)) { return $true }
+        # Remove 10 seconds from the expires_on time to account for clock skew.
+        if ($this.expires_on.AddSeconds(-10) -lt (Get-Date)) { return $true }
         return $false
     }
 
@@ -80,7 +81,7 @@ Class ManagedIdentityToken {
         # Prevent Execution and Writing to Files and Pipeline Variables.
 
         # Token can only be called within Invoke-DSCResource. Test to see if the calling function is Invoke-DSCResource
-        if (-not($this.TestCallStack('Invoke-DSCResource'))) { throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-DSCResource." }
+        if (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod'))) { throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod." }
         # Token cannot be returned within a Write-* function. Test to see if the calling function is Write-*
         if ($this.TestCallStack('Write-')) { throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function." }
         # Token cannot be written to a file. Test to see if the calling function is Out-File

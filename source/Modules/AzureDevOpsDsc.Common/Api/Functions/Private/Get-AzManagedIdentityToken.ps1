@@ -34,14 +34,14 @@ Function Get-AzManagedIdentityToken {
 
     # Get-AzManagedIdentityToken can only be called from New-AzManagedIdentity or Update-AzManagedIdentity
     if ($MyInvocation.InvocationName -ne 'New-AzManagedIdentity' -and $MyInvocation.InvocationName -ne 'Update-AzManagedIdentity') {
-        Throw "Get-AzManagedIdentityToken can only be called from New-AzManagedIdentity or Update-AzManagedIdentity"
+        Throw $AzManagedIdentityLocalizedData.Error_Azure_Get_AzManagedIdentity_Invalid_Caller
     }
 
     # Obtain the access token from Azure AD using the Managed Identity
 
     $ManagedIdentityParams = @{
         # Define the Azure instance metadata endpoint to get the access token
-        Uri = $LocalizedData.Global_Url_AzureInstanceMetadataUrl -f $LocalizedData.Global_AzureDevOps_Resource_Id
+        Uri = $AzManagedIdentityLocalizedData.Global_Url_AzureInstanceMetadataUrl -f $AzManagedIdentityLocalizedData.Global_AzureDevOps_Resource_Id
         Method = 'Get'
         Headers = @{Metadata="true"}
         'Context-Type' = 'Application/json'
@@ -56,7 +56,7 @@ Function Get-AzManagedIdentityToken {
     }
 
     $this.InvokeRestMethod($ManagedIdentityParams.Uri, $ManagedIdentityParams.Method, $ManagedIdentityParams.Headers)
-    if ($null -eq $response.access_token) { throw $LocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token }
+    if ($null -eq $response.access_token) { throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token }
 
     # TypeCast the response to a ManagedIdentityToken object
     $ManagedIdentity = [ManagedIdentityToken]::New($response)
@@ -67,7 +67,7 @@ Function Get-AzManagedIdentityToken {
     if (-not($verify)) { return $ManagedIdentity }
 
     # Test the Connection
-    if (-not(Test-AzManagedIdentityToken)) { throw $LocalizedData.Error_Azure_API_Call_Generic }
+    if (-not(Test-AzManagedIdentityToken)) { throw $AzManagedIdentityLocalizedData.Error_Azure_API_Call_Generic }
 
     # Return the AccessToken
     return ($ManagedIdentity)

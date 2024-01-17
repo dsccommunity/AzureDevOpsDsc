@@ -22,6 +22,9 @@ Function Update-AzManagedIdentity {
         Throw "[Update-AzManagedIdentity] Organization Name is not set. Please run 'New-AzManagedIdentity -OrganizationName <OrganizationName>'"
     }
 
+    # Clear the existing token.
+    $Global:DSCAZDO_ManagedIdentityToken = $null
+
     # Refresh the Token.
     $Global:DSCAZDO_ManagedIdentityToken = Get-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
 

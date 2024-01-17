@@ -5,6 +5,8 @@
 
         NOTE: Use of the '-IsValid' switch is required.
 
+        PAT Tokens and Managed Identity Tokens are allowed.
+
     .PARAMETER HttpRequestHeader
         The 'HttpRequestHeader' to be tested/validated.
 
@@ -38,5 +40,5 @@ function Test-AzDevOpsApiHttpRequestHeader
 
     return !($null -eq $HttpRequestHeader -or
              $null -eq $HttpRequestHeader.Authorization -or
-             $HttpRequestHeader.Authorization -inotlike 'Basic *')
+             $HttpRequestHeader.Authorization -match '^(Basic|Bearer):\s.+$')
 }
