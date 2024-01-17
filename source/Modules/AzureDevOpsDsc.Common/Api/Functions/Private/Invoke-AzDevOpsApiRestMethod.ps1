@@ -96,6 +96,11 @@ function Invoke-AzDevOpsApiRestMethod
         ContentType = $HttpContentType
     }
 
+    # If Managed Identity is enabled, add the access token to the headers
+    if ($Global:DSCAZDO_ManagedIdentityToken) {
+        $invokeRestMethodParameters.Headers.Add('Authorization', "Bearer $($Global:DSCAZDO_ManagedIdentityToken.Get())")
+    }
+
     # Remove the 'Body' and 'ContentType' if not relevant to request
     if ($HttpMethod -in $('Get','Delete'))
     {
