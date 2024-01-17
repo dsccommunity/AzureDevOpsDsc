@@ -89,16 +89,12 @@ function Invoke-AzDevOpsApiRestMethod
     )
 
     $invokeRestMethodParameters = @{
-        Uri         = $ApiUri
-        Method      = $HttpMethod
-        Headers     = $HttpHeaders
-        Body        = $HttpBody
-        ContentType = $HttpContentType
-    }
-
-    # If Managed Identity is enabled, add the access token to the headers
-    if ($Global:DSCAZDO_ManagedIdentityToken) {
-        $invokeRestMethodParameters.Headers.Add('Authorization', "Bearer $($Global:DSCAZDO_ManagedIdentityToken.Get())")
+        Uri                         = $ApiUri
+        Method                      = $HttpMethod
+        Headers                     = $HttpHeaders
+        Body                        = $HttpBody
+        ContentType                 = $HttpContentType
+        ResponseHeadersVariable     = 'responseHeaders'
     }
 
     # Remove the 'Body' and 'ContentType' if not relevant to request
@@ -113,12 +109,80 @@ function Invoke-AzDevOpsApiRestMethod
 
     while ($CurrentNoOfRetryAttempts -lt $RetryAttempts)
     {
+
+        #
+        # Slow down the retry attempts if the API resource is close to being overwelmed
+
+        # If there are any retry attempts, wait for the specified number of seconds before retrying
+        if ($Global:DSCAZDO_APIRateLimit.retryAfter -ge 0)
+        {
+            Write-Verbose -Message ("Waiting for {0} seconds before retrying." -f $Global:DSCAZDO_APIRateLimit.retryAfter)
+            Start-Sleep -Seconds $Global:DSCAZDO_APIRateLimit.retryAfter
+        }
+
+        # If the API resouce is close to beig overwelmed, wait for the specified number of seconds before sending the request
+        if (($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -le 50) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -ge 5))
+        {
+            Write-Verbose -Message "Resource is close to being overwelmed. Waiting for $RetryIntervalMs seconds before sending the request."
+            Start-Sleep -Milliseconds $RetryIntervalMs
+        }
+        # If the API resouce is overwelmed, wait for the specified number of seconds before sending the request
+        elseif ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5)
+        {
+            Write-Verbose -Message ("Resource is overwelmed. Waiting for {0} seconds to reset the TSTUs." -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
+            Start-Sleep -Milliseconds $RetryIntervalMs
+        }
+
+        #
+        # Test if a Managed Identity Token is required
+
+        if ($Global:DSCAZDO_ManagedIdentityToken -ne $null)
+        {
+            # Test if the Managed Identity Token has expired
+            if ($Global:DSCAZDO_ManagedIdentityToken.isExpired())
+            {
+                # If so, get a new token
+                $Global:DSCAZDO_ManagedIdentityToken = Get-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
+            }
+
+            # Add the Managed Identity Token to the HTTP Headers
+            $invokeRestMethodParameters.Headers.Add('Authorization', 'Bearer ' + $Global:DSCAZDO_ManagedIdentityToken.access_token)
+        }
+
+
+        #
+        # Invoke the REST method
+
         try
         {
-            return Invoke-RestMethod @invokeRestMethodParameters
+            $result = Invoke-RestMethod @invokeRestMethodParameters
+
+            # Update
+
+            return $result
+
         }
         catch
         {
+
+            # Check to see if it is an HTTP 429 (Too Many Requests) error
+            if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::TooManyRequests)
+            {
+                # If so, wait for the specified number of seconds before retrying
+                $retryAfter = $_.Exception.Response.Headers.'Retry-After'
+                if ($retryAfter)
+                {
+                    $retryAfter = [int]$retryAfter
+                    Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $retryAfter seconds before retrying."
+                    $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($_.Exception.Response.Headers)
+                } else {
+                    # If the Retry-After header is not present, wait for the specified number of milliseconds before retrying
+                    Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $RetryIntervalMs milliseconds before retrying."
+                    $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($RetryIntervalMs)
+                }
+
+            }
+
             # Increment the number of retries attempted and obtain any exception message
             $CurrentNoOfRetryAttempts++
             $restMethodExceptionMessage = $_.Exception.Message
