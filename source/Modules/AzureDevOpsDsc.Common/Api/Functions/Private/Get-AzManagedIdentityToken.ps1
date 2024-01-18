@@ -16,7 +16,7 @@ Get-AzManagedIdentityToken -OrganizationName "Contoso" -Verify
 Obtains the access token for the managed identity associated with the organization "Contoso" and verifies the connection.
 
 .NOTES
-This function requires the Azure PowerShell module.
+This function does not require the Azure PowerShell module.
 #>
 Function Get-AzManagedIdentityToken {
     [CmdletBinding()]
@@ -33,7 +33,7 @@ Function Get-AzManagedIdentityToken {
     )
 
     # Get-AzManagedIdentityToken can only be called from New-AzManagedIdentity or Update-AzManagedIdentity
-    if ($MyInvocation.InvocationName -ne 'New-AzManagedIdentity' -and $MyInvocation.InvocationName -ne 'Update-AzManagedIdentity') {
+    if (($MyInvocation.InvocationName -eq 'New-AzManagedIdentity') -or ($MyInvocation.InvocationName -eq 'Update-AzManagedIdentity')) {
         Throw $AzManagedIdentityLocalizedData.Error_Azure_Get_AzManagedIdentity_Invalid_Caller
     }
 
@@ -48,14 +48,8 @@ Function Get-AzManagedIdentityToken {
     }
 
     # Invoke the RestAPI
-
-    try {
-        $response = Invoke-AzDevOpsApiRestMethod @params @ManagedIdentityParams
-    } catch {
-        Throw
-    }
-
-    $this.InvokeRestMethod($ManagedIdentityParams.Uri, $ManagedIdentityParams.Method, $ManagedIdentityParams.Headers)
+    try { $response = Invoke-AzDevOpsApiRestMethod @ManagedIdentityParams } catch { Throw $_ }
+    # Test the response
     if ($null -eq $response.access_token) { throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token }
 
     # TypeCast the response to a ManagedIdentityToken object
