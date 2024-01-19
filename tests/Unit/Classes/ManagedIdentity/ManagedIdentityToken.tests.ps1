@@ -1,9 +1,8 @@
 # Initialize tests for module function
 
-#Wait-Debugger
-#. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
-#InModuleScope 'AzureDevOpsDsc.Common' {
+InModuleScope 'AzureDevOpsDsc.Common' {
 
     Describe "ManagedIdentityToken Class Tests" {
         Context "Constructor with Hashtable" {
@@ -119,4 +118,4 @@
         }
     }
 
-#}
+}
