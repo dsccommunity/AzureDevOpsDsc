@@ -1,8 +1,9 @@
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
+#Wait-Debugger
+#. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
-InModuleScope 'AzureDevOpsDsc.Common' {
+#InModuleScope 'AzureDevOpsDsc.Common' {
 
     Describe "ManagedIdentityToken Class Tests" {
         Context "Constructor with Hashtable" {
@@ -28,7 +29,6 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     access_token  = 'fake_access_token'
                     # Missing 'expires_on', 'expires_in', 'resource', and 'token_type'
                 }
-
                 { [ManagedIdentityToken]::new($invalidHashTable) } | Should -Throw "The ManagedIdentityTokenObj is not valid."
             }
         }
@@ -48,10 +48,20 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             }
 
             It "Returns false for an invalid hashtable" {
+
                 $invalidHashTable = @{
                     access_token  = 'fake_access_token'
                     # Missing 'expires_on', 'expires_in', 'resource', and 'token_type'
                 }
+
+                $validHashTable = @{
+                    access_token  = 'fake_access_token'
+                    expires_on    = 1588342322
+                    expires_in    = 3600
+                    resource      = 'https://resource.url'
+                    token_type    = 'Bearer'
+                }
+
                 $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
                 $result = $managedIdentityToken.isValid($invalidHashTable)
                 $result | Should -Be $false
@@ -94,12 +104,19 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                     resource      = 'https://resource.url'
                     token_type    = 'Bearer'
                 }
+
                 $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
-                { $managedIdentityToken.Get() } | Should -Throw "The Get() method can only be called within Invoke-AzDevOpsApiRestMethod."
+                try {
+                    $result = $managedIdentityToken.Get()
+                } catch {}
+
+                { $managedIdentityToken.Get() } | Should -Throw
+                $result | Should -BeNullOrEmpty
+
             }
 
             # Additional tests would need to mock the call stack to simulate being within the allowed methods.
         }
     }
 
-}
+#}

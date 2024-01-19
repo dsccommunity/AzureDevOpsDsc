@@ -36,13 +36,13 @@ Class APIRateLimit {
         # Check if all expected keys exist in the hashtable
         foreach ($key in $expectedKeys) {
             if (-not $APIRateLimitObj.ContainsKey($key)) {
-                Write-Host "[APIRateLimit] The hashtable does not contain the expected key: $key" -ForegroundColor Red
+                Write-Error "[APIRateLimit] The hashtable does not contain the expected key: $key"
                 return $false
             }
         }
 
         # If all checks pass, return true
-        Write-Verbose "[APIRateLimit] The hashtable is valid and contains all the expected keys." -ForegroundColor Green
+        Write-Verbose "[APIRateLimit] The hashtable is valid and contains all the expected keys."
         return $true
 
     }

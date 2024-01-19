@@ -6,6 +6,7 @@ Class ManagedIdentityToken {
     [Int]$expires_in
     [String]$resource
     [String]$token_type
+    hidden [bool]$linux = $IsLinux
 
     # Constructor
     ManagedIdentityToken([HashTable]$ManagedIdentityTokenObj) {
@@ -33,13 +34,13 @@ Class ManagedIdentityToken {
         # Check if all expected keys exist in the hashtable
         foreach ($key in $expectedKeys) {
             if (-not $ManagedIdentityTokenObj.ContainsKey($key)) {
-                Write-Host "The hashtable does not contain the expected key: $key" -ForegroundColor Red
+                Write-Verbose "[ManagedIdentityToken] The hashtable does not contain the expected key: $key"
                 return $false
             }
         }
 
         # If all checks pass, return true
-        Write-Host "The hashtable is valid and contains all the expected keys." -ForegroundColor Green
+        Write-Verbose "[ManagedIdentityToken] The hashtable is valid and contains all the expected keys."
         return $true
     }
 
@@ -47,7 +48,8 @@ Class ManagedIdentityToken {
     hidden [String]ConvertFromSecureString([SecureString]$SecureString) {
         # Convert a SecureString to a String
         $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
-        $String = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+        $String = ($this.linux) ? [System.Runtime.InteropServices.Marshal]::PtrToStringUni($BSTR) :
+                                  [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
         [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
         return $String
     }
