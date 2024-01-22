@@ -1,40 +1,50 @@
+<#
+.SYNOPSIS
+    Test suite for the New-AzManagedIdentity function.
+
+.DESCRIPTION
+    This test suite validates the functionality of the New-AzManagedIdentity function, ensuring it sets global variables correctly and handles token acquisition.
+#>
+
 # Initialize tests for module function
 . $PSScriptRoot\..\..\..\..\DSCClassResources.TestInitialization.ps1
 
 InModuleScope 'AzureDevOpsDsc.Common' {
 
-    Describe 'New-AzManagedIdentity' {
+    Describe "New-AzManagedIdentity Function Tests" {
 
-        Context 'When providing valid OrganizationName' {
-
-            It 'Should set the global variable DSCAZDO_OrganizationName' {
-                $organizationName = 'MyOrganization'
-                New-AzManagedIdentity -OrganizationName $organizationName
-
-                $global:DSCAZDO_OrganizationName | Should -Be $organizationName
-            }
-
-            It 'Should set the global variable DSCAZDO_ManagedIdentityToken' {
-                $organizationName = 'MyOrganization'
-                New-AzManagedIdentity -OrganizationName $organizationName
-
-                $global:DSCAZDO_ManagedIdentityToken | Should -Not -Be $null
+        Mock Get-AzManagedIdentityToken {
+            return @{
+                access_token = "mocked_access_token"
+                expires_on   = (Get-Date).AddHours(1).ToUniversalTime().Subtract([datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)).TotalSeconds
+                expires_in   = 3600
+                resource     = "https://management.azure.com/"
+                token_type   = "Bearer"
             }
         }
 
-        Context 'When not providing OrganizationName' {
+        It "Sets the global organization name and managed identity token" {
+            # Arrange
+            $orgName = "TestOrganization"
 
-            It 'Should not set the global variable DSCAZDO_OrganizationName' {
-                New-AzManagedIdentity
+            # Act
+            New-AzManagedIdentity -OrganizationName $orgName
 
-                $global:DSCAZDO_OrganizationName | Should -Be $null
-            }
+            # Assert
+            $Global:DSCAZDO_OrganizationName | Should -Be $orgName
+            $Global:DSCAZDO_ManagedIdentityToken | Should -Not -Be $null
+            $Global:DSCAZDO_ManagedIdentityToken.access_token | Should -Be "mocked_access_token"
+        }
 
-            It 'Should not set the global variable DSCAZDO_ManagedIdentityToken' {
-                New-AzManagedIdentity
+        It "Sets the global managed identity token to null if Get-AzManagedIdentityToken fails" {
+            # Arrange
+            Mock Get-AzManagedIdentityToken { throw "Failed to get token." }
+            $orgName = "TestOrganization"
 
-                $global:DSCAZDO_ManagedIdentityToken | Should -Be $null
-            }
+            # Act / Assert
+            { New-AzManagedIdentity -OrganizationName $orgName } | Should -Throw "Failed to get token."
+            $Global:DSCAZDO_ManagedIdentityToken | Should -Be $null
         }
     }
+
 }

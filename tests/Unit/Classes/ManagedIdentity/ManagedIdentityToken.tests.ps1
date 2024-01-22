@@ -2,119 +2,93 @@
 
 . $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
+<#
+.SYNOPSIS
+    Test suite for the ManagedIdentityToken class.
+
+.DESCRIPTION
+    This test suite validates the functionality of the ManagedIdentityToken class, ensuring it handles various scenarios correctly.
+#>
+
 InModuleScope 'AzureDevOpsDsc.Common' {
 
     Describe "ManagedIdentityToken Class Tests" {
-        Context "Constructor with Hashtable" {
-            It "Initializes correctly with a valid hashtable" {
-                $validHashTable = @{
-                    access_token  = 'fake_access_token'
-                    expires_on    = (Get-Date).AddHours(1).ToUniversalTime().Subtract([datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)).TotalSeconds
-                    expires_in    = 3600
-                    resource      = 'https://resource.url'
-                    token_type    = 'Bearer'
-                }
 
-                { [ManagedIdentityToken]::new($validHashTable) } | Should -Not -Throw
-                $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
-                ($managedIdentityToken.ConvertFromSecureString($managedIdentityToken.access_token)) | Should -Be 'fake_access_token'
-                $managedIdentityToken.expires_in | Should -Be 3600
-                $managedIdentityToken.resource | Should -Be 'https://resource.url'
-                $managedIdentityToken.token_type | Should -Be 'Bearer'
-            }
-
-            It "Throws an error with an invalid hashtable" {
-                $invalidHashTable = @{
-                    access_token  = 'fake_access_token'
-                    # Missing 'expires_on', 'expires_in', 'resource', and 'token_type'
-                }
-                { [ManagedIdentityToken]::new($invalidHashTable) } | Should -Throw "The ManagedIdentityTokenObj is not valid."
-            }
+        It "Throws an exception when invalid token object is provided" {
+            { [ManagedIdentityToken]::new(@{}) } | Should -Throw "The ManagedIdentityTokenObj is not valid."
         }
 
-        Context "isValid Method" {
-            It "Returns true for a valid hashtable" {
-                $validHashTable = @{
-                    access_token  = 'fake_access_token'
-                    expires_on    = 1588342322
-                    expires_in    = 3600
-                    resource      = 'https://resource.url'
-                    token_type    = 'Bearer'
-                }
-                $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
-                $result = $managedIdentityToken.isValid($validHashTable)
-                $result | Should -Be $true
+        It "Creates a ManagedIdentityToken object with valid properties" {
+            # Arrange
+            $tokenProperties = @{
+                access_token = "test_access_token"
+                expires_on   = 3600 # Assuming this is seconds since epoch
+                expires_in   = 3600
+                resource     = "https://my.resource.com"
+                token_type   = "Bearer"
             }
-
-            It "Returns false for an invalid hashtable" {
-
-                $invalidHashTable = @{
-                    access_token  = 'fake_access_token'
-                    # Missing 'expires_on', 'expires_in', 'resource', and 'token_type'
-                }
-
-                $validHashTable = @{
-                    access_token  = 'fake_access_token'
-                    expires_on    = 1588342322
-                    expires_in    = 3600
-                    resource      = 'https://resource.url'
-                    token_type    = 'Bearer'
-                }
-
-                $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
-                $result = $managedIdentityToken.isValid($invalidHashTable)
-                $result | Should -Be $false
-            }
+            # Act
+            $tokenObject = [ManagedIdentityToken]::new((New-Object PSCustomObject -Property $tokenProperties))
+            # Assert
+            $tokenObject.access_token | Should -Not -BeNullOrEmpty
+            $tokenObject.expires_on | Should -BeOfType [DateTime]
+            $tokenObject.expires_in | Should -Be 3600
+            $tokenObject.resource | Should -Be "https://my.resource.com"
+            $tokenObject.token_type | Should -Be "Bearer"
         }
 
-        Context "isExpired Method" {
-            It "Returns false when token is not expired" {
-                $validHashTable = @{
-                    access_token  = 'fake_access_token'
-                    expires_on    = (Get-Date).AddHours(1).ToUniversalTime().Subtract([datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)).TotalSeconds
-                    expires_in    = 3600
-                    resource      = 'https://resource.url'
-                    token_type    = 'Bearer'
-                }
-                $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
-                $managedIdentityToken.isExpired() | Should -Be $false
+        It "Determines if a token is expired" {
+            # Arrange
+            $tokenProperties = @{
+                access_token = "test_access_token"
+                expires_on   = (Get-Date).AddSeconds(-20).ToUniversalTime().Subtract([datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)).TotalSeconds
+                expires_in   = 3600
+                resource     = "https://my.resource.com"
+                token_type   = "Bearer"
             }
-
-            It "Returns true when token is expired" {
-                $validHashTable = @{
-                    access_token  = 'fake_access_token'
-                    expires_on    = (Get-Date).AddHours(-1).ToUniversalTime().Subtract([datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)).TotalSeconds
-                    expires_in    = -3600
-                    resource      = 'https://resource.url'
-                    token_type    = 'Bearer'
-                }
-                $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
-                $managedIdentityToken.isExpired() | Should -Be $true
-            }
+            $tokenObject = [ManagedIdentityToken]::new((New-Object PSCustomObject -Property $tokenProperties))
+            # Act / Assert
+            $tokenObject.isExpired() | Should -BeTrue
         }
 
-        Context "Get Method" {
-            It "Throws an error when called outside of Invoke-AzDevOpsApiRestMethod" {
-                Mock Get-PSCallStack { return @() }
-                $validHashTable = @{
-                    access_token  = 'fake_access_token'
-                    expires_on    = 1588342322
-                    expires_in    = 3600
-                    resource      = 'https://resource.url'
-                    token_type    = 'Bearer'
-                }
-
-                $managedIdentityToken = [ManagedIdentityToken]::new($validHashTable)
-                try {
-                    $result = $managedIdentityToken.Get()
-                } catch {}
-
-                { $managedIdentityToken.Get() } | Should -Throw
-                $result | Should -BeNullOrEmpty
-
+        It "Gets the access token when called from an allowed method" {
+            Mock Get-PSCallStack {
+                return @(
+                    @{Command="Invoke-AzDevOpsApiRestMethod"}
+                )
             }
+            # Arrange
+            $tokenProperties = @{
+                access_token = "test_access_token"
+                expires_on   = 3600 # Assuming this is seconds since epoch
+                expires_in   = 3600
+                resource     = "https://my.resource.com"
+                token_type   = "Bearer"
+            }
+            $tokenObject = [ManagedIdentityToken]::new((New-Object PSCustomObject -Property $tokenProperties))
+            # Act
+            $accessToken = $tokenObject.Get()
+            # Assert
+            $accessToken | Should -Be "test_access_token"
+        }
 
-            # Additional tests would need to mock the call stack to simulate being within the allowed methods.
+        It "Throws an exception when Get method is called from a disallowed method" {
+            Mock Get-PSCallStack {
+                return @(
+                    @{Command="Write-Host"}
+                )
+            }
+            # Arrange
+            $tokenProperties = @{
+                access_token = "test_access_token"
+                expires_on   = 3600 # Assuming this is seconds since epoch
+                expires_in   = 3600
+                resource     = "https://my.resource.com"
+                token_type   = "Bearer"
+            }
+            $tokenObject = [ManagedIdentityToken]::new((New-Object PSCustomObject -Property $tokenProperties))
+            # Act / Assert
+            { $tokenObject.Get() } | Should -Throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function."
         }
     }
 

@@ -1,40 +1,60 @@
-# ...
+# Initialize tests for module function
+. $PSScriptRoot\..\..\..\..\DSCClassResources.TestInitialization.ps1
 
-Context 'When input parameters are valid' {
+<#
+.SYNOPSIS
+    Test suite for the Test-AzManagedIdentityToken function.
 
-    # ...
+.DESCRIPTION
+    This test suite validates the functionality of the Test-AzManagedIdentityToken function, ensuring it properly tests the managed identity token.
+#>
 
-    Context 'When called with valid "Headers" parameter' {
+InModuleScope 'AzureDevOpsDsc.Common' {
 
-        It 'Should not throw - "Headers"' {
-            param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
+    Describe "Test-AzManagedIdentityToken Function Tests" {
 
-            $headers = @{
-                'Content-Type' = 'application/json'
-                'Authorization' = 'Bearer token'
+        Mock Invoke-AzDevOpsApiRestMethod {
+            return @{
+                value = @("Project1", "Project2")
             }
-
-            { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $headers } | Should -Not -Throw
         }
 
-        It 'Should invoke "Invoke-RestMethod" with the correct "Headers" parameter' {
-            param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-            $headers = @{
-                'Content-Type' = 'application/json'
-                'Authorization' = 'Bearer token'
+        BeforeAll {
+            # Define a mock Managed Identity object with a Get method
+            $mockManagedIdentity = New-Object -TypeName PSObject -Property @{
+                Get = [ScriptBlock]::Create('return "mocked_access_token"')
             }
 
-            Mock Invoke-RestMethod {
-                param ([System.String]$Uri, [System.String]$Method, [Hashtable]$Headers)
-                $Headers | Should -Be $headers
-            } -Verifiable
+            # Set up a global variable as expected by the function
+            $GLOBAL:DSCAZDO_OrganizationName = "MockOrganization"
+        }
 
-            Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $headers
+        It "Returns true when the managed identity token is valid" {
+            # Arrange
+            $AzManagedIdentityLocalizedData = @{
+                Global_Url_AZDO_Project = "https://dev.azure.com/{0}/_apis/projects"
+            }
 
-            Assert-MockCalled Invoke-RestMethod -Times 1 -Exactly -Scope 'It'
+            # Act
+            $result = Test-AzManagedIdentityToken -ManagedIdentity $mockManagedIdentity
+
+            # Assert
+            $result | Should -Be $true
+        }
+
+        It "Returns false when the managed identity token is not valid" {
+            # Arrange
+            Mock Invoke-AzDevOpsApiRestMethod { throw "Unauthorized access." }
+            $AzManagedIdentityLocalizedData = @{
+                Global_Url_AZDO_Project = "https://dev.azure.com/{0}/_apis/projects"
+            }
+
+            # Act
+            $result = Test-AzManagedIdentityToken -ManagedIdentity $mockManagedIdentity
+
+            # Assert
+            $result | Should -Be $false
         }
     }
 
-    # ...
 }
