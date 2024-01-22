@@ -18,6 +18,7 @@ Obtains the access token for the managed identity associated with the organizati
 .NOTES
 This function does not require the Azure PowerShell module.
 #>
+
 Function Get-AzManagedIdentityToken {
     [CmdletBinding()]
     param (
@@ -32,11 +33,6 @@ Function Get-AzManagedIdentityToken {
         $Verify
     )
 
-    # Get-AzManagedIdentityToken can only be called from New-AzManagedIdentity or Update-AzManagedIdentity
-    if (($MyInvocation.InvocationName -eq 'New-AzManagedIdentity') -or ($MyInvocation.InvocationName -eq 'Update-AzManagedIdentity')) {
-        Throw $AzManagedIdentityLocalizedData.Error_Azure_Get_AzManagedIdentity_Invalid_Caller
-    }
-
     # Obtain the access token from Azure AD using the Managed Identity
 
     $ManagedIdentityParams = @{
@@ -44,7 +40,7 @@ Function Get-AzManagedIdentityToken {
         Uri = $AzManagedIdentityLocalizedData.Global_Url_AzureInstanceMetadataUrl -f $AzManagedIdentityLocalizedData.Global_AzureDevOps_Resource_Id
         Method = 'Get'
         Headers = @{Metadata="true"}
-        'Context-Type' = 'Application/json'
+        ContentType = 'Application/json'
     }
 
     # Invoke the RestAPI
@@ -61,7 +57,7 @@ Function Get-AzManagedIdentityToken {
     if (-not($verify)) { return $ManagedIdentity }
 
     # Test the Connection
-    if (-not(Test-AzManagedIdentityToken)) { throw $AzManagedIdentityLocalizedData.Error_Azure_API_Call_Generic }
+    if (-not(Test-AzManagedIdentityToken $ManagedIdentity)) { throw $AzManagedIdentityLocalizedData.Error_Azure_API_Call_Generic }
 
     # Return the AccessToken
     return ($ManagedIdentity)

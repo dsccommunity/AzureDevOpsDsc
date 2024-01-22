@@ -8,11 +8,11 @@ Function New-AzManagedIdentity {
         $OrganizationName
     )
 
-    $Global:DSCAZDO_OrganizationName = $AZDOOrganizationName
+    $Global:DSCAZDO_OrganizationName = $OrganizationName
     $Global:DSCAZDO_ManagedIdentityToken = $null
 
     # If the Token is not Valid. Get a new Token.
-    $Global:DSCAZDO_ManagedIdentityToken = Get-AzManagedIdentityToken -OrganizationName $AZDOOrganizationName -Verify
+    $Global:DSCAZDO_ManagedIdentityToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName -Verify
 
 }
 

@@ -1,4 +1,5 @@
 
+
 Class ManagedIdentityToken {
 
     [SecureString]$access_token
@@ -9,7 +10,7 @@ Class ManagedIdentityToken {
     hidden [bool]$linux = $IsLinux
 
     # Constructor
-    ManagedIdentityToken([HashTable]$ManagedIdentityTokenObj) {
+    ManagedIdentityToken([PSCustomObject]$ManagedIdentityTokenObj) {
 
         # Validate that ManagedIdentityTokenObj is a HashTable and Contains the correct keys
         if (-not $this.isValid($ManagedIdentityTokenObj)) { throw "The ManagedIdentityTokenObj is not valid." }
@@ -17,11 +18,11 @@ Class ManagedIdentityToken {
         $epochStart = [datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)
 
         # Set the properties of the class
-        $this.access_token = $ManagedIdentityTokenObj.access_token | ConvertTo-SecureString -AsPlainText -Force
-        $this.expires_on = $epochStart.AddSeconds($ManagedIdentityTokenObj.expires_on)
-        $this.expires_in = $ManagedIdentityTokenObj.expires_in
-        $this.resource = $ManagedIdentityTokenObj.resource
-        $this.token_type = $ManagedIdentityTokenObj.token_type
+        $this.access_token  = $ManagedIdentityTokenObj.access_token | ConvertTo-SecureString -AsPlainText -Force
+        $this.expires_on    = $epochStart.AddSeconds($ManagedIdentityTokenObj.expires_on)
+        $this.expires_in    = $ManagedIdentityTokenObj.expires_in
+        $this.resource      = $ManagedIdentityTokenObj.resource
+        $this.token_type    = $ManagedIdentityTokenObj.token_type
 
     }
 
@@ -33,8 +34,8 @@ Class ManagedIdentityToken {
 
         # Check if all expected keys exist in the hashtable
         foreach ($key in $expectedKeys) {
-            if (-not $ManagedIdentityTokenObj.ContainsKey($key)) {
-                Write-Verbose "[ManagedIdentityToken] The hashtable does not contain the expected key: $key"
+            if (-not $ManagedIdentityTokenObj."$key") {
+                Write-Verbose "[ManagedIdentityToken] The hashtable does not contain the expected property: $key"
                 return $false
             }
         }
@@ -82,7 +83,7 @@ Class ManagedIdentityToken {
 
         # Prevent Execution and Writing to Files and Pipeline Variables.
 
-        # Token can only be called within Invoke-DSCResource. Test to see if the calling function is Invoke-DSCResource
+        # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
         if (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod'))) { throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod." }
         # Token cannot be returned within a Write-* function. Test to see if the calling function is Write-*
         if ($this.TestCallStack('Write-')) { throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function." }
