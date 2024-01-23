@@ -6,7 +6,7 @@
     This test suite validates the functionality of the Get-AzManagedIdentityToken function, ensuring it handles various scenarios correctly.
 #>
 
-. $PSScriptRoot\..\..\..\..\..\DSCClassResources.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\DSCClassResources.TestInitialization.ps1
 
 Describe "Get-AzManagedIdentityToken Function Tests" {
 

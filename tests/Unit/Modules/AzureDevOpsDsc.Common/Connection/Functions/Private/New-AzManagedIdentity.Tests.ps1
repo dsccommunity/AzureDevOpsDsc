@@ -7,7 +7,7 @@
 #>
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\..\..\DSCClassResources.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\DSCClassResources.TestInitialization.ps1
 
 InModuleScope 'AzureDevOpsDsc.Common' {
 
