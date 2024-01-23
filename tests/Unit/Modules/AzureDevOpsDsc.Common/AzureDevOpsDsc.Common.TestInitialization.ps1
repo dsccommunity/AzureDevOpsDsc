@@ -3,6 +3,9 @@
         Automated unit test for classes in AzureDevOpsDsc.
 #>
 
+$a = $PSScriptRoot
+Write-Host "A"
+Wait-Debugger
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestHelper.psm1')
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestCases.psm1')
 

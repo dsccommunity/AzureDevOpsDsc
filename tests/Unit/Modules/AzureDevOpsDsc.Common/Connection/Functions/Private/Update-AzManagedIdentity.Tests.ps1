@@ -1,5 +1,5 @@
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\DSCClassResources.TestInitialization.ps1
+. $PSScriptRoot\..\..\..\AzureDevOpsDsc.Common.TestInitialization.ps1
 
 Describe 'Update-AzManagedIdentity' {
 
