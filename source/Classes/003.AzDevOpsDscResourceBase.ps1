@@ -16,10 +16,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     $Pat
 
     [DscProperty()]
-    [Alias('UseManagedIdentity')]
-    [System.Boolean]
-
-    [DscProperty()]
     [Ensure]
     $Ensure
 
