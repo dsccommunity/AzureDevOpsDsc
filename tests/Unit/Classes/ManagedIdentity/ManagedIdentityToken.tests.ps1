@@ -1,6 +1,6 @@
 # Initialize tests for module function
 
-. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+. $PSScriptRoot\..\Classes.TestInitialization.ps1
 
 <#
 .SYNOPSIS
@@ -10,7 +10,7 @@
     This test suite validates the functionality of the ManagedIdentityToken class, ensuring it handles various scenarios correctly.
 #>
 
-InModuleScope 'AzureDevOpsDsc.Common' {
+InModuleScope 'AzureDevOpsDsc' {
 
     Describe "ManagedIdentityToken Class Tests" {
 

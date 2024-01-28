@@ -30,8 +30,6 @@ $script:dscModuleName = 'AzureDevOpsDsc'
 $script:dscModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
 $script:dscModuleFile = $($script:dscModule.ModuleBase +'\'+ $script:dscModuleName + ".psd1")
 
-Wait-Debugger
-
 Get-Module -Name $script:dscModuleName -All |
     Remove-Module $script:dscModuleName -Force -ErrorAction SilentlyContinue
 

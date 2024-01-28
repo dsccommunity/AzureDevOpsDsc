@@ -7,10 +7,9 @@
 #>
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+. $PSScriptRoot\..\Classes.TestInitialization.ps1
 
-
-InModuleScope 'AzureDevOpsDsc.Common' {
+InModuleScope 'AzureDevOpsDsc' {
 
     Describe "APIRateLimit Class Tests" {
 
