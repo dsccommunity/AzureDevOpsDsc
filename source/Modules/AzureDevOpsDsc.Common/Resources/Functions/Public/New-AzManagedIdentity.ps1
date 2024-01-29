@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+Creates a new Azure Managed Identity.
+
+.DESCRIPTION
+The New-AzManagedIdentity function creates a new Azure Managed Identity for use in Azure DevOps DSC.
+
+.PARAMETER OrganizationName
+Specifies the name of the organization associated with the Azure Managed Identity.
+
+.EXAMPLE
+New-AzManagedIdentity -OrganizationName "Contoso"
+
+This example creates a new Azure Managed Identity for the organization named "Contoso".
+
+#>
 Function New-AzManagedIdentity {
 
     [CmdletBinding()]
@@ -15,4 +31,3 @@ Function New-AzManagedIdentity {
     $Global:DSCAZDO_ManagedIdentityToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName -Verify
 
 }
-
