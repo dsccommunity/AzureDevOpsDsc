@@ -38,6 +38,13 @@ function Test-AzDevOpsApiHttpRequestHeader
         $IsValid
     )
 
+    # if Metadata is specifed within the header then it is a Managed Identity Token request
+    # and is valid.
+
+    if ($HttpRequestHeader.Metadata) { return $true }
+
+    # Otherwise, if the header is not valid, retrun false
+
     return !($null -eq $HttpRequestHeader -or
              $null -eq $HttpRequestHeader.Authorization -or
              $HttpRequestHeader.Authorization -match '^(Basic|Bearer):\s.+$')

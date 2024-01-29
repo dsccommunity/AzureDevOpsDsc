@@ -96,3 +96,11 @@ Class ManagedIdentityToken {
     }
 
 }
+
+# Function to create a new ManagedIdentityToken object
+Function global:New-ManagedIdentityToken ([hashtable]$ManagedIdentityTokenObj) {
+
+    # Create and return a new ManagedIdentityToken object
+    return [ManagedIdentityToken]::New($ManagedIdentityTokenObj)
+
+}

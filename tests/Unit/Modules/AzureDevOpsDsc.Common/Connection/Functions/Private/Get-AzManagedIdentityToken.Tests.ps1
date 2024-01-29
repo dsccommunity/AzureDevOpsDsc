@@ -12,14 +12,24 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
     Describe "Get-AzManagedIdentityToken Function Tests" {
 
-        Mock Invoke-AzDevOpsApiRestMethod {
-            return @{
-                access_token = 'mock_access_token'
-            }
-        }
+        BeforeAll {
 
-        Mock Test-AzManagedIdentityToken {
-            return $true
+            Import-Module 'AzureDevOpsDsc'
+
+            Mock Invoke-AzDevOpsApiRestMethod {
+                return @{
+                    access_token = 'mock_access_token'
+                    expires_on = 1000
+                    expires_in = 1000
+                    resource = "STRING"
+                    token_type = "bearer"
+                }
+            }
+
+            Mock Test-AzManagedIdentityToken {
+                return $true
+            }
+
         }
 
         It "Obtains a token without verifying if the Verify switch is not set" {

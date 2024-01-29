@@ -13,13 +13,16 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
     Describe "New-AzManagedIdentity Function Tests" {
 
-        Mock Get-AzManagedIdentityToken {
-            return @{
-                access_token = "mocked_access_token"
-                expires_on   = (Get-Date).AddHours(1).ToUniversalTime().Subtract([datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)).TotalSeconds
-                expires_in   = 3600
-                resource     = "https://management.azure.com/"
-                token_type   = "Bearer"
+        BeforeAll {
+
+            Mock Get-AzManagedIdentityToken {
+                return @{
+                    access_token = "mocked_access_token"
+                    expires_on   = (Get-Date).AddHours(1).ToUniversalTime().Subtract([datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)).TotalSeconds
+                    expires_in   = 3600
+                    resource     = "https://management.azure.com/"
+                    token_type   = "Bearer"
+                }
             }
         }
 
