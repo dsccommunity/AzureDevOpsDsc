@@ -249,3 +249,22 @@ function Get-CommandParameterSetParameter
         Where-Object { $_.Name -like $ParameterSetName}).Parameters
 
 }
+
+
+function Set-OutputDirAsModulePath
+{
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [String]
+        $RepositoryRoot
+    )
+
+    # Set the module path if it is not already set
+    if ($ENV:PSModulePath -like "*$($RepositoryRoot)*") { return }
+
+    $ModulePath = '{0}{1}\' -f (($IsLinux) ? ':' : ';'), $RepositoryRoot
+    $ENV:PSModulePath = "{0}{1}\output" -f $ENV:PSModulePath, $ModulePath
+    $ENV:PSModulePath = "{0}{1}\output\AzureDevOpsDsc\0.0.0\Modules" -f $ENV:PSModulePath, $ModulePath
+
+}
