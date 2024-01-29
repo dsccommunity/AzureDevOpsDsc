@@ -44,7 +44,7 @@ InModuleScope 'AzureDevOpsDsc' {
             # Assert
             $apiRateLimit.retryAfter | Should -Be 120
             $apiRateLimit.XRateLimitRemaining | Should -Be 10
-            $apiRateLimit.XRateLimitReset | Should -Be $expectedEpochTime
+            $apiRateLimit.XRateLimitReset | Should -Be 1583000000
         }
 
         It "Initializes with only retryAfter parameter correctly" {

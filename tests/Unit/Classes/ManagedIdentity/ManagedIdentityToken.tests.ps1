@@ -88,7 +88,7 @@ InModuleScope 'AzureDevOpsDsc' {
             }
             $tokenObject = [ManagedIdentityToken]::new((New-Object PSCustomObject -Property $tokenProperties))
             # Act / Assert
-            { $tokenObject.Get() } | Should -Throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function."
+            { $tokenObject.Get() } | Should -Throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod."
         }
     }
 
