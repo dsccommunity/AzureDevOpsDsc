@@ -37,7 +37,7 @@ Function Get-AzManagedIdentityToken {
 
     $ManagedIdentityParams = @{
         # Define the Azure instance metadata endpoint to get the access token
-        Uri = $AzManagedIdentityLocalizedData.Global_Url_AzureInstanceMetadataUrl -f $AzManagedIdentityLocalizedData.Global_AzureDevOps_Resource_Id
+        Uri = $AzManagedIdentityLocalizedData.Global_Url_Azure_Instance_Metadata_Url -f $AzManagedIdentityLocalizedData.Global_AzureDevOps_Resource_Id
         Method = 'Get'
         Headers = @{Metadata="true"}
         ContentType = 'Application/json'

@@ -21,9 +21,8 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
         BeforeAll {
             # Define a mock Managed Identity object with a Get method
-            $mockManagedIdentity = New-Object -TypeName PSObject -Property @{
-                Get = [ScriptBlock]::Create('return "mocked_access_token"')
-            }
+            $mockManagedIdentity = New-Object -TypeName psobject
+            $mockManagedIdentity | Add-Member -MemberType ScriptMethod -Name Get -Value { return "mocked_access_token" }
 
             # Set up a global variable as expected by the function
             $GLOBAL:DSCAZDO_OrganizationName = "MockOrganization"

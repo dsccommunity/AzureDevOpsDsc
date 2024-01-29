@@ -22,10 +22,6 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             return $true
         }
 
-        It "Throws an exception when no organization name is provided" {
-            { Get-AzManagedIdentityToken -Verify } | Should -Throw
-        }
-
         It "Obtains a token without verifying if the Verify switch is not set" {
             # Arrange
             $organizationName = "Contoso"

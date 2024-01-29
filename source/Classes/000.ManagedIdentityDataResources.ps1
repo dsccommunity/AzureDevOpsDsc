@@ -12,3 +12,5 @@ data AzManagedIdentityLocalizedData {
 '@
 
 }
+
+New-Variable -Name AzManagedIdentityLocalizedData -Value $AzManagedIdentityLocalizedData -Option ReadOnly -Scope Global -Force
