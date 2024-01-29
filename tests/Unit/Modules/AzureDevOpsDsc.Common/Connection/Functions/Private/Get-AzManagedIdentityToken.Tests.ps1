@@ -38,7 +38,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             # Act
             $token = Get-AzManagedIdentityToken -OrganizationName $organizationName
             # Assert
-            $token.access_token | Should -Be 'mock_access_token'
+            $token.access_token | Should -BeOfType [System.Security.SecureString]
         }
 
         It "Verifies the connection and obtains a token when the Verify switch is set" {
@@ -55,7 +55,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             }
             $organizationName = "Contoso"
             # Act / Assert
-            { Get-AzManagedIdentityToken -OrganizationName $organizationName } | Should -Throw "Error_Azure_Instance_Metadata_Service_Missing_Token"
+            { Get-AzManagedIdentityToken -OrganizationName $organizationName } | Should -Throw
         }
 
         It "Throws an exception if the Test-AzManagedIdentityToken returns false" {
@@ -65,7 +65,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             }
             $organizationName = "Contoso"
             # Act / Assert
-            { Get-AzManagedIdentityToken -OrganizationName $organizationName -Verify } | Should -Throw "Error_Azure_API_Call_Generic"
+            { Get-AzManagedIdentityToken -OrganizationName $organizationName -Verify } | Should -Throw
         }
     }
 

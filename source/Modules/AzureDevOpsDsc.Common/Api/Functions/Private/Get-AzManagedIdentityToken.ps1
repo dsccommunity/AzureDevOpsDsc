@@ -49,7 +49,7 @@ Function Get-AzManagedIdentityToken {
     if ($null -eq $response.access_token) { throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token }
 
     # TypeCast the response to a ManagedIdentityToken object
-    $ManagedIdentity = [ManagedIdentityToken]::New($response)
+    $ManagedIdentity = New-ManagedIdentityToken -ManagedIdentityTokenObj $response
     # Null the response
     $null = $response
 

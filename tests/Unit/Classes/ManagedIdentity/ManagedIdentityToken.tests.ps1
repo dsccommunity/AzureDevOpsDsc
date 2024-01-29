@@ -88,7 +88,8 @@ InModuleScope 'AzureDevOpsDsc' {
             }
             $tokenObject = [ManagedIdentityToken]::new((New-Object PSCustomObject -Property $tokenProperties))
             # Act / Assert
-            { $tokenObject.Get() } | Should -Throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod."
+            try { $tokenObject.Get() } catch { $exception = $_ }
+            $exception | Should -Be '[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod.'
         }
     }
 
