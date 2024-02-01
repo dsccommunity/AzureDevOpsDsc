@@ -1,6 +1,6 @@
 
 
-Class ManagedIdentityToken {
+class ManagedIdentityToken {
 
     [SecureString]$access_token
     [DateTime]$expires_on

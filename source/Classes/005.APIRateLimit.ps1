@@ -1,4 +1,4 @@
-Class APIRateLimit {
+class APIRateLimit {
 
     [Int]$retryAfter = 0
     [Int]$xRateLimitRemaining = 0
