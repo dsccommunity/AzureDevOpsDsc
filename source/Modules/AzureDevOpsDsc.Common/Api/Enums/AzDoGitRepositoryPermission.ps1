@@ -19,7 +19,7 @@ ID: 2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87
     For more information, refer to the official Microsoft documentation:
     https://learn.microsoft.com/en-us/azure/devops/organizations/security/namespace-reference?view=azure-devops#object-level-namespaces-and-permissions
 #>
-Enum AzDoGitRepositories {
+Enum AzDoGitRepositoryPermission {
     Administer = 1
     GenericRead = 2
     GenericContribute = 4

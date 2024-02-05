@@ -5,7 +5,7 @@
 Enum representing the permissions available for Azure DevOps projects.
 
 .DESCRIPTION
-The AzDoProjectPermission enum represents the various permissions that can be assigned to users or groups at the project level in Azure DevOps. These permissions control what actions users can perform within a project.
+The AzDoProjectGroupPermission enum represents the various permissions that can be assigned to users or groups at the project level in Azure DevOps. These permissions control what actions users can perform within a project.
 
 The enum values are based on the Azure DevOps namespace reference documentation, which can be found at the following URL:
 https://learn.microsoft.com/en-us/azure/devops/organizations/security/namespace-reference?view=azure-devops#project-level-namespaces-and-permissions
@@ -29,15 +29,15 @@ ID: 52d39943-cb85-4d7f-8fa8-c6baac873819
 This enum does not accept any parameters.
 
 .EXAMPLE
-The following example demonstrates how to use the AzDoProjectPermission enum:
+The following example demonstrates how to use the AzDoProjectGroupPermission enum:
 
-$permission = [AzDoProjectPermission]::GenericRead
-if ($permission -band [AzDoProjectPermission]::GenericRead) {
+$permission = [AzDoProjectGroupPermission]::GenericRead
+if ($permission -band [AzDoProjectGroupPermission]::GenericRead) {
     Write-Host "User has GenericRead permission"
 }
 
 #>
-Enum AzDoProjectPermission {
+Enum AzDoProjectGroupPermission {
     GenericRead = 1
     GenericWrite = 2
     Delete = 4

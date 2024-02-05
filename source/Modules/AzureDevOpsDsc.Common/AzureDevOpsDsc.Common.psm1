@@ -10,6 +10,15 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 # Obtain all functions within PSModule
 $functionSubDirectoryPaths = @(
 
+    # Classes
+    "$PSScriptRoot\Api\Classes\",
+
+    # Enum
+    "$PSScriptRoot\Api\Enums\",
+
+    # Data
+    "$PSScriptRoot\Api\Data\",
+
     # Api
     "$PSScriptRoot\Api\Functions\Private",
 

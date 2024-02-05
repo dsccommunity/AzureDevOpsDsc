@@ -83,6 +83,23 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         return $null
     }
 
+    hidden [Object[]]FindEnumValuesForInteger([System.Type]$EnumType, [Int32]$Value)
+    {
+        [System.Collections.ArrayList]$enumValues = @()
+
+        [System.Array]$enumValues = [System.Enum]::GetValues($EnumType)
+
+        [System.Collections.ArrayList]$matchingEnumValues = @()
+
+        $enumValues | ForEach-Object {
+            if ($Value -band $_ -eq $_)
+            {
+                $matchingEnumValues.Add($_)
+            }
+        }
+
+        return $matchingEnumValues.ToArray()
+    }
 
     hidden [Hashtable]GetDscDesiredStateProperties()
     {
