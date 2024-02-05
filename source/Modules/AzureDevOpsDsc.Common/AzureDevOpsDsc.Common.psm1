@@ -20,7 +20,10 @@ $functionSubDirectoryPaths = @(
     "$PSScriptRoot\Api\Data\",
 
     # Api
-    "$PSScriptRoot\Api\Functions\Private",
+    "$PSScriptRoot\Api\Functions\Private\Api",
+    "$PSScriptRoot\Api\Functions\Private\Cache",
+    "$PSScriptRoot\Api\Functions\Private\Helper",
+    "$PSScriptRoot\Api\Functions\Private\ManagedIdentity",
 
     # Connection
     "$PSScriptRoot\Connection\Functions\Private",
@@ -53,3 +56,9 @@ foreach ($function in $functions)
         Export-ModuleMember -Function $($function.BaseName)
     }
 }
+
+#
+# Module initialization
+
+# Initialize cache
+Initalize-AzDevOpsCache
