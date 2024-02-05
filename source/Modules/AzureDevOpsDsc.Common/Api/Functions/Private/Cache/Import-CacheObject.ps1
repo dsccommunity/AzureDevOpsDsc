@@ -23,8 +23,6 @@ None.
 None.
 
 .NOTES
-Author: Your Name
-Date: Current Date
 #>
 
 function Import-CacheObject {
@@ -39,33 +37,48 @@ function Import-CacheObject {
     )
 
     # Write initial verbose message
-    Write-Verbose "[Import-ObjectCache] Starting to import cache object for type: $CacheType"
+    Write-Verbose "[Import-CacheObject] Starting to import cache object for type: $CacheType"
 
     try {
+
         # Determine cache directory path
         $cachePath = Join-Path -Path $CacheRootPath -ChildPath 'Cache'
-
-        # Create cache directory if it does not exist
-        if (-not (Test-Path -Path $cachePath)) {
-            Write-Verbose "[Import-ObjectCache] Creating cache directory at path: $cachePath"
-            New-Item -Path $cachePath -ItemType Directory | Out-Null
-        }
 
         # Determine cache file path
         $cacheFile = Join-Path -Path $cachePath -ChildPath "$CacheType.clixml"
 
-        # Import content from cache file if it exists
-        if (Test-Path -Path $cacheFile) {
-            Write-Verbose "[Import-ObjectCache] Importing content from cache file at path: $cacheFile"
-            $Content = Import-Clixml -Path $cacheFile
-            Set-Variable -Name "AzDo$CacheType" -Value $Content -Scope Global -Force
-            Write-Verbose "[Import-ObjectCache] Successfully imported cache object for type: $CacheType"
-        } else {
-            Write-Error "[Import-ObjectCache] Cache file not found for Azure DevOps API: $CacheType"
+        # Check if cache file exists
+        if (-not (Test-Path -Path $cacheFile)) {
+            Write-Error "[Import-CacheObject] Cache file not found at path: $cacheFile"
         }
 
+        Write-Verbose "[Import-CacheObject] Importing content from cache file at path: $cacheFile"
+
+        $Content = Import-Clixml -Path $cacheFile
+        Set-Variable -Name "AzDo$CacheType" -Value $Content -Scope Global -Force
+        Write-Verbose "[Import-CacheObject] Successfully imported cache object for type: $CacheType"
+
+        # Convert the imported cache object to a list of CacheItem objects
+        $newCache = [System.Collections.Generic.List[CacheItem]]
+        $cacheValue = Get-Variable -Name "AzDo$CacheType" -ValueOnly
+        $newCache = $cacheValue | ForEach-Object {
+
+            # If the key is empty, skip the item
+            if ([string]::IsNullOrEmpty($_.Key)) { return }
+
+            # Create a new CacheItem object and add it to the list
+            $newCache.Add([CacheItem]::New($_.Key, $_.Value))
+
+        }
+
+        # Update the new cache object
+        Set-Variable -Name "AzDo$CacheType" -Value $newCache -Scope Global -Force
+        Write-Verbose "[Import-CacheObject] Cache object imported successfully for '$CacheType'."
+
     } catch {
-        Write-Error "[Import-ObjectCache] Failed to import cache for Azure DevOps API: $_"
+
+        Write-Error "[Import-CacheObject] Failed to import cache for Azure DevOps API: $_"
         throw
+
     }
 }
