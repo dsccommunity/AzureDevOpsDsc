@@ -1,0 +1,4 @@
+Function Test-AzDoOrganizationGroup {
+
+
+}

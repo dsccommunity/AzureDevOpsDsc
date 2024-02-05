@@ -1,0 +1,4 @@
+Function Remove-AzDoOrganizationGroup {
+
+
+}
