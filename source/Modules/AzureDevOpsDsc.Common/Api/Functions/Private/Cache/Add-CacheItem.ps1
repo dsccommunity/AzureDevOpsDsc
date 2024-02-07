@@ -13,7 +13,7 @@ Function Add-CacheItem {
     The value of the cache item to add.
 
     .PARAMETER Type
-    The type of the cache item to add. Valid values are 'Project', 'Team', 'Group', 'GroupDescriptor'.
+    The type of the cache item to add. Valid values are 'Project', 'Team', 'Group', 'SecurityDescriptor'.
 
     .EXAMPLE
     Add-CacheItem -Key 'MyKey' -Value 'MyValue' -Type 'Project'
@@ -32,7 +32,7 @@ Function Add-CacheItem {
         $Value,
 
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
+        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]
         $Type
     )

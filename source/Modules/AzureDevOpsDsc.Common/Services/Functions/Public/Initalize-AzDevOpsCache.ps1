@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     This function initializes the cache for Azure DevOps resources by loading the cache from a file for each type.
-    The cache types include Project, Team, Group, and GroupDescriptor.
+    The cache types include Project, Team, Group, and SecurityDescriptor.
 
 .PARAMETER None
     This function does not accept any parameters.
@@ -25,7 +25,7 @@ function Initialize-Cache {
 
     try {
         # Attempt to load the cache from the file for each type
-        $cacheTypes = @('Project', 'Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')
+        $cacheTypes = @('Project', 'Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')
         foreach ($cacheType in $cacheTypes) {
             Write-Verbose "[Initialize-Cache] Initializing cache object of type: $cacheType"
             Initialize-CacheObject -CacheType $cacheType

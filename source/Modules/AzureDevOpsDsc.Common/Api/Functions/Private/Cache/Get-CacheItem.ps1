@@ -25,7 +25,7 @@ function Get-CacheItem {
         $Key,
 
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
+        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]
         $Type,
 

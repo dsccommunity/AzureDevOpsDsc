@@ -6,7 +6,7 @@
     This function is used to initialize the cache object for Azure DevOps API. It checks if the cache file exists and imports the cache object if it does. If the cache file does not exist, it creates a new cache object.
 
 .PARAMETER CacheType
-    Specifies the type of cache to initialize. Valid values are 'Project', 'Team', 'Group', and 'GroupDescriptor'.
+    Specifies the type of cache to initialize. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
 
 .EXAMPLE
     Initialize-CacheObject -CacheType Project
@@ -18,7 +18,7 @@ Function Initialize-CacheObject {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
+        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType
     )
 

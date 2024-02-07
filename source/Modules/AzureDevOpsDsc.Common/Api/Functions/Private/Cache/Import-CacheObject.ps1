@@ -6,7 +6,7 @@ Imports a cache object for Azure DevOps API.
 The Import-CacheObject function is used to import a cache object for Azure DevOps API. It checks if the cache file exists and imports its content if found. The cache object is then stored in a global variable.
 
 .PARAMETER CacheType
-Specifies the type of cache object to import. Valid values are 'Project', 'Team', 'Group', and 'GroupDescriptor'.
+Specifies the type of cache object to import. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
 
 .PARAMETER CacheRootPath
 Specifies the root path where the cache directory is located. By default, it uses the current script's root path.
@@ -29,7 +29,7 @@ function Import-CacheObject {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
+        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType,
 
         [Parameter()]

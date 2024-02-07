@@ -6,7 +6,7 @@ Sets a cache object for Azure DevOps API.
 The Set-CacheObject function is used to set a cache object for Azure DevOps API. It creates a cache directory if it does not exist, saves the content to a cache file, and sets the content to a global variable.
 
 .PARAMETER CacheType
-Specifies the type of cache object. Valid values are 'Project', 'Team', 'Group', and 'GroupDescriptor'.
+Specifies the type of cache object. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
 
 .PARAMETER Content
 Specifies the content to be cached. This should be an array of objects.
@@ -37,7 +37,7 @@ function Set-CacheObject {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
+        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType,
 
         [Parameter(Mandatory)]

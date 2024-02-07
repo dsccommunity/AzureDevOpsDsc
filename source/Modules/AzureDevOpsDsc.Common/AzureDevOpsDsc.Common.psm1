@@ -62,3 +62,8 @@ foreach ($function in $functions)
 
 # Initialize cache
 Initalize-AzDevOpsCache
+
+# Set the Group Cache
+Set-AzDoAPIGroupCache
+
+#

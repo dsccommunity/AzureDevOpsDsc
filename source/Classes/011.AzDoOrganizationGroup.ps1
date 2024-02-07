@@ -4,6 +4,10 @@ class AzDoOrganizationGroup : AzDevOpsDscResourceBase {
     [Alias('Name')]
     [System.String]$GroupName
 
+    [DscProperty(Key, Mandatory)]
+    [Alias('DisplayName')]
+    [System.String]$GroupDisplayName
+
     [DscProperty()]
     [Alias('Description')]
     [System.String]$GroupDescription
@@ -34,6 +38,7 @@ class AzDoOrganizationGroup : AzDevOpsDscResourceBase {
             }
             $properties.GroupName = $CurrentResourceObject.name
             $properties.GroupDescription = $CurrentResourceObject.description
+            $properties.GroupDisplayName = $CurrentResourceObject.displayName
         }
 
         return $properties

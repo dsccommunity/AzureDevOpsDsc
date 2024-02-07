@@ -6,7 +6,7 @@ Exports content to a cache file and saves it to a global variable.
 The Export-CacheObject function exports content to a cache file and saves it to a global variable. It is used in the AzureDevOpsDsc module for caching Azure DevOps API responses.
 
 .PARAMETER CacheType
-Specifies the type of cache. Valid values are 'Project', 'Team', 'Group', and 'GroupDescriptor'.
+Specifies the type of cache. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
 
 .PARAMETER Content
 Specifies the content to be exported to the cache file.
@@ -34,7 +34,7 @@ Function Export-CacheObject {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
+        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType,
 
         [Parameter(Mandatory)]

@@ -3,10 +3,10 @@
 Retrieves a cache object of a specified type.
 
 .DESCRIPTION
-The Get-CacheObject function is used to retrieve a cache object of a specified type. It first checks if the cache object is available in memory, and if not, it attempts to import it. The function supports different cache types such as Project, Team, Group, and GroupDescriptor.
+The Get-CacheObject function is used to retrieve a cache object of a specified type. It first checks if the cache object is available in memory, and if not, it attempts to import it. The function supports different cache types such as Project, Team, Group, and SecurityDescriptor.
 
 .PARAMETER CacheType
-Specifies the type of cache object to retrieve. Valid values are 'Project', 'Team', 'Group', and 'GroupDescriptor'.
+Specifies the type of cache object to retrieve. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
 
 .PARAMETER CacheRootPath
 Specifies the root path of the cache. By default, it uses the path of the current script.
@@ -36,7 +36,7 @@ function Get-CacheObject {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
+        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType,
 
         [Parameter()]
