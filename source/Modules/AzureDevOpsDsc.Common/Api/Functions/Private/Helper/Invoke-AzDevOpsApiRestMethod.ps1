@@ -85,7 +85,12 @@ function Invoke-AzDevOpsApiRestMethod
         [Parameter()]
         [ValidateRange(250,10000)]
         [Int32]
-        $RetryIntervalMs = 250
+        $RetryIntervalMs = 250,
+
+        [Parameter()]
+        [String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+
     )
 
     $invokeRestMethodParameters = @{
@@ -106,6 +111,9 @@ function Invoke-AzDevOpsApiRestMethod
 
     # Intially set this value to -1, as the first attempt does not want to be classed as a "RetryAttempt"
     $CurrentNoOfRetryAttempts = -1
+    # Set the Continuation Token to be False
+    $isContinuationToken = $false
+    $results = [System.Collections.ArrayList]::new()
 
     while ($CurrentNoOfRetryAttempts -lt $RetryAttempts)
     {
@@ -134,63 +142,95 @@ function Invoke-AzDevOpsApiRestMethod
         }
 
         #
-        # Test if a Managed Identity Token is required and if so, add it to the HTTP Headers
-        if ($Global:DSCAZDO_ManagedIdentityToken -ne $null)
-        {
-            # Test if the Managed Identity Token has expired
-            if ($Global:DSCAZDO_ManagedIdentityToken.isExpired())
+        # Invoke the REST method. Loop until the Continuation Token is False.
+
+        Do {
+
+            #
+            # Test if a Managed Identity Token is required and if so, add it to the HTTP Headers
+
+            if ($Global:DSCAZDO_ManagedIdentityToken -ne $null)
             {
-                # If so, get a new token
-                $Global:DSCAZDO_ManagedIdentityToken = Update-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
-            }
-
-            # Add the Managed Identity Token to the HTTP Headers
-            $invokeRestMethodParameters.Headers.Authorization = 'Bearer {0}' -f $Global:DSCAZDO_ManagedIdentityToken.Get()
-        }
-
-
-        #
-        # Invoke the REST method
-
-        try
-        {
-            $result = Invoke-RestMethod @invokeRestMethodParameters
-
-            # Update
-            $Global:DSCAZDO_APIRateLimit = $null
-            return $result
-
-        }
-        catch
-        {
-
-            # Check to see if it is an HTTP 429 (Too Many Requests) error
-            if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::TooManyRequests)
-            {
-                # If so, wait for the specified number of seconds before retrying
-                $retryAfter = $_.Exception.Response.Headers.'Retry-After'
-                if ($retryAfter)
+                # Test if the Managed Identity Token has expired
+                if ($Global:DSCAZDO_ManagedIdentityToken.isExpired())
                 {
-                    $retryAfter = [int]$retryAfter
-                    Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $retryAfter seconds before retrying."
-                    $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($_.Exception.Response.Headers)
-                } else {
-                    # If the Retry-After header is not present, wait for the specified number of milliseconds before retrying
-                    Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $RetryIntervalMs milliseconds before retrying."
-                    $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($RetryIntervalMs)
+                    # If so, get a new token
+                    $Global:DSCAZDO_ManagedIdentityToken = Update-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
                 }
 
+                # Add the Managed Identity Token to the HTTP Headers
+                $invokeRestMethodParameters.Headers.Authorization = 'Bearer {0}' -f $Global:DSCAZDO_ManagedIdentityToken.Get()
             }
 
-            # Increment the number of retries attempted and obtain any exception message
-            $CurrentNoOfRetryAttempts++
-            $restMethodExceptionMessage = $_.Exception.Message
+            #
+            # Invoke the REST method
 
-            # Wait before the next attempt/retry
-            Start-Sleep -Milliseconds $RetryIntervalMs
-        }
+            try
+            {
+                $response = Invoke-RestMethod @invokeRestMethodParameters
+                # Add the response to the results array
+                $null = $results.Add($response)
+
+                #
+                # Test to see if there is no continuation token
+                if ([String]::IsNullOrEmpty($responseHeaders.'x-ms-continuationtoken'))
+                {
+                    # If not, set the continuation token to False
+                    $isContinuationToken = $false
+                    # Update the Rate Limit information
+                    $Global:DSCAZDO_APIRateLimit = $null
+
+                    return $results
+
+                }
+
+                #
+                # A continuation token is present.
+
+                # If so, set the continuation token to True
+                $isContinuationToken = $true
+                # Update the URI to include the continuation token
+                $invokeRestMethodParameters.Uri = '{0}&continuationToken={1}&{2}' -f $ApiUri, $responseHeaders.'x-ms-continuationtoken', $ApiVersion
+                # Reset the RetryAttempts counter
+                $CurrentNoOfRetryAttempts = -1
+
+            }
+            catch
+            {
+
+                # Check to see if it is an HTTP 429 (Too Many Requests) error
+                if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::TooManyRequests)
+                {
+                    # If so, wait for the specified number of seconds before retrying
+                    $retryAfter = $_.Exception.Response.Headers.'Retry-After'
+                    if ($retryAfter)
+                    {
+                        $retryAfter = [int]$retryAfter
+                        Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $retryAfter seconds before retrying."
+                        $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($_.Exception.Response.Headers)
+                    } else {
+                        # If the Retry-After header is not present, wait for the specified number of milliseconds before retrying
+                        Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $RetryIntervalMs milliseconds before retrying."
+                        $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($RetryIntervalMs)
+                    }
+
+                }
+
+                # Increment the number of retries attempted and obtain any exception message
+                $CurrentNoOfRetryAttempts++
+                $restMethodExceptionMessage = $_.Exception.Message
+
+                # Wait before the next attempt/retry
+                Start-Sleep -Milliseconds $RetryIntervalMs
+
+                # Break the continuation token loop so that the next attempt can be made
+                break;
+
+            }
+
+        } Until (-not $isContinuationToken)
+
     }
-
 
     # If all retry attempts have failed, throw an exception
     $errorMessage = $script:localizedData.AzDevOpsApiRestMethodException -f $MyInvocation.MyCommand, $RetryAttempts, $restMethodExceptionMessage

@@ -32,7 +32,7 @@ Function Add-CacheItem {
         $Value,
 
         [Parameter(Mandatory)]
-        [ValidateSet('Project', 'Team', 'Group', 'GroupDescriptor')]
+        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]
         $Type
     )

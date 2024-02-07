@@ -18,14 +18,20 @@ Function Initialize-CacheObject {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor')]
+        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType
     )
 
     try {
 
-        $cacheFilePath = Join-Path -Path $PSScriptRoot -ChildPath "Cache\.clixml"
-        Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
+        # If the cache group is LiveGroups or LiveProjects, set the cache file path to the temporary directory
+        if ($CacheType -eq 'LiveGroups' -or $CacheType -eq 'LiveProjects') {
+            $cacheFilePath = Join-Path -Path $env:TEMP -ChildPath ".clixml"
+            Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
+        } else {
+            Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
+            $cacheFilePath = Join-Path -Path $PSScriptRoot -ChildPath "Cache\.clixml"
+        }
 
         # Test if the Cache File exists. If it does, import the cache object
         if (Test-Path -Path $cacheFilePath) {

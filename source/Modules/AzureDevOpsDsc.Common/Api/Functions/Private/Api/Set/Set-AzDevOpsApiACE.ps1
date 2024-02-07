@@ -31,7 +31,6 @@ function Set-AzDevOpsApiACE {
     $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PersonalAccessToken)"))
     $headers = @{
         Authorization = "Basic $base64AuthInfo"
-        Content-Type  = "application/json"
     }
 
     try {

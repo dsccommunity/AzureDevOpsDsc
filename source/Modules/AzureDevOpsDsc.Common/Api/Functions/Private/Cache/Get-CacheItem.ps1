@@ -25,15 +25,23 @@ function Get-CacheItem {
         $Key,
 
         [Parameter(Mandatory)]
-        [ValidateSet('Project', 'Team', 'Group', 'GroupDescriptor')]
+        [ValidateSet('Project','Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]
-        $Type
+        $Type,
+
+        [Parameter()]
+        [scriptblock]
+        $Filter
     )
 
     $cache = Get-CacheObject -CacheType $Type
     $cacheItem = $cache.Where({$_.Key -eq $Key})
 
     if ($null -eq $cacheItem) { return $null }
+
+    if ($Filter -ne $null) {
+        $cacheItem = $cacheItem | Where-Object $Filter
+    }
 
     return $cacheItem.Value
 

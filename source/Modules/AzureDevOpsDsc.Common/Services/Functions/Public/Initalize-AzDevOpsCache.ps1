@@ -25,7 +25,7 @@ function Initialize-Cache {
 
     try {
         # Attempt to load the cache from the file for each type
-        $cacheTypes = @('Project', 'Team', 'Group', 'GroupDescriptor')
+        $cacheTypes = @('Project', 'Team', 'Group', 'GroupDescriptor', 'LiveGroups', 'LiveProjects')
         foreach ($cacheType in $cacheTypes) {
             Write-Verbose "[Initialize-Cache] Initializing cache object of type: $cacheType"
             Initialize-CacheObject -CacheType $cacheType
@@ -33,8 +33,11 @@ function Initialize-Cache {
 
         # Confirm completion of cache initialization
         Write-Verbose "[Initialize-Cache] Cache initialization process completed successfully."
+
     } catch {
+
         Write-Error "[Initialize-Cache] An error occurred during cache initialization: $_"
         throw
+
     }
 }
