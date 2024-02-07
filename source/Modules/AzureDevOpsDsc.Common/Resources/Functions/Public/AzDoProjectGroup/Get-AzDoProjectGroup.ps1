@@ -1,9 +1,10 @@
 <#
+
 .SYNOPSIS
-Retrieves an organization group from Azure DevOps.
+Retrieves a project group from Azure DevOps.
 
 .DESCRIPTION
-The Get-AzDoOrganizationGroup function retrieves an organization group from Azure DevOps based on the provided parameters.
+The Get-AzDoProjectGroup function retrieves a project group from Azure DevOps based on the provided parameters.
 
 .PARAMETER ApiUri
 The URI of the Azure DevOps API. This parameter is validated using the Test-AzDevOpsApiUri function.
@@ -12,19 +13,23 @@ The URI of the Azure DevOps API. This parameter is validated using the Test-AzDe
 The Personal Access Token (PAT) used for authentication. This parameter is validated using the Test-AzDevOpsPat function.
 
 .PARAMETER GroupName
-The name of the organization group to retrieve.
+The name of the project group to retrieve. This parameter is mandatory.
+
+.PARAMETER ProjectName
+The name of the project associated with the project group.
 
 .OUTPUTS
 [System.Management.Automation.PSObject[]]
-The retrieved organization group.
+An array of PSObjects representing the retrieved project group.
 
 .EXAMPLE
-Get-AzDoOrganizationGroup -ApiUri 'https://dev.azure.com/contoso' -Pat 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx' -GroupName 'Developers'
-Retrieves the organization group named 'Developers' from the Azure DevOps instance at 'https://dev.azure.com/contoso' using the provided PAT.
+Get-AzDoProjectGroup -ApiUri 'https://dev.azure.com/contoso' -Pat 'xxxxxxxxxxxxxxxxxxxx' -GroupName 'MyGroup' -ProjectName 'MyProject'
+
+This example retrieves the project group named 'MyGroup' from the Azure DevOps instance at 'https://dev.azure.com/contoso' using the provided PAT and project name.
 
 #>
 
-Function Get-AzDoOrganizationGroup {
+Function Get-AzDoProjectGroup {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
@@ -44,12 +49,18 @@ Function Get-AzDoOrganizationGroup {
 
         [Parameter(Mandatory)]
         [Alias('Name')]
-        [System.String]$GroupName
+        [System.String]
+        $GroupName,
+
+        [Parameter()]
+        [Alias('Project')]
+        [System.String]
+        $ProjectName
 
     )
 
     # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
+    $Key = Format-UserPrincipalName -Prefix $ProjectName -GroupName $GroupName
 
     #
     # Check the cache for the group

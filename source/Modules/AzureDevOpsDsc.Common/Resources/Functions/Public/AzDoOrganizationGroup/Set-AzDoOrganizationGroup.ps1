@@ -34,15 +34,18 @@ Function Set-AzDoOrganizationGroup {
 
     #
     # Check the cache for the group
+    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
 
-    $group = Get-CacheItem -Key $Key -Type 'Group'
-
-    #
-    # If the group is not in the internal-cache, get the group from the API cache
-
-    if ($null -eq $group) {
-        $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
+    $params = @{
+        ApiUri = $ApiUri
+        Pat = $Pat
+        GroupName = $GroupName
+        GroupDescription = $GroupDescription
     }
+
+    # Set the group from the API
+    $null = Set-AzDevOpsGroup @params
+
 
     #
     # Return the group from the cache
