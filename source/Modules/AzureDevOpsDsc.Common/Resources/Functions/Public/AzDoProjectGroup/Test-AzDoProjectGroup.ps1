@@ -56,13 +56,10 @@ Function Test-AzDoProjectGroup {
 
     )
 
-    # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix $ProjectName -GroupName $GroupName
-
     #
     # Check the cache for the group
 
-    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
+    $group = Get-CacheItem -Key $ProjectName -Type 'LiveGroups'
 
     if (-not($group)) { $false } else { $true }
 

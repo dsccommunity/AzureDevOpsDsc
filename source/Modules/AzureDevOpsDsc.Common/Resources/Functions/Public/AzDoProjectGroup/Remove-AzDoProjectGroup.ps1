@@ -64,12 +64,11 @@ Function Remove-AzDoProjectGroup {
     $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
 
     if ($null -eq $group) {
-        $group = Get-AzDoOrganizationGroup -ApiUri $ApiUri -Pat $Pat -GroupDisplayName $GroupDisplayName
+        Throw "Group with name '$Key' does not exist in the organization."
     }
 
     #
     # Remove the group from the API
-
     $params = @{
         ApiUri = $ApiUri
         GroupDescriptor = $group.Descriptor
