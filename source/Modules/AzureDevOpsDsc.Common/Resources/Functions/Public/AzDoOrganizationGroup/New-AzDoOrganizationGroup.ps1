@@ -41,7 +41,7 @@ Function New-AzDoOrganizationGroup {
     #
     # Create a new group
 
-    $result = New-AzDevOpsGroup -ApiUri $ApiUri -GroupName $GroupName -GroupDescription $GroupDescription
+    $result = New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName -GroupDescription $GroupDescription
 
     #
     # Add the group to the cache

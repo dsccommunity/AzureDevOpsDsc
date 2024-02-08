@@ -44,7 +44,7 @@ Function Set-AzDoOrganizationGroup {
     }
 
     # Set the group from the API
-    $null = Set-AzDevOpsGroup @params
+    $null = Set-DevOpsGroup @params
 
 
     #

@@ -45,7 +45,7 @@ Function Remove-AzDoOrganizationGroup {
     }
 
     # Remove the group from the API
-    $null = Remove-AzDevOpsGroup @params
+    $null = Remove-DevOpsGroup @params
 
     #
     # Remove the group from the cache and live cache
