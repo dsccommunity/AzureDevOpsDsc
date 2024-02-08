@@ -64,6 +64,7 @@ foreach ($function in $functions)
 Initalize-AzDevOpsCache
 
 # Set the Group Cache
-Set-AzDoAPIGroupCache
+Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
+Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName
 
 #

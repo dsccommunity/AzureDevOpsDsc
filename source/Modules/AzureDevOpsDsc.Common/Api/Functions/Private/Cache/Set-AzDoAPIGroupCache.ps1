@@ -31,11 +31,12 @@ Function Set-AzDoAPIGroupCache {
     }
 
     try {
-        Write-Verbose "Calling 'List-AzDevOpsGroup' with parameters: $($params | Out-String)"
-        # Perform an Azure DevOps API request to get the groups
-        $groups = List-AzDevOpsGroup @params
 
-        Write-Verbose "'List-AzDevOpsGroup' returned a total of $($groups.value.Count) groups."
+        Write-Verbose "Calling 'List-DevOpsGroups' with parameters: $($params | Out-String)"
+        # Perform an Azure DevOps API request to get the groups
+        $groups = List-DevOpsGroups @params
+
+        Write-Verbose "'List-DevOpsGroups' returned a total of $($groups.value.Count) groups."
 
         # Iterate through each of the responses and add them to the cache
         foreach ($group in $groups.value) {
@@ -45,9 +46,13 @@ Function Set-AzDoAPIGroupCache {
         }
 
         Write-Verbose "Completed adding groups to cache."
+
     } catch {
+
         Write-Error "An error occurred: $_"
+
     }
 
-    Write-Verbose "Function 'Set-GroupCache' completed."
+    Write-Verbose "Function 'Set-AzDoAPIGroupCache' completed."
+
 }
