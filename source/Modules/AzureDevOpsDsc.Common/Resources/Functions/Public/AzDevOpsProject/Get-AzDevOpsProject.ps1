@@ -49,13 +49,13 @@ function Get-AzDevOpsProject
     [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
         [Alias('Uri')]
         [System.String]
         $ApiUri,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
         [Alias('PersonalAccessToken')]
         [System.String]
@@ -74,40 +74,12 @@ function Get-AzDevOpsProject
         $ProjectName
     )
 
-    # Prepare initial 'Get-AzDevOpsApiResource' function parameters
-    $azDevOpsApiResourceParameters = @{
-        ApiUri = $ApiUri
-        Pat = $Pat
-        ResourceName = 'Project'
-    }
-    If(![System.String]::IsNullOrWhiteSpace($ProjectId)){
-        $azDevOpsApiResourceParameters.ResourceId = $ProjectId
-    }
+    #
+    # Check the cache for the group
+    $group = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
-    # Obtain all 'Projects' (Note: This returns a limited set of properties, hence why subsequent calls are made)
-    [System.Management.Automation.PSObject[]]$apiListResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
-    [System.Management.Automation.PSObject[]]$projects = @()
+    #
+    # Return the group from the cache
+    return $group.Value
 
-    # Filter projects by 'ProjectId'
-    If(![System.String]::IsNullOrWhiteSpace($ProjectId)){
-        $apiListResources = $apiListResources |
-            Where-Object id -eq $ProjectId
-    }
-
-    # Filter projects by 'ProjectName' (using 'ilike')
-    If(![System.String]::IsNullOrWhiteSpace($ProjectName)){
-        $apiListResources = $apiListResources |
-            Where-Object name -ilike $ProjectName
-    }
-
-    # For each project (if any), call 'Get-AzDevOpsApiResource' again to obtain all 'Project' properties
-    if ($apiListResources.Count -gt 0)
-    {
-        $apiListResources | ForEach-Object {
-            $azDevOpsApiResourceParameters.ResourceId = $_.id
-            $projects += $(Get-AzDevOpsApiResource @azDevOpsApiResourceParameters)
-        }
-    }
-
-    return [System.Management.Automation.PSObject[]]$projects
 }

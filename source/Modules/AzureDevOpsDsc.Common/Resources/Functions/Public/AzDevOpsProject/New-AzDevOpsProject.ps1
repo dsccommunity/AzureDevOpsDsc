@@ -74,35 +74,22 @@ function New-AzDevOpsProject
         $Force
     )
 
-    [string]$resourceJson = '
-    {
-      "id": "00000000-0000-0000-0000-000000000000",
-      "name": "' + $ProjectName + '",
-      "description": "' + $ProjectDescription + '",
-      "capabilities": {
-        "versioncontrol": {
-          "sourceControlType": "' + $SourceControlType + '"
-        },
-        "processTemplate": {
-          "templateTypeId": "6b724908-ef14-45cf-84f8-768b5384da45"
+
+    $body = @{
+        Name = $ProjectName
+        Description = $ProjectDescription
+        Capabilities = @{
+            VersionControl = @{
+                SourceControlType = $SourceControlType
+            }
+            ProcessTemplate = @{
+                TemplateTypeId = '6b724908-ef14-45cf-84f8-768b5384da45'
+            }
         }
-      }
     }
-'
 
-    [System.Object]$newResource = $null
-    $ResourceName = 'Project'
-
-    if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $ResourceName))
-    {
-        New-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
-                                -ResourceName $ResourceName `
-                                -Resource $($resourceJson | ConvertFrom-Json) `
-                                -Force:$Force -Wait | Out-Null
-
-        [System.Object]$newResource = Get-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat `
-                                                          -ProjectName $ProjectName
-    }
+    [System.Object]$newResource = New-AzDevOpsProject -ApiUri $ApiUri -Pat $Pat -ResourceJson $body -Force:$Force
 
     return $newResource
+
 }
