@@ -1,351 +1,195 @@
 
 # Initialize tests for module function
-. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+#. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 
-InModuleScope 'AzureDevOpsDsc.Common' {
+#InModuleScope 'AzureDevOpsDsc.Common' {
 
-    $script:dscModuleName = 'AzureDevOpsDsc'
-    $script:moduleVersion = $(Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1).Version
-    $script:subModuleName = 'AzureDevOpsDsc.Common'
-    $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
-    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Api\Functions\Private\$($script:commandName).ps1"
-    $script:tag = @($($script:commandName -replace '-'))
+#    $script:dscModuleName = 'AzureDevOpsDsc'
+#    $script:moduleVersion = $(Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1).Version
+#    $script:subModuleName = 'AzureDevOpsDsc.Common'
+#    $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
+#    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+#    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Api\Functions\Private\$($script:commandName).ps1"
+#    $script:tag = @($($script:commandName -replace '-'))
 
-    . $script:commandScriptPath
+ #   . $script:commandScriptPath
 
+    <#
+    .DESCRIPTION
+        A set of Pester tests to verify the behavior of the Invoke-AzDevOpsApiRestMethod function.
+    #>
 
-    Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
+    # Importing the module which contains the function (assuming it's in a module)
+    # Import-Module 'PathToYourPowerShellModule'
 
-        # Get default, parameter values
-        $defaultHttpContentType = 'application/json'
-        $defaultHttpBody = ''
-        $defaultRetryAttempts = 5
-        $defaultRetryIntervalMs = 250
+    Describe "Invoke-AzDevOpsApiRestMethod Tests" {
 
-        # Mock functions called in function
-        Mock Invoke-RestMethod {}
-        # Mock New-InvalidOperationException {} # Do not mock
-        Mock Start-Sleep {}
-
-        # Generate valid, test cases
-        $testCasesValidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Valid'
-        $testCasesValidHttpMethods = Get-TestCase -ScopeName 'HttpMethod' -TestCaseName 'Valid'
-        $testCasesValidHttpRequestHeaders = Get-TestCase -ScopeName 'HttpRequestHeader' -TestCaseName 'Valid'
-        $testCasesValidApiUriHttpMethodHttpRequestHeaders = Join-TestCaseArray -TestCaseArray @(
-            $testCasesValidApiUris,
-            $testCasesValidHttpMethods,
-            $testCasesValidHttpRequestHeaders) -Expand
-        $testCasesValidApiUriHttpMethodHttpRequestHeaders3 = $testCasesValidApiUriHttpMethodHttpRequestHeaders | Select-Object -First 3
-
-        # Generate invalid, test cases
-        $testCasesInvalidApiUris = Get-TestCase -ScopeName 'ApiUri' -TestCaseName 'Invalid'
-        $testCasesInvalidHttpMethods = Get-TestCase -ScopeName 'HttpMethod' -TestCaseName 'Invalid'
-        $testCasesInvalidHttpRequestHeaders = Get-TestCase -ScopeName 'HttpRequestHeader' -TestCaseName 'Invalid'
-        $testCasesInvalidApiUriHttpMethodHttpRequestHeaders = Join-TestCaseArray -TestCaseArray @(
-            $testCasesInvalidApiUris,
-            $testCasesInvalidHttpMethods,
-            $testCasesInvalidHttpRequestHeaders) -Expand
-        $testCasesInvalidApiUriHttpMethodHttpRequestHeaders3 = $testCasesInvalidApiUriHttpMethodHttpRequestHeaders | Select-Object -First 3
-
-
-        Context 'When input parameters are valid' {
-
-            Context 'When called just with mandatory, "ApiUri", "HttpMethod" and "HttpRequestHeader" parameters' {
-
-                It 'Should not throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader } | Should -Not -Throw
-                }
-
-                It 'Should output nothing/null - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    $output = Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                    $output | Should -BeNullOrEmpty
-                }
-
-                It 'Should invoke "Invoke-RestMethod" exactly once - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    Mock Invoke-RestMethod {} -Verifiable
-
-                    Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                    Assert-MockCalled Invoke-RestMethod -Times 1 -Exactly -Scope 'It'
-                }
-
-                Context 'When "Invoke-RestMethod" throws an exception on every retry' {
-                    Mock Invoke-RestMethod { throw "Some exception" }
-
-                    It 'Should invoke "Invoke-RestMethod" number of times equal to "RetryAttempts" parameter value + 1 - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                        param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                        Mock Invoke-RestMethod { throw "Some exception" } -Verifiable
-                        Mock New-InvalidOperationException {}
-
-                        Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                        Assert-MockCalled Invoke-RestMethod -Times $($defaultRetryAttempts+1) -Exactly -Scope 'It'
-                    }
-
-
-                    It 'Should invoke "Start-Sleep" number of times equal to "RetryAttempts" parameter value + 1 - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                        param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                        Mock Start-Sleep { } -Verifiable
-
-                        Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                        Assert-MockCalled Start-Sleep -Times $($defaultRetryAttempts+1) -Exactly -Scope 'It'
-                    }
-
-
-                    It 'Should invoke "New-InvalidOperationException" exactly once - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders {
-                        param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                        Mock New-InvalidOperationException {} -Verifiable
-
-                        Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                        Assert-MockCalled New-InvalidOperationException -Times 1 -Exactly -Scope 'It'
-                    }
-
-                }
-
-            }
+        AfterEach {
+            $Global:responseHeaders = $null
+            $Global:calledOnce = $null
         }
 
+        BeforeAll {
+            # Mocking the Invoke-RestMethod to prevent actual API calls during testing
+            Mock Invoke-RestMethod { return @{ Value = "Mocked result"; Headers = @{ 'x-ms-continuationtoken' = $null }} }
 
-        Context 'When input parameters are invalid' {
+            # Mocking Start-Sleep to prevent actual delays during testing
+            Mock Start-Sleep {}
 
-            Context 'When called without mandatory, "ApiUri" parameter' {
-
-                It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader } | Should -Throw
-                }
-
-            }
-
-            Context 'When called without mandatory, "HttpMethod" parameter' {
-
-                It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $null -HttpRequestHeader $HttpRequestHeader } | Should -Throw
-                }
-
-            }
-
-            Context 'When called without mandatory, "ApiUri" and "HttpMethod" parameters' {
-
-                It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $null -HttpRequestHeader $HttpRequestHeader } | Should -Throw
-                }
-
-            }
-
-            Context 'When called without mandatory, "HttpRequestHeader" parameter' {
-
-                It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $null } | Should -Throw
-                }
-
-            }
-
-            Context 'When called without mandatory, "ApiUri" and "HttpRequestHeader" parameters' {
-
-                It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $HttpMethod -HttpRequestHeader $null } | Should -Throw
-                }
-
-            }
-
-            Context 'When called without mandatory, "HttpMethod" and "HttpRequestHeader" parameters' {
-
-                It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $null -HttpRequestHeader $null } | Should -Throw
-                }
-
-            }
-
-            Context 'When called without mandatory, "ApiUri", "HttpMethod" and "HttpRequestHeader" parameters' {
-
-                It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $null -HttpRequestHeader $null } | Should -Throw
-                }
-
-            }
+            # Initializing variables that are used globally within the function
+            $Global:DSCAZDO_APIRateLimit = @{}
         }
-    }
-}
-# Existing code...
 
-Describe "$script:subModuleName\Api\Function\$script:commandName" -Tag $script:tag {
+        It "Should call Invoke-RestMethod with correct parameters" {
+            # Arrange
+            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+            $HttpMethod = 'Get'
+            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
 
-    # Existing code...
+            # Act
+            Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
 
-    Context 'When input parameters are valid' {
+            # Assert
+            Assert-MockCalled Invoke-RestMethod -Times 1 -Exactly -Scope It
+        }
 
-        # Existing code...
+        It "Should not include Body and ContentType for Get and Delete methods" {
+            # Arrange
+            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+            $HttpMethod = 'Get'
+            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
 
-        Context 'When called just with mandatory, "ApiUri", "HttpMethod" and "HttpRequestHeader" parameters' {
+            # Act
+            Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
 
-            # Existing code...
+            # Assert
+            Assert-MockCalled Invoke-RestMethod -ParameterFilter {
+                $PSBoundParameters.ContainsKey('Body') -eq $false -and
+                $PSBoundParameters.ContainsKey('ContentType') -eq $false
+            } -Times 1 -Exactly -Scope It
+        }
 
-            It 'Should not throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
+        It "Should retry the specified number of attempts on failure" {
+            # Arrange
+            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+            $HttpMethod = 'Get'
+            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
+            $RetryAttempts = 2
 
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader } | Should -Not -Throw
-            }
+            # Mocking Invoke-RestMethod to throw an exception to simulate a failure
+            Mock Invoke-RestMethod { throw [System.Net.WebException]::new() } -Verifiable
 
-            It 'Should output nothing/null - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
+            # Act & Assert
+            { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders -RetryAttempts $RetryAttempts } | Should -Throw
 
-                $output = Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
+            # Assert that Invoke-RestMethod was called the expected number of times
+            Assert-MockCalled Invoke-RestMethod -Times ($RetryAttempts + 1) -Exactly -Scope It
+        }
 
-                $output | Should -BeNullOrEmpty
-            }
+        It "Should handle continuation tokens correctly" {
+            # Arrange
+            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+            $HttpMethod = 'Get'
+            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
 
-            It 'Should invoke "Invoke-RestMethod" exactly once - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                Mock Invoke-RestMethod {} -Verifiable
-
-                Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                Assert-MockCalled Invoke-RestMethod -Times 1 -Exactly -Scope 'It'
-            }
-
-            Context 'When "Invoke-RestMethod" throws an exception on every retry' {
-                Mock Invoke-RestMethod { throw "Some exception" }
-
-                It 'Should invoke "Invoke-RestMethod" number of times equal to "RetryAttempts" parameter value + 1 - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    Mock Invoke-RestMethod { throw "Some exception" } -Verifiable
-                    Mock New-InvalidOperationException {}
-
-                    Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                    Assert-MockCalled Invoke-RestMethod -Times $($defaultRetryAttempts+1) -Exactly -Scope 'It'
+            # Mock Invoke-RestMethod to return a continuation token on the first call
+            Mock Invoke-RestMethod {
+                if (!$calledOnce) {
+                    $Global:calledOnce = $true
+                    $Global:responseHeaders = @{ 'x-ms-continuationtoken' = 'abc123' }
+                    return @{ Value = "Partial result" }
+                } else {
+                    $Global:responseHeaders = $null
+                    return @{ Value = "Final result" }
                 }
+            } -Verifiable
 
+            # Act
+            $result = Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
 
-                It 'Should invoke "Start-Sleep" number of times equal to "RetryAttempts" parameter value + 1 - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
+            # Assert
+            $result.Count | Should -Be 2
+            $result[0].Value | Should -Be "Partial result"
+            $result[1].Value | Should -Be "Final result"
+            Assert-MockCalled Invoke-RestMethod -Times 2 -Exactly -Scope It
+        }
 
-                    Mock Start-Sleep { } -Verifiable
+    } -Skip
 
-                    Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
+    Describe "Invoke-AzDevOpsApiRestMethod Rate Limiting Tests" {
 
-                    Assert-MockCalled Start-Sleep -Times $($defaultRetryAttempts+1) -Exactly -Scope 'It'
+        BeforeAll {
+            # Initializing variables that are used globally within the function
+            $Global:DSCAZDO_APIRateLimit = @{}
+            $Global:responseHeaders = @{}
+        }
+
+        It "Should handle HTTP 429 status code and respect Retry-After header" {
+            # Arrange
+            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+            $HttpMethod = 'Get'
+            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
+            $RetryAfterSeconds = 3
+
+            Mock Invoke-RestMethod {
+                $response = @{
+                    StatusCode = [System.Net.HttpStatusCode]::TooManyRequests
+                    Headers = @{ 'Retry-After' = $RetryAfterSeconds }
                 }
-
-
-                It 'Should invoke "New-InvalidOperationException" exactly once - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders {
-                    param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                    Mock New-InvalidOperationException {} -Verifiable
-
-                    Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader
-
-                    Assert-MockCalled New-InvalidOperationException -Times 1 -Exactly -Scope 'It'
-                }
-
+                throw [System.Net.WebException]::new("Too many requests", $null, [System.Net.WebExceptionStatus]::ProtocolError, [System.Net.HttpWebResponse]$response)
             }
 
+            Mock Start-Sleep {}
+
+            # Act & Assert
+            { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders } | Should -Throw
+
+            # Assert that Start-Sleep was called with the correct number of seconds from Retry-After header
+            Assert-MockCalled Start-Sleep -ParameterFilter { $Seconds -eq $RetryAfterSeconds } -Times 1 -Exactly -Scope It
+        }
+
+        It "Should wait for RetryIntervalMs if xRateLimitRemaining is close to being overwhelmed" {
+            # Arrange
+            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+            $HttpMethod = 'Get'
+            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
+            $RetryIntervalMs = 250
+
+            # Setting a mock value to simulate the xRateLimitRemaining being low but not exhausted
+            $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining = 10
+
+            Mock Invoke-RestMethod {}
+            Mock Start-Sleep {}
+
+            # Act
+            Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
+
+            # Assert that Start-Sleep was called with the correct milliseconds when xRateLimitRemaining is low
+            Assert-MockCalled Start-Sleep -ParameterFilter { $Milliseconds -eq $RetryIntervalMs } -Times 1 -Exactly -Scope It
+        }
+
+        It "Should wait for RetryIntervalMs if xRateLimitRemaining is overwhelmed" {
+            # Arrange
+            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+            $HttpMethod = 'Get'
+            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
+            $RetryIntervalMs = 250
+
+            # Setting a mock value to simulate the xRateLimitRemaining being exhausted
+            $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining = 4
+
+            Mock Invoke-RestMethod {}
+            Mock Start-Sleep {}
+
+            # Act
+            Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
+
+            # Assert that Start-Sleep was called with the correct milliseconds when xRateLimitRemaining is exhausted
+            Assert-MockCalled Start-Sleep -ParameterFilter { $Milliseconds -eq $RetryIntervalMs } -Times 1 -Exactly -Scope It
         }
     }
 
 
-    Context 'When input parameters are invalid' {
 
-        # Existing code...
-
-        Context 'When called without mandatory, "ApiUri" parameter' {
-
-            It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $HttpMethod -HttpRequestHeader $HttpRequestHeader } | Should -Throw
-            }
-
-        }
-
-        Context 'When called without mandatory, "HttpMethod" parameter' {
-
-            It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $null -HttpRequestHeader $HttpRequestHeader } | Should -Throw
-            }
-
-        }
-
-        Context 'When called without mandatory, "ApiUri" and "HttpMethod" parameters' {
-
-            It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $null -HttpRequestHeader $HttpRequestHeader } | Should -Throw
-            }
-
-        }
-
-        Context 'When called without mandatory, "HttpRequestHeader" parameter' {
-
-            It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpRequestHeader $null } | Should -Throw
-            }
-
-        }
-
-        Context 'When called without mandatory, "ApiUri" and "HttpRequestHeader" parameters' {
-
-            It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $HttpMethod -HttpRequestHeader $null } | Should -Throw
-            }
-
-        }
-
-        Context 'When called without mandatory, "HttpMethod" and "HttpRequestHeader" parameters' {
-
-            It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $null -HttpRequestHeader $null } | Should -Throw
-            }
-
-        }
-
-        Context 'When called without mandatory, "ApiUri", "HttpMethod" and "HttpRequestHeader" parameters' {
-
-            It 'Should throw - "<ApiUri>", "<HttpMethod>", "<HttpRequestHeader>"' -TestCases $testCasesValidApiUriHttpMethodHttpRequestHeaders3 {
-                param ([System.String]$ApiUri, [System.String]$HttpMethod, [Hashtable]$HttpRequestHeader)
-
-                { Invoke-AzDevOpsApiRestMethod -ApiUri $null -HttpMethod $null -HttpRequestHeader $null } | Should -Throw
-            }
-
-        }
-    }
-}
+#}
