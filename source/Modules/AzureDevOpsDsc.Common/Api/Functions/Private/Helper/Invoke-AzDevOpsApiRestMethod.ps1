@@ -202,12 +202,12 @@ function Invoke-AzDevOpsApiRestMethod
                 if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::TooManyRequests)
                 {
                     # If so, wait for the specified number of seconds before retrying
-                    $retryAfter = $_.Exception.Response.Headers.'Retry-After'
+                    $retryAfter = $_.Exception.Response.Headers | ForEach-Object { if ($_.Key -eq "Retry-After") { return $_.Value } }
                     if ($retryAfter)
                     {
                         $retryAfter = [int]$retryAfter
                         Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $retryAfter seconds before retrying."
-                        $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($_.Exception.Response.Headers)
+                        $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($retryAfter)
                     } else {
                         # If the Retry-After header is not present, wait for the specified number of milliseconds before retrying
                         Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $RetryIntervalMs milliseconds before retrying."
@@ -234,6 +234,6 @@ function Invoke-AzDevOpsApiRestMethod
 
     # If all retry attempts have failed, throw an exception
     $errorMessage = $script:localizedData.AzDevOpsApiRestMethodException -f $MyInvocation.MyCommand, $RetryAttempts, $restMethodExceptionMessage
-    New-InvalidOperationException -Message $errorMessage
+    New-InvalidOperationException -Message $errorMessage -Throw
 
 }

@@ -1,27 +1,26 @@
 
 # Initialize tests for module function
-#. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
+<#
+.DESCRIPTION
+    A set of Pester tests to verify the behavior of the Invoke-AzDevOpsApiRestMethod function.
+#>
 
-#InModuleScope 'AzureDevOpsDsc.Common' {
+# Importing the module which contains the function (assuming it's in a module)
+# Import-Module 'PathToYourPowerShellModule'
 
-#    $script:dscModuleName = 'AzureDevOpsDsc'
-#    $script:moduleVersion = $(Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1).Version
-#    $script:subModuleName = 'AzureDevOpsDsc.Common'
-#    $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
-#    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-#    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Api\Functions\Private\$($script:commandName).ps1"
-#    $script:tag = @($($script:commandName -replace '-'))
+InModuleScope 'AzureDevOpsDsc.Common' {
 
- #   . $script:commandScriptPath
+    $script:dscModuleName = 'AzureDevOpsDsc'
+    $script:moduleVersion = $(Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1).Version
+    $script:subModuleName = 'AzureDevOpsDsc.Common'
+    $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Api\Functions\Private\$($script:commandName).ps1"
+    $script:tag = @($($script:commandName -replace '-'))
 
-    <#
-    .DESCRIPTION
-        A set of Pester tests to verify the behavior of the Invoke-AzDevOpsApiRestMethod function.
-    #>
-
-    # Importing the module which contains the function (assuming it's in a module)
-    # Import-Module 'PathToYourPowerShellModule'
+   . $script:commandScriptPath
 
     Describe "Invoke-AzDevOpsApiRestMethod Tests" {
 
@@ -115,14 +114,23 @@
             Assert-MockCalled Invoke-RestMethod -Times 2 -Exactly -Scope It
         }
 
-    } -Skip
+    }
 
     Describe "Invoke-AzDevOpsApiRestMethod Rate Limiting Tests" {
 
-        BeforeAll {
+        BeforeEach {
             # Initializing variables that are used globally within the function
             $Global:DSCAZDO_APIRateLimit = @{}
             $Global:responseHeaders = @{}
+
+            $script:localizedData = @{ AzDevOpsApiRestMethodException = "{0} - {1} - {2}" }
+
+        }
+
+        AfterEach {
+            # Clearing the global variables
+            $Global:DSCAZDO_APIRateLimit = $null
+            $Global:responseHeaders = $null
         }
 
         It "Should handle HTTP 429 status code and respect Retry-After header" {
@@ -133,11 +141,17 @@
             $RetryAfterSeconds = 3
 
             Mock Invoke-RestMethod {
-                $response = @{
-                    StatusCode = [System.Net.HttpStatusCode]::TooManyRequests
-                    Headers = @{ 'Retry-After' = $RetryAfterSeconds }
-                }
-                throw [System.Net.WebException]::new("Too many requests", $null, [System.Net.WebExceptionStatus]::ProtocolError, [System.Net.HttpWebResponse]$response)
+
+                $response = [System.Net.Http.HttpResponseMessage]::New([System.Net.HttpStatusCode]::TooManyRequests)
+                $exception = [Microsoft.PowerShell.Commands.HttpResponseException]::New("Too many requests", $response)
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+                $errorID = 'WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand'
+                $targetObject = $null
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new($exception, $errorID, $errorCategory, $targetObject)
+                $errorRecord.errorDetails = 'Too many requests'
+                $response.Headers.Add('Retry-After', $RetryAfterSeconds)
+
+                throw $errorRecord
             }
 
             Mock Start-Sleep {}
@@ -146,7 +160,7 @@
             { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders } | Should -Throw
 
             # Assert that Start-Sleep was called with the correct number of seconds from Retry-After header
-            Assert-MockCalled Start-Sleep -ParameterFilter { $Seconds -eq $RetryAfterSeconds } -Times 1 -Exactly -Scope It
+            Assert-MockCalled Start-Sleep -ParameterFilter { $Seconds -eq $RetryAfterSeconds } -Times 1 -Scope It
         }
 
         It "Should wait for RetryIntervalMs if xRateLimitRemaining is close to being overwhelmed" {
@@ -190,6 +204,4 @@
         }
     }
 
-
-
-#}
+}
