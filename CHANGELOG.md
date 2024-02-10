@@ -39,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     for more information).
   - Updated pipeline file `RequiredModules.ps1` to latest pipeline pattern.
   - Updated pipeline file `build.yaml` to latest pipeline pattern.
+  - Updated pipeline file `azure-pipelines.yml` to use correct images (hosted runners)
+    and correct task for artifacts.
 - AzDevOpsProject
   - Added a validate set to the parameter `SourceControlType` to (for now)
     limit the parameter to the values `Git` and `Tfvc`.
