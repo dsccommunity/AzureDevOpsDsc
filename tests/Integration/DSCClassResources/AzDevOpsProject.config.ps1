@@ -70,7 +70,7 @@ Configuration AzDevOpsProject_EnsureGitProjectAbsent1_Config
             ProjectName         = 'TestGitProjectName'
             #ProjectDescription  = 'TestGitProjectDescription'
 
-            #SourceControlType   = 'Git'
+            SourceControlType   = 'Git'
 
             Ensure              = 'Absent'
         }
