@@ -44,6 +44,7 @@ Function Get-AzManagedIdentityToken {
     }
 
     # Invoke the RestAPI
+    Wait-Debugger
     try { $response = Invoke-AzDevOpsApiRestMethod @ManagedIdentityParams } catch { Throw $_ }
     # Test the response
     if ($null -eq $response.access_token) { throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token }

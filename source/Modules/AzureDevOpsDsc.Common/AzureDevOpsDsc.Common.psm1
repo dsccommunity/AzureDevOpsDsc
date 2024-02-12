@@ -60,7 +60,7 @@ foreach ($function in $functions)
 #
 # Module initialization
 
-<#
+
 # Initialize cache
 Initialize-CacheObject -CacheType 'LiveGroups'
 Initialize-CacheObject -CacheType 'LiveProjects'
@@ -69,5 +69,4 @@ Initialize-CacheObject -CacheType 'LiveProjects'
 Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
 Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName
 
-#>
 #
