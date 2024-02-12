@@ -61,7 +61,8 @@ foreach ($function in $functions)
 # Module initialization
 
 # Initialize cache
-Initalize-AzDevOpsCache
+Initialize-CacheObject -CacheType 'LiveGroups'
+Initialize-CacheObject -CacheType 'LiveProjects'
 
 # Set the Group Cache
 Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName

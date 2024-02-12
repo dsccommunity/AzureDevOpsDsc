@@ -2,9 +2,9 @@
     .SYNOPSIS
         Automated unit test for classes in AzureDevOpsDsc.
 #>
-
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestHelper.psm1')
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestCases.psm1')
+$ScriptRoot = $PSScriptRoot
+Import-Module -Name (Join-Path -Path $ScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestHelper.psm1')
+Import-Module -Name (Join-Path -Path $ScriptRoot -ChildPath '\..\Modules\TestHelpers\CommonTestCases.psm1')
 
 $script:dscModuleName = 'AzureDevOpsDsc'
 $script:dscModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
