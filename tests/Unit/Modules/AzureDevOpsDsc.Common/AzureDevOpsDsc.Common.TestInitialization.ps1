@@ -21,7 +21,7 @@ Function Split-RecursivePath {
 }
 
 
-$script:RepositoryRoot = Split-RecurivePath $PSScriptRoot -Times 4
+$script:RepositoryRoot = Split-RecursivePath $PSScriptRoot -Times 4
 
 Import-Module -Name (Join-Path -Path $script:RepositoryRoot -ChildPath '/tests/Unit/Modules/TestHelpers/CommonTestCases.psm1')
 Import-Module -Name (Join-Path -Path $script:RepositoryRoot -ChildPath '/tests/Unit/Modules/TestHelpers/CommonTestHelper.psm1')
