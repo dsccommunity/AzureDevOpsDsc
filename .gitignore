@@ -17,3 +17,4 @@ node_modules
 package-lock.json
 
 CodeCoverage.JaCoCo.xml
+.vscode/launch.json
