@@ -20,7 +20,7 @@ Function New-AzManagedIdentity {
     param (
         [Parameter()]
         [Alias('OrgName')]
-        [String]
+        [string]
         $OrganizationName
     )
 

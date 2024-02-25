@@ -8,7 +8,7 @@ class DscResourceBase
     {
         [System.String]$dscResourceKeyPropertyName = $this.GetDscResourceKeyPropertyName()
 
-        if ([String]::IsNullOrWhiteSpace($dscResourceKeyPropertyName))
+        if ([string]::IsNullOrWhiteSpace($dscResourceKeyPropertyName))
         {
             $errorMessage = "Cannot obtain a 'DscResourceKey' value for the '$($this.GetType().Name)' instance."
             New-InvalidOperationException -Message $errorMessage

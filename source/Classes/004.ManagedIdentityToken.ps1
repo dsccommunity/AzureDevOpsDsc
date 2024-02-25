@@ -5,8 +5,8 @@ class ManagedIdentityToken {
     [SecureString]$access_token
     [DateTime]$expires_on
     [Int]$expires_in
-    [String]$resource
-    [String]$token_type
+    [string]$resource
+    [string]$token_type
     hidden [bool]$linux = $IsLinux
 
     # Constructor
@@ -46,7 +46,7 @@ class ManagedIdentityToken {
     }
 
     # Function to convert a SecureString to a String
-    hidden [String]ConvertFromSecureString([SecureString]$SecureString) {
+    hidden [string]ConvertFromSecureString([SecureString]$SecureString) {
         # Convert a SecureString to a String
         $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
         $String = ($this.linux) ? [System.Runtime.InteropServices.Marshal]::PtrToStringUni($BSTR) :
@@ -56,7 +56,7 @@ class ManagedIdentityToken {
     }
 
     # Function to test the call stack
-    hidden [Bool]TestCallStack([String]$name) {
+    hidden [Bool]TestCallStack([string]$name) {
 
         $CallStack = Get-PSCallStack
 
@@ -79,7 +79,7 @@ class ManagedIdentityToken {
     }
 
     # Return the access token
-    [String] Get() {
+    [string] Get() {
 
         # Prevent Execution and Writing to Files and Pipeline Variables.
 

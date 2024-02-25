@@ -24,7 +24,7 @@ Function Get-AzManagedIdentityToken {
     param (
         # Organization Name
         [Parameter(Mandatory)]
-        [String]
+        [string]
         $OrganizationName,
 
         # Verify the Connection
