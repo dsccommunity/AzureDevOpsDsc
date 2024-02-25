@@ -49,11 +49,11 @@ param
     $MinimumPSDependVersion,
 
     [Parameter()]
-    [Switch]
+    [switch]
     $AllowPrerelease,
 
     [Parameter()]
-    [Switch]
+    [switch]
     $WithYAML
 )
 

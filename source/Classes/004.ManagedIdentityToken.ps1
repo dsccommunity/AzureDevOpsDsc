@@ -4,7 +4,7 @@ class ManagedIdentityToken {
 
     [SecureString]$access_token
     [DateTime]$expires_on
-    [Int]$expires_in
+    [int]$expires_in
     [string]$resource
     [string]$token_type
     hidden [bool]$linux = $IsLinux
@@ -27,14 +27,15 @@ class ManagedIdentityToken {
     }
 
     # Function to validate the ManagedIdentityTokenObj
-    Hidden [Bool]isValid($ManagedIdentityTokenObj) {
+    hidden [bool]isValid($ManagedIdentityTokenObj) {
 
         # Assuming these are the keys we expect in the hashtable
         $expectedKeys = @('access_token', 'expires_on', 'expires_in', 'resource', 'token_type')
 
         # Check if all expected keys exist in the hashtable
         foreach ($key in $expectedKeys) {
-            if (-not $ManagedIdentityTokenObj."$key") {
+            if (-not $ManagedIdentityTokenObj."$key")
+            {
                 Write-Verbose "[ManagedIdentityToken] The hashtable does not contain the expected property: $key"
                 return $false
             }
@@ -56,7 +57,7 @@ class ManagedIdentityToken {
     }
 
     # Function to test the call stack
-    hidden [Bool]TestCallStack([string]$name) {
+    hidden [bool]TestCallStack([string]$name) {
 
         $CallStack = Get-PSCallStack
 
@@ -72,9 +73,13 @@ class ManagedIdentityToken {
 
     }
 
-    [Bool]isExpired() {
+    [bool]isExpired() {
         # Remove 10 seconds from the expires_on time to account for clock skew.
-        if ($this.expires_on.AddSeconds(-10) -lt (Get-Date)) { return $true }
+        if ($this.expires_on.AddSeconds(-10) -lt (Get-Date))
+        {
+            return $true
+        }
+
         return $false
     }
 
@@ -84,11 +89,20 @@ class ManagedIdentityToken {
         # Prevent Execution and Writing to Files and Pipeline Variables.
 
         # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
-        if (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod'))) { throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod." }
+        if (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod')))
+        {
+            throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod."
+        }
         # Token cannot be returned within a Write-* function. Test to see if the calling function is Write-*
-        if ($this.TestCallStack('Write-')) { throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function." }
+        if ($this.TestCallStack('Write-'))
+        {
+            throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function."
+        }
         # Token cannot be written to a file. Test to see if the calling function is Out-File
-        if ($this.TestCallStack('Out-File')) { throw "[ManagedIdentityToken] The Get() method cannot be called within Out-File." }
+        if ($this.TestCallStack('Out-File'))
+        {
+            throw "[ManagedIdentityToken] The Get() method cannot be called within Out-File."
+        }
 
         # Return the access token
         return ($this.ConvertFromSecureString($this.access_token))

@@ -29,7 +29,7 @@ Function Get-AzManagedIdentityToken {
 
         # Verify the Connection
         [Parameter()]
-        [Switch]
+        [switch]
         $Verify
     )
 
@@ -44,9 +44,20 @@ Function Get-AzManagedIdentityToken {
     }
 
     # Invoke the RestAPI
-    try { $response = Invoke-AzDevOpsApiRestMethod @ManagedIdentityParams } catch { Throw $_ }
+    try
+    {
+        $response = Invoke-AzDevOpsApiRestMethod @ManagedIdentityParams
+    }
+    catch
+    {
+        Throw $_
+    }
+
     # Test the response
-    if ($null -eq $response.access_token) { throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token }
+    if ($null -eq $response.access_token)
+    {
+        throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token
+    }
 
     # TypeCast the response to a ManagedIdentityToken object
     $ManagedIdentity = New-ManagedIdentityToken -ManagedIdentityTokenObj $response
@@ -54,10 +65,16 @@ Function Get-AzManagedIdentityToken {
     $null = $response
 
     # Return the token if the verify switch is not set
-    if (-not($verify)) { return $ManagedIdentity }
+    if (-not($verify))
+    {
+        return $ManagedIdentity
+    }
 
     # Test the Connection
-    if (-not(Test-AzManagedIdentityToken $ManagedIdentity)) { throw $AzManagedIdentityLocalizedData.Error_Azure_API_Call_Generic }
+    if (-not(Test-AzManagedIdentityToken $ManagedIdentity))
+    {
+        throw $AzManagedIdentityLocalizedData.Error_Azure_API_Call_Generic
+    }
 
     # Return the AccessToken
     return ($ManagedIdentity)
