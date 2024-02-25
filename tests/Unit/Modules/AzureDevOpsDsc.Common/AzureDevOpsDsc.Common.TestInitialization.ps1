@@ -4,7 +4,7 @@
 #>
 
 
-Function Split-RecurivePath {
+Function Split-RecursivePath {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
