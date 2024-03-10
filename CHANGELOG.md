@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     file `Home.md` will be updated with the correct module version on each
     publish to gallery (including preview).
 - AzureDevOpsDsc.Common
-  - Managed Identity has been added to the system. This feature can be used before invoking Invoke-DSCResource. With New-AzManagedIdentity, the bearer token is automatically authenticated, retrieved, and managed. It’s worth noting that bearer tokens take precedence over basic tokens. When using Invoke-AzDevOpsApiRestMethod, the token is automatically interpolated as required.
+  - Managed Identity has been added to the system. This feature can be used before invoking Invoke-DSCResource. With New-AzManagedIdentity, the bearer token is automatically authenticated, retrieved, and managed. It's worth noting that bearer tokens take precedence over basic tokens. When using Invoke-AzDevOpsApiRestMethod, the token is automatically interpolated as required.
   - Added 'wrapper' functionality around the [Azure DevOps REST API](https://docs.microsoft.com/en-us/rest/api/azure/devops/)
   - Added Supporting Functions for Azure Managed Identity.
 
