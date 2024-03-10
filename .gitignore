@@ -1,5 +1,6 @@
 output/
 .devcontainer/
+internal-tests/
 
 **.bak
 *.local.*
