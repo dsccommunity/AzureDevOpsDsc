@@ -37,7 +37,7 @@ Function Get-AzManagedIdentityToken {
 
     $ManagedIdentityParams = @{
         # Define the Azure instance metadata endpoint to get the access token
-        Uri = $AzManagedIdentityLocalizedData.Global_Url_Azure_Instance_Metadata_Url -f $AzManagedIdentityLocalizedData.Global_AzureDevOps_Resource_Id
+        Uri = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=499b84ac-1321-427f-aa17-267ca6975798"
         Method = 'Get'
         Headers = @{Metadata="true"}
         ContentType = 'Application/json'
@@ -56,7 +56,7 @@ Function Get-AzManagedIdentityToken {
     # Test the response
     if ($null -eq $response.access_token)
     {
-        throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token
+        throw "Error. Access token not returned from Azure Instance Metadata Service. Please ensure that the Azure Instance Metadata Service is available."
     }
 
     # TypeCast the response to a ManagedIdentityToken object
