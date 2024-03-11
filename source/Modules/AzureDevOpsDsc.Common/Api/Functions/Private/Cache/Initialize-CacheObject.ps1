@@ -29,8 +29,8 @@ Function Initialize-CacheObject {
             $cacheFilePath = Join-Path -Path $env:TEMP -ChildPath ".clixml"
             Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
         } else {
-            Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
             $cacheFilePath = Join-Path -Path $PSScriptRoot -ChildPath "Cache\.clixml"
+            Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
         }
 
         # Test if the Cache File exists. If it does, import the cache object

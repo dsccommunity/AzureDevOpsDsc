@@ -41,6 +41,7 @@ function Set-CacheObject {
         [string]$CacheType,
 
         [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
         [Object[]]$Content,
 
         [Parameter()]
