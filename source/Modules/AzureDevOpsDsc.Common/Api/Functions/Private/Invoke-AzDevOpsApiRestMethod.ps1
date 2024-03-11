@@ -121,13 +121,13 @@ function Invoke-AzDevOpsApiRestMethod
         }
 
         # If the API resouce is close to beig overwelmed, wait for the specified number of seconds before sending the request
-        if (($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -le 50) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -ge 5))
+        if (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -le 50) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -ge 5))
         {
             Write-Verbose -Message "[Invoke-AzDevOpsApiRestMethod] Resource is close to being overwelmed. Waiting for $RetryIntervalMs seconds before sending the request."
             Start-Sleep -Milliseconds $RetryIntervalMs
         }
         # If the API resouce is overwelmed, wait for the specified number of seconds before sending the request
-        elseif ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5)
+        elseif (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5))
         {
             Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Resource is overwelmed. Waiting for {0} seconds to reset the TSTUs." -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
             Start-Sleep -Milliseconds $RetryIntervalMs
