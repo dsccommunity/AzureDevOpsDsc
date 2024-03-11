@@ -19,15 +19,15 @@ function Get-AzDevOpsApiVersion
         $Default
     )
 
-    [string]$defaultApiVersion = '6.0'
+    [string]$defaultApiVersion = '6.1'
 
     [string[]]$apiVersions = @(
 
         #'4.0', # Not supported
         #'5.0', # Not supported
         #'5.1', # Not supported
-        '6.0'
-        #'6.1', # Not supported
+        '6.0',
+        '6.1'
 
     )
 

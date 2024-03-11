@@ -11,6 +11,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     [DscProperty()]
     [Alias('PersonalAccessToken')]
+    [Alias('AccessToken')]
     [System.String]
     $Pat
 
