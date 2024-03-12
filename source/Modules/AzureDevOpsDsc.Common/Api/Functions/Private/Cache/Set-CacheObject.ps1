@@ -53,6 +53,7 @@ function Set-CacheObject {
 
     # Write initial verbose message
     Write-Verbose "[Set-ObjectCache] Starting to set cache object for type: $CacheType"
+    Write-Verbose "[Set-ObjectCache] Cache root path: $CacheRootPath"
 
     try {
         # Create cache directory if it does not exist
@@ -67,8 +68,8 @@ function Set-CacheObject {
         Write-Verbose "[Set-ObjectCache] Cache file will be created at path: $cacheFile"
 
         # Save content to cache file
-        Write-Verbose "[Set-ObjectCache] Saving content to cache file"
-        $Content | Export-Clixml -Depth $Depth | Set-Content -Path $cacheFile -Force
+        Write-Verbose "[Set-ObjectCache] Saving content to cache file $cachePath"
+        $Content | Export-Clixml -Depth $Depth -LiteralPath $cacheFile
 
         # Save content to global variable
         Write-Verbose "[Set-ObjectCache] Setting global variable AzDo$CacheType with the provided content"

@@ -26,7 +26,7 @@ Function Initialize-CacheObject {
 
         # If the cache group is LiveGroups or LiveProjects, set the cache file path to the temporary directory
         if ($CacheType -eq 'LiveGroups' -or $CacheType -eq 'LiveProjects') {
-            $cacheFilePath = Join-Path -Path $env:TEMP -ChildPath ".clixml"
+            $cacheFilePath = Join-Path -Path $env:TEMP -ChildPath "$CacheType.clixml"
             Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
         } else {
             $cacheFilePath = Join-Path -Path $PSScriptRoot -ChildPath "Cache\.clixml"
