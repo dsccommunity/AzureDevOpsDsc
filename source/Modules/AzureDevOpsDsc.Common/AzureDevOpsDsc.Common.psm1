@@ -67,11 +67,5 @@ Initialize-CacheObject -CacheType 'LiveProjects'
 
 # Set the Organization Name
 if ($Global:DSCAZDO_OrganizationName -eq $null) {
-    throw "The global variable 'DSCAZDO_OrganizationName' is not set. Please set the variable to the name of the Azure DevOps organization."
+    Write-Warning "The global variable 'DSCAZDO_OrganizationName' is not set. Please set the variable to the name of the Azure DevOps organization."
 }
-
-# Set the Group Cache
-Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
-Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName
-
-#
