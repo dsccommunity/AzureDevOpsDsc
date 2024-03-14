@@ -28,7 +28,7 @@ Function Test-AzManagedIdentityToken {
     )
 
     # Define the Azure DevOps REST API endpoint to get the list of projects
-    $AZDOProjectUrl = $AzManagedIdentityLocalizedData.Global_Url_AZDO_Project -f $GLOBAL:DSCAZDO_OrganizationName
+    $AZDOProjectUrl = "https://dev.azure.com/{0}/_apis/projects" -f $GLOBAL:DSCAZDO_OrganizationName
     $FormattedUrl = "{0}?api-version=7.2-preview.4" -f $AZDOProjectUrl
 
     $params = @{

@@ -37,17 +37,16 @@ Function Get-AzManagedIdentityToken {
 
     $ManagedIdentityParams = @{
         # Define the Azure instance metadata endpoint to get the access token
-        Uri = $AzManagedIdentityLocalizedData.Global_Url_Azure_Instance_Metadata_Url -f $AzManagedIdentityLocalizedData.Global_AzureDevOps_Resource_Id
+        Uri = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=499b84ac-1321-427f-aa17-267ca6975798"
         Method = 'Get'
-        Headers = @{Metadata="true"}
+        Headers = @{ Metadata="true" }
         ContentType = 'Application/json'
     }
 
     # Invoke the RestAPI
-    Wait-Debugger
     try { $response = Invoke-AzDevOpsApiRestMethod @ManagedIdentityParams } catch { Throw $_ }
     # Test the response
-    if ($null -eq $response.access_token) { throw $AzManagedIdentityLocalizedData.Error_Azure_Instance_Metadata_Service_Missing_Token }
+    if ($null -eq $response.access_token) { throw "Error. Access token not returned from Azure Instance Metadata Service. Please ensure that the Azure Instance Metadata Service is available." }
 
     # TypeCast the response to a ManagedIdentityToken object
     $ManagedIdentity = New-ManagedIdentityToken -ManagedIdentityTokenObj $response
@@ -58,7 +57,7 @@ Function Get-AzManagedIdentityToken {
     if (-not($verify)) { return $ManagedIdentity }
 
     # Test the Connection
-    if (-not(Test-AzManagedIdentityToken $ManagedIdentity)) { throw $AzManagedIdentityLocalizedData.Error_Azure_API_Call_Generic }
+    if (-not(Test-AzManagedIdentityToken $ManagedIdentity)) { throw "Error. Failed to call the Azure DevOps API." }
 
     # Return the AccessToken
     return ($ManagedIdentity)
