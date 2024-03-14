@@ -33,8 +33,15 @@ Function Set-AzDoOrganizationGroup {
     $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
 
     #
-    # Check the cache for the group
-    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
+    # Check the live group cache
+    $LiveGroups = Get-CacheItem -Key $Key -Type 'LiveGroups'
+
+    #
+    # Check the local group cache
+    $localgroup = Get-CacheItem -Key $Key -Type 'Group'
+
+    #
+    #
 
     $params = @{
         ApiUri = $ApiUri

@@ -22,21 +22,17 @@ Function New-AzDoOrganizationGroup {
 
         [Parameter()]
         [Alias('Description')]
-        [System.String]$GroupDescription
+        [System.String]$GroupDescription,
+
+        [Parameter()]
+        [Alias('Name')]
+        [System.String]$GetResult
 
     )
 
 
     # Format the Key According to the Principal Name
     $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
-
-    #
-    # Check if the group exists in the cache. If it does throw an error.
-    $online_group = Get-CacheItem -Key $Key -Type 'LiveGroups'
-
-    if ($online_group) {
-        throw "Group with name '$Key' already exists in the organization."
-    }
 
     #
     # Create a new group

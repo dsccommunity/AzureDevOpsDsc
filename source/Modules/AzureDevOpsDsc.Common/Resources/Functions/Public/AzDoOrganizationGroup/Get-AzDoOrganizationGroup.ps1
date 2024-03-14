@@ -53,11 +53,46 @@ Function Get-AzDoOrganizationGroup {
 
     #
     # Check the cache for the group
-    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
+    $livegroup = Get-CacheItem -Key $Key -Type 'LiveGroups'
+
+    #
+    # Check if the group is in the cache
+    $localgroup = Get-CacheItem -Key $Key -Type 'Group'
+
+    # Construct the result object
+    $getResult = @{
+        Current = $livegroup
+        Cache = $localgroup
+        Status = $null
+    }
+
+    #
+    # Construct a hashtable detailing the group
+
+    switch ($localgroup) {
+        # If the group is present in the live cache and the local cache. Flag as Changed.
+        { ($null -ne $livegroup) -and ($null -ne $_)} {
+            $result.Status = ($livegroup.originId -ne $_.originId) ? [DSCGroupTestResult]::Changed : [DSCGroupTestResult]::Unchanged
+            break;
+        }
+
+        # If the group is not present in the live cache. Flag as Not Found.
+        { ($null -eq $livegroup) } {
+            $result.Status = [DSCGroupTestResult]::NotFound
+            break;
+        }
+
+        # All other cases are changed.
+        default {
+            $result.Status = [DSCGroupTestResult]::Changed
+            break;
+        }
+
+    }
 
     #
     # Return the group from the cache
 
-    return $group.Value
+    return $getResult
 
 }

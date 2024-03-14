@@ -116,12 +116,29 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     hidden [RequiredAction]GetDscRequiredAction()
     {
+
+
+        # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
+        $dscRequiredAction = [RequiredAction]::None
+        $cacheProperties = $false
+
         [Hashtable]$currentProperties = $this.GetDscCurrentStateProperties()
         [Hashtable]$desiredProperties = $this.GetDscDesiredStateProperties()
 
         [System.String[]]$dscPropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
         [System.String[]]$dscPropertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
+        #
+        # Test if currentProperties contains a hashtable containing 'Current', 'Cache' and 'Status' properties
+        if ($currentProperties -is [hashtable])
+        {
+            if ($currentProperties.Keys -contains 'Current' -and
+                $currentProperties.Keys -contains 'Cache' -and
+                $currentProperties.Keys -contains 'Status')
+            {
+                $cacheProperties = $true
+            }
+        }
 
         # Update 'Id' property:
         # Set $desiredProperties."$IdPropertyName" to $currentProperties."$IdPropertyName" if it's desired
@@ -137,15 +154,33 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         }
 
 
-        # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
-        $dscRequiredAction = [RequiredAction]::None
-
         switch ($desiredProperties.Ensure)
         {
             ([Ensure]::Present) {
 
+                # If not already present, return [RequiredAction]::New (i.e. Resource needs creating)
+                if ($cacheProperties) {
+
+                    if ($cacheProperties.Status -eq 'NotFound')
+                    {
+                        $dscRequiredAction = [RequiredAction]::New
+                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                        break
+                    }
+
+                    if ($cacheProperties.Status -eq 'Changed')
+                    {
+                        $dscRequiredAction = [RequiredAction]::Set
+                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                        break
+                    }
+
+                    return $dscRequiredAction
+
+                }
+
                 # If not already present, or different to expected/desired - return [RequiredAction]::New (i.e. Resource needs creating)
-                if ($null -eq $currentProperties -or $($currentProperties.Ensure) -ne [Ensure]::Present)
+                if (($null -eq $currentProperties) -or ($($currentProperties.Ensure) -ne [Ensure]::Present))
                 {
                     $dscRequiredAction = [RequiredAction]::New
                     Write-Verbose "DscActionRequired='$dscRequiredAction'"
@@ -190,6 +225,34 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             }
             ([Ensure]::Absent) {
 
+                # If not already present, return [RequiredAction]::New (i.e. Resource needs creating)
+                if ($cacheProperties) {
+
+                    if ($cacheProperties.Status -eq 'NotFound')
+                    {
+                        $dscRequiredAction = [RequiredAction]::None
+                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                        break
+                    }
+
+                    if ($cacheProperties.Status -eq 'Changed')
+                    {
+                        $dscRequiredAction = [RequiredAction]::Remove
+                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                        break
+                    }
+
+                    if ($cacheProperties.Status -eq 'Unchanged') {
+                        $dscRequiredAction = [RequiredAction]::Remove
+                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                        break
+                    }
+
+                    return $dscRequiredAction
+
+                }
+
+
                 # If currently/already present - return $false (i.e. state is incorrect)
                 if ($null -ne $currentProperties -and $currentProperties.Ensure -ne [Ensure]::Absent)
                 {
@@ -212,12 +275,10 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         return $dscRequiredAction
     }
 
-
     hidden [Hashtable]GetDesiredStateParameters([Hashtable]$CurrentStateProperties, [Hashtable]$DesiredStateProperties, [RequiredAction]$RequiredAction)
     {
         [Hashtable]$desiredStateParameters = $DesiredStateProperties
         [System.String]$IdPropertyName = $this.GetResourceIdPropertyName()
-
 
         # If actions required are 'None' or 'Error', return a $null value
         if ($RequiredAction -in @([RequiredAction]::None, [RequiredAction]::Error))
@@ -240,6 +301,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         # If the desired state/action is to add/new or update/set  the resource, start with the values in the $DesiredStateProperties variable, and amend
         elseif ($RequiredAction -in @([RequiredAction]::New, [RequiredAction]::Set))
         {
+
             # Set $desiredParameters."$IdPropertyName" to $CurrentStateProperties."$IdPropertyName" if it's known and can be recovered from existing resource
             if ([System.String]::IsNullOrWhiteSpace($desiredStateParameters."$IdPropertyName") -and
                 ![System.String]::IsNullOrWhiteSpace($CurrentStateProperties."$IdPropertyName"))
@@ -310,6 +372,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     [void] SetToDesiredState()
     {
         [RequiredAction]$dscRequiredAction = $this.GetDscRequiredAction()
+        $cacheProperties = $false
 
         if ($dscRequiredAction -in @([RequiredAction]::'New', [RequiredAction]::'Set', [RequiredAction]::'Remove'))
         {

@@ -48,7 +48,11 @@ Function Test-AzDoOrganizationGroup {
         [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
         [Alias('Uri')]
         [System.String]
-        $ApiUri
+        $ApiUri,
+
+        [Parameter()]
+        [Alias('Name')]
+        [System.String]$GetResult
 
     )
 
