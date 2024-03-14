@@ -1,4 +1,4 @@
-using namespace AzureDevOpsDsc.Common
+using module AzureDevOpsDsc.Common
 
 class AzDoProjectGroupPermission : AzDevOpsDscResourceBase {
 
