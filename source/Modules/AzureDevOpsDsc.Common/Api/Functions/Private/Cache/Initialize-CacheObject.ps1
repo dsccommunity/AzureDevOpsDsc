@@ -20,11 +20,12 @@ Function Initialize-CacheObject {
         [Parameter(Mandatory)]
         [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType
+
     )
 
     try {
 
-        $cacheFilePath = Join-Path -Path $PSScriptRoot -ChildPath "Cache\$CacheType.clixml"
+        $cacheFilePath = Join-Path -Path $ModuleRoot -ChildPath "Cache\$CacheType.clixml"
         Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
 
         # If the cache group is LiveGroups or LiveProjects, set the cache file path to the temporary directory
@@ -55,7 +56,7 @@ Function Initialize-CacheObject {
 
     } catch {
         Write-Verbose "An error occurred: $_"
-        throw "Failed to import cache for Azure DevOps API: $_"
+        throw "[Initialize-CacheObject] Failed to import cache for Azure DevOps API: $_"
     }
 
 }

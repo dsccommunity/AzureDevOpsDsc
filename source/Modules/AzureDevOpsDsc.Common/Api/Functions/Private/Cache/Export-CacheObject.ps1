@@ -44,7 +44,7 @@ Function Export-CacheObject {
         [int]$Depth = 3,
 
         [Parameter()]
-        [String]$CacheRootPath = $PSScriptRoot
+        [String]$CacheRootPath = $ModuleRoot
     )
 
     # Write initial verbose message

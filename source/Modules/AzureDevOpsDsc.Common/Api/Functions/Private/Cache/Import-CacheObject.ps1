@@ -38,6 +38,7 @@ function Import-CacheObject {
 
     # Write initial verbose message
     Write-Verbose "[Import-CacheObject] Starting to import cache object for type: $CacheType"
+    Write-Verbose "[Import-CacheObject] Cache root path: $CacheRootPath"
 
     try {
 

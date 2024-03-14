@@ -40,7 +40,7 @@ function Get-CacheObject {
         [string]$CacheType,
 
         [Parameter()]
-        [String]$CacheRootPath = $PSScriptRoot
+        [String]$CacheRootPath = $ModuleRoot
     )
 
     # Write initial verbose message

@@ -6,36 +6,37 @@
 
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
+$ModuleRoot = $PSScriptRoot
 
 # Obtain all functions within PSModule
 $functionSubDirectoryPaths = @(
 
     # Classes
-    "$PSScriptRoot\Api\Classes\",
+    "$ModuleRoot\Api\Classes\",
 
     # Enum
-    "$PSScriptRoot\Api\Enums\",
+    "$ModuleRoot\Api\Enums\",
 
     # Data
-    "$PSScriptRoot\Api\Data\",
+    "$ModuleRoot\Api\Data\",
 
     # Api
-    "$PSScriptRoot\Api\Functions\Private\Api",
-    "$PSScriptRoot\Api\Functions\Private\Cache",
-    "$PSScriptRoot\Api\Functions\Private\Helper",
-    "$PSScriptRoot\Api\Functions\Private\ManagedIdentity",
+    "$ModuleRoot\Api\Functions\Private\Api",
+    "$ModuleRoot\Api\Functions\Private\Cache",
+    "$ModuleRoot\Api\Functions\Private\Helper",
+    "$ModuleRoot\Api\Functions\Private\ManagedIdentity",
 
     # Connection
-    "$PSScriptRoot\Connection\Functions\Private",
+    "$ModuleRoot\Connection\Functions\Private",
 
     # Resources
-    "$PSScriptRoot\Resources\Functions\Public",
-    "$PSScriptRoot\Resources\Functions\Private",
+    "$ModuleRoot\Resources\Functions\Public",
+    "$ModuleRoot\Resources\Functions\Private",
 
     # Server
 
     # Services
-    "$PSScriptRoot\Services\Functions\Public"
+    "$ModuleRoot\Services\Functions\Public"
 )
 $functions = Get-ChildItem -Path $functionSubDirectoryPaths -Recurse -Include "*.ps1"
 
@@ -50,7 +51,7 @@ foreach ($function in $functions)
         )
     )
 
-    if ($function.FullName -ilike "$PSScriptRoot\*\Functions\Public\*")
+    if ($function.FullName -ilike "$ModuleRoot\*\Functions\Public\*")
     {
         Write-Verbose "Exporting '$($function.BaseName)'..."
         Export-ModuleMember -Function $($function.BaseName)
