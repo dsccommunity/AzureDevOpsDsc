@@ -38,7 +38,7 @@ Function Add-CacheItem {
     )
 
     Write-Verbose "[Add-CacheItem] Retrieving the current cache."
-    $cache = Get-CacheObject -CacheType $Type
+    [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
     #Get-AzDevOpsCache -CacheType $Type
 
     # If the cache is empty, create a new cache

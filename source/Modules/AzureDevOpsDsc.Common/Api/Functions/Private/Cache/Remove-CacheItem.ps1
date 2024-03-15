@@ -34,7 +34,7 @@ Function Remove-CacheItem {
 
     Write-Verbose "[Remove-CacheItem] Retrieving the current cache."
     #$cache = Get-AzDevOpsCache -CacheType $Type
-    $cache = Get-CacheObject -CacheType $Type
+    [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
 
     Write-Verbose "[Remove-CacheItem] Removing the cache item with the key: '$Key'."
 

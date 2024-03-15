@@ -34,7 +34,7 @@ function Get-CacheItem {
         $Filter
     )
 
-    $cache = Get-CacheObject -CacheType $Type
+    [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
     $cacheItem = $cache.Where({$_.Key -eq $Key})
 
     if ($null -eq $cacheItem) { return $null }
