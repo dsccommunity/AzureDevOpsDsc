@@ -166,6 +166,8 @@ function Invoke-AzDevOpsApiRestMethod
                 # Test if the HTTP Headers have been defined. If not, create a new Hashtable.
                 $invokeRestMethodParameters.Headers = ($null -eq $invokeRestMethodParameters.Headers) ? { $invokeRestMethodParameters.Headers = @{} } : $invokeRestMethodParameters.Headers
 
+                Wait-Debugger
+
                 # Add the Managed Identity Token to the HTTP Headers
                 $invokeRestMethodParameters.Headers.Authorization = 'Bearer {0}' -f $Global:DSCAZDO_ManagedIdentityToken.Get()
 
