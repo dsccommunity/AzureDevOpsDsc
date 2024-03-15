@@ -52,7 +52,8 @@ function Get-CacheObject {
 
         if ($var) {
             Write-Verbose "[Get-ObjectCache] Cache object found in memory for type: $CacheType"
-            $var = $var.Value
+            # If the variable is found, return the content of the cache. Dont use $var here, since it will a different object type.
+            $var = Get-Variable -Name "AzDo$CacheType" -ValueOnly -Scope Global
         } else {
             Write-Verbose "[Get-ObjectCache] Cache object not found in memory, attempting to import for type: $CacheType"
             $var = Import-CacheObject -CacheType $CacheType -CacheRootPath $CacheRootPath
