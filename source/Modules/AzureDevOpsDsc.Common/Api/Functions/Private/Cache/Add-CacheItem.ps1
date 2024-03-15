@@ -56,6 +56,8 @@ Function Add-CacheItem {
     if ($existingItem) {
         Write-Warning "[Add-CacheItem] A cache item with the key '$Key' already exists. Flushing key from the cache."
         Remove-CacheItem -Key $Key -Type $Type
+        # Refresh the cache
+        [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
     }
 
     Write-Verbose "Adding new cache item with key: '$Key'."
