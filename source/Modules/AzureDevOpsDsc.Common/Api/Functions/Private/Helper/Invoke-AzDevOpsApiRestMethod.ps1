@@ -64,7 +64,7 @@ function Invoke-AzDevOpsApiRestMethod
         [ValidateScript( { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $_ -IsValid })]
         [Hashtable]
         [Alias('Headers','HttpRequestHeader')]
-        $HttpHeaders,
+        $HttpHeaders=@{},
 
         [Parameter()]
         [System.String]
@@ -160,11 +160,6 @@ function Invoke-AzDevOpsApiRestMethod
                     # If so, get a new token
                     $Global:DSCAZDO_ManagedIdentityToken = Update-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
                 }
-
-                # Add the Managed Identity Token to the HTTP Headers
-
-                # Test if the HTTP Headers have been defined. If not, create a new Hashtable.
-                $invokeRestMethodParameters.Headers = ($null -eq $invokeRestMethodParameters.Headers) ? { $invokeRestMethodParameters.Headers = @{} } : $invokeRestMethodParameters.Headers
 
                 Wait-Debugger
 
