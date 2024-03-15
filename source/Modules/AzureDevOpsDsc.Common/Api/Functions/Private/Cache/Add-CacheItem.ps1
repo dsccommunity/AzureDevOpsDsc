@@ -41,6 +41,12 @@ Function Add-CacheItem {
     $cache = Get-CacheObject -CacheType $Type
     #Get-AzDevOpsCache -CacheType $Type
 
+    # If the cache is empty, create a new cache
+    if ($cache.count -eq 0) {
+        Write-Verbose "[Add-CacheItem] Cache is empty. Creating new cache."
+        $cache = [System.Collections.Generic.List[CacheItem]]::New()
+    }
+
     Write-Verbose "[Add-CacheItem] Creating new cache item."
     $cacheItem = [CacheItem]::New($Key, $Value)
 

@@ -52,6 +52,7 @@ function Get-CacheObject {
 
         if ($var) {
             Write-Verbose "[Get-ObjectCache] Cache object found in memory for type: $CacheType"
+            $var = $var.Value
         } else {
             Write-Verbose "[Get-ObjectCache] Cache object not found in memory, attempting to import for type: $CacheType"
             $var = Import-CacheObject -CacheType $CacheType -CacheRootPath $CacheRootPath
