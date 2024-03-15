@@ -84,9 +84,11 @@ Class ManagedIdentityToken {
         # Prevent Execution and Writing to Files and Pipeline Variables.
 
         # Token can only be called within Test-AzManagedIdentityToken. Test to see if the calling function is Test-AzManagedIdentityToken
-        if (-not($this.TestCallStack('Test-AzManagedIdentityToken'))) { throw "[ManagedIdentityToken] The Get() method can only be called within Test-AzManagedIdentityToken." }
-        # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
-        if (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod'))) { throw "[ManagedIdentityToken] The Get() method can only be called within Invoke-AzDevOpsApiRestMethod." }
+        if ((-not($this.TestCallStack('Test-AzManagedIdentityToken'))) -or (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod')))) {
+            # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
+            throw "[ManagedIdentityToken][Access Denied] The Get() method can only be called within DSC.Common."
+        }
+
         # Token cannot be returned within a Write-* function. Test to see if the calling function is Write-*
         if ($this.TestCallStack('Write-')) { throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function." }
         # Token cannot be written to a file. Test to see if the calling function is Out-File
