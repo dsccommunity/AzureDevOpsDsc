@@ -34,6 +34,7 @@ function Import-CacheObject {
 
         [Parameter()]
         [String]$CacheRootPath = $PSScriptRoot
+
     )
 
     # Write initial verbose message
@@ -42,11 +43,8 @@ function Import-CacheObject {
 
     try {
 
-        # Determine cache directory path
-        $cachePath = Join-Path -Path $CacheRootPath -ChildPath 'Cache'
-
         # Determine cache file path
-        $cacheFile = Join-Path -Path $cachePath -ChildPath "$CacheType.clixml"
+        $cacheFile = Join-Path -Path $CacheRootPath -ChildPath "$CacheType.clixml"
 
         # Check if cache file exists
         if (-not (Test-Path -Path $cacheFile)) {

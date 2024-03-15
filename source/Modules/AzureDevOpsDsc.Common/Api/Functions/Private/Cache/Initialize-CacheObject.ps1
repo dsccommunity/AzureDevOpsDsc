@@ -25,6 +25,8 @@ Function Initialize-CacheObject {
 
     try {
 
+        $CacheDirectoryPath = Join-Path -Path $ModuleRoot -ChildPath "Cache"
+
         $cacheFilePath = Join-Path -Path $ModuleRoot -ChildPath "Cache\$CacheType.clixml"
         Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
 
@@ -39,18 +41,18 @@ Function Initialize-CacheObject {
 
         }
 
-        # Test if the Cache File exists. If it does, import the cache object
+        # Test if the Cache File exists. If it exists, import the cache object
         if (Test-Path -Path $cacheFilePath) {
 
             # If the cache file exists, import the cache object
             Write-Verbose "[Initialize-CacheObject] Cache file found. Importing cache object for '$CacheType'."
-            Import-CacheObject @PSBoundParameters
+            Import-CacheObject -CacheType $CacheType -CacheRootPath $CacheDirectoryPath
 
         } else {
 
             # If the cache file does not exist, create a new cache object
             Write-Verbose "[Initialize-CacheObject] Cache file not found. Creating new cache object for '$CacheType'."
-            Set-CacheObject @PSBoundParameters -Content @()
+            Set-CacheObject -CacheType $CacheType -Content @() -CacheRootPath $CacheDirectoryPath
 
         }
 

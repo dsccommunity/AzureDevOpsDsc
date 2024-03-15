@@ -56,15 +56,9 @@ function Set-CacheObject {
     Write-Verbose "[Set-ObjectCache] Cache root path: $CacheRootPath"
 
     try {
-        # Create cache directory if it does not exist
-        $cachePath = Join-Path -Path $CacheRootPath -ChildPath 'Cache'
-        if (-not (Test-Path -Path $cachePath)) {
-            Write-Verbose "[Set-ObjectCache] Creating cache directory at path: $cachePath"
-            New-Item -Path $cachePath -ItemType Directory | Out-Null
-        }
 
         # Create cache file
-        $cacheFile = Join-Path -Path $cachePath -ChildPath "$CacheType.clixml"
+        $cacheFile = Join-Path -Path $CacheRootPath -ChildPath "$CacheType.clixml"
         Write-Verbose "[Set-ObjectCache] Cache file will be created at path: $cacheFile"
 
         # Save content to cache file
