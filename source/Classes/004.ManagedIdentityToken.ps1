@@ -29,6 +29,9 @@ Class ManagedIdentityToken {
     # Function to validate the ManagedIdentityTokenObj
     Hidden [Bool]isValid($ManagedIdentityTokenObj) {
 
+        # Write-Verbose
+        Write-Verbose "[ManagedIdentityToken] Validating the ManagedIdentityTokenObj."
+
         # Assuming these are the keys we expect in the hashtable
         $expectedKeys = @('access_token', 'expires_on', 'expires_in', 'resource', 'token_type')
 
@@ -58,6 +61,9 @@ Class ManagedIdentityToken {
     # Function to test the call stack
     hidden [Bool]TestCallStack([String]$name) {
 
+        # Get the call stack
+        Write-Verbose "[ManagedIdentityToken] Getting the call stack."
+
         $CallStack = Get-PSCallStack
 
         # Check if any of the callers in the call stack is Invoke-DSCResource
@@ -81,18 +87,24 @@ Class ManagedIdentityToken {
     # Return the access token
     [String] Get() {
 
+        # Verbose output
+        Write-Verbose "[ManagedIdentityToken] Getting the access token:"
+        Write-Verbose "[ManagedIdentityToken] Ensuring that the calling function is allowed to call the Get() method."
+
         # Prevent Execution and Writing to Files and Pipeline Variables.
 
         # Token can only be called within Test-AzManagedIdentityToken. Test to see if the calling function is Test-AzManagedIdentityToken
         if ((-not($this.TestCallStack('Test-AzManagedIdentityToken'))) -and (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod')))) {
             # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
-            throw "[ManagedIdentityToken][Access Denied] The Get() method can only be called within DSC.Common."
+            throw "[ManagedIdentityToken][Access Denied] The Get() method can only be called within AzureDevOpsDsc.Common."
         }
 
         # Token cannot be returned within a Write-* function. Test to see if the calling function is Write-*
-        if ($this.TestCallStack('Write-')) { throw "[ManagedIdentityToken] The Get() method cannot be called within a Write-* function." }
+        if ($this.TestCallStack('Write-')) { throw "[ManagedIdentityToken][Access Denied] The Get() method cannot be called within a Write-* function." }
         # Token cannot be written to a file. Test to see if the calling function is Out-File
-        if ($this.TestCallStack('Out-File')) { throw "[ManagedIdentityToken] The Get() method cannot be called within Out-File." }
+        if ($this.TestCallStack('Out-File')) { throw "[ManagedIdentityToken][Access Denied] The Get() method cannot be called within Out-File." }
+
+        Write-Verbose "[ManagedIdentityToken] Token Retriveal Successful."
 
         # Return the access token
         return ($this.ConvertFromSecureString($this.access_token))
@@ -103,6 +115,9 @@ Class ManagedIdentityToken {
 
 # Function to create a new ManagedIdentityToken object
 Function global:New-ManagedIdentityToken ([PSCustomObject]$ManagedIdentityTokenObj) {
+
+    # Verbose output
+    Write-Verbose "[ManagedIdentityToken] Creating a new ManagedIdentityToken object."
 
     # Create and return a new ManagedIdentityToken object
     return [ManagedIdentityToken]::New($ManagedIdentityTokenObj)

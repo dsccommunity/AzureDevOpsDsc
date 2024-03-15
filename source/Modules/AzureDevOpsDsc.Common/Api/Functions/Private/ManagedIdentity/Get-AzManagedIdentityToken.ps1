@@ -33,6 +33,8 @@ Function Get-AzManagedIdentityToken {
         $Verify
     )
 
+    Write-Verbose "[Get-AzManagedIdentityToken] Getting the managed identity token for the organization $OrganizationName."
+
     # Obtain the access token from Azure AD using the Managed Identity
 
     $ManagedIdentityParams = @{
@@ -43,10 +45,14 @@ Function Get-AzManagedIdentityToken {
         ContentType = 'Application/json'
     }
 
+    Write-Verbose "[Get-AzManagedIdentityToken] Invoking the Azure Instance Metadata Service to get the access token."
+
     # Invoke the RestAPI
     try { $response = Invoke-AzDevOpsApiRestMethod @ManagedIdentityParams } catch { Throw $_ }
     # Test the response
     if ($null -eq $response.access_token) { throw "Error. Access token not returned from Azure Instance Metadata Service. Please ensure that the Azure Instance Metadata Service is available." }
+
+    Write-Verbose "[Get-AzManagedIdentityToken] Managed Identity Token Retrival Successful."
 
     # TypeCast the response to a ManagedIdentityToken object
     $ManagedIdentity = New-ManagedIdentityToken -ManagedIdentityTokenObj $response
@@ -55,6 +61,8 @@ Function Get-AzManagedIdentityToken {
 
     # Return the token if the verify switch is not set
     if (-not($verify)) { return $ManagedIdentity }
+
+    Write-Verbose "[Get-AzManagedIdentityToken] Verifying the connection to the Azure DevOps API."
 
     # Test the Connection
     if (-not(Test-AzManagedIdentityToken $ManagedIdentity)) { throw "Error. Failed to call the Azure DevOps API." }

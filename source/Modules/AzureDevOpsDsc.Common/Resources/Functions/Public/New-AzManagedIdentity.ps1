@@ -24,6 +24,8 @@ Function New-AzManagedIdentity {
         $OrganizationName
     )
 
+    Write-Verbose "[New-AzManagedIdentity] Creating a new Azure Managed Identity with OrganizationName $OrganizationName."
+
     $Global:DSCAZDO_OrganizationName = $OrganizationName
     $Global:DSCAZDO_ManagedIdentityToken = $null
 
