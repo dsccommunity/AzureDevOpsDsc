@@ -122,20 +122,20 @@ function Invoke-AzDevOpsApiRestMethod
         # Slow down the retry attempts if the API resource is close to being overwelmed
 
         # If there are any retry attempts, wait for the specified number of seconds before retrying
-        if ($Global:DSCAZDO_APIRateLimit.retryAfter -ge 0)
+        if (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.retryAfter -ge 0))
         {
             Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Waiting for {0} seconds before retrying." -f $Global:DSCAZDO_APIRateLimit.retryAfter)
             Start-Sleep -Seconds $Global:DSCAZDO_APIRateLimit.retryAfter
         }
 
         # If the API resouce is close to beig overwelmed, wait for the specified number of seconds before sending the request
-        if (($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -le 50) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -ge 5))
+        if (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -le 50) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -ge 5))
         {
             Write-Verbose -Message "[Invoke-AzDevOpsApiRestMethod] Resource is close to being overwelmed. Waiting for $RetryIntervalMs seconds before sending the request."
             Start-Sleep -Milliseconds $RetryIntervalMs
         }
         # If the API resouce is overwelmed, wait for the specified number of seconds before sending the request
-        elseif ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5)
+        elseif (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5))
         {
             Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Resource is overwelmed. Waiting for {0} seconds to reset the TSTUs." -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
             Start-Sleep -Milliseconds $RetryIntervalMs
@@ -151,15 +151,20 @@ function Invoke-AzDevOpsApiRestMethod
 
             if ($Global:DSCAZDO_ManagedIdentityToken -ne $null)
             {
+                Write-Verbose "[Invoke-AzDevOpsApiRestMethod] Adding Managed Identity Token to the HTTP Headers."
+
                 # Test if the Managed Identity Token has expired
                 if ($Global:DSCAZDO_ManagedIdentityToken.isExpired())
                 {
+                    Write-Verbose "[Invoke-AzDevOpsApiRestMethod] Managed Identity Token has expired. Obtaining a new token."
                     # If so, get a new token
                     $Global:DSCAZDO_ManagedIdentityToken = Update-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
                 }
 
                 # Add the Managed Identity Token to the HTTP Headers
+                Wait-Debugger
                 $invokeRestMethodParameters.Headers.Authorization = 'Bearer {0}' -f $Global:DSCAZDO_ManagedIdentityToken.Get()
+
             }
 
             #
