@@ -55,7 +55,7 @@ Function Add-CacheItem {
 
     if ($existingItem) {
         Write-Warning "[Add-CacheItem] A cache item with the key '$Key' already exists. Flushing key from the cache."
-        Remove-CacheItem -Key $Key
+        Remove-CacheItem -Key $Key -Type $Type
     }
 
     Write-Verbose "Adding new cache item with key: '$Key'."
