@@ -26,8 +26,8 @@ Function Initialize-CacheObject {
     try {
 
         $CacheDirectoryPath = Join-Path -Path $ModuleRoot -ChildPath "Cache"
+        $cacheFilePath = Join-Path -Path $CacheDirectoryPath -ChildPath "$CacheType.clixml"
 
-        $cacheFilePath = Join-Path -Path $ModuleRoot -ChildPath "Cache\$CacheType.clixml"
         Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
 
         # If the cache group is LiveGroups or LiveProjects, set the cache file path to the temporary directory
@@ -52,6 +52,14 @@ Function Initialize-CacheObject {
 
             # If the cache file does not exist, create a new cache object
             Write-Verbose "[Initialize-CacheObject] Cache file not found. Creating new cache object for '$CacheType'."
+
+            # Create the cache directory if it does not exist
+            if (-not (Test-Path -Path $CacheDirectoryPath)) {
+                Write-Verbose "[Initialize-CacheObject] Cache directory not found. Creating cache directory."
+                New-Item -Path $CacheDirectoryPath -ItemType Directory | Out-Null
+            }
+
+            # Create a new cache object
             Set-CacheObject -CacheType $CacheType -Content ([System.Collections.Generic.List[CacheItem]]::New()) -CacheRootPath $CacheDirectoryPath
 
         }
