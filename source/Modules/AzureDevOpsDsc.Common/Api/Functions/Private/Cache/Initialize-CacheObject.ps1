@@ -52,7 +52,7 @@ Function Initialize-CacheObject {
 
             # If the cache file does not exist, create a new cache object
             Write-Verbose "[Initialize-CacheObject] Cache file not found. Creating new cache object for '$CacheType'."
-            Set-CacheObject -CacheType $CacheType -Content @() -CacheRootPath $CacheDirectoryPath
+            Set-CacheObject -CacheType $CacheType -Content ([System.Collections.Generic.List[CacheItem]]::New()) -CacheRootPath $CacheDirectoryPath
 
         }
 
