@@ -67,6 +67,8 @@ Function Get-AzManagedIdentityToken {
     # Test the Connection
     if (-not(Test-AzManagedIdentityToken $ManagedIdentity)) { throw "Error. Failed to call the Azure DevOps API." }
 
+    Write-Verbose "[Get-AzManagedIdentityToken] Connection Verified."
+
     # Return the AccessToken
     return ($ManagedIdentity)
 
