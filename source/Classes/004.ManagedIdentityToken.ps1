@@ -84,7 +84,7 @@ Class ManagedIdentityToken {
         # Prevent Execution and Writing to Files and Pipeline Variables.
 
         # Token can only be called within Test-AzManagedIdentityToken. Test to see if the calling function is Test-AzManagedIdentityToken
-        if ((-not($this.TestCallStack('Test-AzManagedIdentityToken'))) -or (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod')))) {
+        if ((-not($this.TestCallStack('Test-AzManagedIdentityToken'))) -and (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod')))) {
             # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
             throw "[ManagedIdentityToken][Access Denied] The Get() method can only be called within DSC.Common."
         }
