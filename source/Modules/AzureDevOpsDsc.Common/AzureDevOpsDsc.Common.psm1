@@ -59,6 +59,11 @@ foreach ($function in $functions)
 }
 
 #
+# Static Functions that need to be exported
+
+Export-ModuleMember -Function 'Set-AzDoAPIGroupCache'
+
+#
 # Module initialization
 
 # Initialize cache

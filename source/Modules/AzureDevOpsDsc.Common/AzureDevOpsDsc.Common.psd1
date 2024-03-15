@@ -37,7 +37,6 @@
         'Test-AzDevOpsProject',
 
         'New-AzManagedIdentity',
-
         'Set-AzDoAPIGroupCache'
 
     )

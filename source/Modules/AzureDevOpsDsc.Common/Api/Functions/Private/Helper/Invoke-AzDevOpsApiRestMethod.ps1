@@ -60,7 +60,7 @@ function Invoke-AzDevOpsApiRestMethod
         [Alias('Method')]
         $HttpMethod,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter()]
         [ValidateScript( { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $_ -IsValid })]
         [Hashtable]
         [Alias('Headers','HttpRequestHeader')]
