@@ -56,13 +56,14 @@ function Import-CacheObject {
         Write-Verbose "[Import-CacheObject] Importing content from cache file at path: $cacheFile"
 
         $Content = Import-Clixml -Path $cacheFile
-        Set-Variable -Name "AzDo$CacheType" -Value $Content -Scope Global -Force
-        Write-Verbose "[Import-CacheObject] Successfully imported cache object for type: $CacheType"
+
+        #Set-Variable -Name "AzDo$CacheType" -Value $Content -Scope Global -Force
+        #Write-Verbose "[Import-CacheObject] Successfully imported cache object for type: $CacheType"
 
         # Convert the imported cache object to a list of CacheItem objects
         $newCache = [System.Collections.Generic.List[CacheItem]]
-        $cacheValue = Get-Variable -Name "AzDo$CacheType" -ValueOnly
-        $newCache = $cacheValue | ForEach-Object {
+        #$cacheValue = Get-Variable -Name "AzDo$CacheType" -ValueOnly
+        $newCache = $Content | ForEach-Object {
 
             # If the key is empty, skip the item
             if ([string]::IsNullOrEmpty($_.Key)) { return }

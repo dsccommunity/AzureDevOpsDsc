@@ -36,10 +36,10 @@ Function Set-AzDoAPIGroupCache {
         # Perform an Azure DevOps API request to get the groups
         $groups = List-DevOpsGroups @params
 
-        Write-Verbose "'List-DevOpsGroups' returned a total of $($groups.value.Count) groups."
+        Write-Verbose "'List-DevOpsGroups' returned a total of $($groups.Count) groups."
 
         # Iterate through each of the responses and add them to the cache
-        foreach ($group in $groups.value) {
+        foreach ($group in $groups) {
             Write-Verbose "Adding group '$($group.PrincipalName)' to cache."
             # Add the group to the cache
             Add-CacheItem -Key $group.PrincipalName -Value $group -Type 'LiveGroups'

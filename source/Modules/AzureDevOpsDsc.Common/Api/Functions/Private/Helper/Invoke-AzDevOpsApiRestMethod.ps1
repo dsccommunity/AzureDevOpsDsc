@@ -161,8 +161,6 @@ function Invoke-AzDevOpsApiRestMethod
                     $Global:DSCAZDO_ManagedIdentityToken = Update-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
                 }
 
-                Wait-Debugger
-
                 # Add the Managed Identity Token to the HTTP Headers
                 $invokeRestMethodParameters.Headers.Authorization = 'Bearer {0}' -f $Global:DSCAZDO_ManagedIdentityToken.Get()
 

@@ -38,7 +38,8 @@ Function Add-CacheItem {
     )
 
     Write-Verbose "[Add-CacheItem] Retrieving the current cache."
-    $cache = Get-AzDevOpsCache -CacheType $Type
+    $cache = Get-CacheObject -CacheType $Type
+    #Get-AzDevOpsCache -CacheType $Type
 
     Write-Verbose "[Add-CacheItem] Creating new cache item."
     $cacheItem = [CacheItem]::New($Key, $Value)

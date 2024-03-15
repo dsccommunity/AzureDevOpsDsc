@@ -33,7 +33,8 @@ Function Remove-CacheItem {
     )
 
     Write-Verbose "[Remove-CacheItem] Retrieving the current cache."
-    $cache = Get-AzDevOpsCache -CacheType $Type
+    #$cache = Get-AzDevOpsCache -CacheType $Type
+    $cache = Get-CacheObject -CacheType $Type
 
     0 .. $cache.Length | Where-Object { $cache[$_] -eq $Key } | ForEach-Object { $cache.RemoveAt($_) }
 }
