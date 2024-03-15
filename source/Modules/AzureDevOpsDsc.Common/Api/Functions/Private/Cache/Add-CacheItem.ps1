@@ -61,5 +61,8 @@ Function Add-CacheItem {
     Write-Verbose "Adding new cache item with key: '$Key'."
     $cache.Add($cacheItem)
 
+    # Update the memory cache
+    Set-Variable -Name "AzDo$Type" -Value $cache -Scope Global
+
     Write-Verbose "Cache item with key: '$Key' successfully added."
 }

@@ -37,4 +37,8 @@ Function Remove-CacheItem {
     $cache = Get-CacheObject -CacheType $Type
 
     0 .. $cache.Length | Where-Object { $cache[$_] -eq $Key } | ForEach-Object { $cache.RemoveAt($_) }
+
+    # Update the memory cache
+    Set-Variable -Name "AzDo$Type" -Value $cache -Scope Global
+
 }
