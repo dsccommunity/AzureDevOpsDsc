@@ -11,7 +11,7 @@ function List-DevOpsProjects {
     )
 
     $params = @{
-        Uri = "https://vssps.dev.azure.com/{0}/_apis/projects?api-version={1}" -f $Organization, $ApiVersion
+        Uri = "https://vssps.dev.azure.com/$Organization/_apis/projects"
         Method = 'Get'
     }
 

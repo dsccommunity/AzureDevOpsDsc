@@ -51,10 +51,10 @@ Function Set-AzDoAPIProjectCache {
         $projects = List-DevOpsProjects @params
 
         # Log the total number of projects returned by the API call
-        Write-Verbose "'List-DevOpsProjects' returned a total of $($projects.value.Count) projects."
+        Write-Verbose "'List-DevOpsProjects' returned a total of $($projects.Count) projects."
 
         # Iterate through each project in the response and add them to the cache
-        foreach ($project in $projects.value) {
+        foreach ($project in $projects) {
             # Log the addition of each project to the cache
             Write-Verbose "Adding Project '$($project.Name)' to the cache."
 
