@@ -5,4 +5,4 @@ $ht = @{
     GroupDescription = "I am a test group."
 }
 
-Invoke-DscResource -Name 'AzDoOrganizationGroup' -Method Get -Property $ht -Verbose
+Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -Verbose -ModuleName 'AzureDevOpsDsc'
