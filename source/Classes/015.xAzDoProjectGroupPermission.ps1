@@ -1,5 +1,15 @@
 using module AzureDevOpsDsc.Common
+<#
+.SYNOPSIS
+This class represents a resource for managing project group permissions in Azure DevOps.
 
+.DESCRIPTION
+The xAzDoProjectGroupPermission class is used to manage project group permissions in Azure DevOps. It provides properties for specifying the project name, group name, and group permissions.
+
+.NOTES
+Author: Your Name
+Date:   Current Date
+#>
 class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
 {
     [DscProperty()]
@@ -48,4 +58,3 @@ class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
     }
 
 }
-

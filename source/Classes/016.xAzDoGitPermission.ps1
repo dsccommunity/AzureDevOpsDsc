@@ -1,5 +1,29 @@
 using module AzureDevOpsDsc.Common
 
+<#
+.SYNOPSIS
+This class represents an Azure DevOps Git permission resource.
+
+.DESCRIPTION
+The xAzDoGitPermission class is used to manage Git repository permissions in Azure DevOps.
+
+.NOTES
+Author: Your Name
+Date:   Current Date
+
+.EXAMPLE
+Example usage of the xAzDoGitPermission class:
+
+$gitPermission = [xAzDoGitPermission]::new()
+$gitPermission.ProjectName = "MyProject"
+$gitPermission.GitRepositoryName = "MyRepository"
+$gitPermission.Permission = @("Read", "Contribute")
+
+$gitPermission.Get()
+
+.LINK
+Azure DevOps DSC Resource Kit: https://github.com/Azure/AzureDevOpsDsc
+#>
 class xAzDoGitPermission : AzDevOpsDscResourceBase
 {
     [DscProperty(Mandatory)]
@@ -47,4 +71,3 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
     }
 
 }
-
