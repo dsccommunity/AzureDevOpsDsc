@@ -13,9 +13,9 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
     [DscProperty(Mandatory)]
     [AzDoGitRepositoryPermission[]]$Permission
 
-    [AzDoGitPermission] Get()
+    [xAzDoGitPermission] Get()
     {
-        return [AzDoGitPermission]$($this.GetDscCurrentStateProperties())
+        return [xAzDoGitPermission]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()

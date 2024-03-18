@@ -11,7 +11,7 @@ class xAzDoOrganizationGroupPermission : AzDevOpsDscResourceBase
 
     [xAzDoOrganizationGroupPermission] Get()
     {
-        return [AzDoProjectGroupPermission]$($this.GetDscCurrentStateProperties())
+        return [xAzDoOrganizationGroupPermission]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()

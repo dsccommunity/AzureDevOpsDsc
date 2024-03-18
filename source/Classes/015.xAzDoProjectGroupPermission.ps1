@@ -12,11 +12,11 @@ class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
 
     [DscProperty()]
     [Alias('Permission')]
-    [AzDoProjectGroupPermission[]]$GroupPermission
+    [xAzDoProjectGroupPermission[]]$GroupPermission
 
-    [AzDoProjectGroupPermission] Get()
+    [xAzDoProjectGroupPermission] Get()
     {
-        return [AzDoProjectGroupPermission]$($this.GetDscCurrentStateProperties())
+        return [xAzDoProjectGroupPermission]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
