@@ -1,3 +1,4 @@
+[DscResource()]
 class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
 {
     [DscProperty(Key, Mandatory)]

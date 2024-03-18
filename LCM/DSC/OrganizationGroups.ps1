@@ -1,4 +1,5 @@
 Configuration OrganizationGroups {
+    param()
 
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DSCResource -ModuleName xPSDesiredStateConfiguration
@@ -6,7 +7,7 @@ Configuration OrganizationGroups {
 
     Node localhost {
 
-        AzDoOrganizationGroup CreateTestGroup {
+        xAzDoOrganizationGroup CreateTestGroup {
 
             GroupName = "TestGroup"
             GroupDisplayName = "Test Group"
