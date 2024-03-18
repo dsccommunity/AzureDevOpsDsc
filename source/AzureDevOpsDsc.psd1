@@ -40,7 +40,7 @@
     # Import all the 'DSCClassResource', modules as part of this module
     NestedModules = @()
 
-    DscResourcesToExport = @('AzDevOpsProject')
+    DscResourcesToExport = @('xAzDevOpsProject','xAzDoOrganizationGroup','xAzDoProjectGroup','xAzDoOrganizationGroupPermission','xAzDoProjectGroupPermission')
 
     RequiredAssemblies = @()
 
