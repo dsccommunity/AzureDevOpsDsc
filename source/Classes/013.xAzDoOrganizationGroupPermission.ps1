@@ -26,11 +26,11 @@ using module AzureDevOpsDsc.Common
         Returns a hashtable of the current state properties of the xAzDoOrganizationGroupPermission resource.
 
 #>
-[DscResource()]
+#[DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDoOrganizationGroupPermission : AzDevOpsDscResourceBase
 {
-    [DscProperty(Mandatory)]
+    [DscProperty(Key, Mandatory)]
     [Alias('Name')]
     [System.String]$GroupName
 

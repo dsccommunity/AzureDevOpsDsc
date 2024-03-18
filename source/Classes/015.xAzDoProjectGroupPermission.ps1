@@ -10,15 +10,15 @@ The xAzDoProjectGroupPermission class is used to manage project group permission
 Author: Your Name
 Date:   Current Date
 #>
-[DscResource()]
+#[DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
 {
-    [DscProperty()]
-    [Alias('Id')]
+    [DscProperty(Key)]
+    [Alias('Project')]
     [System.String]$ProjectName
 
-    [DscProperty()]
+    [DscProperty(Key)]
     [Alias('Name')]
     [System.String]$GroupName
 

@@ -24,16 +24,16 @@ $gitPermission.Get()
 .LINK
 Azure DevOps DSC Resource Kit: https://github.com/Azure/AzureDevOpsDsc
 #>
-[DscResource()]
+#[DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDoGitPermission : AzDevOpsDscResourceBase
 {
-    [DscProperty(Mandatory)]
-    [Alias('ProjectName')]
+    [DscProperty(Key,Mandatory)]
+    [Alias('Project')]
     [System.String]$ProjectName
 
-    [DscProperty(Mandatory)]
-    [Alias('Name')]
+    [DscProperty(Key,Mandatory)]
+    [Alias('GitName')]
     [System.String]$GitRepositoryName
 
     [DscProperty(Mandatory)]

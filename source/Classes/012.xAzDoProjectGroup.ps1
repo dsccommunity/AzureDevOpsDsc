@@ -48,7 +48,7 @@ class xAzDoProjectGroup : AzDevOpsDscResourceBase
     [DscProperty(Key, Mandatory)]
     [System.String]$ProjectName
 
-    [DscProperty(Key, Mandatory)]
+    [DscProperty(Mandatory)]
     [Alias('Name')]
     [System.String]$GroupName
 
