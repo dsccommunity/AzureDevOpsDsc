@@ -22,7 +22,7 @@
 #>
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
-class AzDevOpsProject : AzDevOpsDscResourceBase
+class xAzDevOpsProject : AzDevOpsDscResourceBase
 {
     [DscProperty()]
     [Alias('Id')]
@@ -41,9 +41,9 @@ class AzDevOpsProject : AzDevOpsDscResourceBase
     [System.String]$SourceControlType
 
 
-    [AzDevOpsProject] Get()
+    [xAzDevOpsProject] Get()
     {
-        return [AzDevOpsProject]$($this.GetDscCurrentStateProperties())
+        return [xAzDevOpsProject]$($this.GetDscCurrentStateProperties())
     }
 
 

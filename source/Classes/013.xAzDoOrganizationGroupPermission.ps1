@@ -1,26 +1,22 @@
 using module AzureDevOpsDsc.Common
-
-class AzDoGitPermission : AzDevOpsDscResourceBase {
-
-    [DscProperty(Mandatory)]
-    [Alias('ProjectName')]
-    [System.String]$ProjectName
-
+class xAzDoOrganizationGroupPermission : AzDevOpsDscResourceBase
+{
     [DscProperty(Mandatory)]
     [Alias('Name')]
-    [System.String]$GitRepositoryName
+    [System.String]$GroupName
 
     [DscProperty(Mandatory)]
-    [AzDoGitRepositoryPermission[]]$Permission
+    [Alias('Permission')]
+    [xAzDoOrganizationGroupPermission[]]$GroupPermission
 
-    [AzDoGitPermission] Get()
+    [xAzDoOrganizationGroupPermission] Get()
     {
-        return [AzDoGitPermission]$($this.GetDscCurrentStateProperties())
+        return [AzDoProjectGroupPermission]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
     {
-        return @('SourceControlType')
+        return @()
     }
 
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
@@ -37,10 +33,8 @@ class AzDoGitPermission : AzDevOpsDscResourceBase {
             {
                 $properties.Ensure = [Ensure]::Present
             }
-            $properties.ProjectId = $CurrentResourceObject.id
-            $properties.ProjectName = $CurrentResourceObject.name
-            $properties.ProjectDescription = $CurrentResourceObject.description
-            $properties.SourceControlType = $CurrentResourceObject.capabilities.versioncontrol.sourceControlType
+            $properties.GroupName = $CurrentResourceObject.name
+            $properties.GroupPermission = $CurrentResourceObject.permission
         }
 
         return $properties

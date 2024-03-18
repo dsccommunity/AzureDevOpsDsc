@@ -1,20 +1,22 @@
-class AzDoOrganizationGroup : AzDevOpsDscResourceBase {
+using module AzureDevOpsDsc.Common
 
-    [DscProperty(Key, Mandatory)]
+class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
+{
+    [DscProperty()]
+    [Alias('Id')]
+    [System.String]$ProjectName
+
+    [DscProperty()]
     [Alias('Name')]
     [System.String]$GroupName
 
-    [DscProperty(Key, Mandatory)]
-    [Alias('DisplayName')]
-    [System.String]$GroupDisplayName
-
     [DscProperty()]
-    [Alias('Description')]
-    [System.String]$GroupDescription
+    [Alias('Permission')]
+    [AzDoProjectGroupPermission[]]$GroupPermission
 
-    [AzDoOrganizationGroup] Get()
+    [AzDoProjectGroupPermission] Get()
     {
-        return [AzDoOrganizationGroup]$($this.GetDscCurrentStateProperties())
+        return [AzDoProjectGroupPermission]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
@@ -36,12 +38,14 @@ class AzDoOrganizationGroup : AzDevOpsDscResourceBase {
             {
                 $properties.Ensure = [Ensure]::Present
             }
+            $properties.ProjectName = $CurrentResourceObject.name
             $properties.GroupName = $CurrentResourceObject.name
-            $properties.GroupDescription = $CurrentResourceObject.description
-            $properties.GroupDisplayName = $CurrentResourceObject.displayName
-        }
+            $properties.GroupPermission = $CurrentResourceObject.permission
 
+        }
         return $properties
+
     }
 
 }
+

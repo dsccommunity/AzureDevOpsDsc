@@ -1,5 +1,7 @@
 Configuration OrganizationGroups {
 
+    Import-DscResource -ModuleName PSDesiredStateConfiguration
+    Import-DSCResource -ModuleName xPSDesiredStateConfiguration
     Import-DscResource -ModuleName AzureDevOpsDsc
 
     Node localhost {
@@ -11,6 +13,14 @@ Configuration OrganizationGroups {
             GroupDescription = "I am a test group."
 
         }
+
+        AzDoOrganizationGroupMembers CreateTestGroup-Members {
+
+            DependsOn = '[AzDoOrganizationGroup]CreateTestGroup'
+            Members = @( 'michael.zantta@dfr.com.au' )
+
+        }
+
 
     }
 

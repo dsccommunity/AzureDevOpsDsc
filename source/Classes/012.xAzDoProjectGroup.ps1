@@ -1,5 +1,5 @@
-class AzDoProjectGroup : AzDevOpsDscResourceBase {
-
+class xAzDoProjectGroup : AzDevOpsDscResourceBase
+{
     [DscProperty(Key, Mandatory)]
     [System.String]$ProjectName
 
@@ -11,9 +11,9 @@ class AzDoProjectGroup : AzDevOpsDscResourceBase {
     [Alias('Description')]
     [System.String]$GroupDescription
 
-    [AzDoProjectGroup] Get()
+    [xAzDoProjectGroup] Get()
     {
-        return [AzDoProjectGroup]$($this.GetDscCurrentStateProperties())
+        return [xAzDoProjectGroup]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
