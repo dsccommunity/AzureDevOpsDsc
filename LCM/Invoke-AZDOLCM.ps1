@@ -33,7 +33,6 @@ New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose
 
 # Set the Group Cache
 Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
-Wait-Debugger
 Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
 
 # Locate the Resources and load into Memory
