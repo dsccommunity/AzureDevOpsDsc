@@ -116,8 +116,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     hidden [RequiredAction]GetDscRequiredAction()
     {
-
-
         # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
         $dscRequiredAction = [RequiredAction]::None
         $cacheProperties = $false
@@ -159,8 +157,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             ([Ensure]::Present) {
 
                 # If not already present, return [RequiredAction]::New (i.e. Resource needs creating)
-                if ($cacheProperties) {
-
+                if ($cacheProperties)
+                {
                     if ($cacheProperties.Status -eq 'NotFound')
                     {
                         $dscRequiredAction = [RequiredAction]::New
@@ -174,9 +172,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                         Write-Verbose "DscActionRequired='$dscRequiredAction'"
                         break
                     }
-
                     return $dscRequiredAction
-
                 }
 
                 # If not already present, or different to expected/desired - return [RequiredAction]::New (i.e. Resource needs creating)
@@ -226,32 +222,28 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             ([Ensure]::Absent) {
 
                 # If not already present, return [RequiredAction]::New (i.e. Resource needs creating)
-                if ($cacheProperties) {
-
+                if ($cacheProperties)
+                {
                     if ($cacheProperties.Status -eq 'NotFound')
                     {
                         $dscRequiredAction = [RequiredAction]::None
                         Write-Verbose "DscActionRequired='$dscRequiredAction'"
                         break
                     }
-
                     if ($cacheProperties.Status -eq 'Changed')
                     {
                         $dscRequiredAction = [RequiredAction]::Remove
                         Write-Verbose "DscActionRequired='$dscRequiredAction'"
                         break
                     }
-
-                    if ($cacheProperties.Status -eq 'Unchanged') {
+                    if ($cacheProperties.Status -eq 'Unchanged')
+                    {
                         $dscRequiredAction = [RequiredAction]::Remove
                         Write-Verbose "DscActionRequired='$dscRequiredAction'"
                         break
                     }
-
                     return $dscRequiredAction
-
                 }
-
 
                 # If currently/already present - return $false (i.e. state is incorrect)
                 if ($null -ne $currentProperties -and $currentProperties.Ensure -ne [Ensure]::Absent)

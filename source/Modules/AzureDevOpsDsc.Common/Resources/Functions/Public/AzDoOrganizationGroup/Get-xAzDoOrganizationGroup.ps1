@@ -56,8 +56,12 @@ Function Get-xAzDoOrganizationGroup {
 
     )
 
+    #
     # Define the Current State
     $CurrentState = [xAzDoOrganizationGroup]::New()
+    $CurrentState.DisplayName = $GroupDisplayName
+    $CurrentState.Name = $GroupName
+    $CurrentState.Description = $GroupDescription
 
     # Format the Key According to the Principal Name
     $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
@@ -70,13 +74,9 @@ Function Get-xAzDoOrganizationGroup {
     # Check if the group is in the cache
     $localgroup = Get-CacheItem -Key $Key -Type 'Group'
 
-    # Construct the result object
-    $DscGetResult = @{
-        Current = $livegroup
-        Cache = $localgroup
-        Status = $null
-        PropertiesChanged = @()
-    }
+    #
+    #
+
 
     #
     # Construct a hashtable detailing the group
