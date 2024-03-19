@@ -22,7 +22,7 @@
     Returns $true if the organization group exists, otherwise returns $false.
 
 .EXAMPLE
-    Test-AzDoOrganizationGroup -GroupName 'MyGroup' -Pat '********' -ApiUri 'https://dev.azure.com/myorg'
+    Test-xAzDoOrganizationGroup -GroupName 'MyGroup' -Pat '********' -ApiUri 'https://dev.azure.com/myorg'
 
     Description
     -----------
@@ -30,7 +30,7 @@
     using the specified personal access token and API URI.
 
 #>
-Function Test-AzDevOpsxAzDoOrganizationGroup {
+Function Test-xAzDoOrganizationGroup {
 
     param(
         [Parameter(Mandatory)]

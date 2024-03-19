@@ -1,4 +1,4 @@
-Function New-AzDevOpsxAzDoOrganizationGroup {
+Function New-xAzDoOrganizationGroup {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
