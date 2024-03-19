@@ -26,15 +26,18 @@ function Test-AzDevOpsApiUri
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ApiUri,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
+
+    # The APIUri is not mandatory. If it is not provided, the function will return $true.
+    if ($null -eq $ApiUri) { return $true }
 
     return !(($ApiUri -inotlike 'http://*' -and
               $ApiUri -inotlike 'https://*') -or
