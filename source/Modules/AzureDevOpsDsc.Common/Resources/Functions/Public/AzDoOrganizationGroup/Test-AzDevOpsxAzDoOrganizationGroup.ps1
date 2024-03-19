@@ -30,7 +30,7 @@
     using the specified personal access token and API URI.
 
 #>
-Function Test-AzDoOrganizationGroup {
+Function Test-AzDevOpsxAzDoOrganizationGroup {
 
     param(
         [Parameter(Mandatory)]

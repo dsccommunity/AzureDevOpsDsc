@@ -3,7 +3,7 @@
 Retrieves an organization group from Azure DevOps.
 
 .DESCRIPTION
-The Get-AzDoOrganizationGroup function retrieves an organization group from Azure DevOps based on the provided parameters.
+The Get-AzDevOpsxAzDoOrganizationGroup function retrieves an organization group from Azure DevOps based on the provided parameters.
 
 .PARAMETER ApiUri
 The URI of the Azure DevOps API. This parameter is validated using the Test-AzDevOpsApiUri function.
@@ -19,7 +19,7 @@ The name of the organization group to retrieve.
 The retrieved organization group.
 
 .EXAMPLE
-Get-AzDoOrganizationGroup -ApiUri 'https://dev.azure.com/contoso' -Pat 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx' -GroupName 'Developers'
+Get-AzDevOpsxAzDoOrganizationGroup -ApiUri 'https://dev.azure.com/contoso' -Pat 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx' -GroupName 'Developers'
 Retrieves the organization group named 'Developers' from the Azure DevOps instance at 'https://dev.azure.com/contoso' using the provided PAT.
 
 #>
