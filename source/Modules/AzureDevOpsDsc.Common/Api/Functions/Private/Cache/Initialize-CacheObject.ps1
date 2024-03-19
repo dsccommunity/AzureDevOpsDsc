@@ -39,6 +39,9 @@ Function Initialize-CacheObject {
                 Remove-Item -LiteralPath $cacheFilePath -Force
             }
 
+        } else {
+            # Test if the Cache File exists. If it exists, import the cache object
+            Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
         }
 
         # Test if the Cache File exists. If it exists, import the cache object

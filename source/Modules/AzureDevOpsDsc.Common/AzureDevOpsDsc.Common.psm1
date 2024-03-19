@@ -72,9 +72,10 @@ Export-ModuleMember -Function 'Get-AzDoAPIProjectCache'
 #
 # Module initialization
 
-# Initialize cache
-Initialize-CacheObject -CacheType 'LiveGroups'
-Initialize-CacheObject -CacheType 'LiveProjects'
+# Initalize the Cache
+'LiveGroups', 'LiveProjects', 'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object {
+    Initialize-CacheObject -CacheType $_
+}
 
 # Set the Organization Name
 if ($Global:DSCAZDO_OrganizationName -eq $null) {

@@ -32,9 +32,6 @@ New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose
 Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
 Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName
 
-# Initalize the Cache for the Other Items
-#'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object { Initialize-CacheObject -CacheType $_ }
-
 # Locate the Resources and load into Memory
 
 # Invoke the Resouces using the specified method
