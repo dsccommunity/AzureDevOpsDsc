@@ -50,7 +50,7 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
     [Alias('Name')]
     [System.String]$GroupName
 
-    [DscProperty(Mandatory)]
+    [DscProperty()]
     [Alias('DisplayName')]
     [System.String]$GroupDisplayName
 

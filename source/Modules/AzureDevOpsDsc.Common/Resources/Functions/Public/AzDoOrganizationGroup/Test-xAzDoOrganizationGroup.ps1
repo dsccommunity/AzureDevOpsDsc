@@ -38,13 +38,13 @@ Function Test-xAzDoOrganizationGroup {
         [string]
         $GroupName,
 
-        [Parameter(Mandatory)]
+        [Parameter()]
         [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
         [Alias('PersonalAccessToken')]
         [System.String]
         $Pat,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
         [Alias('Uri')]
         [System.String]
@@ -56,9 +56,56 @@ Function Test-xAzDoOrganizationGroup {
 
         [Parameter()]
         [Alias('Name')]
-        [System.String]$GetResult
+        [hashtable]$GetResult
 
     )
+
+    #
+    # Firstly we need to compare to see if the group names are the same. If so we can return $false.
+
+    if ($GetResult.Status -eq [DSCGroupTestResult]::Unchanged ) {
+
+        $result = $true
+
+        if ($GroupDescription -eq $GetResult.Current.description)
+        {
+            $GetResult.
+            $result = $false
+        }
+
+        return $true }
+
+    #
+    # If the status has been flagged as 'Renamed', returned $true. This means that the originId has changed.
+    if ($GetResult.Status -eq [DSCGroupTestResult]::Renamed) { return $false }
+
+    #
+    # If the status has been flagged as 'Missing', returned $true. This means that the group is missing from the live cache.
+
+
+
+    if ($GetResult.Status -eq [DSCGroupTestResult]::Changed) {
+
+        #
+        # If the group is present in the live cache and the local cache. This means that the originId has changed. This needs to be updated.
+        if (($null -ne $GetResult.Current) -and ($null -ne $GetResult.Cache)) {
+            return $true
+        }
+
+        #
+        # If the group is present in the live cache but not in the local cache. Flag as Changed.
+        if ($GetResult.Current -and -not($GetResult.Cache)) {
+            return $true
+        }
+
+        #
+        # If the group is not present in the live cache but is in the local cache. Flag as Changed.
+        if (-not($GetResult.Current) -and $GetResult.Cache) {
+            return $true
+        }
+
+    }
+
 
     # Format the Key According to the Principal Name
     $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName

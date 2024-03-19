@@ -42,13 +42,22 @@ Function Get-xAzDoOrganizationGroup {
         [System.String]
         $Pat,
 
+        [DscProperty()]
+        [Alias('DisplayName')]
+        [System.String]$GroupDisplayName,
+
         [Parameter(Mandatory)]
         [Alias('Name')]
-        [System.String]$GroupName
+        [System.String]$GroupName,
+
+        [Parameter()]
+        [Alias('Description')]
+        [System.String]$GroupDescription
 
     )
 
-    Wait-Debugger
+    # Define the Current State
+    $CurrentState = [xAzDoOrganizationGroup]::New()
 
     # Format the Key According to the Principal Name
     $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
@@ -62,31 +71,39 @@ Function Get-xAzDoOrganizationGroup {
     $localgroup = Get-CacheItem -Key $Key -Type 'Group'
 
     # Construct the result object
-    $getResult = @{
+    $DscGetResult = @{
         Current = $livegroup
         Cache = $localgroup
         Status = $null
+        PropertiesChanged = @()
     }
 
     #
     # Construct a hashtable detailing the group
 
     switch ($localgroup) {
-        # If the group is present in the live cache and the local cache. Flag as Changed.
+        # If the group is present in the live cache and the local cache.
         { ($null -ne $livegroup) -and ($null -ne $_)} {
-            $result.Status = ($livegroup.originId -ne $_.originId) ? [DSCGroupTestResult]::Changed : [DSCGroupTestResult]::Unchanged
+            # Test if the originId is the same. If so, the group is unchanged. If not, the group has been renamed.
+            $DscGetResult.Status = ($livegroup.originId -ne $_.originId) ? [DSCGroupTestResult]::Renamed : [DSCGroupTestResult]::Unchanged
             break;
         }
 
         # If the group is not present in the live cache. Flag as Not Found.
         { ($null -eq $livegroup) } {
-            $result.Status = [DSCGroupTestResult]::NotFound
+            $DscGetResult.Status = [DSCGroupTestResult]::NotFound
+            break;
+        }
+
+        # If the group is not present in the local cache. Flag as Missing.
+        { ($null -eq $_) } {
+            $DscGetResult.Status = [DSCGroupTestResult]::Missing
             break;
         }
 
         # All other cases are changed.
         default {
-            $result.Status = [DSCGroupTestResult]::Changed
+            $DscGetResult.Status = [DSCGroupTestResult]::Changed
             break;
         }
 
@@ -95,6 +112,6 @@ Function Get-xAzDoOrganizationGroup {
     #
     # Return the group from the cache
 
-    return $getResult
+    return $DscGetResult
 
 }
