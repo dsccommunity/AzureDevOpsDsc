@@ -22,23 +22,31 @@
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport = @(
 
-        'New-AzManagedIdentity',
+        #
+        # LCM Supporting Functions
 
         'Get-AzDevOpsServicesUri',
         'Get-AzDevOpsServicesApiUri',
-
         'Get-AzDevOpsOperation',
         'Test-AzDevOpsOperation',
 
+        'New-AzManagedIdentity',
+        'Set-AzDoAPIGroupCache',
+        'Set-AzDoAPIProjectCache'
+
+        #
+        # DSC Class Based Resources
         'Get-AzDevOpsProject',
         'New-AzDevOpsProject',
         'Set-AzDevOpsProject',
         'Remove-AzDevOpsProject',
         'Test-AzDevOpsProject',
 
-        'New-AzManagedIdentity',
-        'Set-AzDoAPIGroupCache',
-        'Set-AzDoAPIProjectCache'
+        'Get-xAzDoOrganizationGroup',
+        'New-xAzDoOrganizationGroup',
+        'Set-xAzDoOrganizationGroup',
+        'Remove-xAzDoOrganizationGroup',
+        'Test-xAzDoOrganizationGroup'
 
     )
 
