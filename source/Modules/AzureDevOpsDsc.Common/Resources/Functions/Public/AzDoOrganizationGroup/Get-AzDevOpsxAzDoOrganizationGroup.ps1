@@ -24,7 +24,7 @@ Retrieves the organization group named 'Developers' from the Azure DevOps instan
 
 #>
 
-Function Get-AzDoOrganizationGroup {
+Function Get-AzDevOpsxAzDoOrganizationGroup {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
@@ -65,6 +65,8 @@ Function Get-AzDoOrganizationGroup {
         Cache = $localgroup
         Status = $null
     }
+
+    Wait-Debugger
 
     #
     # Construct a hashtable detailing the group

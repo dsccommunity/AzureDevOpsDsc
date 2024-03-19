@@ -1,4 +1,4 @@
-Function Remove-AzDoOrganizationGroup {
+Function Remove-AzDevOpsxAzDoOrganizationGroup {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]

@@ -1,4 +1,4 @@
-Function Set-AzDoOrganizationGroup {
+Function Set-AzDevOpsxAzDoOrganizationGroup {
 
     param(
         [Parameter(Mandatory)]
