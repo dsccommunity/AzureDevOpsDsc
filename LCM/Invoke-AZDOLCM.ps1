@@ -18,9 +18,6 @@ param(
 # Define the Report Path
 $ReportPath = Join-Path -Path $DSCDirectory -ChildPath "Reports"
 
-# TODO: Fix Class Issue
-. "C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\Api\Enums\AzDoGitRepositoryPermission.ps1"
-
 # Load the module
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1' -Verbose
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\AzureDevOpsDsc.psd1' -Verbose
