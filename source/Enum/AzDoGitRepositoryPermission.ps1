@@ -1,3 +1,4 @@
+using module AzureDevOpsDsc.Common
 <#
 .SYNOPSIS
     Enumeration of Azure DevOps Git repository permissions.

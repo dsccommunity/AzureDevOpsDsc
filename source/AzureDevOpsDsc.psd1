@@ -26,10 +26,10 @@
     CLRVersion         = '4.0'
 
     # Functions to export from this module
-    FunctionsToExport  = @()
+    #FunctionsToExport  = @()
 
     # Cmdlets to export from this module
-    CmdletsToExport    = @()
+    #CmdletsToExport    = @()
 
     # Variables to export from this module
     VariablesToExport  = @()
@@ -40,7 +40,11 @@
     # Import all the 'DSCClassResource', modules as part of this module
     NestedModules = @()
 
-    DscResourcesToExport = @('xAzDevOpsProject','xAzDoOrganizationGroup','xAzDoProjectGroup','xAzDoOrganizationGroupPermission','xAzDoProjectGroupPermission')
+    DscResourcesToExport = @(
+      'xAzDevOpsProject',
+      'xAzDoOrganizationGroup',
+      'xAzDoProjectGroup'
+    )
 
     RequiredAssemblies = @()
 

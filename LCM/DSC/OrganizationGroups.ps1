@@ -3,7 +3,7 @@ Configuration OrganizationGroups {
 
     Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DSCResource -ModuleName xPSDesiredStateConfiguration
-    Import-DscResource -ModuleName AzureDevOpsDsc
+    Import-DscResource -ModuleName AzureDevOpsDsc -ModuleVersion 1.0.0
 
     Node localhost {
 
