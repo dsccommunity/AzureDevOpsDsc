@@ -17,8 +17,9 @@ Function Remove-xAzDoOrganizationGroup {
         $Pat,
 
         [Parameter(Mandatory)]
-        [Alias('DisplayName')]
-        [System.String]$GroupDisplayName
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GroupDisplayName
 
     )
 

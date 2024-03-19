@@ -48,8 +48,6 @@ Function Get-xAzDoOrganizationGroup {
 
     )
 
-Wait-Debugger
-
     # Format the Key According to the Principal Name
     $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
 
@@ -67,8 +65,6 @@ Wait-Debugger
         Cache = $localgroup
         Status = $null
     }
-
-    Wait-Debugger
 
     #
     # Construct a hashtable detailing the group

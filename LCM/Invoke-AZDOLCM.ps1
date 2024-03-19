@@ -1,3 +1,4 @@
+<#
 param(
 
     [Parameter(Mandatory)]
@@ -14,9 +15,11 @@ param(
     [String]$ResourceMethods
 
 )
+#>
+
 
 # Define the Report Path
-$ReportPath = Join-Path -Path $DSCDirectory -ChildPath "Reports"
+#$ReportPath = Join-Path -Path $DSCDirectory -ChildPath "Reports"
 
 # Load the module
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1' -Verbose
@@ -30,7 +33,7 @@ Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
 Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName
 
 # Initalize the Cache for the Other Items
-'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object { Initialize-CacheObject -CacheType $_ }
+#'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object { Initialize-CacheObject -CacheType $_ }
 
 # Locate the Resources and load into Memory
 

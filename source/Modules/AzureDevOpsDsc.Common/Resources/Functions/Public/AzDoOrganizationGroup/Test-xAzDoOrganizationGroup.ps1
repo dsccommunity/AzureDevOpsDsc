@@ -51,6 +51,10 @@ Function Test-xAzDoOrganizationGroup {
         $ApiUri,
 
         [Parameter()]
+        [string]
+        $GroupDescription=$null,
+
+        [Parameter()]
         [Alias('Name')]
         [System.String]$GetResult
 
