@@ -30,6 +30,9 @@ Function Format-UserPrincipalName {
         $GroupName
     )
 
+    # If the prefix contains starting or ending square brackets, remove them.
+    $Prefix = $Prefix -replace '^\[|\]$', ''
+
     # Build the User Principal Name string
     $userPrincipalName = '[{0}]\{1}' -f $Prefix, $GroupName
 

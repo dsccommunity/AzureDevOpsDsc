@@ -1,4 +1,5 @@
-enum DSCGroupTestResult {
+enum DSCGroupTestResult
+{
     # Changed
     Changed = 0
     # Unchanged

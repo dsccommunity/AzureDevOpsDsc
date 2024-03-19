@@ -64,6 +64,11 @@ foreach ($function in $functions)
 Export-ModuleMember -Function 'Set-AzDoAPIGroupCache'
 Export-ModuleMember -Function 'Set-AzDoAPIProjectCache'
 
+Export-ModuleMember -Function 'Set-CacheObject'
+Export-ModuleMember -Function 'Get-CacheItem'
+Export-ModuleMember -Function 'Get-AzDoAPIGroupCache'
+Export-ModuleMember -Function 'Get-AzDoAPIProjectCache'
+
 #
 # Module initialization
 

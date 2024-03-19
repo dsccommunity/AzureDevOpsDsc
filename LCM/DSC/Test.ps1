@@ -1,0 +1,1 @@
+Get-xAzDoOrganizationGroup -GroupName 'Testgroup'
