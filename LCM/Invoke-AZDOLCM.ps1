@@ -22,6 +22,9 @@ param(
 #$ReportPath = Join-Path -Path $DSCDirectory -ChildPath "Reports"
 
 # Load the module
+
+$VerbosePreference = "Continue"
+#Wait-Debugger
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1' -Verbose
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\AzureDevOpsDsc.psd1' -Verbose
 
@@ -30,7 +33,8 @@ New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose
 
 # Set the Group Cache
 Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
-Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName
+Wait-Debugger
+Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
 
 # Locate the Resources and load into Memory
 

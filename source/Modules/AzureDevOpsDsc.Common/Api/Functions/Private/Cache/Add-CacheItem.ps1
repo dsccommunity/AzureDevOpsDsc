@@ -47,7 +47,7 @@ Function Add-CacheItem {
         $cache = [System.Collections.Generic.List[CacheItem]]::New()
     }
 
-    Write-Verbose "[Add-CacheItem] Creating new cache item."
+    Write-Verbose "[Add-CacheItem] Creating new cache item with key: '$Key'."
     $cacheItem = [CacheItem]::New($Key, $Value)
 
     Write-Verbose "[Add-CacheItem] Checking if the cache already contains the key: '$Key'."
@@ -60,11 +60,11 @@ Function Add-CacheItem {
         [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
     }
 
-    Write-Verbose "Adding new cache item with key: '$Key'."
+    Write-Verbose "[Add-CacheItem] Adding new cache item with key: '$Key'."
     $cache.Add($cacheItem)
 
     # Update the memory cache
     Set-Variable -Name "AzDo$Type" -Value $cache -Scope Global
 
-    Write-Verbose "Cache item with key: '$Key' successfully added."
+    Write-Verbose "[Add-CacheItem] Cache item with key: '$Key' successfully added."
 }

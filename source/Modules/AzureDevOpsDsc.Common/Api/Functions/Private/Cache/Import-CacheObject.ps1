@@ -58,18 +58,22 @@ function Import-CacheObject
         $Content = Import-Clixml -Path $cacheFile
 
         #Set-Variable -Name "AzDo$CacheType" -Value $Content -Scope Global -Force
-        #Write-Verbose "[Import-CacheObject] Successfully imported cache object for type: $CacheType"
+        Write-Verbose "[Import-CacheObject] Successfully imported cache object for type: $cacheFile"
 
         # Convert the imported cache object to a list of CacheItem objects
         $newCache = [System.Collections.Generic.List[CacheItem]]
-        #$cacheValue = Get-Variable -Name "AzDo$CacheType" -ValueOnly
-        $newCache = $Content | ForEach-Object
-        {
-            # If the key is empty, skip the item
-            if ([string]::IsNullOrEmpty($_.Key)) { return }
 
-            # Create a new CacheItem object and add it to the list
-            $newCache.Add([CacheItem]::New($_.Key, $_.Value))
+        # If the content is null, skip!
+        if ($null -ne $Content)
+        {
+            $newCache = $Content | ForEach-Object
+            {
+                # If the key is empty, skip the item
+                if ([string]::IsNullOrEmpty($_.Key)) { return }
+
+                # Create a new CacheItem object and add it to the list
+                $newCache.Add([CacheItem]::New($_.Key, $_.Value))
+            }
         }
 
         # Update the new cache object
