@@ -1,1 +1,1 @@
-Get-xAzDoOrganizationGroup -GroupName 'Testgroup'
+Get-xAzDoOrganizationGroup -GroupName 'Testgroup' -Verbose

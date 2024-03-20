@@ -1,5 +1,5 @@
 
-. 'C:\Temp\AzureDevOpsDSC\LCM\Invoke-AZDOLCM.ps1'
+#. 'C:\Temp\AzureDevOpsDSC\LCM\Invoke-AZDOLCM.ps1'
 
 #Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\AzureDevOpsDsc.psd1'
 
@@ -9,4 +9,7 @@ $ht = @{
     GroupDescription = "I am a test group."
 }
 
-Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -Verbose -ModuleName 'AzureDevOpsDsc'
+#$VerbosePreference = "Continue"
+
+Wait-Debugger
+Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -Verbose -ModuleName 'AzureDevOpsDsc' -Debug

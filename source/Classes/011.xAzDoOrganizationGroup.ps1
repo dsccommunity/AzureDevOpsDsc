@@ -71,21 +71,18 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $properties = @{
-            Pat = $this.Pat
-            ApiUri = $this.ApiUri
             Ensure = [Ensure]::Absent
         }
 
         if ($null -ne $CurrentResourceObject)
         {
-            if (![System.String]::IsNullOrWhiteSpace($CurrentResourceObject.id))
-            {
-                $properties.Ensure = [Ensure]::Present
-            }
+            $properties.Ensure = ([System.String]::IsNullOrEmpty($CurrentResourceObject.name)) ? [Ensure]::Absent : [Ensure]::Present
             $properties.GroupName = $CurrentResourceObject.name
-            $properties.GroupDescription = $CurrentResourceObject.description
             $properties.GroupDisplayName = $CurrentResourceObject.displayName
+            $properties.GroupDescription = $CurrentResourceObject.description
         }
+
+        Write-Verbose "[xAzDoOrganizationGroup] Current state properties: $($properties | Out-String)"
 
         return $properties
     }

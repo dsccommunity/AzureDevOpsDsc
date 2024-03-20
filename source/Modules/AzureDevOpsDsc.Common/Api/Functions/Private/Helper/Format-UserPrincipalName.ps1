@@ -37,8 +37,8 @@ Function Format-UserPrincipalName {
     $userPrincipalName = '[{0}]\{1}' -f $Prefix, $GroupName
 
     # Use a verbose statement to show the input and resulting formatted UPN
-    Write-Verbose "Formatting User Principal Name with Prefix: '$Prefix' and GroupName: '$GroupName'."
-    Write-Verbose "Resulting User Principal Name: '$userPrincipalName'."
+    Write-Verbose "[Format-UserPrincipalName] Formatting User Principal Name with Prefix: '$Prefix' and GroupName: '$GroupName'."
+    Write-Verbose "[Format-UserPrincipalName] Resulting User Principal Name: '$userPrincipalName'."
 
     return $userPrincipalName
 }
