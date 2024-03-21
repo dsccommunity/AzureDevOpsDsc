@@ -36,7 +36,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     {
         # Obtain the 'Get' function name for the object, then invoke it
         $thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
-        Wait-Debugger
         return $(& $thisResourceGetFunctionName @GetParameters)
     }
 
@@ -48,7 +47,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             GroupName = $this.GroupName
             GroupDisplayName = $this.GroupDisplayName
             GroupDescription = $this.GroupDescription
-            Ensure = [Ensure]::Absent
         }
 
         $getParameters      = $this.GetDscCurrentStateObjectGetParameters()

@@ -83,28 +83,21 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
 
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
-        # Create a hashtable to store the properties of the resource
         $properties = @{
             Ensure = [Ensure]::Absent
-            LookupResult = $this.getDscCurrentAPIState()
         }
 
-        if ($null -ne $CurrentResourceObject)
-        {
-            # If the resource exists, set the Ensure property to Present
-            $properties.Ensure = ($CurrentResourceObject.LookupResult.status -eq [DSCGroupTestResult]::Unchanged) ? [Ensure]::Present : [Ensure]::Absent
-            $properties.GroupName = $CurrentResourceObject.name
-            $properties.GroupDisplayName = $CurrentResourceObject.displayName
-            $properties.GroupDescription = $CurrentResourceObject.description
-        }
-        else
-        {
-            # If the resource exists, set the Ensure property to Present
-            $properties.Ensure = ($this.LookupResult.status -eq [DSCGroupTestResult]::Unchanged) ? [Ensure]::Present : [Ensure]::Absent
-            $properties.GroupName = $this.GroupName
-            $properties.GroupDisplayName = $this.GroupDisplayName
-            $properties.GroupDescription = $this.GroupDescription
-        }
+        # If the resource object is null, return the properties
+        if ($null -eq $CurrentResourceObject) { return $properties }
+
+        $properties.GroupName           = $CurrentResourceObject.GroupName
+        $properties.GroupDisplayName    = $CurrentResourceObject.GroupDisplayName
+        $properties.GroupDescription    = $CurrentResourceObject.GroupDescription
+        $properties.Ensure              = $CurrentResourceObject.Ensure
+        $properties.LookupResult        = $CurrentResourceObject.LookupResult
+        $properties.Reasons             = $CurrentResourceObject.LookupResult.Reasons
+
+        Wait-Debugger
 
         Write-Verbose "[xAzDoOrganizationGroup] Current state properties: $($properties | Out-String)"
 
