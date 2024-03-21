@@ -44,20 +44,19 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     {
         # Declare the result hashtable
         $props = @{
+            GroupName = $this.GroupName
+            GroupDisplayName = $this.GroupDisplayName
+            GroupDescription = $this.GroupDescription
             Ensure = [Ensure]::Absent
         }
 
         $getParameters      = $this.GetDscCurrentStateObjectGetParameters()
         $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
         $props.Reasons      = $props.LookupResult.Reasons
-
-        # If the property 'LookupResult' is null, return the $props hashtable
-        if ($null -eq $props.LookupResult) { return $props }
-
-        # If the property 'LookupResult' is not null, review the content within it.
-        if ($props.LookupResult.status -eq [DSCGroupTestResult]::Unchanged) { $props.Ensure = [Ensure]::Present }
+        $props.Ensure       = $props.LookupResult.Ensure
 
         return $props
+
     }
 
 
