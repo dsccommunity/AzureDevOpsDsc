@@ -13,7 +13,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     [HashTable]$LookupResult
 
     [DscProperty(NotConfigurable)]
-    [System.Collections.Generic.List[DscResourceReason]] $Reasons
+    [DscResourceReason()] $Reasons
 
     hidden [Hashtable]GetDscCurrentStateObjectGetParameters()
     {
