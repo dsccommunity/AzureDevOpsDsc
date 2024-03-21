@@ -1,3 +1,5 @@
+using module AzDevOpsDsc
+
 <#
 .SYNOPSIS
 Retrieves an organization group from Azure DevOps.

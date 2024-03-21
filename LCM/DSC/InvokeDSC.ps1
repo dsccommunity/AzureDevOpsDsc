@@ -11,11 +11,15 @@ $ht = @{
 
 #$VerbosePreference = "Continue"
 
-#Wait-Debugger
+$ErrorActionPreference = "break"
+
+Wait-Debugger
 $get = Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -Verbose -ModuleName 'AzureDevOpsDsc' -Debug
 
+<#
 $a = [xAzDoOrganizationGroup]::New()
 $a.GroupName = "Testgroup"
 $a.GroupDisplayName = "Test Group"
 $a.GroupDescription = "TEST Group"
 $a.Get()
+#>
