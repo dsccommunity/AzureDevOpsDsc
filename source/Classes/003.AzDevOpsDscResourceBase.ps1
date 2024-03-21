@@ -5,27 +5,20 @@
 class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 {
     [DscProperty()]
-    [Alias('Uri')]
-    [System.String]
-    $ApiUri
-
-    [DscProperty()]
-    [Alias('PersonalAccessToken')]
-    [Alias('AccessToken')]
-    [System.String]
-    $Pat
-
-    [DscProperty()]
     [Ensure]
     $Ensure
 
+    [DscProperty(NotConfigurable)]
+    [Alias('result')]
+    [HashTable]$LookupResult
+
+    [DscProperty(NotConfigurable)]
+    [System.Collections.Generic.List[DscResourceReason]] $Reasons
 
     hidden [Hashtable]GetDscCurrentStateObjectGetParameters()
     {
         # Setup a default set of parameters to pass into the resource/object's 'Get' method
         $getParameters = @{
-            ApiUri                                  = $this.ApiUri
-            Pat                                     = $this.Pat
             "$($this.GetResourceKeyPropertyName())" = $this.GetResourceKey()
         }
 
@@ -47,20 +40,24 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     }
 
 
-    hidden [System.Management.Automation.PSObject]GetDscCurrentStateObject()
+    hidden [HashTable]GetDscCurrentStateObject()
     {
-        $getParameters = $this.GetDscCurrentStateObjectGetParameters()
-        $dscCurrentStateResourceObject = $this.GetDscCurrentStateResourceObject($getParameters)
-
-        # If no object was returned (i.e it does not exist), create a default/empty object
-        if ($null -eq $dscCurrentStateResourceObject)
-        {
-            return New-Object -TypeName 'System.Management.Automation.PSObject' -Property @{
-                Ensure = [Ensure]::Absent
-            }
+        # Declare the result hashtable
+        $props = @{
+            Ensure = [Ensure]::Absent
         }
 
-        return $dscCurrentStateResourceObject
+        $getParameters      = $this.GetDscCurrentStateObjectGetParameters()
+        $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
+        $props.Reasons      = $props.LookupResult.Reasons
+
+        # If the property 'LookupResult' is null, return the $props hashtable
+        if ($null -eq $props.LookupResult) { return $props }
+
+        # If the property 'LookupResult' is not null, review the content within it.
+        if ($props.LookupResult.status -eq [DSCGroupTestResult]::Unchanged) { $props.Ensure = [Ensure]::Present }
+
+        return $props
     }
 
 

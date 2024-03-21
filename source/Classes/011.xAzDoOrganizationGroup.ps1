@@ -63,6 +63,19 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
         return [xAzDoOrganizationGroup]$($this.GetDscCurrentStateProperties())
     }
 
+    hidden [HashTable] getDscCurrentAPIState()
+    {
+        # Get the current state of the resource
+        $params = @{
+            GroupName = $this.GroupName
+            GroupDisplayName = $this.GroupDisplayName
+            GroupDescription = $this.GroupDescription
+        }
+
+        return Get-xAzDoOrganizationGroup @params
+
+    }
+
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
     {
         return @()
@@ -70,16 +83,27 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
 
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
+        # Create a hashtable to store the properties of the resource
         $properties = @{
             Ensure = [Ensure]::Absent
+            LookupResult = $this.getDscCurrentAPIState()
         }
 
         if ($null -ne $CurrentResourceObject)
         {
-            $properties.Ensure = ([System.String]::IsNullOrEmpty($CurrentResourceObject.name)) ? [Ensure]::Absent : [Ensure]::Present
+            # If the resource exists, set the Ensure property to Present
+            $properties.Ensure = ($CurrentResourceObject.LookupResult.status -eq [DSCGroupTestResult]::Unchanged) ? [Ensure]::Present : [Ensure]::Absent
             $properties.GroupName = $CurrentResourceObject.name
             $properties.GroupDisplayName = $CurrentResourceObject.displayName
             $properties.GroupDescription = $CurrentResourceObject.description
+        }
+        else
+        {
+            # If the resource exists, set the Ensure property to Present
+            $properties.Ensure = ($this.LookupResult.status -eq [DSCGroupTestResult]::Unchanged) ? [Ensure]::Present : [Ensure]::Absent
+            $properties.GroupName = $this.GroupName
+            $properties.GroupDisplayName = $this.GroupDisplayName
+            $properties.GroupDescription = $this.GroupDescription
         }
 
         Write-Verbose "[xAzDoOrganizationGroup] Current state properties: $($properties | Out-String)"

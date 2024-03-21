@@ -14,14 +14,14 @@ Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Classes' -File | ForEa
 }
 
 
-Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\Resources\Functions' -Recurse -File | ForEach-Object {
+Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\Resources\Functions' -Recurse -File | ForEach-Object {
     . $_.FullName
 }
-Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\Api' -Recurse -File | ForEach-Object {
+Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\Api' -Recurse -File | ForEach-Object {
     . $_.FullName
 }
 
-$ModuleRoot = 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\'
+$ModuleRoot = 'C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\'
 
 # Initalize the Cache
 'LiveGroups', 'LiveProjects', 'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object {
