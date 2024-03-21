@@ -12,4 +12,10 @@ class DscResourceReason
         $this.Phrase = $ht.Phrase
     }
 
+    DscResourceReason($Code, $Phrase)
+    {
+        $this.Code = $Code
+        $this.Phrase = $Phrase
+    }
+
 }

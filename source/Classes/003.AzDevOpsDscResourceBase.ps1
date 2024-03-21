@@ -36,6 +36,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     {
         # Obtain the 'Get' function name for the object, then invoke it
         $thisResourceGetFunctionName = $this.GetResourceFunctionName(([RequiredAction]::Get))
+        Wait-Debugger
         return $(& $thisResourceGetFunctionName @GetParameters)
     }
 
