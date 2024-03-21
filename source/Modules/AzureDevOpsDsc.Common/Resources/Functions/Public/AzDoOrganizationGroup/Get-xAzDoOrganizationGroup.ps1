@@ -99,7 +99,7 @@ Function Get-xAzDoOrganizationGroup {
                 # The group has been renamed.
                 $getGroupResult.status = [DSCGroupTestResult]::Renamed
                 # Add the reason
-                $getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:RenamedGroup', 'The group was renamed')
+                #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:RenamedGroup', 'The group was renamed')
 
             } else {
                 # The group has been deleted and recreated. Treat the new group as the live group.
@@ -119,7 +119,7 @@ Function Get-xAzDoOrganizationGroup {
                     # Update the Result
                     $getGroupResult.status = [DSCGroupTestResult]::Changed
                     # Add the reason
-                    $getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Deleted&ReCreate', 'The group was deleted and recreated with another group. The properties have changed')
+                    #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Deleted&ReCreate', 'The group was deleted and recreated with another group. The properties have changed')
                 } else {
                     # Update the Result
                     $getGroupResult.status = [DSCGroupTestResult]::Unchanged
@@ -143,7 +143,7 @@ Function Get-xAzDoOrganizationGroup {
         $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGroupTestResult]::Changed : [DSCGroupTestResult]::Unchanged
         if ($getGroupResult.status -eq [DSCGroupTestResult]::Changed) {
             # Add the reason
-            $getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Changed', 'The group has changed')
+            #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Changed', 'The group has changed')
         } else {
             $getGroupResult.Ensure = [Ensure]::Present
         }
@@ -159,7 +159,7 @@ Function Get-xAzDoOrganizationGroup {
         $getGroupResult.status = [DSCGroupTestResult]::Removed
         $getGroupResult.propertiesChanged = @('DisplayName', 'Description', 'Name')
         # Add the reason
-        $getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Removed', 'The group is missing')
+        #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Removed', 'The group is missing')
         return $getGroupResult
     }
 
@@ -177,7 +177,7 @@ Function Get-xAzDoOrganizationGroup {
         $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGroupTestResult]::Missing : [DSCGroupTestResult]::Unchanged
         if ($getGroupResult.status -ne [DSCGroupTestResult]::Unchanged) {
             # Add the reason
-            $getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')
+            #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')
         } else {
             # Add the unchanged group to the local cache
             Add-CacheItem -Key $Key -Value $livegroup -Type 'Group'
@@ -196,7 +196,7 @@ Function Get-xAzDoOrganizationGroup {
         $getGroupResult.status = [DSCGroupTestResult]::NotFound
         $getGroupResult.propertiesChanged = @('DisplayName', 'Description', 'Name')
         # Add the reason
-        $getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:NotFound', 'The group is not found')
+        #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:NotFound', 'The group is not found')
         return $getGroupResult
     }
 

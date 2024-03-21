@@ -12,9 +12,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     [Alias('result')]
     [HashTable]$LookupResult
 
-    [DscProperty(NotConfigurable)]
-    [DscResourceReason()] $Reasons
-
     hidden [Hashtable]GetDscCurrentStateObjectGetParameters()
     {
         # Setup a default set of parameters to pass into the resource/object's 'Get' method
@@ -51,7 +48,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
         $getParameters      = $this.GetDscCurrentStateObjectGetParameters()
         $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
-        $props.Reasons      = $props.LookupResult.Reasons
         $props.Ensure       = $props.LookupResult.Ensure
 
         return $props
