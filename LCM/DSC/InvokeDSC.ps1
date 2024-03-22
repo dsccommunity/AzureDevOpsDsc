@@ -11,9 +11,9 @@ $ht = @{
 
 #$VerbosePreference = "Continue"
 
-$ErrorActionPreference = "break"
+#$ErrorActionPreference = "break"
 
-Wait-Debugger
+#Wait-Debugger
 $get = Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -Verbose -ModuleName 'AzureDevOpsDsc' -Debug
 
 <#

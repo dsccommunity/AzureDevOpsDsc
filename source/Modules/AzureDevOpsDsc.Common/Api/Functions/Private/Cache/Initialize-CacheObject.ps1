@@ -17,9 +17,13 @@
 Function Initialize-CacheObject {
     [CmdletBinding()]
     param(
+        # Specifies the type of cache to initialize. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
         [Parameter(Mandatory)]
         [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
-        [string]$CacheType
+        [string]$CacheType,
+        # Used to bypass the file deletion check for live caches. Needed for DSC Resources to import the cache.
+        [Parameter()]
+        [Switch]$BypassFileCheck
 
     )
 
@@ -31,7 +35,7 @@ Function Initialize-CacheObject {
         Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
 
         # If the cache group is LiveGroups or LiveProjects, set the cache file path to the temporary directory
-        if (($CacheType -eq 'LiveGroups') -or ($CacheType -eq 'LiveProjects')) {
+        if (-not($BypassFileCheck.IsPresent) -and (($CacheType -eq 'LiveGroups') -or ($CacheType -eq 'LiveProjects'))) {
 
             # Flush the cache if it is a live cache
             if (Test-Path -LiteralPath $cacheFilePath -ErrorAction SilentlyContinue) {
@@ -64,6 +68,8 @@ Function Initialize-CacheObject {
 
             # Create a new cache object
             Set-CacheObject -CacheType $CacheType -Content ([System.Collections.Generic.List[CacheItem]]::New()) -CacheRootPath $CacheDirectoryPath
+            # Export the cache object to a cache file
+            Export-CacheObject -CacheType $CacheType -CacheRootPath $CacheDirectoryPath
 
         }
 

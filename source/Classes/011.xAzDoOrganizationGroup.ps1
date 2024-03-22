@@ -58,6 +58,24 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
     [Alias('Description')]
     [System.String]$GroupDescription
 
+    [DscProperty(NotConfigurable)]
+    [Alias('Cache')]
+    [HashTable]$Cache
+
+    xAzDoOrganizationGroup()
+    {
+
+        # Initialize the cache object
+        'Group', 'LiveGroups' | Initialize-CacheObject -BypassFileCheck
+
+        # Check if the Managed Identity Token exists. If not create one.
+        if (-not($Global:DSCAZDO_ManagedIdentityToken)) {
+            # Create a Managed Identity Token
+            New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose
+        }
+
+    }
+
     [xAzDoOrganizationGroup] Get()
     {
         return [xAzDoOrganizationGroup]$($this.GetDscCurrentStateProperties())
@@ -95,7 +113,7 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
         $properties.GroupDescription    = $CurrentResourceObject.GroupDescription
         $properties.Ensure              = $CurrentResourceObject.Ensure
         $properties.LookupResult        = $CurrentResourceObject.LookupResult
-        $properties.Reasons             = $CurrentResourceObject.LookupResult.Reasons
+        #$properties.Reasons             = $CurrentResourceObject.LookupResult.Reasons
 
         Wait-Debugger
 

@@ -1,5 +1,3 @@
-using module AzDevOpsDsc
-
 <#
 .SYNOPSIS
 Retrieves an organization group from Azure DevOps.
@@ -67,7 +65,7 @@ Function Get-xAzDoOrganizationGroup {
     #
     # Construct a hashtable detailing the group
     $getGroupResult = @{
-        Reasons = $()
+        #Reasons = $()
         Ensure = [Ensure]::Absent
         localCache = $localgroup
         liveCache = $livegroup
