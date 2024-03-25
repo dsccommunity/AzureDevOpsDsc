@@ -29,9 +29,14 @@ Function Initialize-CacheObject {
 
     try {
 
-        $CacheDirectoryPath = Join-Path -Path $ModuleRoot -ChildPath "Cache"
-        $cacheFilePath = Join-Path -Path $CacheDirectoryPath -ChildPath "$CacheType.clixml"
+        # Use the Enviroment Variables to set the Cache Directory Path
+        if ($ENV:AZDODSC_CACHE_DIRECTORY) {
+            $CacheDirectoryPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Cache"
+        } else {
+            Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
+        }
 
+        $cacheFilePath = Join-Path -Path $CacheDirectoryPath -ChildPath "$CacheType.clixml"
         Write-Verbose "[Initialize-CacheObject] Cache file path: $cacheFilePath"
 
         # If the cache group is LiveGroups or LiveProjects, set the cache file path to the temporary directory
@@ -66,10 +71,11 @@ Function Initialize-CacheObject {
                 New-Item -Path $CacheDirectoryPath -ItemType Directory | Out-Null
             }
 
+            # Create the content
+            $content = [System.Collections.Generic.List[CacheItem]]::New()
+
             # Create a new cache object
-            Set-CacheObject -CacheType $CacheType -Content ([System.Collections.Generic.List[CacheItem]]::New()) -CacheRootPath $CacheDirectoryPath
-            # Export the cache object to a cache file
-            Export-CacheObject -CacheType $CacheType -CacheRootPath $CacheDirectoryPath
+            Set-CacheObject -CacheType $CacheType -Content $content -CacheRootPath $CacheDirectoryPath
 
         }
 

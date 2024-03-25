@@ -62,6 +62,9 @@ Function Set-AzDoAPIProjectCache {
             Add-CacheItem -Key $project.Name -Value $project -Type 'LiveProjects'
         }
 
+        # Export the cache to a file
+        Export-CacheObject -CacheType 'LiveProjects' -Content $projects
+
         # Indicate completion of adding projects to cache
         Write-Verbose "Completed adding projects to cache."
 

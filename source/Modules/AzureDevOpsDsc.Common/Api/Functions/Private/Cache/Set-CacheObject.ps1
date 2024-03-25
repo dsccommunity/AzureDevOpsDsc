@@ -33,14 +33,15 @@ Author: Your Name
 Date: MM/DD/YYYY
 #>
 
-function Set-CacheObject {
+function Set-CacheObject
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType,
 
-        [Parameter(Mandatory)]
+        [Parameter()]
         [AllowEmptyCollection()]
         [Object[]]$Content,
 
@@ -56,7 +57,6 @@ function Set-CacheObject {
     Write-Verbose "[Set-ObjectCache] Cache root path: $CacheRootPath"
 
     try {
-
         # Create cache file
         $cacheFile = Join-Path -Path $CacheRootPath -ChildPath "$CacheType.clixml"
         Write-Verbose "[Set-ObjectCache] Cache file will be created at path: $cacheFile"

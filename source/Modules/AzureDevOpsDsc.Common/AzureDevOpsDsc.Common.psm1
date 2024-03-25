@@ -1,3 +1,9 @@
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [Switch]
+    $isClass
+)
 #using module AzureDevOpsDsc
 # Setup/Import 'DscResource.Common' helper module
 #$script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Common'
@@ -68,6 +74,10 @@ Export-ModuleMember -Function 'Set-CacheObject'
 Export-ModuleMember -Function 'Get-CacheItem'
 Export-ModuleMember -Function 'Get-AzDoAPIGroupCache'
 Export-ModuleMember -Function 'Get-AzDoAPIProjectCache'
+Export-ModuleMember -Function 'Initialize-CacheObject'
+
+# Stop processing
+if ($isClass) { return }
 
 #
 # Module initialization

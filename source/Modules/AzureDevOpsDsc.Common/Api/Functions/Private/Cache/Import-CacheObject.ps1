@@ -31,21 +31,26 @@ function Import-CacheObject
     param (
         [Parameter(Mandatory)]
         [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
-        [string]$CacheType,
-
-        [Parameter()]
-        [String]$CacheRootPath = $PSScriptRoot
+        [string]$CacheType
 
     )
 
     # Write initial verbose message
     Write-Verbose "[Import-CacheObject] Starting to import cache object for type: $CacheType"
+
+    # Use the Enviroment Variables to set the Cache Directory Path
+    if ($ENV:AZDODSC_CACHE_DIRECTORY) {
+        $CacheDirectoryPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Cache"
+    } else {
+        Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
+    }
+
     Write-Verbose "[Import-CacheObject] Cache root path: $CacheRootPath"
 
     try
     {
         # Determine cache file path
-        $cacheFile = Join-Path -Path $CacheRootPath -ChildPath "$CacheType.clixml"
+        $cacheFile = Join-Path -Path $CacheDirectoryPath -ChildPath "$CacheType.clixml"
 
         # Check if cache file exists
         if (-not (Test-Path -Path $cacheFile))

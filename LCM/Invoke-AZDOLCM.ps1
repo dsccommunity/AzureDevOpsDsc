@@ -23,7 +23,7 @@ param(
 
 # Load the module
 
-$VerbosePreference = "Continue"
+#$VerbosePreference = "Continue"
 #Wait-Debugger
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1' -Verbose
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\AzureDevOpsDsc.psd1' -Verbose

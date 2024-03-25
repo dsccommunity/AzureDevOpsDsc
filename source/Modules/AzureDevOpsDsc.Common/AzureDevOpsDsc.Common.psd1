@@ -29,6 +29,7 @@
         'Get-AzDevOpsServicesApiUri',
         'Get-AzDevOpsOperation',
         'Test-AzDevOpsOperation',
+        'Initialize-CacheObject',
 
         'New-AzManagedIdentity',
         'Set-AzDoAPIGroupCache',

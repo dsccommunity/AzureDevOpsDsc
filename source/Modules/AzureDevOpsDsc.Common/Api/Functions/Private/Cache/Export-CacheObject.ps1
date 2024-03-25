@@ -37,7 +37,8 @@ Function Export-CacheObject {
         [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
         [string]$CacheType,
 
-        [Parameter(Mandatory)]
+        [Parameter()]
+        [AllowEmptyCollection()]
         [Object[]]$Content,
 
         [Parameter()]
@@ -50,24 +51,26 @@ Function Export-CacheObject {
     # Write initial verbose message
     Write-Verbose "[Export-ObjectCache] Starting export process for cache type: $CacheType"
 
+    # Use the Enviroment Variables to set the Cache Directory Path
+    if ($ENV:AZDODSC_CACHE_DIRECTORY) {
+        $CacheDirectoryPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Cache"
+    } else {
+        Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
+    }
+
     try {
+
+        $cacheFilePath = Join-Path -Path $CacheDirectoryPath -ChildPath "$CacheType.clixml"
+
         # Create cache directory if it does not exist
-        $cachePath = Join-Path -Path $CacheRootPath -ChildPath 'Cache'
-        if (-not (Test-Path -Path $cachePath)) {
+        if (-not (Test-Path -Path $cacheFilePath)) {
             Write-Verbose "[Export-ObjectCache] Creating cache directory at path: $cachePath"
             New-Item -Path $cachePath -ItemType Directory | Out-Null
         }
 
-        # Create cache file path
-        $cacheFile = Join-Path -Path $cachePath -ChildPath "$CacheType.clixml"
-
         # Save content to cache file
-        Write-Verbose "[Export-ObjectCache] Saving content to cache file: $cacheFile"
-        $Content | Export-Clixml -Depth $Depth | Set-Content -Path $cacheFile -Force
-
-        # Save content to global variable
-        Write-Verbose "[Export-ObjectCache] Saving content to global variable: AzDo$CacheType"
-        Set-Variable -Name "AzDo$CacheType" -Value $Content -Scope Global -Force
+        Write-Verbose "[Export-ObjectCache] Saving content to cache file: $cacheFilePath"
+        $Content | Export-Clixml -Depth $Depth -LiteralPath $cacheFilePath
 
         # Confirm completion of export process
         Write-Verbose "[Export-ObjectCache] Export process completed successfully for cache type: $CacheType"

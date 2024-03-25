@@ -37,14 +37,18 @@ function Get-CacheObject {
     param (
         [Parameter(Mandatory)]
         [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects')]
-        [string]$CacheType,
-
-        [Parameter()]
-        [String]$CacheRootPath = $ModuleRoot
+        [string]$CacheType
     )
 
     # Write initial verbose message
     Write-Verbose "[Get-ObjectCache] Attempting to retrieve cache object for type: $CacheType"
+
+    # Use the Enviroment Variables to set the Cache Directory Path
+    if ($ENV:AZDODSC_CACHE_DIRECTORY) {
+        $CacheDirectoryPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Cache"
+    } else {
+        Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
+    }
 
     try {
         # Attempt to get the variable from the global scope
@@ -56,11 +60,11 @@ function Get-CacheObject {
             $var = Get-Variable -Name "AzDo$CacheType" -ValueOnly -Scope Global
         } else {
             Write-Verbose "[Get-ObjectCache] Cache object not found in memory, attempting to import for type: $CacheType"
-            $var = Import-CacheObject -CacheType $CacheType -CacheRootPath $CacheRootPath
+            $var = Import-CacheObject -CacheType $CacheType -CacheRootPath $CacheDirectoryPath
         }
 
         # Return the content of the cache after importing it
-        Write-Verbose "[Get-ObjectCache] Returning imported cache object for type: $CacheType"
+        Write-Verbose "[Get-ObjectCache] Returning imported cache object for type: $CacheDirectoryPath"
         return $var
 
     } catch {

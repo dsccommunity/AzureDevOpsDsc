@@ -1,7 +1,12 @@
+$VerbosePreference = 'Continue'
+$ErrorActionPreference = 'Break'
+
 Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Enum' -File | ForEach-Object {
+    Write-Verbose "Dot Sourcing $($_.FullName)"
     . $_.FullName
 }
 Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Classes' -File | ForEach-Object {
+    Write-Verbose "Dot Sourcing $($_.FullName)"
     # Read the file and remove [DscResource()] attribute
     $file = Get-Command $_.FullName
     # Remove [DscResource()] attribute
@@ -15,9 +20,11 @@ Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Classes' -File | ForEa
 
 
 Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\Resources\Functions' -Recurse -File | ForEach-Object {
+    Write-Verbose "Dot Sourcing $($_.FullName)"
     . $_.FullName
 }
 Get-ChildItem -LiteralPath 'C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\Api' -Recurse -File | ForEach-Object {
+    Write-Verbose "Dot Sourcing $($_.FullName)"
     . $_.FullName
 }
 

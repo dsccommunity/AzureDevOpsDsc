@@ -11,10 +11,10 @@ $ht = @{
 
 #$VerbosePreference = "Continue"
 
-#$ErrorActionPreference = "break"
+$ErrorActionPreference = "break"
 
 #Wait-Debugger
-$get = Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -Verbose -ModuleName 'AzureDevOpsDsc' -Debug
+$get = Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -ModuleName 'AzureDevOpsDsc' -Debug
 
 <#
 $a = [xAzDoOrganizationGroup]::New()
