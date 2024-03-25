@@ -39,18 +39,6 @@ Function Test-xAzDoOrganizationGroup {
         $GroupName,
 
         [Parameter()]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
-
-        [Parameter()]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri,
-
-        [Parameter()]
         [string]
         $GroupDescription=$null,
 
@@ -59,6 +47,8 @@ Function Test-xAzDoOrganizationGroup {
         [hashtable]$GetResult
 
     )
+
+    Wait-Debugger
 
     #
     # Firstly we need to compare to see if the group names are the same. If so we can return $false.

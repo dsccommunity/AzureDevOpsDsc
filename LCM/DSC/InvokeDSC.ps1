@@ -16,6 +16,8 @@ $ErrorActionPreference = "break"
 #Wait-Debugger
 $get = Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Get -Property $ht -ModuleName 'AzureDevOpsDsc' -Debug
 
+#$test = Invoke-DscResource -Name 'xAzDoOrganizationGroup' -Method Test -Property $ht -ModuleName 'AzureDevOpsDsc' -Debug
+
 <#
 $a = [xAzDoOrganizationGroup]::New()
 $a.GroupName = "Testgroup"

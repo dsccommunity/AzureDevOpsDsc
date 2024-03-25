@@ -79,15 +79,3 @@ Export-ModuleMember -Function 'Initialize-CacheObject'
 # Stop processing
 if ($isClass) { return }
 
-#
-# Module initialization
-
-# Initalize the Cache
-'LiveGroups', 'LiveProjects', 'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object {
-    Initialize-CacheObject -CacheType $_
-}
-
-# Set the Organization Name
-if ($Global:DSCAZDO_OrganizationName -eq $null) {
-    Write-Warning "The global variable 'DSCAZDO_OrganizationName' is not set. Please set the variable to the name of the Azure DevOps organization."
-}

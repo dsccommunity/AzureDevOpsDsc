@@ -66,12 +66,12 @@ function Import-CacheObject
         Write-Verbose "[Import-CacheObject] Successfully imported cache object for type: $cacheFile"
 
         # Convert the imported cache object to a list of CacheItem objects
-        $newCache = [System.Collections.Generic.List[CacheItem]]
+        $newCache = [System.Collections.Generic.List[CacheItem]]::New()
 
         # If the content is null, skip!
         if ($null -ne $Content)
         {
-            $newCache = $Content | ForEach-Object {
+            $Content | ForEach-Object {
                 # If the key is empty, skip the item
                 if ([string]::IsNullOrEmpty($_.Key)) { return }
 
