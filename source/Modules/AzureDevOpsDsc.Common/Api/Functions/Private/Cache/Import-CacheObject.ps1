@@ -12,7 +12,7 @@ Specifies the type of cache object to import. Valid values are 'Project', 'Team'
 Specifies the root path where the cache directory is located. By default, it uses the current script's root path.
 
 .EXAMPLE
-Import-CacheObject -CacheType Project -CacheRootPath "C:\Cache"
+
 
 This example imports the cache object for the 'Project' type from the cache directory located at "C:\Cache".
 
@@ -45,7 +45,7 @@ function Import-CacheObject
         Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
     }
 
-    Write-Verbose "[Import-CacheObject] Cache root path: $CacheRootPath"
+    Write-Verbose "[Import-CacheObject] Cache root path: $CacheDirectoryPath"
 
     try
     {

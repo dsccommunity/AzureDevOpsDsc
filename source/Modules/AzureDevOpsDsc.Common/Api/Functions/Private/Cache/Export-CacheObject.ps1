@@ -42,10 +42,7 @@ Function Export-CacheObject {
         [Object[]]$Content,
 
         [Parameter()]
-        [int]$Depth = 3,
-
-        [Parameter()]
-        [String]$CacheRootPath = $ModuleRoot
+        [int]$Depth = 3
     )
 
     # Write initial verbose message
@@ -64,8 +61,8 @@ Function Export-CacheObject {
 
         # Create cache directory if it does not exist
         if (-not (Test-Path -Path $cacheFilePath)) {
-            Write-Verbose "[Export-ObjectCache] Creating cache directory at path: $cachePath"
-            New-Item -Path $cachePath -ItemType Directory | Out-Null
+            Write-Verbose "[Export-ObjectCache] Creating cache directory at path: $CacheDirectoryPath"
+            New-Item -Path $CacheDirectoryPath -ItemType Directory | Out-Null
         }
 
         # Save content to cache file

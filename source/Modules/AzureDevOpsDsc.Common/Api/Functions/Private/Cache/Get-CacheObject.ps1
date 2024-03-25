@@ -16,7 +16,7 @@ Get-CacheObject -CacheType Project
 Retrieves the cache object of type 'Project'.
 
 .EXAMPLE
-Get-CacheObject -CacheType Team -CacheRootPath "C:\Cache"
+
 Retrieves the cache object of type 'Team' from the specified root path.
 
 .INPUTS
@@ -60,7 +60,7 @@ function Get-CacheObject {
             $var = Get-Variable -Name "AzDo$CacheType" -ValueOnly -Scope Global
         } else {
             Write-Verbose "[Get-ObjectCache] Cache object not found in memory, attempting to import for type: $CacheType"
-            $var = Import-CacheObject -CacheType $CacheType -CacheRootPath $CacheDirectoryPath
+            $var = Import-CacheObject -CacheType $CacheType
         }
 
         # Return the content of the cache after importing it

@@ -46,24 +46,17 @@ function Set-CacheObject
         [Object[]]$Content,
 
         [Parameter()]
-        [int]$Depth = 3,
-
-        [Parameter()]
-        [String]$CacheRootPath = $ModuleRoot
+        [int]$Depth = 3
     )
 
     # Write initial verbose message
     Write-Verbose "[Set-ObjectCache] Starting to set cache object for type: $CacheType"
-    Write-Verbose "[Set-ObjectCache] Cache root path: $CacheRootPath"
 
     try {
-        # Create cache file
-        $cacheFile = Join-Path -Path $CacheRootPath -ChildPath "$CacheType.clixml"
-        Write-Verbose "[Set-ObjectCache] Cache file will be created at path: $cacheFile"
 
         # Save content to cache file
-        Write-Verbose "[Set-ObjectCache] Saving content to cache file $cachePath"
-        $Content | Export-Clixml -Depth $Depth -LiteralPath $cacheFile
+        Write-Verbose "[Set-ObjectCache] Exporting content to cache file for type: $CacheType"
+        Export-CacheObject -CacheType $CacheType -Content $Content -Depth $Depth
 
         # Save content to global variable
         Write-Verbose "[Set-ObjectCache] Setting global variable AzDo$CacheType with the provided content"

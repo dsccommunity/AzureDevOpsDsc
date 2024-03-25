@@ -58,7 +58,7 @@ Function Initialize-CacheObject {
 
             # If the cache file exists, import the cache object
             Write-Verbose "[Initialize-CacheObject] Cache file found. Importing cache object for '$CacheType'."
-            Import-CacheObject -CacheType $CacheType -CacheRootPath $CacheDirectoryPath
+            Import-CacheObject -CacheType $CacheType
 
         } else {
 
@@ -75,7 +75,7 @@ Function Initialize-CacheObject {
             $content = [System.Collections.Generic.List[CacheItem]]::New()
 
             # Create a new cache object
-            Set-CacheObject -CacheType $CacheType -Content $content -CacheRootPath $CacheDirectoryPath
+            Set-CacheObject -CacheType $CacheType -Content $content
 
         }
 
