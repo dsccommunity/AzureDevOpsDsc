@@ -46,7 +46,7 @@ Function Set-AzDoAPIGroupCache {
         }
 
         # Export the cache to a file
-        Export-CacheObject -CacheType 'LiveGroups' -Content $groups
+        Export-CacheObject -CacheType 'LiveGroups' -Content $AzDoLiveGroups
 
         Write-Verbose "Completed adding groups to cache."
 

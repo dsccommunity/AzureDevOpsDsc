@@ -71,8 +71,7 @@ function Import-CacheObject
         # If the content is null, skip!
         if ($null -ne $Content)
         {
-            $newCache = $Content | ForEach-Object
-            {
+            $newCache = $Content | ForEach-Object {
                 # If the key is empty, skip the item
                 if ([string]::IsNullOrEmpty($_.Key)) { return }
 

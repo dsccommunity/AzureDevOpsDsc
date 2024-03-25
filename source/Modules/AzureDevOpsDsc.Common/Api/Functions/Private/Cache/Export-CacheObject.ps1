@@ -60,7 +60,7 @@ Function Export-CacheObject {
         $cacheFilePath = Join-Path -Path $CacheDirectoryPath -ChildPath "$CacheType.clixml"
 
         # Create cache directory if it does not exist
-        if (-not (Test-Path -Path $cacheFilePath)) {
+        if (-not (Test-Path -Path $CacheDirectoryPath)) {
             Write-Verbose "[Export-ObjectCache] Creating cache directory at path: $CacheDirectoryPath"
             New-Item -Path $CacheDirectoryPath -ItemType Directory | Out-Null
         }
