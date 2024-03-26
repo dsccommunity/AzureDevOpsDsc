@@ -109,7 +109,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     {
         # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
         $dscRequiredAction = [RequiredAction]::None
-        $cacheProperties = $false
+        #$cacheProperties = $false
 
         [Hashtable]$currentProperties = $this.GetDscCurrentStateProperties()
         [Hashtable]$desiredProperties = $this.GetDscDesiredStateProperties()
@@ -122,97 +122,37 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         {
             ([Ensure]::Present) {
 
-                # If not already present, return [RequiredAction]::New (i.e. Resource needs creating)
-                if ($cacheProperties)
+                # If the desired state is to add the resource, however the current resource is absent. It is not in state.
+                if ($currentProperties.Ensure -eq [Ensure]::Absent)
                 {
-                    if ($cacheProperties.Status -eq 'NotFound')
+                    # The resource is not in the desired state and is not present.
+                    if ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::NotFound)
                     {
                         $dscRequiredAction = [RequiredAction]::New
                         Write-Verbose "DscActionRequired='$dscRequiredAction'"
                         break
                     }
-
-                    if ($cacheProperties.Status -eq 'Changed')
+                    # If the resource has been renamed or changed, it is not in state. The resource needs to be updated.
+                    if ($currentProperties.LookupResult.Status -in ([DSCGetSummaryState]::Changed, [DSCGetSummaryState]::Renamed))
                     {
                         $dscRequiredAction = [RequiredAction]::Set
                         Write-Verbose "DscActionRequired='$dscRequiredAction'"
                         break
                     }
+
                     return $dscRequiredAction
-                }
-
-                # If not already present, or different to expected/desired - return [RequiredAction]::New (i.e. Resource needs creating)
-                if (($null -eq $currentProperties) -or ($($currentProperties.Ensure) -ne [Ensure]::Present))
-                {
-                    $dscRequiredAction = [RequiredAction]::New
-                    Write-Verbose "DscActionRequired='$dscRequiredAction'"
                     break
-                }
 
-                # Changes made by DSC to the following properties are unsupported by the resource (other than when creating a [RequiredAction]::New resource)
-                if ($dscPropertyNamesWithNoSetSupport.Count -gt 0)
-                {
-                    $dscPropertyNamesWithNoSetSupport | ForEach-Object {
-
-                        if ($($currentProperties[$_].ToString()) -ne $($desiredProperties[$_].ToString()))
-                        {
-                            $errorMessage = "The '$($this.GetType().Name)', DSC Resource does not support changes for/to the '$_' property."
-                            New-InvalidOperationException -Message $errorMessage
-                        }
-                    }
-                }
-
-                # Compare all properties ('Current' vs 'Desired')
-                if ($dscPropertyNamesToCompare.Count -gt 0)
-                {
-                    $dscPropertyNamesToCompare | ForEach-Object {
-
-                        if ($($currentProperties."$_") -ne $($desiredProperties."$_"))
-                        {
-                            Write-Verbose "DscPropertyValueMismatch='$_'"
-                            $dscRequiredAction = [RequiredAction]::Set
-                        }
-                    }
-
-                    if ($dscRequiredAction -eq [RequiredAction]::Set)
-                    {
-                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                        break
-                    }
                 }
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
                 return $dscRequiredAction
                 break
+
             }
             ([Ensure]::Absent) {
 
-                # If not already present, return [RequiredAction]::New (i.e. Resource needs creating)
-                if ($cacheProperties)
-                {
-                    if ($cacheProperties.Status -eq 'NotFound')
-                    {
-                        $dscRequiredAction = [RequiredAction]::None
-                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                        break
-                    }
-                    if ($cacheProperties.Status -eq 'Changed')
-                    {
-                        $dscRequiredAction = [RequiredAction]::Remove
-                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                        break
-                    }
-                    if ($cacheProperties.Status -eq 'Unchanged')
-                    {
-                        $dscRequiredAction = [RequiredAction]::Remove
-                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                        break
-                    }
-                    return $dscRequiredAction
-                }
-
-                # If currently/already present - return $false (i.e. state is incorrect)
-                if ($null -ne $currentProperties -and $currentProperties.Ensure -ne [Ensure]::Absent)
+                if ($currentProperties.LookupResult.Status -ne [DSCGetSummaryState]::Missing)
                 {
                     $dscRequiredAction = [RequiredAction]::Remove
                     Write-Verbose "DscActionRequired='$dscRequiredAction'"
@@ -223,6 +163,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                 Write-Verbose "DscActionRequired='$dscRequiredAction'"
                 return $dscRequiredAction
                 break
+
             }
             default {
                 $errorMessage = "Could not obtain a valid 'Ensure' value within '$($this.GetResourceName())' Test() function. Value was '$($desiredProperties.Ensure)'."
@@ -244,7 +185,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             return $null
         }
         # If the desired state/action is to remove the resource, generate/return a minimal set of parameters required to remove the resource
-        elseif ($RequiredAction -eq [RequiredAction]::Remove)
+        elseif ($RequiredAction -eq [RequiredAction]::NotFound)
         {
             return @{
                 ApiUri                      = $DesiredStateProperties.ApiUri

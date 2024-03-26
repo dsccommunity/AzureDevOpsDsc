@@ -51,7 +51,7 @@ Function Test-xAzDoOrganizationGroup {
     #
     # Firstly we need to compare to see if the group names are the same. If so we can return $false.
 
-    if ($GetResult.Status -eq [DSCGroupTestResult]::Unchanged ) {
+    if ($GetResult.Status -eq [DSCGetSummaryState]::Unchanged ) {
 
         $result = $true
 
@@ -65,14 +65,14 @@ Function Test-xAzDoOrganizationGroup {
 
     #
     # If the status has been flagged as 'Renamed', returned $true. This means that the originId has changed.
-    if ($GetResult.Status -eq [DSCGroupTestResult]::Renamed) { return $false }
+    if ($GetResult.Status -eq [DSCGetSummaryState]::Renamed) { return $false }
 
     #
     # If the status has been flagged as 'Missing', returned $true. This means that the group is missing from the live cache.
 
 
 
-    if ($GetResult.Status -eq [DSCGroupTestResult]::Changed) {
+    if ($GetResult.Status -eq [DSCGetSummaryState]::Changed) {
 
         #
         # If the group is present in the live cache and the local cache. This means that the originId has changed. This needs to be updated.

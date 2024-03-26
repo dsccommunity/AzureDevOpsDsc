@@ -1,4 +1,4 @@
-enum DSCGroupTestResult
+enum DSCGetSummaryState
 {
     # Changed
     Changed = 0

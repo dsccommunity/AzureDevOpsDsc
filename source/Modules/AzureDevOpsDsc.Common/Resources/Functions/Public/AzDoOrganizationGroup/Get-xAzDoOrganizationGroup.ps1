@@ -95,7 +95,7 @@ Function Get-xAzDoOrganizationGroup {
                 # Add the renamed group to result
                 $getGroupResult.renamedGroup = $renamedGroup
                 # The group has been renamed.
-                $getGroupResult.status = [DSCGroupTestResult]::Renamed
+                $getGroupResult.status = [DSCGetSummaryState]::Renamed
                 # Add the reason
                 #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:RenamedGroup', 'The group was renamed')
 
@@ -115,12 +115,12 @@ Function Get-xAzDoOrganizationGroup {
                 # If the properties are the same, the group is unchanged. If not, the group has been changed.
                 if ($getGroupResult.propertiesChanged.count -ne 0) {
                     # Update the Result
-                    $getGroupResult.status = [DSCGroupTestResult]::Changed
+                    $getGroupResult.status = [DSCGetSummaryState]::Changed
                     # Add the reason
                     #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Deleted&ReCreate', 'The group was deleted and recreated with another group. The properties have changed')
                 } else {
                     # Update the Result
-                    $getGroupResult.status = [DSCGroupTestResult]::Unchanged
+                    $getGroupResult.status = [DSCGetSummaryState]::Unchanged
                 }
 
             }
@@ -138,8 +138,8 @@ Function Get-xAzDoOrganizationGroup {
         if ($livegroup.name -ne $localgroup.name) { $getGroupResult.propertiesChanged += 'Name' }
 
         # If the properties are the same, the group is unchanged. If not, the group has been changed.
-        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGroupTestResult]::Changed : [DSCGroupTestResult]::Unchanged
-        if ($getGroupResult.status -eq [DSCGroupTestResult]::Changed) {
+        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Changed : [DSCGetSummaryState]::Unchanged
+        if ($getGroupResult.status -eq [DSCGetSummaryState]::Changed) {
             # Add the reason
             #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Changed', 'The group has changed')
         } else {
@@ -154,7 +154,7 @@ Function Get-xAzDoOrganizationGroup {
     #
     # If the livegroup is not present and the localgroup is present, the group is missing and recreate it.
     if (($null -eq $livegroup) -and ($null -ne $localgroup)) {
-        $getGroupResult.status = [DSCGroupTestResult]::Removed
+        $getGroupResult.status = [DSCGetSummaryState]::NotFound
         $getGroupResult.propertiesChanged = @('DisplayName', 'Description', 'Name')
         # Add the reason
         #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Removed', 'The group is missing')
@@ -172,8 +172,8 @@ Function Get-xAzDoOrganizationGroup {
         if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'Description' }
         if ($livegroup.name        -ne $localgroup.name ) { $getGroupResult.propertiesChanged += 'Name'        }
         # If the properties are the same, the group is unchanged. If not, the group has been changed.
-        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGroupTestResult]::Missing : [DSCGroupTestResult]::Unchanged
-        if ($getGroupResult.status -ne [DSCGroupTestResult]::Unchanged) {
+        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Missing : [DSCGetSummaryState]::Unchanged
+        if ($getGroupResult.status -ne [DSCGetSummaryState]::Unchanged) {
             # Add the reason
             #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')
         } else {
@@ -191,7 +191,7 @@ Function Get-xAzDoOrganizationGroup {
     #
     # If the livegroup and localgroup are not present, the group is missing and recreate it.
     if (($null -eq $livegroup) -and ($null -eq $localgroup)) {
-        $getGroupResult.status = [DSCGroupTestResult]::NotFound
+        $getGroupResult.status = [DSCGetSummaryState]::NotFound
         $getGroupResult.propertiesChanged = @('DisplayName', 'Description', 'Name')
         # Add the reason
         #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:NotFound', 'The group is not found')

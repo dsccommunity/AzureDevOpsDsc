@@ -1,18 +1,22 @@
 Function Set-xAzDoOrganizationGroup {
 
     param(
+
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $GroupName,
+        [Alias('Name')]
+        [System.String]$GroupName,
 
         [Parameter()]
-        [string]
-        $GroupDescription=$null,
+        [Alias('DisplayName')]
+        [System.String]$GroupDisplayName,
 
         [Parameter()]
-        [string]
-        $GroupDisplayName=$null
+        [Alias('Description')]
+        [System.String]$GroupDescription,
+
+        [Parameter()]
+        [Alias('Lookup')]
+        [System.String]$LookupResult
 
     )
 

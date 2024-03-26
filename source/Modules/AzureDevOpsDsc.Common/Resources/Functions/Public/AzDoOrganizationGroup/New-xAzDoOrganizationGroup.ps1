@@ -4,19 +4,11 @@ Function New-xAzDoOrganizationGroup {
     [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
-        [Parameter()]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri,
-
-        [Parameter()]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
-
         [Parameter(Mandatory)]
+        [Alias('Name')]
+        [System.String]$GroupName,
+
+        [Parameter()]
         [Alias('DisplayName')]
         [System.String]$GroupDisplayName,
 
@@ -25,11 +17,10 @@ Function New-xAzDoOrganizationGroup {
         [System.String]$GroupDescription,
 
         [Parameter()]
-        [Alias('Name')]
-        [System.String]$GetResult
+        [Alias('Lookup')]
+        [System.String]$LookupResult
 
     )
-
 
     # Format the Key According to the Principal Name
     $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
