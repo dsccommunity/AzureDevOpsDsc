@@ -6,21 +6,14 @@ Function Set-xAzDoOrganizationGroup {
         [string]
         $GroupName,
 
-        [Parameter(Mandatory)]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
-
         [Parameter()]
         [string]
         $GroupDescription=$null,
 
-        [Parameter(Mandatory = $true)]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri
+        [Parameter()]
+        [string]
+        $GroupDisplayName=$null
+
     )
 
     # Format the Key According to the Principal Name

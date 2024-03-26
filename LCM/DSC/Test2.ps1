@@ -1,0 +1,2 @@
+Wait-Debugger
+$get.GetDscRequiredAction()

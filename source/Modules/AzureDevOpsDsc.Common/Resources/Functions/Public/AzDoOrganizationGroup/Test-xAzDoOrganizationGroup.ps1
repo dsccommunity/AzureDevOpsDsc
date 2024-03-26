@@ -48,8 +48,6 @@ Function Test-xAzDoOrganizationGroup {
 
     )
 
-    Wait-Debugger
-
     #
     # Firstly we need to compare to see if the group names are the same. If so we can return $false.
 

@@ -117,31 +117,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         [System.String[]]$dscPropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
         [System.String[]]$dscPropertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
-        #
-        # Test if currentProperties contains a hashtable containing 'Current', 'Cache' and 'Status' properties
-        if ($currentProperties -is [hashtable])
-        {
-            if ($currentProperties.Keys -contains 'Current' -and
-                $currentProperties.Keys -contains 'Cache' -and
-                $currentProperties.Keys -contains 'Status')
-            {
-                $cacheProperties = $true
-            }
-        }
-
-        # Update 'Id' property:
-        # Set $desiredProperties."$IdPropertyName" to $currentProperties."$IdPropertyName" if it's desired
-        # value is blank/null but it's current/existing value is known (and can be recovered from $currentProperties).
-        #
-        # This ensures that alternate keys (typically ResourceIds) not provided in the DSC configuration do not flag differences
-        [System.String]$IdPropertyName = $this.GetResourceIdPropertyName()
-
-        if ([System.String]::IsNullOrWhiteSpace($desiredProperties[$IdPropertyName]) -and
-            ![System.String]::IsNullOrWhiteSpace($currentProperties[$IdPropertyName]))
-        {
-            $desiredProperties."$IdPropertyName" = $currentProperties."$IdPropertyName"
-        }
-
 
         switch ($desiredProperties.Ensure)
         {
