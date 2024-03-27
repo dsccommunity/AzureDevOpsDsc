@@ -19,7 +19,7 @@ Function Remove-xAzDoOrganizationGroup {
 
         [Parameter()]
         [Alias('Lookup')]
-        [System.String]$LookupResult
+        [HashTable]$LookupResult
 
     )
 

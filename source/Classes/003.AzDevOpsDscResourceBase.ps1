@@ -280,6 +280,11 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             $dscRequiredActionFunctionName = $this.GetResourceFunctionName($dscRequiredAction)
             $dscDesiredStateParameters = $this.GetDesiredStateParameters($dscCurrentStateProperties, $dscDesiredStateProperties, $dscRequiredAction)
 
+            # Set the lookup properties on the desired state object. Since it will be used to set the resource.
+            if ($null -ne $dscCurrentStateProperties.LookupResult) {
+                $dscDesiredStateParameters.LookupResult = $dscCurrentStateProperties.LookupResult
+            }
+
             & $dscRequiredActionFunctionName @dscDesiredStateParameters | Out-Null
             Start-Sleep -Milliseconds $($this.GetPostSetWaitTimeMs())
         }

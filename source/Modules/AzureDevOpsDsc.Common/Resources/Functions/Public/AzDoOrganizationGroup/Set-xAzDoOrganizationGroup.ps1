@@ -16,7 +16,7 @@ Function Set-xAzDoOrganizationGroup {
 
         [Parameter()]
         [Alias('Lookup')]
-        [System.String]$LookupResult,
+        [HashTable]$LookupResult,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -34,6 +34,8 @@ Function Set-xAzDoOrganizationGroup {
         return
 
     }
+
+    $LookupResult | Export-Clixml -Path "C:\Temp\LookupResult.xml"
 
     #
     # Update the group
