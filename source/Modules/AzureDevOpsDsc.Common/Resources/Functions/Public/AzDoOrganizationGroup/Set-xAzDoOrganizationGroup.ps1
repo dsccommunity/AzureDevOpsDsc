@@ -16,34 +16,38 @@ Function Set-xAzDoOrganizationGroup {
 
         [Parameter()]
         [Alias('Lookup')]
-        [System.String]$LookupResult
+        [System.String]$LookupResult,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 
-    # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
+    #
+    # Depending on the type of lookup status, the group has been renamed the group has been deleted and recreated.
+
+    if ($LookupResult.Status -eq [DSCGetSummaryState]::Renamed) {
+
+        # For the time being write a warning and return
+        Write-Warning "[Set-xAzDoOrganizationGroup] The group has been renamed. The group will not be set."
+        return
+
+    }
 
     #
-    # Check the live group cache
-    $LiveGroups = Get-CacheItem -Key $Key -Type 'LiveGroups'
-
-    #
-    # Check the local group cache
-    $localgroup = Get-CacheItem -Key $Key -Type 'Group'
-
-    #
-    #
+    # Update the group
 
     $params = @{
-        ApiUri = $ApiUri
-        Pat = $Pat
+        ApiUri = "https://dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
         GroupName = $GroupName
+        GroupDisplayName = $GroupDisplayName
         GroupDescription = $GroupDescription
+        GroupDescriptor = $LookupResult.descriptor
     }
 
     # Set the group from the API
-    $null = Set-DevOpsGroup @params
-
+    $group = Set-DevOpsGroup @params
 
     #
     # Return the group from the cache

@@ -33,48 +33,72 @@ This example updates the group named "MyGroup" in the Azure DevOps organization 
 # This function is designed to update the description of a group in Azure DevOps.
 Function Set-DevOpsGroup {
     # CmdletBinding attribute allows the function to use cmdlet parameters and supports advanced functionality like ShouldProcess.
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     # OutputType attribute specifies the type of object that the function returns.
     [OutputType([System.Management.Automation.PSObject])]
     param
     (
         # Parameter attribute marks this as a mandatory parameter that the user must supply when calling the function.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'ProjectScope')]
+        [Parameter(Mandatory, ParameterSetName = 'Default')]
         [string]
         $ApiUri, # The URI for the Azure DevOps API.
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'ProjectScope')]
+        [Parameter(Mandatory, ParameterSetName = 'Default')]
         [string]
         $GroupName, # The name of the group to be updated.
 
+        [Parameter(ParameterSetName = 'ProjectScope')]
+        [Parameter(ParameterSetName = 'Default')]
+        [string]
+        $GroupDisplayName, # The new display name for the group.
+
         # Optional parameter with a default value of $null if not specified by the user.
-        [Parameter()]
+        [Parameter(ParameterSetName = 'ProjectScope')]
+        [Parameter(ParameterSetName = 'Default')]
         [String]
         $GroupDescription = $null, # The new description for the group.
 
         # Optional parameter that gets the default API version if not specified.
-        [Parameter()]
+        [Parameter(ParameterSetName = 'ProjectScope')]
+        [Parameter(ParameterSetName = 'Default')]
         [String]
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default), # The API version to use for the request.
 
+        # Group Descriptor for the project within which the group exists.
+        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [String]
+        $GroupDescriptor,
+
         # Optional parameter without a default value.
-        [Parameter()]
+        [Parameter(Mandatory, ParameterSetName = 'ProjectScope')]
         [String]
         $ProjectScopeDescriptor # Scope descriptor for the project within which the group exists.
     )
 
     # A hashtable is created to hold parameters that will be used in the REST method invocation.
     $params = @{
-        Uri = "{0}/_apis/graph/groups?api-version={1}" -f $ApiUri, $ApiVersion # The API endpoint, formatted with the base URI and API version.
+        Uri = "{0}/_apis/graph/groups/{1}?api-version={2}" -f $ApiUri, $GroupDescriptor, $ApiVersion # The API endpoint, formatted with the base URI and API version.
         Method = 'Patch' # The HTTP method used for the request, indicating an update operation.
         ContentType = 'application/json' # The content type header indicating the format of the body data.
         Body = @(
             @{
                 op = "add" # Operation type in JSON Patch format, here adding a new value.
+                path = "/displayName" # The path in the target object to add the new value.
+                value = $GroupDisplayName # The value to add, which is the new group display name.
+            }
+            @{
+                op = "add" # Operation type in JSON Patch format, here adding a new value.
                 path = "/description" # The path in the target object to add the new value.
                 value = $GroupDescription # The value to add, which is the new group description.
+            },
+            @{
+                op = "add" # Operation type in JSON Patch format, here adding a new value.
+                path = "/groupname" # The path in the target object to add the new value.
+                value = $GroupName # The value to add, which is the new group name.
             }
-        ) | ConvertTo-Json # Converts the body to a JSON string.
+        )
     }
 
     # If ProjectScopeDescriptor is provided, modify the URI to include it in the query parameters.

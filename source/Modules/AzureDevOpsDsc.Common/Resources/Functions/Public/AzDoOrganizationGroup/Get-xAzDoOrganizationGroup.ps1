@@ -96,6 +96,7 @@ Function Get-xAzDoOrganizationGroup {
                 $getGroupResult.renamedGroup = $renamedGroup
                 # The group has been renamed.
                 $getGroupResult.status = [DSCGetSummaryState]::Renamed
+
                 # Add the reason
                 #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:RenamedGroup', 'The group was renamed')
 
@@ -172,7 +173,7 @@ Function Get-xAzDoOrganizationGroup {
         if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'Description' }
         if ($livegroup.name        -ne $localgroup.name ) { $getGroupResult.propertiesChanged += 'Name'        }
         # If the properties are the same, the group is unchanged. If not, the group has been changed.
-        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Missing : [DSCGetSummaryState]::Unchanged
+        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Renamed : [DSCGetSummaryState]::Unchanged
         if ($getGroupResult.status -ne [DSCGetSummaryState]::Unchanged) {
             # Add the reason
             #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')

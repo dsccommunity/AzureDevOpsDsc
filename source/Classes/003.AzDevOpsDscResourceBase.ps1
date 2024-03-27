@@ -117,7 +117,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         [System.String[]]$dscPropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
         [System.String[]]$dscPropertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
-
         switch ($desiredProperties.Ensure)
         {
             ([Ensure]::Present) {
