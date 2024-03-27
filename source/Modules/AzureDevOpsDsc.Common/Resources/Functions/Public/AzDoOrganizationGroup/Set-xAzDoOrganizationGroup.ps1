@@ -41,11 +41,11 @@ Function Set-xAzDoOrganizationGroup {
     # Update the group
 
     $params = @{
-        ApiUri = "https://dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
+        ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
         GroupName = $GroupName
         GroupDisplayName = $GroupDisplayName
         GroupDescription = $GroupDescription
-        GroupDescriptor = $LookupResult.descriptor
+        GroupDescriptor = $LookupResult.liveCache.descriptor
     }
 
     # Set the group from the API

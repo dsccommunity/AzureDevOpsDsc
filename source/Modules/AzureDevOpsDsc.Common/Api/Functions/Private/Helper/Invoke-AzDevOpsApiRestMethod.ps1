@@ -74,7 +74,7 @@ function Invoke-AzDevOpsApiRestMethod
         [Parameter()]
         [System.String]
         [Alias('ContentType')]
-        [ValidateSet('application/json')]
+        [ValidateSet('application/json','application/json-patch+json')]
         $HttpContentType = 'application/json',
 
         [Parameter()]

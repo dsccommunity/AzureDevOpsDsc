@@ -81,24 +81,19 @@ Function Set-DevOpsGroup {
     $params = @{
         Uri = "{0}/_apis/graph/groups/{1}?api-version={2}" -f $ApiUri, $GroupDescriptor, $ApiVersion # The API endpoint, formatted with the base URI and API version.
         Method = 'Patch' # The HTTP method used for the request, indicating an update operation.
-        ContentType = 'application/json' # The content type header indicating the format of the body data.
+        ContentType = 'application/json-patch+json' # The content type of the request body.
         Body = @(
             @{
-                op = "add" # Operation type in JSON Patch format, here adding a new value.
+                op = "replace" # Operation type in JSON Patch format, here adding a new value.
                 path = "/displayName" # The path in the target object to add the new value.
                 value = $GroupDisplayName # The value to add, which is the new group display name.
             }
             @{
-                op = "add" # Operation type in JSON Patch format, here adding a new value.
+                op = "replace" # Operation type in JSON Patch format, here adding a new value.
                 path = "/description" # The path in the target object to add the new value.
                 value = $GroupDescription # The value to add, which is the new group description.
-            },
-            @{
-                op = "add" # Operation type in JSON Patch format, here adding a new value.
-                path = "/groupname" # The path in the target object to add the new value.
-                value = $GroupName # The value to add, which is the new group name.
             }
-        )
+        ) | ConvertTo-Json # Convert the hashtable to JSON format for the request body.
     }
 
     # If ProjectScopeDescriptor is provided, modify the URI to include it in the query parameters.

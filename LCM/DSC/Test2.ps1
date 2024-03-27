@@ -1,2 +1,6 @@
+
+
+$params = Import-Clixml -LiteralPath "C:\Temp\dscDesiredStateParameters.xml"
+
 Wait-Debugger
-$get.GetDscRequiredAction()
+Set-xAzDoOrganizationGroup @params

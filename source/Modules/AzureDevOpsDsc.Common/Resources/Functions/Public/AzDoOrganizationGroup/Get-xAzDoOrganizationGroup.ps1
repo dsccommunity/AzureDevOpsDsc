@@ -164,7 +164,7 @@ Function Get-xAzDoOrganizationGroup {
 
     #
     # If the localgroup is not present and the livegroup is present, the group is not found. Check the properties are the same as the parameters.
-    # If the properties are the same, the group is unchanged. If not, the group has been deleted and then recreated.
+    # If the properties are the same, the group is unchanged. If not, the group has been deleted and then recreated and the new group will become authoritative.
     #
     if (($null -eq $localgroup) -and ($null -ne $livegroup)) {
 
@@ -173,7 +173,7 @@ Function Get-xAzDoOrganizationGroup {
         if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'Description' }
         if ($livegroup.name        -ne $localgroup.name ) { $getGroupResult.propertiesChanged += 'Name'        }
         # If the properties are the same, the group is unchanged. If not, the group has been changed.
-        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Renamed : [DSCGetSummaryState]::Unchanged
+        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Changed : [DSCGetSummaryState]::Unchanged
         if ($getGroupResult.status -ne [DSCGetSummaryState]::Unchanged) {
             # Add the reason
             #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')
