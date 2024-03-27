@@ -184,7 +184,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             return $null
         }
         # If the desired state/action is to remove the resource, generate/return a minimal set of parameters required to remove the resource
-        elseif ($RequiredAction -eq [RequiredAction]::NotFound)
+        elseif ($RequiredAction -eq [RequiredAction]::Remove)
         {
             return @{
                 ApiUri                      = $DesiredStateProperties.ApiUri
