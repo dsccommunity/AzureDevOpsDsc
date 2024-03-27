@@ -49,11 +49,6 @@ Function Set-DevOpsGroup {
         [string]
         $GroupName, # The name of the group to be updated.
 
-        [Parameter(ParameterSetName = 'ProjectScope')]
-        [Parameter(ParameterSetName = 'Default')]
-        [string]
-        $GroupDisplayName, # The new display name for the group.
-
         # Optional parameter with a default value of $null if not specified by the user.
         [Parameter(ParameterSetName = 'ProjectScope')]
         [Parameter(ParameterSetName = 'Default')]
@@ -86,7 +81,7 @@ Function Set-DevOpsGroup {
             @{
                 op = "replace" # Operation type in JSON Patch format, here adding a new value.
                 path = "/displayName" # The path in the target object to add the new value.
-                value = $GroupDisplayName # The value to add, which is the new group display name.
+                value = $GroupName # The value to add, which is the new group display name.
             }
             @{
                 op = "replace" # Operation type in JSON Patch format, here adding a new value.

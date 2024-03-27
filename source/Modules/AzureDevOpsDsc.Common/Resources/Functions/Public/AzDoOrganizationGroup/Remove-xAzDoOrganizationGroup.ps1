@@ -10,10 +10,6 @@ Function Remove-xAzDoOrganizationGroup {
         [System.String]$GroupName,
 
         [Parameter()]
-        [Alias('DisplayName')]
-        [System.String]$GroupDisplayName,
-
-        [Parameter()]
         [Alias('Description')]
         [System.String]$GroupDescription,
 

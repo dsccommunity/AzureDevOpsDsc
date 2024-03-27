@@ -30,10 +30,6 @@ Function Get-xAzDoOrganizationGroup {
     [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
-        [Parameter()]
-        [Alias('DisplayName')]
-        [System.String]$GroupDisplayName,
-
         [Parameter(Mandatory)]
         [Alias('Name')]
         [System.String]$GroupName,
@@ -109,7 +105,6 @@ Function Get-xAzDoOrganizationGroup {
                 Add-CacheItem -Key $Key -Value $livegroup -Type 'Group'
 
                 # Compare the properties of the live group with the parameters
-                if ($livegroup.displayName -ne $groupDisplayName) { $getGroupResult.propertiesChanged += 'DisplayName' }
                 if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'Description' }
                 if ($livegroup.name -ne $localgroup.name) { $getGroupResult.propertiesChanged += 'Name' }
 
@@ -134,7 +129,6 @@ Function Get-xAzDoOrganizationGroup {
         # The Group hasn't been renamed. Test the properties to make sure they are the same as the parameters.
 
         # Compare the properties of the live group with the parameters
-        if ($livegroup.displayName -ne $groupDisplayName) { $getGroupResult.propertiesChanged += 'DisplayName' }
         if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'Description' }
         if ($livegroup.name -ne $localgroup.name) { $getGroupResult.propertiesChanged += 'Name' }
 
@@ -156,7 +150,7 @@ Function Get-xAzDoOrganizationGroup {
     # If the livegroup is not present and the localgroup is present, the group is missing and recreate it.
     if (($null -eq $livegroup) -and ($null -ne $localgroup)) {
         $getGroupResult.status = [DSCGetSummaryState]::NotFound
-        $getGroupResult.propertiesChanged = @('DisplayName', 'Description', 'Name')
+        $getGroupResult.propertiesChanged = @('Description', 'Name')
         # Add the reason
         #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Removed', 'The group is missing')
         return $getGroupResult
@@ -169,7 +163,6 @@ Function Get-xAzDoOrganizationGroup {
     if (($null -eq $localgroup) -and ($null -ne $livegroup)) {
 
         # Validate that the live properties are the same as the parameters
-        if ($livegroup.displayName -ne $groupDisplayName) { $getGroupResult.propertiesChanged += 'DisplayName' }
         if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'Description' }
         if ($livegroup.name        -ne $localgroup.name ) { $getGroupResult.propertiesChanged += 'Name'        }
         # If the properties are the same, the group is unchanged. If not, the group has been changed.
@@ -193,7 +186,7 @@ Function Get-xAzDoOrganizationGroup {
     # If the livegroup and localgroup are not present, the group is missing and recreate it.
     if (($null -eq $livegroup) -and ($null -eq $localgroup)) {
         $getGroupResult.status = [DSCGetSummaryState]::NotFound
-        $getGroupResult.propertiesChanged = @('DisplayName', 'Description', 'Name')
+        $getGroupResult.propertiesChanged = @('Description', 'Name')
         # Add the reason
         #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:NotFound', 'The group is not found')
         return $getGroupResult

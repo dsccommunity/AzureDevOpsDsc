@@ -17,10 +17,6 @@
     The name of the organization group.
     This property is mandatory and serves as the key property for the resource.
 
-.PARAMETER GroupDisplayName
-    The display name of the organization group.
-    This property is mandatory and serves as the key property for the resource.
-
 .PARAMETER GroupDescription
     The description of the organization group.
 
@@ -35,7 +31,6 @@
 
     $organizationGroup = [xAzDoOrganizationGroup]::new()
     $organizationGroup.GroupName = "MyGroup"
-    $organizationGroup.GroupDisplayName = "My Group"
     $organizationGroup.GroupDescription = "This is my group."
 
     $organizationGroup.Get()
@@ -49,10 +44,6 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
     [DscProperty(Key, Mandatory)]
     [Alias('Name')]
     [System.String]$GroupName
-
-    [DscProperty()]
-    [Alias('DisplayName')]
-    [System.String]$GroupDisplayName
 
     [DscProperty()]
     [Alias('Description')]
@@ -86,7 +77,6 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
         # Get the current state of the resource
         $params = @{
             GroupName = $this.GroupName
-            GroupDisplayName = $this.GroupDisplayName
             GroupDescription = $this.GroupDescription
         }
 
@@ -109,7 +99,6 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
         if ($null -eq $CurrentResourceObject) { return $properties }
 
         $properties.GroupName           = $CurrentResourceObject.GroupName
-        $properties.GroupDisplayName    = $CurrentResourceObject.GroupDisplayName
         $properties.GroupDescription    = $CurrentResourceObject.GroupDescription
         $properties.Ensure              = $CurrentResourceObject.Ensure
         $properties.LookupResult        = $CurrentResourceObject.LookupResult

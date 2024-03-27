@@ -7,10 +7,6 @@ Function Set-xAzDoOrganizationGroup {
         [System.String]$GroupName,
 
         [Parameter()]
-        [Alias('DisplayName')]
-        [System.String]$GroupDisplayName,
-
-        [Parameter()]
         [Alias('Description')]
         [System.String]$GroupDescription,
 
@@ -43,7 +39,6 @@ Function Set-xAzDoOrganizationGroup {
     $params = @{
         ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
         GroupName = $GroupName
-        GroupDisplayName = $GroupDisplayName
         GroupDescription = $GroupDescription
         GroupDescriptor = $LookupResult.liveCache.descriptor
     }
