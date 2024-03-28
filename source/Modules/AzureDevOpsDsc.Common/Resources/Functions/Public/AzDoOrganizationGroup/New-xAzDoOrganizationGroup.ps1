@@ -14,20 +14,27 @@ Function New-xAzDoOrganizationGroup {
 
         [Parameter()]
         [Alias('Lookup')]
-        [HashTable]$LookupResult
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 
-    # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
-
     #
     # Create a new group
-
-    $result = New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName -GroupDescription $GroupDescription
+    $group = New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName -GroupDescription $GroupDescription
 
     #
     # Add the group to the cache
-    Add-CacheItem -Key $Key -Value $result -Type 'LiveGroups'
+    Add-CacheItem -Key $group.principalName -Value $group -Type 'LiveGroups'
+    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
+
+    Add-CacheItem -Key $group.principalName -Value $group -Type 'Groups'
+    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Groups'
 
 }

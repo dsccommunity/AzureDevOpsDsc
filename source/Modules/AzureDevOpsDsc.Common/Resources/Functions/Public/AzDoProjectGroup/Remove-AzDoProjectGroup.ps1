@@ -56,7 +56,7 @@ Function Remove-AzDoProjectGroup {
     #
     # Format the Key According to the Principal Name
 
-    $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupDisplayName
+    $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupDisplayName
 
     #
     # Check if the group exists in the live cache.

@@ -22,7 +22,7 @@ Function Remove-xAzDoOrganizationGroup {
     #
     # Format the Key According to the Principal Name
 
-    $Key = Format-UserPrincipalName -Prefix '[TEAM FOUNDATION]' -GroupName $GroupName
+    $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
 
     #
     # Check if the group exists in the live cache.
