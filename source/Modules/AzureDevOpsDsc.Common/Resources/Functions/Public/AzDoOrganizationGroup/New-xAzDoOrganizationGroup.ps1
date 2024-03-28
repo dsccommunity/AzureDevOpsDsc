@@ -27,7 +27,13 @@ Function New-xAzDoOrganizationGroup {
 
     #
     # Create a new group
-    $group = New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName -GroupDescription $GroupDescription
+    $group = New-DevOpsGroup -GroupName $GroupName -GroupDescription $GroupDescription
+
+    @{
+        GroupName = $GroupName
+        GroupDescription = $GroupDescription
+        LookupResult = $LookupResult
+    } | Export-Clixml "C:\Temp\newgroup.clixml"
 
     #
     # Add the group to the cache

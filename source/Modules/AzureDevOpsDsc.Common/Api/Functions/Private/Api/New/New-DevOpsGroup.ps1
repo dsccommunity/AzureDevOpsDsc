@@ -40,11 +40,6 @@ Function New-DevOpsGroup {
     # Parameters block defining the parameters accepted by the function
     param
     (
-        # Mandatory parameter for the API URI
-        [Parameter(Mandatory)]
-        [string]
-        $ApiUri,
-
         # Mandatory parameter for the group name
         [Parameter(Mandatory)]
         [string]

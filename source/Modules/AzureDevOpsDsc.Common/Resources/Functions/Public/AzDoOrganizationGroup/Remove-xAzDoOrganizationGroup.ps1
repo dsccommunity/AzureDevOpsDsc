@@ -15,7 +15,14 @@ Function Remove-xAzDoOrganizationGroup {
 
         [Parameter()]
         [Alias('Lookup')]
-        [HashTable]$LookupResult
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 
