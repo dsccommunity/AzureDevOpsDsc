@@ -65,6 +65,7 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
         # Initialize the cache object
         Initialize-CacheObject -CacheType 'Group' -BypassFileCheck -Debug
         Initialize-CacheObject -CacheType 'LiveGroups' -BypassFileCheck -Debug
+
     }
 
     [xAzDoOrganizationGroup] Get()
