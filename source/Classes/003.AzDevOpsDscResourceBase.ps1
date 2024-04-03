@@ -58,8 +58,6 @@
         $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
         $props.Ensure       = $props.LookupResult.Ensure
 
-        Wait-Debugger
-
         return $props
 
      }
@@ -131,8 +129,6 @@
          {
              ([Ensure]::Present) {
 
-                $currentProperties | Export-Clixml -LiteralPath C:\Temp\currentProperties.xml
-
                  # If the desired state is to add the resource, however the current resource is absent. It is not in state.
                  if ($currentProperties.Ensure -eq [Ensure]::Absent)
                  {
@@ -162,19 +158,11 @@
 
              }
              ([Ensure]::Absent) {
-
-                 if ($currentProperties.LookupResult.Status -ne [DSCGetSummaryState]::Missing)
-                 {
-                     $dscRequiredAction = [RequiredAction]::Remove
-                     Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                     break
-                 }
-
-                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
-                 Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                 return $dscRequiredAction
-                 break
-
+                $dscRequiredAction = ($currentProperties.Ensure -eq [Ensure]::Present) ? [RequiredAction]::Remove : [RequiredAction]::None
+                # Otherwise, no changes to make (i.e. The desired state is already achieved)
+                Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                return $dscRequiredAction
+                break
              }
              default {
                  $errorMessage = "Could not obtain a valid 'Ensure' value within '$($this.GetResourceName())' Test() function. Value was '$($desiredProperties.Ensure)'."
@@ -198,10 +186,12 @@
          # If the desired state/action is to remove the resource, generate/return a minimal set of parameters required to remove the resource
          elseif ($RequiredAction -eq [RequiredAction]::Remove)
          {
-             return @{
+
+            return $desiredStateParameters
+
+            return @{
                  ApiUri                      = $DesiredStateProperties.ApiUri
                  Pat                         = $DesiredStateProperties.Pat
-
                  Force                       = $true
 
                  # Set this from the 'Current' state as we would expect this to have an existing key/ID value to use

@@ -1,6 +1,8 @@
 
 
-$params = Import-Clixml -LiteralPath "C:\Temp\newgroup.clixml"
+$params = Import-Clixml -LiteralPath "C:\Temp\a.clixml"
 
 Wait-Debugger
-Set-xAzDoOrganizationGroup @params
+New-DevOpsGroup -GroupName $params.GroupName -GroupDescription $params.GroupDescription -ApiUri ("https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName)
+
+#Set-xAzDoOrganizationGroup @params

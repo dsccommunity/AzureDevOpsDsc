@@ -25,22 +25,22 @@ Function New-xAzDoOrganizationGroup {
 
     )
 
-    #
-    # Create a new group
-    $group = New-DevOpsGroup -GroupName $GroupName -GroupDescription $GroupDescription
-
-    @{
+    $params = @{
         GroupName = $GroupName
         GroupDescription = $GroupDescription
-        LookupResult = $LookupResult
-    } | Export-Clixml "C:\Temp\newgroup.clixml"
+        ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
+    }
+
+    #
+    # Create a new group
+    $group = New-DevOpsGroup @params
 
     #
     # Add the group to the cache
     Add-CacheItem -Key $group.principalName -Value $group -Type 'LiveGroups'
     Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
 
-    Add-CacheItem -Key $group.principalName -Value $group -Type 'Groups'
-    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Groups'
+    Add-CacheItem -Key $group.principalName -Value $group -Type 'Group'
+    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Group'
 
 }

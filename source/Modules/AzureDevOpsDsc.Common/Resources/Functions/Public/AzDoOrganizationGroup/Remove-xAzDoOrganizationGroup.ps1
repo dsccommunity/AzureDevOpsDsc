@@ -23,37 +23,39 @@ Function Remove-xAzDoOrganizationGroup {
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $Force
-
     )
 
-    #
-    # Format the Key According to the Principal Name
-
-    $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
-
-    #
-    # Check if the group exists in the live cache.
-
-    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
-
-    if ($null -eq $group) {
-        $group = Get-AzDoOrganizationGroup -ApiUri $ApiUri -Pat $Pat -GroupDisplayName $GroupDisplayName
+    # If no cache items exist, return.
+    if (($null -eq $LookupResult.liveCache) -and ($null -eq $LookupResult.localCache)) {
+        return
     }
-
-    #
-    # Remove the group from the API
 
     $params = @{
-        ApiUri = $ApiUri
-        GroupDescriptor = $group.Descriptor
+        GroupDescriptor = $LookupResult.liveCache.Descriptor
+        ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
     }
 
+    $cacheItem = @{
+        Key = $LookupResult.liveCache.principalName
+    }
+
+    # If the group is not found, return
+    if (($null -ne $LookupResult.localCache) -and ($null -eq $LookupResult.liveCache)) {
+        $cacheItem.Key = $LookupResult.localCache.principalName
+        $params.GroupDescriptor = $LookupResult.localCache.Descriptor
+    }
+
+    #
     # Remove the group from the API
     $null = Remove-DevOpsGroup @params
 
     #
-    # Remove the group from the cache and live cache
+    # Remove the group from the API
 
-    Remove-CacheItem -Key $Key -Type 'LiveGroups'
+    Remove-CacheItem @cacheItem -Type 'LiveGroups'
+    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
+
+    Remove-CacheItem @cacheItem -Type 'Group'
+    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Group'
 
 }

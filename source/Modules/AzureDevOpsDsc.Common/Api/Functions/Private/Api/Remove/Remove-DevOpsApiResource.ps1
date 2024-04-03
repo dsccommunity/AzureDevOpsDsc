@@ -68,12 +68,6 @@ function Remove-DevOpsApiResource
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
 
         [Parameter(Mandatory = $true)]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
-
-        [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-AzDevOpsApiResourceName -ResourceName $_ -IsValid })]
         [System.String]
         $ResourceName,
