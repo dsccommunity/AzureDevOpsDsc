@@ -85,11 +85,6 @@ class xAzDoProjectGroup : AzDevOpsDscResourceBase
 
     }
 
-    hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
-    {
-        return @()
-    }
-
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $properties = @{

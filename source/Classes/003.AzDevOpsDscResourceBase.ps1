@@ -15,7 +15,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
     hidden Construct()
     {
         # Import the Module Settings
-        $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Settings\ModuleSettings.clixml"
+        $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
         $objectSettings = Import-Clixml -LiteralPath $moduleSettingsPath
         $OrganizationName = $objectSettings.OrganizationName
 

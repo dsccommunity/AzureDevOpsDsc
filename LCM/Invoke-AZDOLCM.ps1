@@ -28,15 +28,10 @@ param(
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1' -Verbose
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\AzureDevOpsDsc.psd1' -Verbose
 
-# Initalize the Cache
-'LiveGroups', 'LiveProjects', 'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object {
-    Initialize-CacheObject -CacheType $_
-}
-
 #
 # Create an Object Containing the Organization Name.
 
-$moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Settings\ModuleSettings.clixml"
+$moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
 
 $objectSettings = @{
     OrganizationName = "akkodistestorg"
@@ -44,6 +39,10 @@ $objectSettings = @{
 
 $objectSettings | Export-Clixml -LiteralPath $moduleSettingsPath
 
+# Initalize the Cache
+'LiveGroups', 'LiveProjects', 'Project','Team', 'Group', 'SecurityDescriptor' | ForEach-Object {
+    Initialize-CacheObject -CacheType $_
+}
 
 # Create a Managed Identity Token
 New-AzManagedIdentity -OrganizationName $objectSettings.OrganizationName -Verbose
