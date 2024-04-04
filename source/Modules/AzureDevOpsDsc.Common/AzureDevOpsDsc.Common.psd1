@@ -43,6 +43,12 @@
         'Remove-AzDevOpsProject',
         'Test-AzDevOpsProject',
 
+        'Get-xAzDoProjectGroup',
+        'New-xAzDoProjectGroup',
+        'Set-xAzDoProjectGroup',
+        'Remove-xAzDoProjectGroup',
+        'Test-xAzDoProjectGroup',
+
         'Get-xAzDoOrganizationGroup',
         'New-xAzDoOrganizationGroup',
         'Set-xAzDoOrganizationGroup',

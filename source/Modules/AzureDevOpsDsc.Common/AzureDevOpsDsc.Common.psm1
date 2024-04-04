@@ -76,6 +76,12 @@ Export-ModuleMember -Function 'Get-AzDoAPIGroupCache'
 Export-ModuleMember -Function 'Get-AzDoAPIProjectCache'
 Export-ModuleMember -Function 'Initialize-CacheObject'
 
+Export-ModuleMember -Function 'Get-xAzDoProjectGroup'
+Export-ModuleMember -Function 'New-xAzDoProjectGroup'
+Export-ModuleMember -Function 'Set-xAzDoProjectGroup'
+Export-ModuleMember -Function 'Remove-xAzDoProjectGroup'
+Export-ModuleMember -Function 'Test-xAzDoProjectGroup'
+
 # Stop processing
 if ($isClass) { return }
 

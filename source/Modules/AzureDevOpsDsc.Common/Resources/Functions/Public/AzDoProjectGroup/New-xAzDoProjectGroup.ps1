@@ -12,7 +12,7 @@ Function New-xAzDoProjectGroup {
         [Alias('Description')]
         [System.String]$GroupDescription,
 
-        [Parameter()]
+        [Parameter(Mandatory)]
         [Alias('Project')]
         [System.String]$ProjectName,
 
@@ -33,8 +33,11 @@ Function New-xAzDoProjectGroup {
         GroupName = $GroupName
         GroupDescription = $GroupDescription
         ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
-        ProjectScopeDescriptor = $LookupResult.project.ProjectDescriptor
+        ProjectScopeDescriptor = (Get-CacheItem -Key $ProjectName -Type 'LiveProjects').ProjectDescriptor
     }
+
+    $AZDoLiveProjects | Export-Clixml -LiteralPath "C:\Temp\New-xAzDoProjectGroup_LiveProjects.xml"
+    $params | Export-Clixml -LiteralPath "C:\Temp\New-xAzDoProjectGroup_Params.xml"
 
     #
     # Create a new group
