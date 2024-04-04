@@ -1,4 +1,4 @@
-Function Set-AzDoProjectGroup {
+Function Set-xAzDoProjectGroup {
 
     param(
 

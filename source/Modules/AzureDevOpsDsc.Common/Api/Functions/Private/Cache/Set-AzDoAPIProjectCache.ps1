@@ -49,24 +49,23 @@ Function Set-AzDoAPIProjectCache {
 
         # Perform an Azure DevOps API request to get the projects
         $projects = List-DevOpsProjects @params
+        $projectsArr = [System.Collections.ArrayList]::new()
 
         # Iterate through each project and get the security descriptors
         foreach ($project in $projects) {
             # Add the Project
             $securityDescriptor = Get-DevOpsSecurityDescriptor -ProjectId $project.Id -Organization $OrganizationName
             # Add the security descriptor to the project object
-            $project = $project | Select-Object *, @{Name='ProjectDescriptor'; Expression={$securityDescriptor}}
-
+            $projectsArr.Add(($project | Select-Object *, @{Name='ProjectDescriptor'; Expression={$securityDescriptor}}))
         }
 
         # Log the total number of projects returned by the API call
         Write-Verbose "'List-DevOpsProjects' returned a total of $($projects.Count) projects."
 
         # Iterate through each project in the response and add them to the cache
-        foreach ($project in $projects) {
+        foreach ($project in $projectsArr) {
             # Log the addition of each project to the cache
             Write-Verbose "Adding Project '$($project.Name)' to the cache."
-
             # Add the project to the cache with its name as the key
             Add-CacheItem -Key $project.Name -Value $project -Type 'LiveProjects'
         }

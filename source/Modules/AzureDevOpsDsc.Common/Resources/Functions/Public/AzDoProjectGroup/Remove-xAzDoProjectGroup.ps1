@@ -1,9 +1,10 @@
-Function New-AzDoProjectGroup {
+Function Remove-xAzDoProjectGroup {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
+
         [Parameter(Mandatory)]
         [Alias('Name')]
         [System.String]$GroupName,
@@ -12,7 +13,7 @@ Function New-AzDoProjectGroup {
         [Alias('Description')]
         [System.String]$GroupDescription,
 
-        [Parameter()]
+        [Parameter(Mandatory)]
         [Alias('Project')]
         [System.String]$ProjectName,
 
@@ -26,26 +27,39 @@ Function New-AzDoProjectGroup {
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $Force
-
     )
 
+    # If no cache items exist, return.
+    if (($null -eq $LookupResult.liveCache) -and ($null -eq $LookupResult.localCache)) {
+        return
+    }
+
     $params = @{
-        GroupName = $GroupName
-        GroupDescription = $GroupDescription
+        GroupDescriptor = $LookupResult.liveCache.Descriptor
         ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
-        ProjectScopeDescriptor = $LookupResult.project.ProjectDescriptor
+    }
+
+    $cacheItem = @{
+        Key = $LookupResult.liveCache.principalName
+    }
+
+    # If the group is not found, return
+    if (($null -ne $LookupResult.localCache) -and ($null -eq $LookupResult.liveCache)) {
+        $cacheItem.Key = $LookupResult.localCache.principalName
+        $params.GroupDescriptor = $LookupResult.localCache.Descriptor
     }
 
     #
-    # Create a new group
-    $group = New-DevOpsGroup @params
+    # Remove the group from the API
+    $null = Remove-DevOpsGroup @params
 
     #
-    # Add the group to the cache
-    Add-CacheItem -Key $group.principalName -Value $group -Type 'LiveGroups'
+    # Remove the group from the API
+
+    Remove-CacheItem @cacheItem -Type 'LiveGroups'
     Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
 
-    Add-CacheItem -Key $group.principalName -Value $group -Type 'Group'
+    Remove-CacheItem @cacheItem -Type 'Group'
     Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Group'
 
 }

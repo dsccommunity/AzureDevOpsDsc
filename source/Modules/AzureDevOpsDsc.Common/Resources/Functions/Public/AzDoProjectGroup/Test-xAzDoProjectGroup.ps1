@@ -30,7 +30,7 @@
     using the specified personal access token and API URI.
 
 #>
-Function Test-AzDoProjectGroup {
+Function Test-xAzDoProjectGroup {
 
     param(
         [Parameter(Mandatory)]
@@ -44,7 +44,7 @@ Function Test-AzDoProjectGroup {
 
         [Parameter()]
         [Alias('Project')]
-        [hashtable]$ProjectName
+        [hashtable]$ProjectName,
 
         [Parameter()]
         [Alias('Name')]

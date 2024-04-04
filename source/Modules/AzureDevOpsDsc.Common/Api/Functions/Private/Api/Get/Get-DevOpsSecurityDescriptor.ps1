@@ -39,7 +39,7 @@ function Get-DevOpsSecurityDescriptor
     # Get the project
     # Construct the URI with optional state filter
     $params = @{
-        Uri = "https://dev.azure.com/{0}/_apis/graph/descriptors/{1}?api-version={2}" -f $Organization, $ProjectId, $ApiVersion
+        Uri = "https://vssps.dev.azure.com/{0}/_apis/graph/descriptors/{1}?api-version={2}" -f $Organization, $ProjectId, $ApiVersion
         Method = 'Get'
     }
 
