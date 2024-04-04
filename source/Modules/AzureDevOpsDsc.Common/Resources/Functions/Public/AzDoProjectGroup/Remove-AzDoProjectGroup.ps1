@@ -1,85 +1,65 @@
-<#
-.SYNOPSIS
-Removes an Azure DevOps project group.
-
-.DESCRIPTION
-The Remove-AzDoProjectGroup function removes an Azure DevOps project group from the API and cache. It first checks if the group exists in the live cache, and if not, retrieves it from the API. Then, it removes the group from the API and removes it from the cache and live cache.
-
-.PARAMETER ApiUri
-The URI of the Azure DevOps API.
-
-.PARAMETER Pat
-The Personal Access Token (PAT) used for authentication.
-
-.PARAMETER GroupDisplayName
-The display name of the project group to remove.
-
-.OUTPUTS
-[System.Management.Automation.PSObject[]]
-The removed project group.
-
-.EXAMPLE
-Remove-AzDoProjectGroup -ApiUri 'https://dev.azure.com/contoso' -Pat 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' -GroupDisplayName 'MyProjectGroup'
-
-This example removes the project group with the display name 'MyProjectGroup' from the Azure DevOps organization at 'https://dev.azure.com/contoso' using the specified PAT.
-
-#>
 Function Remove-AzDoProjectGroup {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
-        [Parameter()]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri,
-
-        [Parameter()]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
 
         [Parameter(Mandatory)]
-        [Alias('DisplayName')]
-        [System.String]$GroupDisplayName,
+        [Alias('Name')]
+        [System.String]$GroupName,
 
         [Parameter()]
-        [Alias('Project')]
-        [System.String]
-        $ProjectName
+        [Alias('Description')]
+        [System.String]$GroupDescription,
 
+        [Parameter(Mandatory)]
+        [Alias('Project')]
+        [System.String]$ProjectName,
+
+        [Parameter()]
+        [Alias('Lookup')]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
     )
 
-    #
-    # Format the Key According to the Principal Name
-
-    $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupDisplayName
-
-    #
-    # Check if the group exists in the live cache.
-
-    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
-
-    if ($null -eq $group) {
-        Throw "Group with name '$Key' does not exist in the organization."
+    # If no cache items exist, return.
+    if (($null -eq $LookupResult.liveCache) -and ($null -eq $LookupResult.localCache)) {
+        return
     }
 
-    #
-    # Remove the group from the API
     $params = @{
-        ApiUri = $ApiUri
-        GroupDescriptor = $group.Descriptor
+        GroupDescriptor = $LookupResult.liveCache.Descriptor
+        ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
     }
 
-    # Remove the group from the API
-    $null = Remove-AzDevOpsGroup @params
+    $cacheItem = @{
+        Key = $LookupResult.liveCache.principalName
+    }
+
+    # If the group is not found, return
+    if (($null -ne $LookupResult.localCache) -and ($null -eq $LookupResult.liveCache)) {
+        $cacheItem.Key = $LookupResult.localCache.principalName
+        $params.GroupDescriptor = $LookupResult.localCache.Descriptor
+    }
 
     #
-    # Remove the group from the cache and live cache
+    # Remove the group from the API
+    $null = Remove-DevOpsGroup @params
 
-    Remove-CacheItem -Key $Key -Type 'LiveGroups'
+    #
+    # Remove the group from the API
+
+    Remove-CacheItem @cacheItem -Type 'LiveGroups'
+    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
+
+    Remove-CacheItem @cacheItem -Type 'Group'
+    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Group'
 
 }

@@ -50,6 +50,15 @@ Function Set-AzDoAPIProjectCache {
         # Perform an Azure DevOps API request to get the projects
         $projects = List-DevOpsProjects @params
 
+        # Iterate through each project and get the security descriptors
+        foreach ($project in $projects) {
+            # Add the Project
+            $securityDescriptor = Get-DevOpsSecurityDescriptor -ProjectId $project.Id -Organization $OrganizationName
+            # Add the security descriptor to the project object
+            $project = $project | Select-Object *, @{Name='ProjectDescriptor'; Expression={$securityDescriptor}}
+
+        }
+
         # Log the total number of projects returned by the API call
         Write-Verbose "'List-DevOpsProjects' returned a total of $($projects.Count) projects."
 

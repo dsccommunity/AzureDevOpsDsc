@@ -33,8 +33,20 @@ Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\AzureDevOpsDsc
     Initialize-CacheObject -CacheType $_
 }
 
+#
+# Create an Object Containing the Organization Name.
+
+$moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Settings\ModuleSettings.clixml"
+
+$objectSettings = @{
+    OrganizationName = "akkodistestorg"
+}
+
+$objectSettings | Export-Clixml -LiteralPath $moduleSettingsPath
+
+
 # Create a Managed Identity Token
-New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose
+New-AzManagedIdentity -OrganizationName $objectSettings.OrganizationName -Verbose
 
 # Set the Group Cache
 Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName

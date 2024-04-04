@@ -46,15 +46,21 @@
 class xAzDoProjectGroup : AzDevOpsDscResourceBase
 {
     [DscProperty(Key, Mandatory)]
+    [Alias('Project')]
     [System.String]$ProjectName
 
-    [DscProperty(Mandatory)]
+    [DscProperty(Key, Mandatory)]
     [Alias('Name')]
     [System.String]$GroupName
 
     [DscProperty()]
     [Alias('Description')]
     [System.String]$GroupDescription
+
+    xAzDoProjectGroup()
+    {
+        $this.Construct()
+    }
 
     [xAzDoProjectGroup] Get()
     {
@@ -66,25 +72,41 @@ class xAzDoProjectGroup : AzDevOpsDscResourceBase
         return @()
     }
 
+    hidden [HashTable] getDscCurrentAPIState()
+    {
+        # Get the current state of the resource
+        $params = @{
+            GroupName = $this.GroupName
+            GroupDescription = $this.GroupDescription
+            ProjectName = $this.ProjectName
+        }
+
+        return Get-xAzDoProjectGroup @params
+
+    }
+
+    hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
+    {
+        return @()
+    }
+
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $properties = @{
-            Pat = $this.Pat
-            ApiUri = $this.ApiUri
             Ensure = [Ensure]::Absent
         }
 
-        if ($null -ne $CurrentResourceObject)
-        {
-            if (![System.String]::IsNullOrWhiteSpace($CurrentResourceObject.id))
-            {
-                $properties.Ensure = [Ensure]::Present
-            }
-            $properties.ProjectName = $CurrentResourceObject.ProjectName
-            $properties.GroupName = $CurrentResourceObject.name
-            $properties.GroupDescription = $CurrentResourceObject.description
+        # If the resource object is null, return the properties
+        if ($null -eq $CurrentResourceObject) { return $properties }
 
-        }
+        $properties.GroupName           = $CurrentResourceObject.GroupName
+        $properties.GroupDescription    = $CurrentResourceObject.GroupDescription
+        $properties.ProjectName         = $CurrentResourceObject.ProjectName
+        $properties.Ensure              = $CurrentResourceObject.Ensure
+        $properties.LookupResult        = $CurrentResourceObject.LookupResult
+        #$properties.Reasons             = $CurrentResourceObject.LookupResult.Reasons
+
+        Write-Verbose "[xAzDoProjectGroup] Current state properties: $($properties | Out-String)"
 
         return $properties
     }

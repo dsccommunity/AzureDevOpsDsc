@@ -1,31 +1,33 @@
 <#
 .SYNOPSIS
-    Tests if a project group exists in Azure DevOps.
+    Tests if an organization group exists in Azure DevOps.
 
 .DESCRIPTION
-    The Test-AzDoProjectGroup function is used to check if a project group exists in Azure DevOps.
-    It takes the group name, project name, personal access token (PAT), and API URI as parameters.
-    It then formats the key according to the principal name and checks the cache for the group.
-    If the group is found in the cache, it returns $true; otherwise, it returns $false.
+    The Test-AzDoOrganizationGroup function checks if a specified organization group exists in Azure DevOps.
+    It uses a personal access token (PAT) and the Azure DevOps API to perform the check.
 
 .PARAMETER GroupName
-    Specifies the name of the project group to test.
-
-.PARAMETER ProjectName
-    Specifies the name of the project. This parameter is optional.
-    If not provided, the function will not validate the project name.
+    Specifies the name of the organization group to test.
 
 .PARAMETER Pat
     Specifies the personal access token (PAT) to authenticate with Azure DevOps.
+    The PAT is validated using the Test-AzDevOpsPat function.
 
 .PARAMETER ApiUri
-    Specifies the API URI of the Azure DevOps instance.
+    Specifies the URI of the Azure DevOps API to connect to.
+    The URI is validated using the Test-AzDevOpsApiUri function.
+
+.OUTPUTS
+    System.Boolean
+    Returns $true if the organization group exists, otherwise returns $false.
 
 .EXAMPLE
-    Test-AzDoProjectGroup -GroupName "MyGroup" -ProjectName "MyProject" -Pat "********" -ApiUri "https://dev.azure.com/myorg"
+    Test-xAzDoOrganizationGroup -GroupName 'MyGroup' -Pat '********' -ApiUri 'https://dev.azure.com/myorg'
 
-    This example tests if the project group named "MyGroup" exists in the project "MyProject" in Azure DevOps.
-    It uses the specified personal access token (PAT) and API URI to authenticate with Azure DevOps.
+    Description
+    -----------
+    Tests if the organization group named 'MyGroup' exists in the Azure DevOps organization 'myorg'
+    using the specified personal access token and API URI.
 
 #>
 Function Test-AzDoProjectGroup {
@@ -37,30 +39,72 @@ Function Test-AzDoProjectGroup {
         $GroupName,
 
         [Parameter()]
-        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid -AllowWildcard })]
-        [Alias('ProjectName')]
-        [System.String]
-        $ProjectName,
+        [string]
+        $GroupDescription=$null,
 
-        [Parameter(Mandatory)]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
+        [Parameter()]
+        [Alias('Project')]
+        [hashtable]$ProjectName
 
-        [Parameter(Mandatory = $true)]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri
+        [Parameter()]
+        [Alias('Name')]
+        [hashtable]$GetResult
 
     )
 
     #
+    # Firstly we need to compare to see if the group names are the same. If so we can return $false.
+
+    if ($GetResult.Status -eq [DSCGetSummaryState]::Unchanged ) {
+
+        $result = $true
+
+        if ($GroupDescription -eq $GetResult.Current.description)
+        {
+            $GetResult.
+            $result = $false
+        }
+
+        return $true }
+
+    #
+    # If the status has been flagged as 'Renamed', returned $true. This means that the originId has changed.
+    if ($GetResult.Status -eq [DSCGetSummaryState]::Renamed) { return $false }
+
+    #
+    # If the status has been flagged as 'Missing', returned $true. This means that the group is missing from the live cache.
+
+
+
+    if ($GetResult.Status -eq [DSCGetSummaryState]::Changed) {
+
+        #
+        # If the group is present in the live cache and the local cache. This means that the originId has changed. This needs to be updated.
+        if (($null -ne $GetResult.Current) -and ($null -ne $GetResult.Cache)) {
+            return $true
+        }
+
+        #
+        # If the group is present in the live cache but not in the local cache. Flag as Changed.
+        if ($GetResult.Current -and -not($GetResult.Cache)) {
+            return $true
+        }
+
+        #
+        # If the group is not present in the live cache but is in the local cache. Flag as Changed.
+        if (-not($GetResult.Current) -and $GetResult.Cache) {
+            return $true
+        }
+
+    }
+
+
+    # Format the Key According to the Principal Name
+    $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
+
+    #
     # Check the cache for the group
-
-    $group = Get-CacheItem -Key $ProjectName -Type 'LiveGroups'
-
+    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
     if (-not($group)) { $false } else { $true }
 
 }

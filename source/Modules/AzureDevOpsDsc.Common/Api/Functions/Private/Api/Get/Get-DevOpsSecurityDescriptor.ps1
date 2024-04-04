@@ -16,17 +16,18 @@ The name of the Azure DevOps organization.
 The version of the Azure DevOps REST API to use. If not specified, the default version will be used.
 
 .EXAMPLE
-Get-DevOpsSecurityDescriptor -ProjectName "MyProject" -Organization "MyOrganization"
+Get-DevOpsSecurityDescriptor -ProjectId "ProjectID" -Organization "MyOrganization"
 
 This example retrieves the security descriptor for the project named "MyProject" in the Azure DevOps organization "MyOrganization".
 
 #>
-function Get-DevOpsSecurityDescriptor {
+function Get-DevOpsSecurityDescriptor
+{
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory)]
         [string]
-        $ProjectName,
+        $ProjectId,
         [Parameter(Mandatory)]
         [string]
         $Organization,
@@ -35,30 +36,21 @@ function Get-DevOpsSecurityDescriptor {
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
-    #
-    # Extract the Project Name from the LiveCache
-    $project = Get-CacheItem -Key $ProjectName -Type 'ProjectLive'
-
-    # If the project does not exist in the cache, throw an error.
-    if (-not $project) {
-        throw "Project with name '$ProjectName' does not exist in the cache."
-    }
-
-    # Perform a Lookup to get the descriptor using the project id.
-
+    # Get the project
     # Construct the URI with optional state filter
     $params = @{
-        Uri = "https://dev.azure.com/$Organization/_apis/graph/descriptors/{0}?api-version={1}" -f $project.id, $ApiVersion
+        Uri = "https://dev.azure.com/{0}/_apis/graph/descriptors/{1}?api-version={2}" -f $Organization, $ProjectId, $ApiVersion
         Method = 'Get'
     }
 
-    try {
-
+    try
+    {
         $response = Invoke-AzDevOpsApiRestMethod @params
         # Output the security descriptor
         return $response.value
-
-    } catch {
+    }
+    catch
+    {
         Write-Error "Failed to get Security Descriptor: $_"
     }
 

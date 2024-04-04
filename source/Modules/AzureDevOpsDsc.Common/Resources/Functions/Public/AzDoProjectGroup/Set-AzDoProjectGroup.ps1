@@ -1,88 +1,77 @@
-<#
-.SYNOPSIS
-Sets the Azure DevOps project group.
-
-.DESCRIPTION
-This function sets the Azure DevOps project group by specifying the group name, group description, project name, personal access token (PAT), and API URI.
-
-.PARAMETER GroupName
-The name of the Azure DevOps project group.
-
-.PARAMETER GroupDescription
-The description of the Azure DevOps project group.
-
-.PARAMETER ProjectName
-The name of the Azure DevOps project.
-
-.PARAMETER Pat
-The personal access token (PAT) used for authentication.
-
-.PARAMETER ApiUri
-The URI of the Azure DevOps API.
-
-.EXAMPLE
-Set-AzDoProjectGroup -GroupName "MyGroup" -GroupDescription "Group for My Project" -ProjectName "MyProject" -Pat "********" -ApiUri "https://dev.azure.com/myorganization"
-
-This example sets the Azure DevOps project group with the specified parameters.
-
-#>
-
 Function Set-AzDoProjectGroup {
 
     param(
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $GroupName,
-
-        [Parameter()]
-        [string]
-        $GroupDescription=$null,
-
-        [Parameter()]
-        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid -AllowWildcard })]
-        [Alias('ProjectName')]
-        [System.String]
-        $ProjectName,
 
         [Parameter(Mandatory)]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
+        [Alias('Name')]
+        [System.String]$GroupName,
 
-        [Parameter(Mandatory = $true)]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri
+        [Parameter()]
+        [Alias('Description')]
+        [System.String]$GroupDescription,
+
+        [Parameter(Mandatory)]
+        [Alias('Project')]
+        [System.String]$ProjectName,
+
+        [Parameter()]
+        [Alias('Lookup')]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
+
     )
 
-    # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix $ProjectName -GroupName $GroupName
-
     #
-    # Check the cache for the group
-    $group = Get-CacheItem -Key $Key -Type 'LiveGroups'
+    # Depending on the type of lookup status, the group has been renamed the group has been deleted and recreated.
+    if ($LookupResult.Status -eq [DSCGetSummaryState]::Renamed) {
 
-    $params = @{
-        ApiUri = $ApiUri
-        Pat = $Pat
-        GroupName = $GroupName
-        GroupDescription = $GroupDescription
-        ProjectScopeDescriptor = Get-AzDevOpsSecurityDescriptor -ProjectName $ProjectName -Organization $Global:DSCAZDO_OrganizationName
+        # For the time being write a warning and return
+        Write-Warning "[Set-AzDoProjectGroup] The group has been renamed. The group will not be set."
+        return
+
     }
 
-    # Set the group from the API
-    $group = Set-AzDevOpsGroup @params
+    #
+    # Update the group
+    $params = @{
+        ApiUri = "https://vssps.dev.azure.com/{0}" -f $Global:DSCAZDO_OrganizationName
+        GroupName = $GroupName
+        GroupDescription = $GroupDescription
+        GroupDescriptor = $LookupResult.liveCache.descriptor
+    }
+
+    try {
+        # Set the group from the API
+        $group = Set-DevOpsGroup @params
+    } catch {
+        throw $_
+    }
 
     #
-    # Update the cache with the new group
+    # Firstly Replace the live cache with the new group
+
+    if ($null -ne $LookupResult.liveCache) {
+        Remove-CacheItem -Key $LookupResult.liveCache.principalName -Type 'LiveGroups'
+    }
+    Add-CacheItem -Key $group.principalName -Value $group -Type 'LiveGroups'
+    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
 
     #
-    # Add the group to the cache
-    Add-CacheItem -Key $Key -Value $result.value -Type 'LiveGroups'
+    # Secondarily Replace the local cache with the new group
+    if ($null -ne $LookupResult.localCache) {
+        Remove-CacheItem -Key $LookupResult.localCache.principalName -Type 'Groups'
+    }
+    Add-CacheItem -Key $group.principalName -Value $group -Type 'Groups'
+    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Groups'
 
-    return $group.Value
+    #
+    # Return the group from the cache
+    return $group
 
 }

@@ -51,21 +51,7 @@ class xAzDoOrganizationGroup : AzDevOpsDscResourceBase
 
     xAzDoOrganizationGroup()
     {
-
-        # Import the AzureDevOpsDsc.Common module using the $true argument to bypassing the cache flush
-        Import-Module AzureDevOpsDsc.Common -ArgumentList @($true)
-
-        # Check if the Managed Identity Token exists. If not create one.
-        if (-not($Global:DSCAZDO_ManagedIdentityToken))
-        {
-            # Create a Managed Identity Token
-            New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose -Debug
-        }
-
-        # Initialize the cache object
-        Initialize-CacheObject -CacheType 'Group' -BypassFileCheck -Debug
-        Initialize-CacheObject -CacheType 'LiveGroups' -BypassFileCheck -Debug
-
+        $this.Construct()
     }
 
     [xAzDoOrganizationGroup] Get()
