@@ -16,6 +16,7 @@ $ht = @{
     #GroupDisplayName = "Test Group"
     GroupDescription = "I am a test group"
     ProjectName = "AkkodisTest"
+    Ensure = "Absent"
 }
 
 #$VerbosePreference = "Continue"

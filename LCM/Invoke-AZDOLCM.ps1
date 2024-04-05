@@ -48,10 +48,15 @@ $objectSettings | Export-Clixml -LiteralPath $moduleSettingsPath
 New-AzManagedIdentity -OrganizationName $objectSettings.OrganizationName -Verbose
 
 # Set the Group Cache
-Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
+Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
 Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
 
-# Locate the Resources and load into Memory
+# Locate the Configuration and load into Memory
+
+$Configuration = Get-Configuration -DSCDirectory $DSCDirectory -DSCResourcesPath $DSCResourcesPath
+Get-ChildItem -LiteralPath $Configuration -Recurse -Filter '*.yaml' | ForEach-Object {
+    . $_.FullName
+}
 
 # Invoke the Resouces using the specified method
 
