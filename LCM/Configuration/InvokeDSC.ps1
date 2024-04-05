@@ -11,6 +11,32 @@ $ht = @{
 }
 #>
 
+
+## DSC RESOURCE
+
+Configuration Test {
+    Import-DscResource -ModuleName 'AzureDevOpsDsc'
+
+    xAzDoProjectGroup TestProjectGroup {
+        GroupName = "Test Project Group"
+        #GroupDisplayName = "Test Group"
+        GroupDescription = "I am a test group"
+        ProjectName = "AkkodisTest"
+        Ensure = "Absent"
+    }
+}
+
+$ht = @{
+    Resource = 'xAzDoProjectGroup'
+    Name = 'TestProjectGroup'
+    Properties = @{
+        GroupName = "Test Group AAAAAAAA123"
+        #GroupDisplayName = "Test Group"
+        GroupDescription = "I am a test group"
+        Ensure = "Absent"
+    }
+}
+
 $ht = @{
     GroupName = "Test Project Group"
     #GroupDisplayName = "Test Group"
