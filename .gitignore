@@ -1,6 +1,7 @@
 output/
 .devcontainer/
 internal-tests/
+LCM/Datum/*
 
 **.bak
 *.local.*

@@ -65,6 +65,81 @@ function not {
     return $Statement -ne $true
 }
 
+Function Sort-DependsOn {
+    [OutputType([System.Collections.ArrayList])]
+    param(
+        [Object[]]$PipelineResources
+    )
+
+    #
+    # Order the Tasks according to DependsOn Property
+
+    $ResourcesWithoutDependsOn, $ResourcesWithDependsOn = $PipelineResources.Where({ $null -eq $_.DependsOn }, 'Split')
+
+    #
+    # Format the DependsOn Property by ensuring the Resource parent is before the child.
+
+    $TaskList = [System.Collections.ArrayList]::New()
+
+    #
+    # Enumerate the Resources with DependsOn Property
+
+    ForEach ($ResourceObject in $ResourcesWithDependsOn) {
+
+        # Get the DependsOn Property and format it into a hashtable.
+        $DependsOn = $ResourceObject.DependsOn | ForEach-Object {
+            $split = $_.Split("/")
+            @{
+                Type = "{0}/{1}" -f $split[0], $split[1]
+                Name = $split[2..$split.length] -join "/"
+            }
+        }
+
+        #
+        # Test to see if the Resource DependsOn is the current Resource. If so, throw an error.
+        if (($DependsOn.Name -eq $ResourceObject.Name) -and ($DependsOn.Type -eq $ResourceObject.Type)) {
+            throw "Resource [$($_.Type)/$($_.Name)] DependsOn Resource cannot be the same Resource."
+        }
+
+        # Enumerate the DependsOn Property and locate the Resource within ResourceConfiguration.
+        # Order the Resources by the index position of the Resource within ResourceConfiguration.
+        # We only need the lowest index number since the resource can be inserted before the Resource.
+
+        $ResourceTopIndex = $DependsOn | ForEach-Object {
+            $ht = $_
+            # Locate the index position of the Resource within ResourceConfiguration. If there are multiple resources with the same name, sort by the lowest index number.
+            0 .. $PipelineResources.Count | Where-Object {
+                ($ht.Type -eq $TaskList[$_].Type) -and
+                ($ht.Name -eq $TaskList[$_].Name)
+            }
+        } | Sort-Object | Select-Object -First 1
+
+        # If the Resource is not found, add it to the end of the list.
+        if ($null -eq $ResourceTopIndex) {
+            # Write a Warning
+            Write-Warning "Resource [$($DependsOn.Type)/$($DependsOn.Name)] DependsOn Resource not found. Adding to the end of the list."
+            # Add the Resource to the end of the list.
+            $null = $TaskList.Add($ResourceObject)
+        }
+        # If the Resource is found, insert it before the Resource.
+        else {
+
+            if ($ResourceTopIndex -eq 0) { $null = $TaskList.Insert(0, $ResourceObject) }
+            else { $null = $TaskList.Insert($ResourceTopIndex - 1, $ResourceObject) }
+
+        }
+    }
+
+    #
+    # Add ResourcesWithoutDependsOn to the top of the task list.
+    $ResourcesWithoutDependsOn | ForEach-Object {
+        $null = $TaskList.Insert(0, $_)
+    }
+
+    $TaskList
+
+}
+
 function Invoke-DscConfiguration {
     param (
         [string] $FilePath,
@@ -89,71 +164,12 @@ function Invoke-DscConfiguration {
     SetVariables -Source $pipeline.variables -Target $variables
     SetVariables -Source $defaultValues -Target $parameters
 
-    #
-    # Order the Tasks according to DependsOn Property
-
-    $ResourcesWithDependsOn, $ResourcesWithoutDependsOn = $pipeline.resources.Where({ $null -eq $_.DependsOn }, 'Split')
-
-    #
-    # Format the DependsOn Property by ensuring the Resource parent is before the child.
-
-    $TaskList = [System.Collections.ArrayList]::New()
-
-    #
-    # Enumerate the Resources with DependsOn Property
-
-    ForEach ($ResourceObject in $TaskList) {
-
-        # Get the DependsOn Property and format it into a hashtable.
-        $DependsOn = $ResourceObject.DependsOn | ForEach-Object {
-            $split = $_.Split("/")
-            @{
-                Type = "{0}/{1}" -f $split[0], $split[1]
-                Name = $split[2..$split.length] -join "/"
-            }
-        }
-
-        #
-        # Test to see if the Resource DependsOn is the current Resource. If so, throw an error.
-        if (($DependsOn.Name -eq $ResourceObject.Name) -and ($DependsOn.Type -eq $ResourceObject.Type)) {
-            throw "Resource [$($_.Type)/$($_.Name)] DependsOn Resource cannot be the same Resource."
-        }
-
-        # Enumerate the DependsOn Property and locate the Resource within ResourceConfiguration.
-        # Order the Resources by the index position of the Resource within ResourceConfiguration.
-        # We only need the lowest index number since the resource can be inserted before the Resource.
-
-        $ResourceTopIndex = $DependsOn | ForEach-Object {
-            $ht = $_
-            # Locate the index position of the Resource within ResourceConfiguration. If there are multiple resources with the same name, sort by the lowest index number.
-            0 .. $pipeline.resources.Count | Where-Object {
-                ($ht.Type -eq $TaskList[$_].Type) -and
-                ($ht.Name -eq $TaskList[$_].Name)
-            }
-        } | Sort-Object | Select-Object -First 1
-
-        # If the Resource is not found, add it to the end of the list.
-        if ($null -eq $ResourceTopIndex) {
-            # Write a Warning
-            Write-Warning "Resource [$($_.Type)/$($_.Name)] DependsOn Resource not found. Adding to the end of the list."
-            # Add the Resource to the end of the list.
-            $TaskList.Add($_)
-        }
-        # If the Resource is found, insert it before the Resource.
-        else {
-            $TaskList.Insert($ResourceObject, $_)
-        }
-    }
-
-    #
-    # Add ResourcesWithoutDependsOn to the top of the task list.
-
-    $ResourcesWithoutDependsOn | ForEach-Object {
-        $TaskList.Insert(0, $_)
-    }
+    # Format the Depends On
+    $tasks = Sort-DependsOn -PipelineResources $pipeline.resources
 
     # Execute Tasks
-    foreach ($task in $pipeline.resources) {
+    foreach ($task in $tasks) {
+
         Write-Host "Resource [$($task.type)/$($task.name)]"
 
         $condition = [scriptblock]::New($task.condition)
@@ -189,6 +205,8 @@ function Invoke-DscConfiguration {
 
         # Execute Test for task
         $result = Invoke-DscResource @resourceParameters
+
+        # Execute Set for task
         if ($result.InDesiredState) {
             Write-Host "ok" -ForegroundColor Green
         }
@@ -222,5 +240,8 @@ function Invoke-DscConfiguration {
         $resourceParameters.Property = $getProperties
         $output_var = Invoke-DscResource @resourceParameters
         $references.Add($task.name, $output_var)
+
     }
 }
+
+
