@@ -1,0 +1,16 @@
+parameters: {}
+
+variables: {}
+
+resources:
+- name: Team Leaders Organization Group
+  type: AzureDevOpsDsc/xAzDoOrganizationGroup
+  properties:
+    GroupName: AZDO_TeamLeaders_Group
+    GroupDescription: Team Leaders Organization Group
+
+- name: Service Accounts Organization Group
+  type: AzureDevOpsDsc/xAzDoOrganizationGroup
+  properties:
+    GroupName: AZDO_ServiceAccounts_Group
+    GroupDescription: Service Accounts Organization Group

@@ -1,6 +1,5 @@
 ResolutionPrecedence:
   - AllNodes\$($Node.Project)\NodeGroups.yml
-  - AllNodes\$($Node.Project)\Project.yml
   - Baselines\Organization\Groups\Baseline.yml
 
 DatumHandlersThrowOnError: true
