@@ -20,11 +20,13 @@ $Baseline = $ConfigurationData.Datum.Baseline
 
 #$a = (Lookup MergeTest1)
 
-$TestProject = $Datum.AllNodes.TestProject.NodeGroups
+#$TestProject = $Datum.AllNodes.TestProject.NodeGroups
 #Lookup 'project' -Node $TestProject -DatumTree $Datum
 #Lookup 'Resources' -Node $Node -DatumTree $Datum
 
-$Resources = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources' -Verbose
+$Resources = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources'
+$Variables = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources'
+$Parameters = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources'
+$Conditions = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources'
 
 
-$r = Get-DatumRsop -Datum $Datum -AllNodes $Node -Verbose
