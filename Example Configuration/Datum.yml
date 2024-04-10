@@ -1,5 +1,13 @@
 ResolutionPrecedence:
-  - AllNodes\$($Node.Project)\NodeGroups.yml
-  - Baselines\Organization\Groups\Baseline.yml
+  - AllNodes\$($Node.Project)\NodeGroups
+  - Baselines\Organization\Groups\Baseline
 
 DatumHandlersThrowOnError: true
+
+lookup_options:
+  Configurations:
+    merge_basetype_array: Unique
+
+  Baseline:
+    merge_hash: deep
+    merge_basetype_array: Unique
