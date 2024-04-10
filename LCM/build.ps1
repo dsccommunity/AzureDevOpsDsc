@@ -16,13 +16,15 @@ $ConfigurationData = @{
 }
 
 $Node = $ConfigurationData.AllNodes
+$Baseline = $ConfigurationData.Datum.Baseline
 
-$a = (Lookup MergeTest1)
+#$a = (Lookup MergeTest1)
 
 $TestProject = $Datum.AllNodes.TestProject.NodeGroups
-Lookup 'project' -Node $TestProject -DatumTree $Datum
-Lookup 'Resources' -Node $TestProject -DatumTree $Datum
+#Lookup 'project' -Node $TestProject -DatumTree $Datum
+#Lookup 'Resources' -Node $Node -DatumTree $Datum
 
-Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources'
+$Resources = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources' -Verbose
+
 
 $r = Get-DatumRsop -Datum $Datum -AllNodes $Node -Verbose

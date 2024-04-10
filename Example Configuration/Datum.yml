@@ -5,9 +5,10 @@ ResolutionPrecedence:
 DatumHandlersThrowOnError: true
 
 lookup_options:
-  Configurations:
-    merge_basetype_array: Unique
 
-  Baseline:
-    merge_hash: deep
-    merge_basetype_array: Unique
+  resources:
+    merge_hash_array: UniqueKeyValTuples
+    merge_options:
+      tuple_keys:
+        - name
+
