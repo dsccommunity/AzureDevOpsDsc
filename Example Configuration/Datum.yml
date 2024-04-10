@@ -1,6 +1,6 @@
 ResolutionPrecedence:
   - AllNodes\$($Node.Project)\NodeGroups
-  - Baselines\Organization\Groups\Baseline
+  - Baselines\Groups
 
 DatumHandlersThrowOnError: true
 
