@@ -211,6 +211,10 @@ function Invoke-DscConfiguration {
         }
         Write-Verbose "Replaced variables in properties with actual values" -Verbose
 
+        if ($Property.ContainsKey("Ensure")) {
+            Wait-Debugger
+        }
+
         # Prepare parameters for invoking the DSC resource using the 'Test' method
         $resourceParameters = @{
             Name = $resourceType
