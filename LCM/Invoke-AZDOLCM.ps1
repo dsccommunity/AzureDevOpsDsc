@@ -52,8 +52,8 @@ Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verb
 
 #
 # Compile the Datum Configuration
-
-Build -OutputPath $ConfigurationDirectory
+Wait-Debugger
+Build -OutputPath $ConfigurationDirectory -Verbose
 
 #
 # Invoke the Resources

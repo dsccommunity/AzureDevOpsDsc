@@ -302,12 +302,8 @@ Function Build {
    Write-Verbose "Changed directory to Example Configuration" -Verbose
 
    # Clear the output directory
-   Remove-Item -Path $OutputPath -Recurse -Force -ErrorAction SilentlyContinue
+   Get-ChildItem -LiteralPath $OutputPath -File | Remove-Item -Force -ErrorAction SilentlyContinue
    Write-Verbose "Cleared the output directory at path: $OutputPath" -Verbose
-
-   # Define a project name variable (this is not used in the script but may be a placeholder for future use)
-   $Project = 'TestProject'
-   Write-Verbose "Project name set to '$Project'" -Verbose
 
    # Create a new Datum structure based on the provided definition file 'Datum.yml'
    $Datum = New-DatumStructure -DefinitionFile Datum.yml
