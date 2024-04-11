@@ -66,21 +66,21 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     hidden [HashTable]GetDscCurrentStateObject()
     {
-    # Declare the result hashtable
-    $props = @{}
+        # Declare the result hashtable
+        $props = @{}
 
-    $getParameters      = $this.GetDscCurrentStateObjectGetParameters()
+        $getParameters      = $this.GetDscCurrentStateObjectGetParameters()
 
-    # Add all properties from the current object to the hashtable
-    $getParameters.Keys | ForEach-Object {
-        $props."$_" = $this."$_"
-    }
+        # Add all properties from the current object to the hashtable
+        $getParameters.Keys | ForEach-Object {
+            $props."$_" = $this."$_"
+        }
 
 
-    $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
-    $props.Ensure       = $props.LookupResult.Ensure
+        $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
+        $props.Ensure       = $props.LookupResult.Ensure
 
-    return $props
+        return $props
 
     }
 
@@ -179,12 +179,17 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                 break
 
             }
+
             ([Ensure]::Absent) {
-            $dscRequiredAction = ($currentProperties.Ensure -eq [Ensure]::Present) ? [RequiredAction]::Remove : [RequiredAction]::None
-            # Otherwise, no changes to make (i.e. The desired state is already achieved)
-            Write-Verbose "DscActionRequired='$dscRequiredAction'"
-            return $dscRequiredAction
-            break
+
+                $dscRequiredAction = ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::NotFound) ? [RequiredAction]::None : [RequiredAction]::Remove
+                #$dscRequiredAction = ($currentProperties.Ensure -eq [Ensure]::Present) ? [RequiredAction]::Remove : [RequiredAction]::None
+
+                # Otherwise, no changes to make (i.e. The desired state is already achieved)
+                Write-Verbose "DscActionRequired='$dscRequiredAction'"
+                return $dscRequiredAction
+                break
+
             }
             default {
                 $errorMessage = "Could not obtain a valid 'Ensure' value within '$($this.GetResourceName())' Test() function. Value was '$($desiredProperties.Ensure)'."

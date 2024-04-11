@@ -176,11 +176,11 @@ Function Get-xAzDoOrganizationGroup {
         if ($getGroupResult.status -ne [DSCGetSummaryState]::Unchanged) {
             # Add the reason
             #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')
+            # Set the Ensure to Present
+            $getGroupResult.Ensure = [Ensure]::Present
         } else {
             # Add the unchanged group to the local cache
             Add-CacheItem -Key $Key -Value $livegroup -Type 'Group'
-            # Set the Ensure to Present
-            $getGroupResult.Ensure = [Ensure]::Present
         }
 
         # Return the group from the cache
