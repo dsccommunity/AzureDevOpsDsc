@@ -25,8 +25,12 @@ Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\DSCConfiguration\DscConfiguration.psm1
 Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\datum\0.40.1\datum.psd1'
 
 #
-# Create an Object Containing the Organization Name.
+# Compile the Datum Configuration
 
+Build -OutputPath $ConfigurationDirectory -Verbose
+
+#
+# Create an Object Containing the Organization Name.
 
 $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
 
@@ -49,11 +53,6 @@ Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbos
 Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
 
 # Clone-DscConfiguration
-
-#
-# Compile the Datum Configuration
-Wait-Debugger
-Build -OutputPath $ConfigurationDirectory -Verbose
 
 #
 # Invoke the Resources

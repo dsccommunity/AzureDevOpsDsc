@@ -291,56 +291,87 @@ Function Build {
     .\build.ps1
     #>
 
-   # Import the YAML module for handling YAML files
-   # Import the Datum module for configuration data management
-   Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\powershell-yaml\0.4.7\powershell-yaml.psd1'
-   Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\datum\0.40.1\datum.psd1'
-   Write-Verbose "Modules for YAML and Datum have been imported" -Verbose
+    $scriptBlock = {
+        param($OutputPath)
 
-   # Change the current directory to the Example Configuration directory
-   Set-Location 'C:\Temp\AzureDevOpsDSC\Example Configuration'
-   Write-Verbose "Changed directory to Example Configuration" -Verbose
+        # Import the YAML module for handling YAML files
+        # Import the Datum module for configuration data management
+        Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\powershell-yaml\0.4.7\powershell-yaml.psd1'
+        Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\datum\0.40.1\datum.psd1'
+        Write-Verbose "Modules for YAML and Datum have been imported" -Verbose
 
-   # Clear the output directory
-   Get-ChildItem -LiteralPath $OutputPath -File | Remove-Item -Force -ErrorAction SilentlyContinue
-   Write-Verbose "Cleared the output directory at path: $OutputPath" -Verbose
+        # Change the current directory to the Example Configuration directory
+        Set-Location 'C:\Temp\AzureDevOpsDSC\Example Configuration'
+        Write-Verbose "Changed directory to Example Configuration" -Verbose
 
-   # Create a new Datum structure based on the provided definition file 'Datum.yml'
-   $Datum = New-DatumStructure -DefinitionFile Datum.yml
-   Write-Verbose "Datum structure created from definition file 'Datum.yml'" -Verbose
+        # Clear the output directory
+        Get-ChildItem -LiteralPath $OutputPath -File | Remove-Item -Force -ErrorAction SilentlyContinue
+        Write-Verbose "Cleared the output directory at path: $OutputPath" -Verbose
 
-   # Iterate over each node defined in the Datum structure
-   ForEach ($NodeName in $Datum.AllNodes.psobject.properties) {
-       Write-Verbose "Processing node: $($NodeName.Name)" -Verbose
+        # Create a new Datum structure based on the provided definition file 'Datum.yml'
+        $Datum = New-DatumStructure -DefinitionFile Datum.yml
+        Write-Verbose "Datum structure created from definition file 'Datum.yml'" -Verbose
 
-       # Retrieve the NodeGroups for the current node and store them in an array
-       $AllNodes = $Datum.AllNodes."$($NodeName.Name)".NodeGroups | ForEach-Object { $_ }
-       Write-Verbose "Retrieved NodeGroups for node: $($NodeName.Name)" -Verbose
+        # Iterate over each node defined in the Datum structure
+        ForEach ($NodeName in $Datum.AllNodes.psobject.properties) {
+            Write-Verbose "Processing node: $($NodeName.Name)" -Verbose
 
-       # Create a hashtable to hold configuration data, including all nodes and the Datum structure itself
-       $ConfigurationData = @{
-           AllNodes = $AllNodes
-           Datum    = $Datum
-       }
-       Write-Verbose "Configuration data hashtable created for node: $($NodeName.Name)" -Verbose
+            # Retrieve the NodeGroups for the current node and store them in an array
+            $AllNodes = $Datum.AllNodes."$($NodeName.Name)".NodeGroups | ForEach-Object { $_ }
+            Write-Verbose "Retrieved NodeGroups for node: $($NodeName.Name)" -Verbose
 
-       # Access the AllNodes and Baseline properties from the configuration data
-       $Node = $ConfigurationData.AllNodes
-       $Baseline = $ConfigurationData.Datum.Baseline
-       Write-Verbose "Accessed AllNodes and Baseline properties for node: $($NodeName.Name)" -Verbose
+            # Create a hashtable to hold configuration data, including all nodes and the Datum structure itself
+            $ConfigurationData = @{
+                AllNodes = $AllNodes
+                Datum    = $Datum
+            }
+            Write-Verbose "Configuration data hashtable created for node: $($NodeName.Name)" -Verbose
 
-       # Resolve and store the resources, parameters, conditions, and variables using the Resolve-Datum function
-       $configuration = @{
-           resources  = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources'
-           parameters = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Parameters'
-           conditions = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Conditions'
-           variables  = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Variables'
-       }
-       Write-Verbose "Resolved resources, parameters, conditions, and variables for node: $($NodeName.Name)" -Verbose
+            # Access the AllNodes and Baseline properties from the configuration data
+            $Node = $ConfigurationData.AllNodes
+            $Baseline = $ConfigurationData.Datum.Baselines
+            Write-Verbose "Accessed AllNodes and Baseline properties for node: $($NodeName.Name)" -Verbose
 
-       # Convert the configuration to YAML format and save it to the output file
-       $configuration | ConvertTo-Yaml | Out-File "$OutputPath\$($NodeName.Name).yml"
-       Write-Verbose "Configuration for node: $($NodeName.Name) has been converted to YAML and saved to file" -Verbose
-   }
+            # Resolve and store the resources, parameters, conditions, and variables using the Resolve-Datum function
+            $configuration = @{
+                resources  = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Resources'
+                parameters = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Parameters'
+                conditions = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Conditions'
+                variables  = Resolve-Datum -SearchPaths $datum.__Definition.ResolutionPrecedence -DatumStructure $Datum -PropertyPath 'Variables'
+            }
+            Write-Verbose "Resolved resources, parameters, conditions, and variables for node: $($NodeName.Name)" -Verbose
+
+            # Convert the configuration to YAML format and save it to the output file
+            $configuration | ConvertTo-Yaml | Out-File "$OutputPath\$($NodeName.Name).yml"
+            Write-Verbose "Configuration for node: $($NodeName.Name) has been converted to YAML and saved to file" -Verbose
+        }
+    }
+
+    #
+    # Run the following powershell in a seperate thread
+
+    # Create a runspace (thread) for the script block to run in
+    $runspace = [runspacefactory]::CreateRunspace()
+
+    # Open the runspace
+    $runspace.Open()
+
+    # Create a PowerShell instance and attach the script block and runspace
+    $powerShellInstance = [powershell]::Create().AddScript($scriptBlock).AddArgument($OutputPath)
+    $powerShellInstance.Runspace = $runspace
+
+    # Run the PowerShell script asynchronously
+    $asyncResult = $powerShellInstance.BeginInvoke()
+
+    # Optionally, you can handle the output of the script after it has completed
+    $scriptOutput = $powerShellInstance.EndInvoke($asyncResult)
+
+    # Output the results from the script block
+    foreach ($output in $scriptOutput) {
+        Write-Output $output
+    }
+
+    # Close the runspace when done
+    $runspace.Close()
 
 }

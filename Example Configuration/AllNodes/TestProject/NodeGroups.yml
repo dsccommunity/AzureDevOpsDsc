@@ -8,18 +8,21 @@ resources:
 - name: Project Service Accounts Group
   type: AzureDevOpsDsc/xAzDoProjectGroup
   properties:
+    ProjectName: TestProject
     GroupName: AZDO_ProjectServiceAccounts_Group
     GroupDescription: Team Leaders Organization Group
 
 - name: Git Test Repository Read Access Group
   type: AzureDevOpsDsc/xAzDoProjectGroup
   properties:
+    ProjectName: TestProject
     GroupName: AZDO_GIT_TEST_REPO_READ_ACCESS_GROUP
     GroupDescription: The following group provides members with read access to the Git Test Repository
 
 - name: Git Test Repository Contribute Access Group
   type: AzureDevOpsDsc/xAzDoProjectGroup
   properties:
+    ProjectName: TestProject
     GroupName: AZDO_GIT_TEST_REPO_CONTRIBUTE_ACCESS_GROUP
     GroupDescription: The following group provides members with read/write access to the Git Test Repository
 
@@ -29,5 +32,6 @@ resources:
     - AzureDevOpsDsc/xAzDoProjectGroup/Git Test Repository Read Access Group
     - AzureDevOpsDsc/xAzDoProjectGroup/Git Test Repository Contribute Access Group
   properties:
+    ProjectName: TestProject
     GroupName: AZDO_GIT_TEST_REPO_FULLCONTROL_ACCESS_GROUP
     GroupDescription: The following group provides members with full control access to the Git Test Repository
