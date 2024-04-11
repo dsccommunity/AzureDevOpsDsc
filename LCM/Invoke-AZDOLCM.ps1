@@ -2,12 +2,12 @@ param(
     [Parameter(Mandatory)]
     [String]$ConfigurationDirectory,
 
-    [Parameter(Mandatory)]
+    [Parameter()]
     [ValidateSet('Test', 'Set')]
-    [String]$ResourceMethods,
+    [String]$ResourceMethods='Set'#
 
-    [Parameter(Mandatory)]
-    [Uri]$DatumURL
+    #[Parameter(Mandatory)]
+    #[Uri]$DatumURL
 )
 
 
@@ -18,10 +18,10 @@ param(
 
 #$VerbosePreference = "Continue"
 #Wait-Debugger
+Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\powershell-yaml'
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1' -Verbose
 Import-Module 'C:\Temp\AzureDevOpsDSC\output\AzureDevOpsDsc\0.0.0\AzureDevOpsDsc.psd1' -Verbose
-Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\DSCConfiguration\DscConfiguration.psd1'
-Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\powershell-yaml'
+Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\DSCConfiguration\DscConfiguration.psm1'
 Import-Module 'C:\Temp\AzureDevOpsDSC\LCM\Datum\datum\0.40.1\datum.psd1'
 
 #
@@ -48,16 +48,15 @@ New-AzManagedIdentity -OrganizationName $objectSettings.OrganizationName -Verbos
 Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
 Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
 
+# Clone-DscConfiguration
+
 #
 # Compile the Datum Configuration
 
-# Clone-DscConfiguration
-
-
-
+Build -OutputPath $ConfigurationDirectory
 
 #
 # Invoke the Resources
 
-Get-ChildItem -LiteralPath $ConfigurationDirectory -File -Filter "*.yml" | ForEach-Object { Invoke-DscConfiguration -FilePath $_.Fullname -Mode $Mode }
+Get-ChildItem -LiteralPath $ConfigurationDirectory -File -Filter "*.yml" | ForEach-Object { Invoke-DscConfiguration -FilePath $_.Fullname -Mode $ResourceMethods }
 
