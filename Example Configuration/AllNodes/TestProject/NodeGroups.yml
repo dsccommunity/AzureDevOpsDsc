@@ -12,10 +12,10 @@ resources:
     GroupName: AZDO_ProjectServiceAccounts_Group
     GroupDescription: Team Leaders Organization Group
 
-- name: Test Group AAAAAAA
+- name: Test Group_123
   type: AzureDevOpsDsc/xAzDoOrganizationGroup
   properties:
-    GroupName: Test Group AAAAAAA
+    GroupName: Test Group_123
     Ensure: Absent
 
 - name: Git Test Repository Read Access Group
