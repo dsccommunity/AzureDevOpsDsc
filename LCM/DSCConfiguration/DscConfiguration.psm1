@@ -291,6 +291,10 @@ Function Build {
     .\build.ps1
     #>
 
+    # Clear the output directory
+    Get-ChildItem -LiteralPath $OutputPath -File | Remove-Item -Force -ErrorAction SilentlyContinue
+    Write-Verbose "Cleared the output directory at path: $OutputPath" -Verbose
+
     $scriptBlock = {
         param($OutputPath)
 
@@ -303,10 +307,6 @@ Function Build {
         # Change the current directory to the Example Configuration directory
         Set-Location 'C:\Temp\AzureDevOpsDSC\Example Configuration'
         Write-Verbose "Changed directory to Example Configuration" -Verbose
-
-        # Clear the output directory
-        Get-ChildItem -LiteralPath $OutputPath -File | Remove-Item -Force -ErrorAction SilentlyContinue
-        Write-Verbose "Cleared the output directory at path: $OutputPath" -Verbose
 
         # Create a new Datum structure based on the provided definition file 'Datum.yml'
         $Datum = New-DatumStructure -DefinitionFile Datum.yml

@@ -10,7 +10,7 @@ param(
     #[Uri]$DatumURL
 )
 
-
+$ErrorActionPreference = "Stop"
 
 # Define the Report Path
 #$ReportPath = Join-Path -Path $DSCDirectory -ChildPath "Reports"
