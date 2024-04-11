@@ -18,6 +18,12 @@ resources:
     GroupName: Test Group_1234
     Ensure: Absent
 
+- name: Test Group AAAAAAAA
+  type: AzureDevOpsDsc/xAzDoOrganizationGroup
+  properties:
+    GroupName: Test Group AAAAAAAA
+    Ensure: Absent
+
 - name: Git Test Repository Read Access Group
   type: AzureDevOpsDsc/xAzDoProjectGroup
   properties:
