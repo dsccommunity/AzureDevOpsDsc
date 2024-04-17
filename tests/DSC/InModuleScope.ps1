@@ -39,5 +39,5 @@ $ModuleRoot = 'C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\'
 New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose
 
 # Set the Group Cache
-Set-AzDoAPIGroupCache -OrganizationName $Global:DSCAZDO_OrganizationName
-Set-AzDoAPIProjectCache -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
+Set-AzDoAPICache-Group -OrganizationName $Global:DSCAZDO_OrganizationName
+Set-AzDoAPICache-Project -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose

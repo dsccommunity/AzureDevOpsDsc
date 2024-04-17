@@ -9,7 +9,7 @@ This function sets the Azure DevOps API project cache by making an API request t
 Specifies the name of the organization. If not provided, the function uses a global variable as a fallback.
 
 .EXAMPLE
-Set-AzDoAPIProjectCache -OrganizationName "MyOrganization"
+Set-AzDoAPICache-Project -OrganizationName "MyOrganization"
 This example sets the Azure DevOps API project cache for the organization "MyOrganization".
 
 .INPUTS
@@ -23,14 +23,14 @@ Author: [Author Name]
 Date: [Date]
 #>
 
-Function Set-AzDoAPIProjectCache {
+Function Set-AzDoAPICache-Project {
     [CmdletBinding()]
     param(
         [string]$OrganizationName
     )
 
     # Use a verbose statement to indicate the start of the function.
-    Write-Verbose "Starting 'Set-AzDoAPIProjectCache' function."
+    Write-Verbose "Starting 'Set-AzDoAPICache-Project' function."
 
     if (-not $OrganizationName) {
         # If no organization name is provided, use a global variable as fallback
@@ -82,5 +82,5 @@ Function Set-AzDoAPIProjectCache {
     }
 
     # Signal the end of the function execution
-    Write-Verbose "Function 'Set-AzDoAPIProjectCache' completed."
+    Write-Verbose "Function 'Set-AzDoAPICache-Project' completed."
 }

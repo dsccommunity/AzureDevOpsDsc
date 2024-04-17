@@ -9,10 +9,10 @@ This function sets the cache for Azure DevOps API groups. It retrieves the group
 The name of the organization. If not provided as a parameter, it uses the global variable $Global:DSCAZDO_OrganizationName.
 
 .EXAMPLE
-Set-AzDoAPIGroupCache -OrganizationName "MyOrganization"
+Set-AzDoAPICache-Group -OrganizationName "MyOrganization"
 #>
 
-Function Set-AzDoAPIGroupCache {
+Function Set-AzDoAPICache-Group {
     [CmdletBinding()]
     param(
         [string]$OrganizationName
@@ -56,6 +56,6 @@ Function Set-AzDoAPIGroupCache {
 
     }
 
-    Write-Verbose "Function 'Set-AzDoAPIGroupCache' completed."
+    Write-Verbose "Function 'Set-AzDoAPICache-Group' completed."
 
 }
