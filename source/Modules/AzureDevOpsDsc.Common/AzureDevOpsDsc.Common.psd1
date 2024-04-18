@@ -32,8 +32,8 @@
         'Initialize-CacheObject',
 
         'New-AzManagedIdentity',
-        'Set-AzDoAPICache-Group',
-        'Set-AzDoAPICache-Project'
+        'Set-AzDoAPICacheGroup',
+        'Set-AzDoAPICacheProject'
 
         #
         # DSC Class Based Resources

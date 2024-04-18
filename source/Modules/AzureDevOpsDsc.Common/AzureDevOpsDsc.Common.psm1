@@ -67,8 +67,8 @@ foreach ($function in $functions)
 #
 # Static Functions that need to be exported
 
-Export-ModuleMember -Function 'Set-AzDoAPICache-Group'
-Export-ModuleMember -Function 'Set-AzDoAPICache-Project'
+Export-ModuleMember -Function 'Set-AzDoAPICacheGroup'
+Export-ModuleMember -Function 'Set-AzDoAPICacheProject'
 
 Export-ModuleMember -Function 'Set-CacheObject'
 Export-ModuleMember -Function 'Get-CacheItem'

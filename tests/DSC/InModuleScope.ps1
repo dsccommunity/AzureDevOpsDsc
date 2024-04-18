@@ -35,9 +35,11 @@ $ModuleRoot = 'C:\Temp\AzureDevOpsDSC\source\Modules\AzureDevOpsDsc.Common\'
     Initialize-CacheObject -CacheType $_
 }
 
+<#
 # Create a Managed Identity Token
 New-AzManagedIdentity -OrganizationName "akkodistestorg" -Verbose
 
 # Set the Group Cache
-Set-AzDoAPICache-Group -OrganizationName $Global:DSCAZDO_OrganizationName
-Set-AzDoAPICache-Project -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
+Set-AzDoAPICacheGroup -OrganizationName $Global:DSCAZDO_OrganizationName
+Set-AzDoAPICacheProject -OrganizationName $Global:DSCAZDO_OrganizationName -Verbose
+#>
