@@ -2,7 +2,7 @@
     RootModule = 'AzureDevOpsDsc.psm1'
 
     # Version number of this module.
-    moduleVersion      = '0.0.0'
+    moduleVersion      = '0.0.1'
 
     # ID used to uniquely identify this module
     GUID               = '3f8bbada-0fa9-4d80-b3d8-f019c3c60230'
@@ -20,7 +20,7 @@
     Description        = 'Module with DSC Resources for deployment and configuration of Azure DevOps Server/Services.'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion  = '5.0'
+    PowerShellVersion  = '7.0'
 
     # Minimum version of the common language runtime (CLR) required by this module
     CLRVersion         = '4.0'
