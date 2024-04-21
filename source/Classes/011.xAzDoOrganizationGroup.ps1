@@ -7,8 +7,8 @@
     It provides properties to specify the group name, display name, and description.
 
 .NOTES
-    Author: Your Name
-    Date:   Current Date
+    Author: Michael Zanatta
+    Date:   04/19/2024
 
 .LINK
     GitHub Repository: <link to the GitHub repository>

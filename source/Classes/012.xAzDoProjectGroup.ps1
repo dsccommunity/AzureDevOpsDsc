@@ -6,8 +6,8 @@
     The xAzDoProjectGroup class is a DSC resource that allows you to manage Azure DevOps project groups.
 
 .NOTES
-    Author: Your Name
-    Date:   Current Date
+    Author: Michael Zanatta
+    Date:   04/19/2024
 
 .LINK
     GitHub Repository: <link to your GitHub repository>
