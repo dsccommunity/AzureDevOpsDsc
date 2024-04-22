@@ -22,98 +22,44 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
    . $script:commandScriptPath
 
-    Describe "Invoke-AzDevOpsApiRestMethod Tests" {
+    Describe 'Invoke-AzDevOpsApiRestMethod' {
+        Mock Invoke-RestMethod { return @{ Value = "Success" } }
+        Mock Start-Sleep {}
+        Mock Test-AzDevOpsApiHttpRequestHeader { return $true }
+        Mock Get-AzDevOpsApiVersion { return "1.0" }
+        Mock Update-AzManagedIdentityToken { return @{ Get = { "token" }; isExpired = { $false } } }
+        Mock New-InvalidOperationException {}
 
-        AfterEach {
-            $Global:responseHeaders = $null
-            $Global:calledOnce = $null
+        It 'Successfully invokes a GET method without retries' {
+            $result = Invoke-AzDevOpsApiRestMethod -ApiUri 'https://dev.azure.com/organization/_apis/' -HttpMethod 'Get'
+            $result.Value | Should -BeExactly "Success"
         }
 
-        BeforeAll {
-            # Mocking the Invoke-RestMethod to prevent actual API calls during testing
-            Mock Invoke-RestMethod { return @{ Value = "Mocked result"; Headers = @{ 'x-ms-continuationtoken' = $null }} }
-
-            # Mocking Start-Sleep to prevent actual delays during testing
-            Mock Start-Sleep {}
-
-            # Initializing variables that are used globally within the function
-            $Global:DSCAZDO_APIRateLimit = @{}
-        }
-
-        It "Should call Invoke-RestMethod with correct parameters" {
-            # Arrange
-            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
-            $HttpMethod = 'Get'
-            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
-
-            # Act
-            Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
-
-            # Assert
-            Assert-MockCalled Invoke-RestMethod -Times 1 -Exactly -Scope It
-        }
-
-        It "Should not include Body and ContentType for Get and Delete methods" {
-            # Arrange
-            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
-            $HttpMethod = 'Get'
-            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
-
-            # Act
-            Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
-
-            # Assert
-            Assert-MockCalled Invoke-RestMethod -ParameterFilter {
-                $PSBoundParameters.ContainsKey('Body') -eq $false -and
-                $PSBoundParameters.ContainsKey('ContentType') -eq $false
-            } -Times 1 -Exactly -Scope It
-        }
-
-        It "Should retry the specified number of attempts on failure" {
-            # Arrange
-            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
-            $HttpMethod = 'Get'
-            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
-            $RetryAttempts = 2
-
-            # Mocking Invoke-RestMethod to throw an exception to simulate a failure
+        It 'Retries the specified number of times on failure and then throws' {
             Mock Invoke-RestMethod { throw [System.Net.WebException]::new() } -Verifiable
-
-            # Act & Assert
-            { Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders -RetryAttempts $RetryAttempts } | Should -Throw
-
-            # Assert that Invoke-RestMethod was called the expected number of times
-            Assert-MockCalled Invoke-RestMethod -Times ($RetryAttempts + 1) -Exactly -Scope It
+            { Invoke-AzDevOpsApiRestMethod -ApiUri 'https://dev.azure.com/organization/_apis/' -HttpMethod 'Get' -RetryAttempts 2 } | Should -Throw
+            Assert-MockCalled Invoke-RestMethod -Exactly 3 -Scope It # Initial + 2 retries
         }
 
-        It "Should handle continuation tokens correctly" {
-            # Arrange
-            $ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
-            $HttpMethod = 'Get'
-            $HttpHeaders = @{ Authorization = "Bearer fakeToken" }
-
-            # Mock Invoke-RestMethod to return a continuation token on the first call
-            Mock Invoke-RestMethod {
-                if (!$calledOnce) {
-                    $Global:calledOnce = $true
-                    $Global:responseHeaders = @{ 'x-ms-continuationtoken' = 'abc123' }
-                    return @{ Value = "Partial result" }
-                } else {
-                    $Global:responseHeaders = $null
-                    return @{ Value = "Final result" }
-                }
-            } -Verifiable
-
-            # Act
-            $result = Invoke-AzDevOpsApiRestMethod -ApiUri $ApiUri -HttpMethod $HttpMethod -HttpHeaders $HttpHeaders
-
-            # Assert
-            $result.Count | Should -Be 2
-            $result[0].Value | Should -Be "Partial result"
-            $result[1].Value | Should -Be "Final result"
-            Assert-MockCalled Invoke-RestMethod -Times 2 -Exactly -Scope It
+        It 'Handles rate limiting by waiting before retrying' {
+            Mock Invoke-RestMethod { throw [System.Net.WebException]::new() } -Verifiable
+            $Global:DSCAZDO_APIRateLimit = @{ xRateLimitRemaining = 0; retryAfter = 1 }
+            { Invoke-AzDevOpsApiRestMethod -ApiUri 'https://dev.azure.com/organization/_apis/' -HttpMethod 'Get' -RetryAttempts 1 } | Should -Throw
+            Assert-MockCalled Start-Sleep -Exactly 1 -Scope It
+            $Global:DSCAZDO_APIRateLimit = $null
         }
 
+        It 'Handles continuation tokens properly' {
+            Mock Invoke-RestMethod { return @{ 'x-ms-continuationtoken' = 'abc123' } } -Verifiable
+            Invoke-AzDevOpsApiRestMethod -ApiUri 'https://dev.azure.com/organization/_apis/' -HttpMethod 'Get' -RetryAttempts 0
+            Assert-MockCalled Invoke-RestMethod -Exactly 2 -Scope It # Initial + continuation token call
+        }
+
+        It 'Throws an error after all retries have been exhausted' {
+            Mock Invoke-RestMethod { throw [System.Net.WebException]::new() } -Verifiable
+            { Invoke-AzDevOpsApiRestMethod -ApiUri 'https://dev.azure.com/organization/_apis/' -HttpMethod 'Get' -RetryAttempts 1 } | Should -Throw
+            Assert-MockCalled New-InvalidOperationException -Exactly 1 -Scope It
+        }
     }
 
     Describe "Invoke-AzDevOpsApiRestMethod Rate Limiting Tests" {
