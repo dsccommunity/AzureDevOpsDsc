@@ -1,3 +1,5 @@
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+
 Describe 'Initialize-CacheObject' {
     Mock Test-Path {
         return $false

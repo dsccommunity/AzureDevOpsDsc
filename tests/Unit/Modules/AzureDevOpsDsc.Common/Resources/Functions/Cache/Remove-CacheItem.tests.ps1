@@ -1,3 +1,5 @@
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+
 Describe 'Remove-CacheItem' {
     Mock Get-CacheObject {}
     Mock Set-Variable {}

@@ -1,4 +1,6 @@
 
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+
 Describe 'Set-AzDoAPICacheGroup' {
     Mock List-DevOpsGroups {}
     Mock Add-CacheItem {}

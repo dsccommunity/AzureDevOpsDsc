@@ -1,3 +1,4 @@
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 Describe 'Set-CacheObject' {
     Mock Export-CacheObject {}

@@ -1,3 +1,4 @@
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
 
 Describe 'Add-CacheItem' {
     Mock Get-CacheObject { return [System.Collections.Generic.List[CacheItem]]::new() }
