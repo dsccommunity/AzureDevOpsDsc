@@ -25,6 +25,9 @@ Function List-DevOpsGroups {
     }
 
     #
+    # Perform a lookup to get the group
+
+    #
     # Return the groups from the cache
     return $groups.Value
 

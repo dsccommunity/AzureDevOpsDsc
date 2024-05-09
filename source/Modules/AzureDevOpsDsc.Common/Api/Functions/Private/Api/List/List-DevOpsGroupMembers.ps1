@@ -7,14 +7,14 @@ function List-DevOpsGroupMembers
         $Organization,
         [Parameter(Mandatory)]
         [String]
-        $URL,
+        $GroupDescriptor,
         [Parameter()]
         [String]
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
     $params = @{
-        Uri = $URL
+        Uri = "https://vssps.dev.azure.com/{0}/_apis/graph/Memberships/{1}?direction=down" -f $Organization, $GroupDescriptor
         Method = 'Get'
     }
 
@@ -22,13 +22,12 @@ function List-DevOpsGroupMembers
     # Invoke the Rest API to get the groups
     $membership = Invoke-AzDevOpsApiRestMethod @params
 
-    if ($null -eq $groups.value) {
+    if ($null -eq $membership.value) {
         return $null
     }
 
     #
     # Return the groups from the cache
     return $groups.Value
-
 
 }

@@ -1,4 +1,4 @@
-function Set-AzDoAPIGroupMemberCache
+function AzDoAPI_3_GroupMemberCache
 {
     [CmdletBinding()]
     param(
@@ -14,37 +14,35 @@ function Set-AzDoAPIGroupMemberCache
         $OrganizationName = $Global:DSCAZDO_OrganizationName
     }
 
-    $params = @{}
+    $params = @{
+        Organization = $OrganizationName
+    }
 
     # Enumerate the live group cache
     $AzDoLiveGroups = Get-CacheObject -CacheType 'LiveGroups'
+    # Enumerate the live users cache
+    $AzDoLiveUsers = Get-CacheObject -CacheType 'LiveUsers'
 
     try
     {
         ForEach ($AzDoLiveGroup in $AzDoLiveGroups)
         {
             # Update the Group ID in the parameters
-            $GroupID = $AzDoLiveGroup.Value.originId
+            $GroupDescriptor = $AzDoLiveGroup.Value.descriptor
 
-            $params.url =
-
-            Write-Verbose "Calling 'List-DevOpsGroupMembers' with parameters: $($params | Out-String)"
+            Write-Verbose "Calling 'AzDoAPI_2_GroupMemberCache' with parameters: $($params | Out-String)"
 
             # Perform an Azure DevOps API request to get the groups
-            $groupMembers = List-DevOpsGroupMembers -URL $AzDoLiveGroup.value._links.memberships.href
+            $groupMembers = List-DevOpsGroupMembers -GroupDescriptor $GroupDescriptor
 
-            Write-Verbose "'List-DevOpsGroupMembers' returned a total of $($groupMembers.Count) group members."
+            # Iterate through each of the users and groups and add them to the cache
+            $members = @{
+                users = $AzDoLiveUsers.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
+                groups = $AzDoLiveGroups.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
+            }
 
-            Write-Verbose "Adding group id '$($AzDoLiveGroup.originId)' to cache."
             # Add the group to the cache
-            Add-CacheItem -Key $group.PrincipalName -Value $group -Type 'LiveGroups'
-
-        }
-
-
-        # Iterate through each of the responses and add them to the cache
-        foreach ($group in $groups)
-        {
+            Add-CacheItem -Key $AzDoLiveGroup.PrincipalName -Value $members -Type 'LiveGroupMembers'
 
         }
 
