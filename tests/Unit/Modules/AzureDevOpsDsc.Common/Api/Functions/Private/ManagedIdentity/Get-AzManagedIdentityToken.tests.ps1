@@ -1,3 +1,5 @@
+. $PSScriptRoot\..\..\..\..\AzureDevOpsDsc.Common.Tests.Initialization.ps1
+
 Describe 'Get-AzManagedIdentityToken' {
     Mock Invoke-AzDevOpsApiRestMethod { return @{ access_token = "fake-access-token" } }
     Mock New-ManagedIdentityToken { return @{ AccessToken = "fake-access-token"; TokenType = "Bearer" } }

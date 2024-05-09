@@ -31,6 +31,7 @@ $functionSubDirectoryPaths = @(
     "$ModuleRoot\Api\Functions\Private\Cache",
     "$ModuleRoot\Api\Functions\Private\Helper",
     "$ModuleRoot\Api\Functions\Private\ManagedIdentity",
+    "$ModuleRoot\Api\Functions\Private\Cache\Cache Initalization"
 
     # Connection
     "$ModuleRoot\Connection\Functions\Private",
@@ -67,8 +68,7 @@ foreach ($function in $functions)
 #
 # Static Functions that need to be exported
 
-Export-ModuleMember -Function 'Set-AzDoAPICacheGroup'
-Export-ModuleMember -Function 'Set-AzDoAPICacheProject'
+Export-ModuleMember -Function 'AzDoAPI_*'
 
 Export-ModuleMember -Function 'Set-CacheObject'
 Export-ModuleMember -Function 'Get-CacheItem'
@@ -76,11 +76,7 @@ Export-ModuleMember -Function 'Get-AzDoAPIGroupCache'
 Export-ModuleMember -Function 'Get-AzDoAPIProjectCache'
 Export-ModuleMember -Function 'Initialize-CacheObject'
 
-Export-ModuleMember -Function 'Get-xAzDoProjectGroup'
-Export-ModuleMember -Function 'New-xAzDoProjectGroup'
-Export-ModuleMember -Function 'Set-xAzDoProjectGroup'
-Export-ModuleMember -Function 'Remove-xAzDoProjectGroup'
-Export-ModuleMember -Function 'Test-xAzDoProjectGroup'
+Export-ModuleMember -Function '*-xAzDoProjectGroup'
 
 # Stop processing
 if ($isClass) { return }

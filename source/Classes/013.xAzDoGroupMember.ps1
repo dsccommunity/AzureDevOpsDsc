@@ -5,7 +5,7 @@ using module AzureDevOpsDsc.Common
     This class represents an Azure DevOps organization group permission.
 
 .DESCRIPTION
-    The xAzDoOrganizationGroupPermission class is used to manage Azure DevOps organization group permissions.
+    The xAzDoGroupMember class is used to manage Azure DevOps organization group permissions.
     It inherits from the AzDevOpsDscResourceBase class.
 
 .PARAMETER GroupName
@@ -16,14 +16,14 @@ using module AzureDevOpsDsc.Common
 
 .METHODS
     Get()
-        Retrieves the current state of the xAzDoOrganizationGroupPermission resource.
+        Retrieves the current state of the xAzDoGroupMember resource.
 
 .HIDDEN METHODS
     GetDscResourcePropertyNamesWithNoSetSupport()
         Returns an array of property names that do not support the Set method.
 
     GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
-        Returns a hashtable of the current state properties of the xAzDoOrganizationGroupPermission resource.
+        Returns a hashtable of the current state properties of the xAzDoGroupMember resource.
 
 #>
 #[DscResource()]
@@ -43,9 +43,9 @@ class xAzDoGroupMember : AzDevOpsDscResourceBase
         $this.Construct()
     }
 
-    [xAzDoOrganizationGroupPermission] Get()
+    [xAzDoGroupMember] Get()
     {
-        return [xAzDoOrganizationGroupPermission]$($this.GetDscCurrentStateProperties())
+        return [xAzDoGroupMember]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
