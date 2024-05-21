@@ -9,19 +9,14 @@ Function New-xAzDoOrganizationGroup {
         [System.String]$GroupName,
 
         [Parameter()]
-        [Alias('Description')]
-        [System.String]$GroupDescription,
+        [Alias('Members')]
+        [System.String[]]$GroupMembers=$null,
 
         [Parameter()]
-        [Alias('Lookup')]
         [HashTable]$LookupResult,
 
         [Parameter()]
-        [Ensure]$Ensure,
-
-        [Parameter()]
-        [System.Management.Automation.SwitchParameter]
-        $Force
+        [Ensure]$Ensure
 
     )
 

@@ -35,10 +35,19 @@ function AzDoAPI_3_GroupMemberCache
             # Perform an Azure DevOps API request to get the groups
             $groupMembers = List-DevOpsGroupMembers -GroupDescriptor $GroupDescriptor
 
+            # Members
+            $members = [System.Collections.Generic.List[object]]::new()
+
             # Iterate through each of the users and groups and add them to the cache
-            $members = @{
-                users = $AzDoLiveUsers.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
-                groups = $AzDoLiveGroups.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
+            $azdoUserMembers = $AzDoLiveUsers.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
+            $azdoGroupMembers = $AzDoLiveGroups.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
+
+            $azdoUserMembers | Select-Object *,@{Name="Type";Exp={"user"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor | ForEach-Object {
+                $null = $members.Add($_)
+            }
+
+            $azdoGroupMembers | Select-Object *,@{Name="Type";Exp={"group"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor | ForEach-Object {
+                $null = $members.Add($_)
             }
 
             # Add the group to the cache

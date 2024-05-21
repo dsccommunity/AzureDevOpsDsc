@@ -35,8 +35,8 @@ Function Get-xAzDoOrganizationGroup {
         [System.String]$GroupName,
 
         [Parameter()]
-        [Alias('Description')]
-        [System.String]$GroupDescription,
+        [Alias('Members')]
+        [System.String[]]$GroupMembers=$null,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -51,15 +51,11 @@ Function Get-xAzDoOrganizationGroup {
 
     #
     # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
+   # $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
 
     #
-    # Check the cache for the group
-    $livegroup = Get-CacheItem -Key $Key -Type 'LiveGroups'
-
-    #
-    # Check if the group is in the cache
-    $localgroup = Get-CacheItem -Key $Key -Type 'Group'
+    # Check the cache for the group members
+    $livegroupMembers = Get-CacheItem -Key $Key -Type 'LiveGroupMembers'
 
 
     Write-Verbose "[Get-xAzDoOrganizationGroup] GroupName: '$GroupName'"
@@ -78,124 +74,89 @@ Function Get-xAzDoOrganizationGroup {
     Write-Verbose "[Get-xAzDoOrganizationGroup] Testing LocalCache, LiveCache and Parameters."
 
     #
-    # If the localgroup and lifegroup are present, compare the properties as well as the originId
-    if (($null -ne $livegroup.originId) -and ($null -ne $localgroup.originId)) {
+    # Test if the group is present in the live cache
+    if ($null -eq $livegroupMembers) {
 
-        Write-Verbose "[Get-xAzDoOrganizationGroup] Testing LocalCache, LiveCache and Parameters."
+        # If there are no group members, test to see if there are group members defined in the parameters
+        if ($GroupMembers.Count -eq 0) {
+            $getGroupResult.status = [DSCGetSummaryState]::Unchanged
+        } else {
+            $getGroupResult.status = [DSCGetSummaryState]::Changed
+        }
+
+        # Return the result
+        return $getGroupResult
+    }
+
+    #
+    # Test if there are no group memebers in parameters
+    if ($GroupMembers.Count -eq 0) {
+
+        # If there are no live group members, the group is unchanged.
+        if ($livegroupMembers.Count -eq 0) {
+            $getGroupResult.status = [DSCGetSummaryState]::Unchanged
+        } else {
+            # If there are live group members, the group has been changed.
+            $getGroupResult.status = [DSCGetSummaryState]::Changed
+        }
+
+        # Return the result
+        return $getGroupResult
+    }
+
+    #
+    # If both parameters and group members exist.
+
+    # Compare the members of the live group with the parameters.
+
+    # Format the parameters
+
+    $FormattedLiveGroups = @()
+    $FormattedParametersGroups = @()
+
+    #
+    # Compare the live group members with the parameters
+
+    $params = @{
+        ReferenceObject = $FormattedParametersGroups
+        DifferenceObject = $FormattedLiveGroups
+    }
+
+    try {
 
         #
-        # Check if the originId is the same. If so, the group is unchanged. If not, the group has been renamed.
+        # Compare the group members
+        $members = Compare-Object @Params
 
-        if ($livegroup.originId -ne $localgroup.originId) {
-            # The group has been renamed or deleted and recreated.
+    } catch {
 
-            # Perform a lookup in the live cache to see if the group has been deleted and recreated.
-            $renamedGroup = $livegroup | Find-CacheItem { $_.originId -eq $livegroup.originId }
+        # If an error occurs, assume the group has changed.
+        $getGroupResult.status = [DSCGetSummaryState]::Changed
+        return $getGroupResult
 
-            # If renamed group is not null, the group has been renamed.
-            if ($null -ne $renamedGroup) {
-                # Add the renamed group to result
-                $getGroupResult.renamedGroup = $renamedGroup
-                # The group has been renamed.
-                $getGroupResult.status = [DSCGetSummaryState]::Renamed
+    }
 
-                # Add the reason
-                #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:RenamedGroup', 'The group was renamed')
+    #
+    # If there are no differences, the group is unchanged.
 
-            } else {
-                # The group has been deleted and recreated. Treat the new group as the live group.
+    if ($members.Count -eq 0) {
+        $getGroupResult.status = [DSCGetSummaryState]::Unchanged
+    } else {
 
-                # Remove the old group from the local cache
-                Remove-CacheItem -Key $Key -Type 'Group'
-                # Add the new group to the local cache
-                Add-CacheItem -Key $Key -Value $livegroup -Type 'Group'
-
-                # Compare the properties of the live group with the parameters
-                if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'description' }
-                if ($livegroup.name -ne $localgroup.name) { $getGroupResult.propertiesChanged += 'displayName' }
-
-                # If the properties are the same, the group is unchanged. If not, the group has been changed.
-                if ($getGroupResult.propertiesChanged.count -ne 0) {
-                    # Update the Result
-                    $getGroupResult.status = [DSCGetSummaryState]::Changed
-                    # Add the reason
-                    #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Deleted&ReCreate', 'The group was deleted and recreated with another group. The properties have changed')
-                } else {
-                    # Update the Result
-                    $getGroupResult.status = [DSCGetSummaryState]::Unchanged
-                }
-
+        # Users on the left side are in the comparison object but not in the reference object are to be added.
+        # Users on the right side are in the reference object but not in the comparison object are to be removed.
+        $getGroupResult.propertiesChanged += $members | ForEach-Object {
+            @{
+                action = ($_.SideIndicator -eq '<=') ? 'Add' : 'Remove'
+                value = $_.InputObject
             }
-
-            return $getGroupResult
-
         }
 
-        #
-        # The Group hasn't been renamed. Test the properties to make sure they are the same as the parameters.
-
-        # Compare the properties of the live group with the parameters
-        if ($livegroup.description -ne $groupDescription) { $getGroupResult.propertiesChanged += 'Description' }
-        if ($livegroup.name -ne $localgroup.name) { $getGroupResult.propertiesChanged += 'Name' }
-
-        # If the properties are the same, the group is unchanged. If not, the group has been changed.
-        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Changed : [DSCGetSummaryState]::Unchanged
-        if ($getGroupResult.status -eq [DSCGetSummaryState]::Changed) {
-            # Add the reason
-            #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Changed', 'The group has changed')
-        } else {
-            $getGroupResult.Ensure = [Ensure]::Present
-        }
-
-        # Return the group from the cache
-        return $getGroupResult
+        # The group has changed.
+        $getGroupResult.status = [DSCGetSummaryState]::Changed
 
     }
 
-    #
-    # If the livegroup is not present and the localgroup is present, the group is missing and recreate it.
-    if (($null -eq $livegroup) -and ($null -ne $localgroup)) {
-        $getGroupResult.status = [DSCGetSummaryState]::NotFound
-        $getGroupResult.propertiesChanged = @('description', 'displayName')
-        # Add the reason
-        #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Removed', 'The group is missing')
-        return $getGroupResult
-    }
-
-    #
-    # If the localgroup is not present and the livegroup is present, the group is not found. Check the properties are the same as the parameters.
-    # If the properties are the same, the group is unchanged. If not, the group has been deleted and then recreated and the new group will become authoritative.
-    #
-    if (($null -eq $localgroup) -and ($null -ne $livegroup)) {
-
-        # Validate that the live properties are the same as the parameters
-        if ($livegroup.description -ne $GroupDescription )            { $getGroupResult.propertiesChanged += 'description' }
-        if ($livegroup.displayName -ne $GroupName )                   { $getGroupResult.propertiesChanged += 'displayName' }
-        # If the properties are the same, the group is unchanged. If not, the group has been changed.
-        $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Changed : [DSCGetSummaryState]::Unchanged
-        if ($getGroupResult.status -ne [DSCGetSummaryState]::Unchanged) {
-            # Add the reason
-            #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')
-            # Set the Ensure to Present
-            $getGroupResult.Ensure = [Ensure]::Present
-        } else {
-            # Add the unchanged group to the local cache
-            Add-CacheItem -Key $Key -Value $livegroup -Type 'Group'
-        }
-
-        # Return the group from the cache
-        return $getGroupResult
-
-    }
-
-    #
-    # If the livegroup and localgroup are not present, the group is missing and recreate it.
-    if (($null -eq $livegroup) -and ($null -eq $localgroup)) {
-        $getGroupResult.status = [DSCGetSummaryState]::NotFound
-        $getGroupResult.propertiesChanged = @('description', 'displayName')
-        # Add the reason
-        #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:NotFound', 'The group is not found')
-        return $getGroupResult
-    }
+    return $getGroupResult
 
 }
