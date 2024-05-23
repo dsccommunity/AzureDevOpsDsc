@@ -28,6 +28,6 @@ function List-DevOpsGroupMembers
 
     #
     # Return the groups from the cache
-    return $groups.Value
+    return $membership.Value
 
 }

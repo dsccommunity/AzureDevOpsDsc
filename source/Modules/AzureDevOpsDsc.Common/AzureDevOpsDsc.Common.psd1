@@ -34,6 +34,8 @@
         'New-AzManagedIdentity',
         'AzDoAPI_0_ProjectCache',
         'AzDoAPI_1_GroupCache',
+        'AzDoAPI_2_UserCache',
+        'AzDoAPI_3_GroupMemberCache',
 
         #
         # DSC Class Based Resources

@@ -33,7 +33,14 @@ function AzDoAPI_3_GroupMemberCache
             Write-Verbose "Calling 'AzDoAPI_2_GroupMemberCache' with parameters: $($params | Out-String)"
 
             # Perform an Azure DevOps API request to get the groups
-            $groupMembers = List-DevOpsGroupMembers -GroupDescriptor $GroupDescriptor
+            $groupMembers = List-DevOpsGroupMembers -Organization $OrganizationName -GroupDescriptor $GroupDescriptor
+
+            # If there are no members, skip to the next group
+            if ($null -eq $groupMembers.memberDescriptor)
+            {
+                Write-Verbose "No members found for group '$($AzDoLiveGroup.Key)'; skipping."
+                continue
+            }
 
             # Members
             $members = [System.Collections.Generic.List[object]]::new()
@@ -42,21 +49,21 @@ function AzDoAPI_3_GroupMemberCache
             $azdoUserMembers = $AzDoLiveUsers.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
             $azdoGroupMembers = $AzDoLiveGroups.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
 
-            $azdoUserMembers | Select-Object *,@{Name="Type";Exp={"user"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor | ForEach-Object {
+            $azdoUserMembers | Select-Object *,@{Name="Type";Exp={"user"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor } | ForEach-Object {
                 $null = $members.Add($_)
             }
 
-            $azdoGroupMembers | Select-Object *,@{Name="Type";Exp={"group"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor | ForEach-Object {
+            $azdoGroupMembers | Select-Object *,@{Name="Type";Exp={"group"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor } | ForEach-Object {
                 $null = $members.Add($_)
             }
 
             # Add the group to the cache
-            Add-CacheItem -Key $AzDoLiveGroup.PrincipalName -Value $members -Type 'LiveGroupMembers'
+            Add-CacheItem -Key $AzDoLiveGroup.value.PrincipalName -Value $members -Type 'LiveGroupMembers'
 
         }
 
         # Export the cache to a file
-        Export-CacheObject -CacheType 'LiveGroups' -Content $AzDoLiveGroups
+        Export-CacheObject -CacheType 'LiveGroupMembers' -Content $AzDoLiveGroups
 
         Write-Verbose "Completed adding groups to cache."
 
