@@ -63,7 +63,7 @@ function AzDoAPI_3_GroupMemberCache
         }
 
         # Export the cache to a file
-        Export-CacheObject -CacheType 'LiveGroupMembers' -Content $AzDoLiveGroups
+        Export-CacheObject -CacheType 'LiveGroupMembers' -Content $AzdoLiveGroupMembers
 
         Write-Verbose "Completed adding groups to cache."
 

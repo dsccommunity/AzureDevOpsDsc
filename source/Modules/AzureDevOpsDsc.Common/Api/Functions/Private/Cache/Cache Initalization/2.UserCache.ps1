@@ -35,7 +35,7 @@ Function AzDoAPI_2_UserCache {
         }
 
         # Export the cache to a file
-        Export-CacheObject -CacheType 'LiveUsers' -Content $AzDoLiveGroups
+        Export-CacheObject -CacheType 'LiveUsers' -Content $AzDoLiveUsers
 
         Write-Verbose "Completed adding users to cache."
 
