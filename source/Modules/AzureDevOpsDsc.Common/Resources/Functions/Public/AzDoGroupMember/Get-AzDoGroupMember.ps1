@@ -1,30 +1,6 @@
-<#
-.SYNOPSIS
-Retrieves an organization group from Azure DevOps.
 
-.DESCRIPTION
-The Get-xAzDoOrganizationGroup function retrieves an organization group from Azure DevOps based on the provided parameters.
 
-.PARAMETER ApiUri
-The URI of the Azure DevOps API. This parameter is validated using the Test-AzDevOpsApiUri function.
-
-.PARAMETER Pat
-The Personal Access Token (PAT) used for authentication. This parameter is validated using the Test-AzDevOpsPat function.
-
-.PARAMETER GroupName
-The name of the organization group to retrieve.
-
-.OUTPUTS
-[System.Management.Automation.PSObject[]]
-The retrieved organization group.
-
-.EXAMPLE
-Get-xAzDoOrganizationGroup -ApiUri 'https://dev.azure.com/contoso' -Pat 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx' -GroupName 'Developers'
-Retrieves the organization group named 'Developers' from the Azure DevOps instance at 'https://dev.azure.com/contoso' using the provided PAT.
-
-#>
-
-Function Get-xAzDoOrganizationGroup {
+Function Get-AzDoGroupMember {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
