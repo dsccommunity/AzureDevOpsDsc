@@ -23,18 +23,24 @@ Function Get-xAzDoGroupMember {
     )
 
     # Logging
-    Write-Verbose "[Get-xAzDoOrganizationGroup] Retriving the GroupName from the Live and Local Cache."
+    Write-Verbose "[Get-xAzDoGroupMember] Retriving the GroupName from the Live and Local Cache."
+
+    $obj = @{
+        GroupMembers = $GroupMembers
+        GroupName = $GroupName
+        LookupResult = $LookupResult
+        Ensure = $Ensure
+    } | Export-Clixml "C:\Temp\Get-xAzDoGroupMemberDump.clixml" -Depth 5
+
+
 
     #
     # Format the Key According to the Principal Name
-   # $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
-
     #
     # Check the cache for the group members
-    $livegroupMembers = Get-CacheItem -Key $Key -Type 'LiveGroupMembers'
+    $livegroupMembers = Get-CacheObject -CacheType 'LiveGroupMembers'
 
-
-    Write-Verbose "[Get-xAzDoOrganizationGroup] GroupName: '$GroupName'"
+    Write-Verbose "[Get-xAzDoGroupMember] GroupName: '$GroupName'"
 
     #
     # Construct a hashtable detailing the group
@@ -47,7 +53,7 @@ Function Get-xAzDoGroupMember {
         status = $null
     }
 
-    Write-Verbose "[Get-xAzDoOrganizationGroup] Testing LocalCache, LiveCache and Parameters."
+    Write-Verbose "[Get-xAzDoGroupMember] Testing LocalCache, LiveCache and Parameters."
 
     #
     # Test if the group is present in the live cache

@@ -55,7 +55,14 @@
         'New-xAzDoOrganizationGroup',
         'Set-xAzDoOrganizationGroup',
         'Remove-xAzDoOrganizationGroup',
-        'Test-xAzDoOrganizationGroup'
+        'Test-xAzDoOrganizationGroup',
+
+        'Get-xAzDoGroupMember',
+        'New-xAzDoGroupMember',
+        'Set-xAzDoGroupMember',
+        'Remove-xAzDoGroupMember',
+        'Test-xAzDoGroupMember'
+
 
     )
 

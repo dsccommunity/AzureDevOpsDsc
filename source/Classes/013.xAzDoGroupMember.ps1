@@ -61,6 +61,7 @@ class xAzDoGroupMember : AzDevOpsDscResourceBase
 
     [xAzDoGroupMember] Get()
     {
+        $this.GroupMembers | Export-Clixml "C:\Temp\GroupMembers.clixml"
         return [xAzDoGroupMember]$($this.GetDscCurrentStateProperties())
     }
 
