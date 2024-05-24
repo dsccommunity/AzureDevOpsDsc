@@ -12,7 +12,7 @@ Function Get-AzDoGroupMember {
 
         [Parameter()]
         [Alias('Members')]
-        [System.String[]]$GroupMembers=$null,
+        [System.String[]]$GroupMembers=@(),
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -86,9 +86,13 @@ Function Get-AzDoGroupMember {
     # Compare the members of the live group with the parameters.
 
     # Format the parameters
+    $FormattedLiveGroups = [Array]($livegroupMembers | Where-Object { ($_.Key -replace "^(\[)|(\])", "") -eq $GroupName }).Value.principalName
+    $FormattedParametersGroups = $GroupMembers
 
-    $FormattedLiveGroups = @()
-    $FormattedParametersGroups = @()
+    # If the formatted live groups is empty. Modify the formatted live groups to be an empty array.
+    if ($null -eq $FormattedLiveGroups) {
+        $FormattedLiveGroups = @()
+    }
 
     #
     # Compare the live group members with the parameters
@@ -98,25 +102,18 @@ Function Get-AzDoGroupMember {
         DifferenceObject = $FormattedLiveGroups
     }
 
-    try {
-
-        #
-        # Compare the group members
-        $members = Compare-Object @Params
-
-    } catch {
-
-        # If an error occurs, assume the group has changed.
-        $getGroupResult.status = [DSCGetSummaryState]::Changed
-        return $getGroupResult
-
-    }
+    #
+    # Compare the group members
+    $members = Compare-Object @Params -ErrorAction SilentlyContinue
 
     #
     # If there are no differences, the group is unchanged.
 
     if ($members.Count -eq 0) {
+
+        # The group is unchanged.
         $getGroupResult.status = [DSCGetSummaryState]::Unchanged
+
     } else {
 
         # Users on the left side are in the comparison object but not in the reference object are to be added.
@@ -132,6 +129,8 @@ Function Get-AzDoGroupMember {
         $getGroupResult.status = [DSCGetSummaryState]::Changed
 
     }
+
+    $getGroupResult | Export-Clixml -LiteralPath "C:\Temp\getGroupResult.clixml"
 
     return $getGroupResult
 

@@ -2,20 +2,27 @@
 Function Test-AzDoGroupMember {
 
     param(
+
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $GroupName,
-
-        [Parameter()]
-        [string]
-        $GroupDescription=$null,
-
-        [Parameter()]
         [Alias('Name')]
-        [hashtable]$GetResult
+        [System.String]$GroupName,
+
+        [Parameter()]
+        [Alias('Members')]
+        [System.String]$GroupMembers=@(),
+
+        [Parameter()]
+        [Alias('Lookup')]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 
-
+    $return
 }
