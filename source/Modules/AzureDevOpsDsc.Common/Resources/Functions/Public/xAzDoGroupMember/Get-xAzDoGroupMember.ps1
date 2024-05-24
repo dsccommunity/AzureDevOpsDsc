@@ -1,6 +1,6 @@
 
 
-Function Get-AzDoGroupMember {
+Function Get-xAzDoGroupMember {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]

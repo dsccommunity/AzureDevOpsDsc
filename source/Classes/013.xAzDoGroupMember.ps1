@@ -1,32 +1,48 @@
-using module AzureDevOpsDsc.Common
-
 <#
 .SYNOPSIS
-    This class represents an Azure DevOps organization group permission.
+    This class represents a DSC resource for managing Azure DevOps group members.
 
 .DESCRIPTION
-    The xAzDoGroupMember class is used to manage Azure DevOps organization group permissions.
+    The xAzDoGroupMember class is a DSC resource that allows you to manage the members of an Azure DevOps group.
     It inherits from the AzDevOpsDscResourceBase class.
 
+.NOTES
+    Author: Your Name
+    Date:   Current Date
+
+.LINK
+    GitHub Repository: <link to the GitHub repository>
+
 .PARAMETER GroupName
-    Specifies the name of the Azure DevOps organization group.
+    The name of the Azure DevOps group.
 
-.PARAMETER GroupPermission
-    Specifies the permissions for the Azure DevOps organization group.
+.PARAMETER GroupMembers
+    An array of strings representing the members of the Azure DevOps group.
 
-.METHODS
-    Get()
-        Retrieves the current state of the xAzDoGroupMember resource.
+.EXAMPLE
+    This example shows how to use the xAzDoGroupMember resource to add members to an Azure DevOps group.
 
-.HIDDEN METHODS
-    GetDscResourcePropertyNamesWithNoSetSupport()
-        Returns an array of property names that do not support the Set method.
+    Configuration Example {
+        Import-DscResource -ModuleName xAzDoGroupMember
 
-    GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
-        Returns a hashtable of the current state properties of the xAzDoGroupMember resource.
+        Node localhost {
+            xAzDoGroupMember GroupMember {
+                GroupName = 'MyGroup'
+                GroupMembers = @('User1', 'User2', 'User3')
+                Ensure = 'Present'
+            }
+        }
+    }
+
+.INPUTS
+    None
+
+.OUTPUTS
+    None
 
 #>
-#[DscResource()]
+
+[DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDoGroupMember : AzDevOpsDscResourceBase
 {

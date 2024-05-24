@@ -1,9 +1,7 @@
-Function New-AzDoGroupMember {
 
-    [CmdletBinding()]
-    [OutputType([System.Management.Automation.PSObject[]])]
-    param
-    (
+Function Test-xAzDoGroupMember{
+
+    param(
 
         [Parameter(Mandatory)]
         [Alias('Name')]
@@ -23,8 +21,8 @@ Function New-AzDoGroupMember {
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $Force
+
     )
 
     $return
-
 }

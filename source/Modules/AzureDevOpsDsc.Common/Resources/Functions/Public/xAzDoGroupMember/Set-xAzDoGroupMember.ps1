@@ -1,4 +1,4 @@
-Function Set-AzDoGroupMember {
+Function Set-xAzDoGroupMember {
 
     param(
 
