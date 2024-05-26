@@ -32,13 +32,15 @@ Function Get-xAzDoGroupMember {
         Ensure = $Ensure
     } | Export-Clixml "C:\Temp\Get-xAzDoGroupMemberDump.clixml" -Depth 5
 
+    # Format the  According to the Group Name
+    $Key = Format-AzDoProjectName -GroupName $GorupName -OrganizationName $Global:AZDOOrganizationName
+    # Check the cache for the group
+    $livegroupMembers = Get-CacheItem -Key $Key -Type 'LiveGroupMembers'
 
-
-    #
-    # Format the Key According to the Principal Name
-    #
     # Check the cache for the group members
-    $livegroupMembers = Get-CacheObject -CacheType 'LiveGroupMembers'
+    #$livegroupMembers = Get-CacheObject -CacheType 'LiveGroupMembers'
+
+    $livegroupMembers | Export-Clixml -LiteralPath "C:\Temp\livegroupMembers123.clixml"
 
     Write-Verbose "[Get-xAzDoGroupMember] GroupName: '$GroupName'"
 
@@ -59,6 +61,8 @@ Function Get-xAzDoGroupMember {
     # Test if the group is present in the live cache
     if ($null -eq $livegroupMembers) {
 
+        "A" | Set-Content "C:\Temp\a.txt"
+
         # If there are no group members, test to see if there are group members defined in the parameters
         if ($GroupMembers.Count -eq 0) {
             $getGroupResult.status = [DSCGetSummaryState]::Unchanged
@@ -69,6 +73,8 @@ Function Get-xAzDoGroupMember {
         # Return the result
         return $getGroupResult
     }
+
+    "b" | Set-Content "C:\Temp\b.txt"
 
     #
     # Test if there are no group memebers in parameters
@@ -85,6 +91,8 @@ Function Get-xAzDoGroupMember {
         # Return the result
         return $getGroupResult
     }
+
+    "c" | Set-Content "C:\Temp\c.txt"
 
     #
     # If both parameters and group members exist.
