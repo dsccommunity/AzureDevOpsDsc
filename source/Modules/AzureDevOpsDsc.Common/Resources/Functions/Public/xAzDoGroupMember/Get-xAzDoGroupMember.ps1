@@ -33,7 +33,7 @@ Function Get-xAzDoGroupMember {
     } | Export-Clixml "C:\Temp\Get-xAzDoGroupMemberDump.clixml" -Depth 5
 
     # Format the  According to the Group Name
-    $Key = Format-AzDoProjectName -GroupName $GorupName -OrganizationName $Global:AZDOOrganizationName
+    $Key = Format-AzDoProjectName -GroupName $GorupName -OrganizationName $Global:DSCAZDO_OrganizationName
     # Check the cache for the group
     $livegroupMembers = Get-CacheItem -Key $Key -Type 'LiveGroupMembers'
 
