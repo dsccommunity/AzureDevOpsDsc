@@ -18,29 +18,22 @@ Function Get-xAzDoGroupMember {
         [HashTable]$LookupResult,
 
         [Parameter()]
-        [Ensure]$Ensure
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 
     # Logging
     Write-Verbose "[Get-xAzDoGroupMember] Retriving the GroupName from the Live and Local Cache."
 
-    $obj = @{
-        GroupMembers = $GroupMembers
-        GroupName = $GroupName
-        LookupResult = $LookupResult
-        Ensure = $Ensure
-    } | Export-Clixml "C:\Temp\Get-xAzDoGroupMemberDump.clixml" -Depth 5
-
     # Format the  According to the Group Name
-    $Key = Format-AzDoProjectName -GroupName $GorupName -OrganizationName $Global:DSCAZDO_OrganizationName
+    $Key = Format-AzDoProjectName -GroupName $GroupName -OrganizationName $Global:DSCAZDO_OrganizationName
+
     # Check the cache for the group
     $livegroupMembers = Get-CacheItem -Key $Key -Type 'LiveGroupMembers'
-
-    # Check the cache for the group members
-    #$livegroupMembers = Get-CacheObject -CacheType 'LiveGroupMembers'
-
-    $livegroupMembers | Export-Clixml -LiteralPath "C:\Temp\livegroupMembers123.clixml"
 
     Write-Verbose "[Get-xAzDoGroupMember] GroupName: '$GroupName'"
 
@@ -61,20 +54,19 @@ Function Get-xAzDoGroupMember {
     # Test if the group is present in the live cache
     if ($null -eq $livegroupMembers) {
 
-        "A" | Set-Content "C:\Temp\a.txt"
+        Write-Verbose "[Get-xAzDoGroupMember] Group '$GroupName' not found in the live cache."
 
         # If there are no group members, test to see if there are group members defined in the parameters
         if ($GroupMembers.Count -eq 0) {
             $getGroupResult.status = [DSCGetSummaryState]::Unchanged
         } else {
-            $getGroupResult.status = [DSCGetSummaryState]::Changed
+            # If there are group members defined in the parameters, but no live group members, the group is new.
+            $getGroupResult.status = [DSCGetSummaryState]::NotFound
         }
 
         # Return the result
         return $getGroupResult
     }
-
-    "b" | Set-Content "C:\Temp\b.txt"
 
     #
     # Test if there are no group memebers in parameters
@@ -84,15 +76,13 @@ Function Get-xAzDoGroupMember {
         if ($livegroupMembers.Count -eq 0) {
             $getGroupResult.status = [DSCGetSummaryState]::Unchanged
         } else {
-            # If there are live group members, the group has been changed.
+            # If there are live group members, the groups members are to be removed.
             $getGroupResult.status = [DSCGetSummaryState]::Changed
         }
 
         # Return the result
         return $getGroupResult
     }
-
-    "c" | Set-Content "C:\Temp\c.txt"
 
     #
     # If both parameters and group members exist.
@@ -143,8 +133,6 @@ Function Get-xAzDoGroupMember {
         $getGroupResult.status = [DSCGetSummaryState]::Changed
 
     }
-
-    $getGroupResult | Export-Clixml -LiteralPath "C:\Temp\getGroupResult.clixml"
 
     return $getGroupResult
 

@@ -61,7 +61,6 @@ class xAzDoGroupMember : AzDevOpsDscResourceBase
 
     [xAzDoGroupMember] Get()
     {
-        $this.GroupMembers | Export-Clixml "C:\Temp\GroupMembers.clixml"
         return [xAzDoGroupMember]$($this.GetDscCurrentStateProperties())
     }
 
@@ -81,6 +80,8 @@ class xAzDoGroupMember : AzDevOpsDscResourceBase
 
         $properties.GroupName           = $CurrentResourceObject.GroupName
         $properties.GroupMembers        = $CurrentResourceObject.GroupMembers
+        $properties.Ensure              = $CurrentResourceObject.Ensure
+        $properties.LookupResult        = $CurrentResourceObject.LookupResult
 
         Write-Verbose "[xAzDoProjectGroup] Current state properties: $($properties | Out-String)"
 

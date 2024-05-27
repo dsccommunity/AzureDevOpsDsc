@@ -9,7 +9,7 @@ Function Test-xAzDoGroupMember{
 
         [Parameter()]
         [Alias('Members')]
-        [System.String]$GroupMembers=@(),
+        [System.String[]]$GroupMembers=@(),
 
         [Parameter()]
         [Alias('Lookup')]

@@ -1,4 +1,4 @@
-Function New-xAzDoGroupMember {
+Function Remove-xAzDoGroupMember {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
@@ -11,7 +11,7 @@ Function New-xAzDoGroupMember {
 
         [Parameter()]
         [Alias('Members')]
-        [System.String]$GroupMembers=@(),
+        [System.String[]]$GroupMembers=@(),
 
         [Parameter()]
         [Alias('Lookup')]
@@ -24,6 +24,8 @@ Function New-xAzDoGroupMember {
         [System.Management.Automation.SwitchParameter]
         $Force
     )
+
+    "TRIGGERED" | Out-File "C:\Temp\New-xAzDoGroupMember.txt"
 
     $return
 

@@ -8,7 +8,7 @@ Function Set-xAzDoGroupMember {
 
         [Parameter()]
         [Alias('Members')]
-        [System.String]$GroupMembers=@(),
+        [System.String[]]$GroupMembers=@(),
 
         [Parameter()]
         [Alias('Lookup')]
@@ -22,6 +22,8 @@ Function Set-xAzDoGroupMember {
         $Force
 
     )
+
+    "TRIGGERED" | Out-File "C:\Temp\Set-xAzDoGroupMember.txt"
 
     $return
 

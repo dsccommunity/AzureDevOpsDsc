@@ -36,9 +36,6 @@ Function New-xAzDoProjectGroup {
         ProjectScopeDescriptor = (Get-CacheItem -Key $ProjectName -Type 'LiveProjects').ProjectDescriptor
     }
 
-    $AZDoLiveProjects | Export-Clixml -LiteralPath "C:\Temp\New-xAzDoProjectGroup_LiveProjects.xml"
-    $params | Export-Clixml -LiteralPath "C:\Temp\New-xAzDoProjectGroup_Params.xml"
-
     #
     # Create a new group
     $group = New-DevOpsGroup @params

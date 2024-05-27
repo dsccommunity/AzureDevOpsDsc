@@ -182,8 +182,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
             ([Ensure]::Absent) {
 
+                # If the desired state is to remove the resource, however the current resource is present. It is not in state.
                 $dscRequiredAction = ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::NotFound) ? [RequiredAction]::None : [RequiredAction]::Remove
-                #$dscRequiredAction = ($currentProperties.Ensure -eq [Ensure]::Present) ? [RequiredAction]::Remove : [RequiredAction]::None
 
                 # Otherwise, no changes to make (i.e. The desired state is already achieved)
                 Write-Verbose "DscActionRequired='$dscRequiredAction'"
@@ -310,7 +310,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             $dscDesiredStateParameters = $this.GetDesiredStateParameters($dscCurrentStateProperties, $dscDesiredStateProperties, $dscRequiredAction)
 
             # Set the lookup properties on the desired state object. Since it will be used to set the resource.
-            if ($null -ne $dscCurrentStateProperties.LookupResult) {
+            if ($null -ne $dscCurrentStateProperties.LookupResult)
+            {
                 $dscDesiredStateParameters.LookupResult = $dscCurrentStateProperties.LookupResult
             }
 

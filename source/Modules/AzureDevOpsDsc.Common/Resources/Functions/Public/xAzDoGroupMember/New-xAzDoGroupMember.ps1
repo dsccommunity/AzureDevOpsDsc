@@ -10,15 +10,23 @@ Function New-xAzDoGroupMember {
 
         [Parameter()]
         [Alias('Members')]
-        [System.String[]]$GroupMembers=$(),
+        [System.String[]]$GroupMembers=@(),
 
         [Parameter()]
         [HashTable]$LookupResult,
 
         [Parameter()]
-        [Ensure]$Ensure
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
+
+
+    "TRIGGED" | Out-File "C:\Temp\New-xAzDoGroupMember.txt"
+
 
     return
 

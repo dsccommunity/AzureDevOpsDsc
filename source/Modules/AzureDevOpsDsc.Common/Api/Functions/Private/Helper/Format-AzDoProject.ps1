@@ -14,12 +14,12 @@ Function Format-AzDoProjectName {
     # Logging
     Write-Verbose "[Format-AzDoProjectName] Formatting GroupName."
 
-    # Split the group name with a '\' and create an array.
-    $splitGroupName = $GroupName -split '\\'
+    # Split the group name with a '\' or '/' and create an array.
+    $splitGroupName = $GroupName -split '\\|\/'
 
     # There must be at least 2 elements in the array. The first element is the project name and the second element is the group name.
     if ($splitGroupName.Length -lt 2) {
-        Throw "The GroupName '$GroupName' is not in the correct format. The GroupName must be in the format 'ProjectName\GroupName'."
+        Throw "The GroupName '$GroupName' is not in the correct format. The GroupName must be in the format 'ProjectName\GroupName' or 'Project/GroupName."
     }
 
     # If the first element contains '%ORG%' or is empty, replace it with the organization name.
