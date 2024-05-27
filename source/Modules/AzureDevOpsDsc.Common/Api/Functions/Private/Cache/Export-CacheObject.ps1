@@ -67,6 +67,7 @@ Function Export-CacheObject {
 
         # Save content to cache file
         Write-Verbose "[Export-ObjectCache] Saving content to cache file: $cacheFilePath"
+        $Content | Export-Clixml -Depth $Depth -LiteralPath $cacheFilePath
 
         # Confirm completion of export process
         Write-Verbose "[Export-ObjectCache] Export process completed successfully for cache type: $CacheType"
