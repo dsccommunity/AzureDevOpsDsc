@@ -25,7 +25,7 @@ Function Find-AzDoIdentity {
             return $cachedItem
         }
         # Test if the Username contains a '\' or '/' symbol. If it does, it is a group and needs to be sanitized
-        { $Identity -match '\\|\/') } {
+        { $Identity -match '\\|\/' } {
             # Perform a lookup using the existing username
             $cachedItem = Get-CacheItem -Key $Identity -Type 'LiveGroups'
             $cachedItem.value.add('Type','Group')
@@ -73,6 +73,5 @@ Function Find-AzDoIdentity {
         }
 
     }
-
 
 }

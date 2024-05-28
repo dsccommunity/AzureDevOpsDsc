@@ -28,7 +28,7 @@ Function New-xAzDoGroupMember {
     Write-Verbose "[New-xAzDoGroupMember] Starting group member addition process for group '$GroupName'."
 
     # Fetch the Group Identity
-    $GroupIdentity = Find-AzDoIdentity -Identity $GroupName
+    $GroupIdentity =  Find-AzDoIdentity $GroupName
     Write-Verbose "[New-xAzDoGroupMember] Fetched group identity for '$GroupName'."
 
     # Retrieve the group members from the cache
