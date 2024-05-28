@@ -9,7 +9,7 @@
 
 Describe "Get-xAzDoProjectGroup Tests" {
 
-    Mock Format-UserPrincipalName { return "FormattedName" }
+    Mock Format-AzDoGroup { return "FormattedName" }
     Mock Get-CacheItem {}
     Mock Remove-CacheItem {}
     Mock Add-CacheItem {}

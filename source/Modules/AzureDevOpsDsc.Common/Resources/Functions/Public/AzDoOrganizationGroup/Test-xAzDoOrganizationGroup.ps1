@@ -96,7 +96,7 @@ Function Test-xAzDoOrganizationGroup {
 
 
     # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
+    $Key = Format-AzDoGroup -Prefix "[$Global:DSCAZDO_OrganizationName]" -GroupName $GroupName
 
     #
     # Check the cache for the group

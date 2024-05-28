@@ -56,7 +56,7 @@ Function Get-xAzDoProjectGroup {
 
     #
     # Format the Key According to the Principal Name
-    $Key = Format-UserPrincipalName -Prefix "[$ProjectName]" -GroupName $GroupName
+    $Key = Format-AzDoGroup -Prefix "[$ProjectName]" -GroupName $GroupName
 
     #
     # Check the cache for the group
