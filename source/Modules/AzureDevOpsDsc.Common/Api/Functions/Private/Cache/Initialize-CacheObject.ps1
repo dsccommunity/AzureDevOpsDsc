@@ -18,7 +18,7 @@ Function Initialize-CacheObject {
     [CmdletBinding()]
     param(
         # Specifies the type of cache to initialize. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,ValueFromPipeline)]
         [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers')]
         [string]$CacheType,
         # Used to bypass the file deletion check for live caches. Needed for DSC Resources to import the cache.

@@ -5,12 +5,12 @@ Function New-DevOpsGroupMember {
         # The group Identity
         [Parameter(Mandatory)]
         [Alias('Group')]
-        [System.String]$GroupIdentity,
+        [Object]$GroupIdentity,
 
         # The group member
         [Parameter(Mandatory)]
         [Alias('Member')]
-        [System.String]$MemberIdentity,
+        [Object]$MemberIdentity,
 
         # Optional parameter for the API version with a default value obtained from the Get-AzDevOpsApiVersion function
         [Parameter()]
@@ -29,8 +29,8 @@ Function New-DevOpsGroupMember {
         # Construct the Uri using string formatting with the -f operator.
         # It includes the API endpoint, group identity, member identity, and the API version.
         Uri = "{0}/_apis/GroupEntitlements/{1}/members/{2}?api-version={3}" -f $ApiUri,
-                                                                                $GroupIdentity.value.originId,
-                                                                                $MemberIdentity.value.originId,
+                                                                                $GroupIdentity.originId,
+                                                                                $MemberIdentity.originId,
                                                                                 $ApiVersion
         # Specifies the HTTP method to be used in the REST call, in this case 'PUT'.
         Method = 'PUT'
@@ -51,6 +51,8 @@ Function New-DevOpsGroupMember {
         # If an exception occurs, write an error message to the console with details about the issue.
         Write-Error "[Add-DevOpsGroupMember] Failed to add member to group: $($_.Exception.Message)"
     }
+
+    Write-Verbose "[Add-DevOpsGroupMember] Result $($member | ConvertTo-Json)."
 
     # Return the result of the REST method invocation, which is stored in $member.
     Write-Verbose "[Add-DevOpsGroupMember] Returning result from REST method invocation."

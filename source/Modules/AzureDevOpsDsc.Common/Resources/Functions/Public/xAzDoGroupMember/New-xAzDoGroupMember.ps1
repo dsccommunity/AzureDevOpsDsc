@@ -28,7 +28,7 @@ Function New-xAzDoGroupMember {
     Write-Verbose "[New-xAzDoGroupMember] Starting group member addition process for group '$GroupName'."
 
     # Fetch the Group Identity
-    $GroupIdentity =  Find-AzDoIdentity $GroupName
+    $GroupIdentity = Find-AzDoIdentity $GroupName
     Write-Verbose "[New-xAzDoGroupMember] Fetched group identity for '$GroupName'."
 
     # Retrieve the group members from the cache
@@ -40,6 +40,9 @@ Function New-xAzDoGroupMember {
         ApiUri = 'https://vsaex.dev.azure.com/{0}/' -f $Global:DSCAZDO_OrganizationName
     }
 
+    Write-Verbose "[New-xAzDoGroupMember] Starting group member addition process for group '$GroupName'."
+    Write-Verbose "[New-xAzDoGroupMember] Group members: $($GroupMembers -join ',')."
+
     # Define the members
     $members = [System.Collections.Generic.List[object]]::new()
 
@@ -47,10 +50,18 @@ Function New-xAzDoGroupMember {
     ForEach ($MemberIdentity in $GroupMembers) {
 
         # Use the Find-AzDoIdentity function to search for an Azure DevOps identity that matches the given $MemberIdentity.
+        Write-Verbose "[New-xAzDoGroupMember] Looking up identity for member '$MemberIdentity'."
         $identity = Find-AzDoIdentity -Identity $MemberIdentity
+        if ($null -eq $identity) {
+            Write-Warning "[New-xAzDoGroupMember] Unable to find identity for member '$MemberIdentity'."
+            continue
+        }
+
         Write-Verbose "[New-xAzDoGroupMember] Found identity for member '$MemberIdentity'."
 
         # Call the New-DevOpsGroupMember function with a hashtable of parameters to add the found identity as a new member to a group.
+        Write-Verbose "[New-xAzDoGroupMember] Adding member '$MemberIdentity' to group '$($params.GroupIdentity)'."
+
         $result = New-DevOpsGroupMember @params -MemberIdentity $identity
 
         # Add the member to the list
@@ -59,11 +70,11 @@ Function New-xAzDoGroupMember {
     }
 
     # Add the group to the cache
-    Add-CacheItem -Key $GroupIdentity.value.principalName -Value $members -Type 'LiveGroups'
     Write-Verbose "[New-xAzDoGroupMember] Added group '$GroupName' with members to the cache."
+    Add-CacheItem -Key $GroupIdentity.principalName -Value $members -Type 'LiveGroupMembers'
 
-    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
     Write-Verbose "[New-xAzDoGroupMember] Updated global cache with live group information."
+    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroupMembers'
 
     # Write a verbose log message indicating that the function has completed the group member addition process.
     Write-Verbose "[New-xAzDoGroupMember] Completed group member addition process for group '$GroupName'."

@@ -30,9 +30,9 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         }
 
         # Initialize the cache object
-        Initialize-CacheObject -CacheType 'Group' -BypassFileCheck -Debug
-        Initialize-CacheObject -CacheType 'LiveGroups' -BypassFileCheck -Debug
-        Initialize-CacheObject -CacheType 'LiveProjects' -BypassFileCheck -Debug
+        'Group', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers' | ForEach-Object {
+            Initialize-CacheObject -CacheType $_ -BypassFileCheck -Debug
+        }
 
     }
 
