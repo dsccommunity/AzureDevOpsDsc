@@ -27,6 +27,12 @@ Function Find-AzDoIdentity {
             $cachedItem = Get-CacheItem -Key $Identity -Type 'LiveUsers'
             #$cachedItem = $cachedItem | Select-Object *, @{Name = 'Type'; Exp={'Users'}}
 
+            # Test if the user is found
+            if ($null -eq $cachedItem) {
+                Write-Warning "[Find-AzDoIdentity] No user found with the UPN '$Identity'."
+                return
+            }
+
             Write-Verbose "[Find-AzDoIdentity] Found user with UPN '$Identity'."
             return $cachedItem
         }
@@ -44,6 +50,13 @@ Function Find-AzDoIdentity {
             # Perform a lookup using the existing username
             Write-Verbose "[Find-AzDoIdentity] Performing a lookup using the group name '$Identity'."
             $cachedItem = Get-CacheItem -Key $Identity -Type 'LiveGroups'
+
+            # Test if the group is found
+            if ($null -eq $cachedItem) {
+                Write-Warning "[Find-AzDoIdentity] No group found with the name '$Identity'."
+                return
+            }
+
             #$cachedItem = $cachedItem | Select-Object *, @{Name = 'Type'; Exp={'Group'}}
 
             Write-Verbose "[Find-AzDoIdentity] cachedItem '$($cachedItem | ConvertTo-Json)'."
@@ -56,49 +69,47 @@ Function Find-AzDoIdentity {
         # If multiple users are found, throw an error.
         # If no users are found, throw an error.
         default {
+
             Write-Verbose "[Find-AzDoIdentity] Performing a lookup using the display name '$Identity'."
 
             # Perform a lookup using the existing username
             $User = $CachedUsers | Where-Object { $_.value.displayName -eq $Identity }
             $Group = $CachedGroups | Where-Object { $_.value.displayName -eq $Identity }
 
+            # Write the number of users and groups found
+            Write-Verbose "[Find-AzDoIdentity] Found $($User.Count) users and $($Group.Count) groups with the display name '$Identity'."
+
             # Test if the user is found
             if ($User.Count -gt 1) {
-                Write-Warning "Multiple users found with the display name '$Identity'. Please use the UPN (user@domain.com)"
-                return
-            } elseif ($User.Count -eq 0) {
-                Write-Warning "No users found with the display name '$Identity'. Please use the UPN (user@domain.com)"
+                Write-Warning "[Find-AzDoIdentity] Multiple users found with the display name '$Identity'. Please use the UPN (user@domain.com)"
                 return
             }
 
             # Test if a group is found
             if ($Group.Count -gt 1) {
-                Write-Warning "Multiple groups found with the display name '$Identity'. Please use the UPN ([project]\[groupname])"
-                return
-            } elseif ($Group.Count -eq 0) {
-                Write-Warning "No groups found with the display name '$Identity'. Please use the UPN ([project]\[groupname])"
+                Write-Warning "[Find-AzDoIdentity] Multiple groups found with the display name '$Identity'. Please use the UPN ([project]\[groupname])"
                 return
             }
 
             # Test if both a user and a group are found
             if ($User.Count -eq 1 -and $Group.Count -eq 1) {
-                Write-Warning "Both a user and a group found with the display name '$Identity'. Please use the UPN (user@domain.com or [project]\[groupname])"
+                Write-Warning "[Find-AzDoIdentity] Both a user and a group found with the display name '$Identity'. Please use the UPN (user@domain.com or [project]\[groupname])"
                 return
             }
 
             if ($User.Count -eq 1) {
-                Write-Verbose "[Find-AzDoIdentity] Single user found with the display name '$Identity'."
-
                 # If the user is found, add the type and return the user
-                $User.Value.Add('Type','User')
-                return $User
-            } else {
-                Write-Verbose "[Find-AzDoIdentity] Single group found with the display name '$Identity'."
-
+                Write-Verbose "[Find-AzDoIdentity] Single user found with the display name '$Identity'."
+                return $User.value
+            } elseif ($Group.Count -eq 1) {
                 # If the group is found, add the type and return the group
-                $Group.Value.Add('Type','Group')
-                return $Group
+                Write-Verbose "[Find-AzDoIdentity] Single group found with the display name '$Identity'."
+                return $Group.value
             }
+
+            Write-Warning "No identity found for '$Identity'."
+            return
+
         }
     }
 }
