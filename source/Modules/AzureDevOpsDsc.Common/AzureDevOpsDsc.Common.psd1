@@ -31,7 +31,7 @@
         'Test-AzDevOpsOperation',
         'Initialize-CacheObject',
 
-        'New-AzManagedIdentity',
+        'New-AzDoAuthenticationProvider',
         'AzDoAPI_0_ProjectCache',
         'AzDoAPI_1_GroupCache',
         'AzDoAPI_2_UserCache',

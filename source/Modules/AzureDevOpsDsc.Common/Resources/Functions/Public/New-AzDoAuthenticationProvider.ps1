@@ -49,7 +49,7 @@ Function New-AzDoAuthenticationProvider {
         [Parameter(ParameterSetName = 'SecureStringPersonalAccessToken')]
         [Parameter(ParameterSetName = 'ManagedIdentity')]
         [Switch]
-        $NoExport
+        $isResource
 
     )
 
@@ -88,13 +88,28 @@ Function New-AzDoAuthenticationProvider {
     #
     # Export the Token information to the Cache Directory
 
-    if ($NoExport.IsPresent) {
-        Write-Verbose "[New-AzDoAuthenticationProvider] The Token will not be exported to the Cache Directory."
+    if ($isResource.IsPresent) {
+        Write-Verbose "[New-AzDoAuthenticationProvider] isResource is set. The Token will not be exported."
         return
     }
 
-    # Create an Object Containing the Organization Name.
+    #
+    # Initialize the Cache
 
+    # Initialize the Cache Objects
+    Get-AzDoCacheObjects | ForEach-Object {
+        Initialize-CacheObject -CacheType $_
+    }
+
+    # Iterate through Each of the Caching Commands and initalize the Cache.
+    Get-Command "AzDoAPI_*" | Where-Object Source -eq 'AzureDevOpsDsc.Common' | ForEach-Object {
+        . $_.Name -OrganizationName $AzureDevopsOrganizationName -Verbose
+    }
+
+    #
+    # Export the Token to the Cache Directory
+
+    # Create an Object Containing the Organization Name.
     $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
     Write-Verbose "[New-AzDoAuthenticationProvider] Exporting the Module Settings to $moduleSettingsPath."
 

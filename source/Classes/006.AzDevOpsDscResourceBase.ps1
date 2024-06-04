@@ -46,8 +46,10 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             Throw "[AzDevOpsDscResourceBase] The Token information does not exist in the Cache Directory. Please ensure that the Token information exists."
         }
 
+        #
         # Determine the type of Token (PersonalAccessToken or ManagedIdentity)
-        switch ($token.tokenType.ToString()) {
+
+        switch ($tokenObject.tokenType.ToString()) {
 
             # If the Token is empty
             { [String]::IsNullOrEmpty($_) } {
@@ -56,13 +58,13 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             }
             # If the Token is a Personal Access Token
             { $_ -eq 'PersonalAccessToken' } {
-                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -SecureStringPersonalAccessToken $access_token -NoExport
+                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -SecureStringPersonalAccessToken $access_token -isResource
                 break;
             }
             # If the Token is a Managed Identity Token
             { $_ -eq 'ManagedIdentity' } {
                 # Create a Managed Identity Token
-                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -useManagedIdentity -NoExport
+                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -useManagedIdentity -isResource
                 break;
             }
             # Default
@@ -74,7 +76,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
         #
         # Initialize the cache objects. Don't delete the cache objects since they are used by other resources.
-        'Group', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers' | ForEach-Object {
+        Get-AzDoCacheObjects | ForEach-Object {
             Initialize-CacheObject -CacheType $_ -BypassFileCheck -Debug
         }
 
