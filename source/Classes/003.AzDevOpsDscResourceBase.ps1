@@ -14,22 +14,66 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     hidden Construct()
     {
-        # Import the Module Settings
-        $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
-        $objectSettings = Import-Clixml -LiteralPath $moduleSettingsPath
-        $OrganizationName = $objectSettings.OrganizationName
-
-        # Import the AzureDevOpsDsc.Common module using the $true argument to bypassing the cache flush
-        Import-Module AzureDevOpsDsc.Common -ArgumentList @($true)
-
-        # Check if the Managed Identity Token exists. If not create one.
-        if (-not($Global:DSCAZDO_AuthenticationToken))
+        # Ensure that $ENV:AZDODSC_CACHE_DIRECTORY is set. If not, throw an error.
+        if (-not($ENV:AZDODSC_CACHE_DIRECTORY))
         {
-            # Create a Managed Identity Token
-            New-AzManagedIdentity -OrganizationName $OrganizationName -Verbose -Debug
+            Throw "[AzDevOpsDscResourceBase] The Environment Variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the Environment Variable 'AZDODSC_CACHE_DIRECTORY' to the Cache Directory."
         }
 
-        # Initialize the cache object
+        # Attempt to import the ModuleSettings.clixml file. If it does not exist, throw an error.
+        $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
+        # Check if the ModuleSettings.clixml file exists in the Cache Directory. If not, throw an error.
+        if (-not(Test-Path -Path $moduleSettingsPath))
+        {
+            Throw "[AzDevOpsDscResourceBase] The ModuleSettings.clixml file does not exist in the Cache Directory. Please ensure that the file exists."
+        }
+
+        # Import the ModuleSettings.clixml file
+        $objectSettings = Import-Clixml -LiteralPath $moduleSettingsPath
+
+        #
+        # Import the Token information from the Cache Directory
+
+        $organizationName = $objectSettings.OrganizationName
+        $tokenObject = $objectSettings.Token
+        $access_token = $tokenObject.access_token
+
+        $Global:DSCAZDO_OrganizationName
+
+        # Ensure that the access_token is not null or empty. If it is, throw an error.
+        if ([String]::IsNullOrEmpty($access_token))
+        {
+            Throw "[AzDevOpsDscResourceBase] The Token information does not exist in the Cache Directory. Please ensure that the Token information exists."
+        }
+
+        # Determine the type of Token (PersonalAccessToken or ManagedIdentity)
+        switch ($token.tokenType.ToString()) {
+
+            # If the Token is empty
+            { [String]::IsNullOrEmpty($_) } {
+                Throw "[AzDevOpsDscResourceBase] The Token information does not exist in the Cache Directory. Please ensure that the Token information exists."
+                break;
+            }
+            # If the Token is a Personal Access Token
+            { $_ -eq 'PersonalAccessToken' } {
+                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -SecureStringPersonalAccessToken $access_token -NoExport
+                break;
+            }
+            # If the Token is a Managed Identity Token
+            { $_ -eq 'ManagedIdentity' } {
+                # Create a Managed Identity Token
+                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -useManagedIdentity -NoExport
+                break;
+            }
+            # Default
+            default {
+                Throw "[AzDevOpsDscResourceBase] The Token information does not exist in the Cache Directory. Please ensure that the Token information exists."
+            }
+
+        }
+
+        #
+        # Initialize the cache objects. Don't delete the cache objects since they are used by other resources.
         'Group', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers' | ForEach-Object {
             Initialize-CacheObject -CacheType $_ -BypassFileCheck -Debug
         }

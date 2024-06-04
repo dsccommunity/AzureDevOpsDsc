@@ -65,7 +65,7 @@ Function Get-AzManagedIdentityToken {
     Write-Verbose "[Get-AzManagedIdentityToken] Verifying the connection to the Azure DevOps API."
 
     # Test the Connection
-    if (-not(Test-Token $ManagedIdentity)) { throw "Error. Failed to call the Azure DevOps API." }
+    if (-not(Test-AzToken $ManagedIdentity)) { throw "Error. Failed to call the Azure DevOps API." }
 
     Write-Verbose "[Get-AzManagedIdentityToken] Connection Verified."
 
