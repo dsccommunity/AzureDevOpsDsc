@@ -26,7 +26,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                 }
             }
 
-            Mock Test-AzManagedIdentityToken {
+            Mock Test-Token {
                 return $true
             }
 
@@ -58,9 +58,9 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             { Get-AzManagedIdentityToken -OrganizationName $organizationName } | Should -Throw
         }
 
-        It "Throws an exception if the Test-AzManagedIdentityToken returns false" {
+        It "Throws an exception if the Test-Token returns false" {
             # Arrange
-            Mock Test-AzManagedIdentityToken {
+            Mock Test-Token {
                 return $false
             }
             $organizationName = "Contoso"

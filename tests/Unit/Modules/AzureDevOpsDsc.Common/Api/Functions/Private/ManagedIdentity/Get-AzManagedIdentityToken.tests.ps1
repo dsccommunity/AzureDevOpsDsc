@@ -3,7 +3,7 @@
 Describe 'Get-AzManagedIdentityToken' {
     Mock Invoke-AzDevOpsApiRestMethod { return @{ access_token = "fake-access-token" } }
     Mock New-ManagedIdentityToken { return @{ AccessToken = "fake-access-token"; TokenType = "Bearer" } }
-    Mock Test-AzManagedIdentityToken { return $true }
+    Mock Test-Token { return $true }
 
     It 'Successfully retrieves a managed identity token without verification' {
         $result = Get-AzManagedIdentityToken -OrganizationName "Contoso"
@@ -24,7 +24,7 @@ Describe 'Get-AzManagedIdentityToken' {
     }
 
     It 'Throws an error when verification fails' {
-        Mock Test-AzManagedIdentityToken { return $false }
+        Mock Test-Token { return $false }
 
         { Get-AzManagedIdentityToken -OrganizationName "Contoso" -Verify } | Should -Throw "Failed to call the Azure DevOps API."
     }

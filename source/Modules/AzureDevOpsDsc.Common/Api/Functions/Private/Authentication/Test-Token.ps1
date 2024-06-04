@@ -3,28 +3,22 @@
     Tests the Azure Managed Identity token for accessing Azure DevOps REST API.
 
 .DESCRIPTION
-    The Test-AzManagedIdentityToken function is used to test the Azure Managed Identity token for accessing the Azure DevOps REST API.
+    The Test-AzToken function is used to test the Azure Managed Identity token for accessing the Azure DevOps REST API.
     It calls the Azure DevOps REST API with the provided Managed Identity token and returns true if the token is valid, otherwise returns false.
 
-.PARAMETER ManagedIdentity
+.PARAMETER Token
     Specifies the Managed Identity token to be tested.
 
 .EXAMPLE
-    $token = Get-AzManagedIdentityToken -ResourceId 'https://management.azure.com'
-    $isValid = Test-AzManagedIdentityToken -ManagedIdentity $token
-    if ($isValid) {
-        Write-Host "Token is valid."
-    } else {
-        Write-Host "Token is invalid."
-    }
+
 #>
 
-Function Test-AzManagedIdentityToken {
+Function Test-AzToken {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [Object]
-        $ManagedIdentity
+        $Token
     )
 
     # Define the Azure DevOps REST API endpoint to get the list of projects
@@ -35,7 +29,7 @@ Function Test-AzManagedIdentityToken {
         Uri = $FormattedUrl
         Method = 'Get'
         Headers = @{
-            Authorization ="Bearer {0}" -f $ManagedIdentity.Get()
+            Authorization ="Bearer {0}" -f $Token.Get()
         }
     }
 

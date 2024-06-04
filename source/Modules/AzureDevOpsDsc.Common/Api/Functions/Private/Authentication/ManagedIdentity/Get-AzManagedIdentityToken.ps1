@@ -55,7 +55,7 @@ Function Get-AzManagedIdentityToken {
     Write-Verbose "[Get-AzManagedIdentityToken] Managed Identity Token Retrival Successful."
 
     # TypeCast the response to a ManagedIdentityToken object
-    $ManagedIdentity = New-ManagedIdentityToken -ManagedIdentityTokenObj $response
+    $ManagedIdentity = New-ManagedIdentityToken $response
     # Null the response
     $null = $response
 
@@ -65,7 +65,7 @@ Function Get-AzManagedIdentityToken {
     Write-Verbose "[Get-AzManagedIdentityToken] Verifying the connection to the Azure DevOps API."
 
     # Test the Connection
-    if (-not(Test-AzManagedIdentityToken $ManagedIdentity)) { throw "Error. Failed to call the Azure DevOps API." }
+    if (-not(Test-Token $ManagedIdentity)) { throw "Error. Failed to call the Azure DevOps API." }
 
     Write-Verbose "[Get-AzManagedIdentityToken] Connection Verified."
 

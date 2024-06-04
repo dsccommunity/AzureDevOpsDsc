@@ -23,7 +23,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         Import-Module AzureDevOpsDsc.Common -ArgumentList @($true)
 
         # Check if the Managed Identity Token exists. If not create one.
-        if (-not($Global:DSCAZDO_ManagedIdentityToken))
+        if (-not($Global:DSCAZDO_AuthenticationToken))
         {
             # Create a Managed Identity Token
             New-AzManagedIdentity -OrganizationName $OrganizationName -Verbose -Debug

@@ -13,7 +13,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
                 Update-AzManagedIdentity
 
-                $global:DSCAZDO_ManagedIdentityToken | Should -Not -Be $null
+                $Global:DSCAZDO_AuthenticationToken | Should -Not -Be $null
             }
         }
 

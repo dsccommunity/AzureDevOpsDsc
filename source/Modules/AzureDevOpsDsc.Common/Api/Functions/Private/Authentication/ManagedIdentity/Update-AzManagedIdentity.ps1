@@ -23,9 +23,9 @@ Function Update-AzManagedIdentity {
     }
 
     # Clear the existing token.
-    $Global:DSCAZDO_ManagedIdentityToken = $null
+    $Global:DSCAZDO_AuthenticationToken = $null
 
     # Refresh the Token.
-    $Global:DSCAZDO_ManagedIdentityToken = Get-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
+    $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
 
 }

@@ -35,8 +35,8 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
             # Assert
             $Global:DSCAZDO_OrganizationName | Should -Be $orgName
-            $Global:DSCAZDO_ManagedIdentityToken | Should -Not -Be $null
-            $Global:DSCAZDO_ManagedIdentityToken.access_token | Should -Be "mocked_access_token"
+            $Global:DSCAZDO_AuthenticationToken | Should -Not -Be $null
+            $Global:DSCAZDO_AuthenticationToken.access_token | Should -Be "mocked_access_token"
         }
 
         It "Sets the global managed identity token to null if Get-AzManagedIdentityToken fails" {
@@ -46,7 +46,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
 
             # Act / Assert
             { New-AzManagedIdentity -OrganizationName $orgName } | Should -Throw "Failed to get token."
-            $Global:DSCAZDO_ManagedIdentityToken | Should -Be $null
+            $Global:DSCAZDO_AuthenticationToken | Should -Be $null
         }
     }
 

@@ -147,24 +147,9 @@ function Invoke-AzDevOpsApiRestMethod
         Do {
 
             #
-            # Test if a Managed Identity Token is required and if so, add it to the HTTP Headers
+            # Add the Authentication Header
 
-            if ($Global:DSCAZDO_ManagedIdentityToken -ne $null)
-            {
-                Write-Verbose "[Invoke-AzDevOpsApiRestMethod] Adding Managed Identity Token to the HTTP Headers."
-
-                # Test if the Managed Identity Token has expired
-                if ($Global:DSCAZDO_ManagedIdentityToken.isExpired())
-                {
-                    Write-Verbose "[Invoke-AzDevOpsApiRestMethod] Managed Identity Token has expired. Obtaining a new token."
-                    # If so, get a new token
-                    $Global:DSCAZDO_ManagedIdentityToken = Update-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
-                }
-
-                # Add the Managed Identity Token to the HTTP Headers
-                $invokeRestMethodParameters.Headers.Authorization = 'Bearer {0}' -f $Global:DSCAZDO_ManagedIdentityToken.Get()
-
-            }
+            $invokeRestMethodParameters.Headers.Authorization = Add-AuthenticationHTTPHeader
 
             #
             # Invoke the REST method

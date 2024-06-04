@@ -10,7 +10,7 @@ Describe 'Update-AzManagedIdentity' {
             Update-AzManagedIdentity -OrganizationName "Contoso"
 
             # Check if the token was updated
-            $Global:DSCAZDO_ManagedIdentityToken | Should -Be "new-token-value"
+            $Global:DSCAZDO_AuthenticationToken | Should -Be "new-token-value"
         }
     }
 

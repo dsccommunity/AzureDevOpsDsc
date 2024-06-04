@@ -4,14 +4,14 @@
 
 <#
 .SYNOPSIS
-    Test suite for the Test-AzManagedIdentityToken function.
+    Test suite for the Test-Token function.
 
 .DESCRIPTION
-    This test suite validates the functionality of the Test-AzManagedIdentityToken function, ensuring it properly tests the managed identity token.
+    This test suite validates the functionality of the Test-Token function, ensuring it properly tests the managed identity token.
 #>
 
 InModuleScope 'AzureDevOpsDsc.Common' {
-    Describe "Test-AzManagedIdentityToken Function Tests" {
+    Describe "Test-Token Function Tests" {
 
         Mock Invoke-AzDevOpsApiRestMethod {
             return @{
@@ -35,7 +35,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             }
 
             # Act
-            $result = Test-AzManagedIdentityToken -ManagedIdentity $mockManagedIdentity
+            $result = Test-Token -ManagedIdentity $mockManagedIdentity
 
             # Assert
             $result | Should -Be $true
@@ -49,7 +49,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
             }
 
             # Act
-            $result = Test-AzManagedIdentityToken -ManagedIdentity $mockManagedIdentity
+            $result = Test-Token -ManagedIdentity $mockManagedIdentity
 
             # Assert
             $result | Should -Be $false

@@ -1,16 +1,17 @@
 
 
-Class ManagedIdentityToken {
+Class ManagedIdentityToken : AuthenticationToken {
 
-    [SecureString]$access_token
+    hidden [SecureString]$access_token
     [DateTime]$expires_on
     [Int]$expires_in
     [String]$resource
     [String]$token_type
-    hidden [bool]$linux = $IsLinux
 
     # Constructor
     ManagedIdentityToken([PSCustomObject]$ManagedIdentityTokenObj) {
+
+        $this.tokenType = [TokenType].ManagedIdentity
 
         # Validate that ManagedIdentityTokenObj is a HashTable and Contains the correct keys
         if (-not $this.isValid($ManagedIdentityTokenObj)) { throw "The ManagedIdentityTokenObj is not valid." }
@@ -48,36 +49,6 @@ Class ManagedIdentityToken {
         return $true
     }
 
-    # Function to convert a SecureString to a String
-    hidden [String]ConvertFromSecureString([SecureString]$SecureString) {
-        # Convert a SecureString to a String
-        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
-        $String = ($this.linux) ? [System.Runtime.InteropServices.Marshal]::PtrToStringUni($BSTR) :
-                                  [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
-        return $String
-    }
-
-    # Function to test the call stack
-    hidden [Bool]TestCallStack([String]$name) {
-
-        # Get the call stack
-        Write-Verbose "[ManagedIdentityToken] Getting the call stack."
-
-        $CallStack = Get-PSCallStack
-
-        # Check if any of the callers in the call stack is Invoke-DSCResource
-        foreach ($stackFrame in $callStack) {
-            if ($stackFrame.Command -eq $name) {
-                Write-Verbose "[ManagedIdentityToken] The calling function is $name."
-                return $true
-            }
-        }
-
-        return $false
-
-    }
-
     [Bool]isExpired() {
         # Remove 10 seconds from the expires_on time to account for clock skew.
         if ($this.expires_on.AddSeconds(-10) -lt (Get-Date)) { return $true }
@@ -91,20 +62,10 @@ Class ManagedIdentityToken {
         Write-Verbose "[ManagedIdentityToken] Getting the access token:"
         Write-Verbose "[ManagedIdentityToken] Ensuring that the calling function is allowed to call the Get() method."
 
-        # Prevent Execution and Writing to Files and Pipeline Variables.
+        # Test the caller
+        $this.TestCaller()
 
-        # Token can only be called within Test-AzManagedIdentityToken. Test to see if the calling function is Test-AzManagedIdentityToken
-        if ((-not($this.TestCallStack('Test-AzManagedIdentityToken'))) -and (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod')))) {
-            # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
-            throw "[ManagedIdentityToken][Access Denied] The Get() method can only be called within AzureDevOpsDsc.Common."
-        }
-
-        # Token cannot be returned within a Write-* function. Test to see if the calling function is Write-*
-        if ($this.TestCallStack('Write-')) { throw "[ManagedIdentityToken][Access Denied] The Get() method cannot be called within a Write-* function." }
-        # Token cannot be written to a file. Test to see if the calling function is Out-File
-        if ($this.TestCallStack('Out-File')) { throw "[ManagedIdentityToken][Access Denied] The Get() method cannot be called within Out-File." }
-
-        Write-Verbose "[ManagedIdentityToken] Token Retriveal Successful."
+        Write-Verbose "[ManagedIdentityToken] Token Retrival Successful."
 
         # Return the access token
         return ($this.ConvertFromSecureString($this.access_token))

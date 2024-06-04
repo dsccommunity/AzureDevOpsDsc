@@ -1,4 +1,4 @@
-Describe 'Test-AzManagedIdentityToken' {
+Describe 'Test-Token' {
     Mock Invoke-AzDevOpsApiRestMethod { return $null }
 
     BeforeAll {
@@ -12,7 +12,7 @@ Describe 'Test-AzManagedIdentityToken' {
             Get = { "fake-valid-token" }
         }
 
-        $result = Test-AzManagedIdentityToken -ManagedIdentity $validToken
+        $result = Test-Token -ManagedIdentity $validToken
         $result | Should -Be $true
     }
 
@@ -25,7 +25,7 @@ Describe 'Test-AzManagedIdentityToken' {
         # Simulate the API call failure
         Mock Invoke-AzDevOpsApiRestMethod { throw "Unauthorized" }
 
-        $result = Test-AzManagedIdentityToken -ManagedIdentity $invalidToken
+        $result = Test-Token -ManagedIdentity $invalidToken
         $result | Should -Be $false
     }
 }
