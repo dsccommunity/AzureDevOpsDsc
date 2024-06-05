@@ -2,7 +2,7 @@
 
 Class AuthenticationToken {
 
-    hidden [TokenType]$tokenType
+    [TokenType]$tokenType
     hidden [bool]$linux = $isLinux
 
     # Function to convert a SecureString to a String
@@ -41,7 +41,11 @@ Class AuthenticationToken {
         # Prevent Execution and Writing to Files and Pipeline Variables.
 
         # Token can only be called within Test-AzAuthenticationToken. Test to see if the calling function is Test-AzAuthenticationToken
-        if ((-not($this.TestCallStack('Add-AuthenticationHTTPHeader'))) -and (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod')))) {
+        if (
+                (-not($this.TestCallStack('Add-AuthenticationHTTPHeader'))) -and
+                (-not($this.TestCallStack('Invoke-AzDevOpsApiRestMethod'))) -and
+                (-not($this.TestCallStack('New-AzDoAuthenticationProvider')))
+            ) {
             # Token can only be called within Invoke-AzDevOpsApiRestMethod. Test to see if the calling function is Invoke-AzDevOpsApiRestMethod
             throw "[AuthenticationToken][Access Denied] The Get() method can only be called within AzureDevOpsDsc.Common."
         }

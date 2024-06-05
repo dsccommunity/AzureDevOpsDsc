@@ -11,7 +11,7 @@ Class ManagedIdentityToken : AuthenticationToken {
     # Constructor
     ManagedIdentityToken([PSCustomObject]$ManagedIdentityTokenObj) {
 
-        $this.tokenType = [TokenType].ManagedIdentity
+        $this.tokenType = [TokenType]::ManagedIdentity
 
         # Validate that ManagedIdentityTokenObj is a HashTable and Contains the correct keys
         if (-not $this.isValid($ManagedIdentityTokenObj)) { throw "The ManagedIdentityTokenObj is not valid." }

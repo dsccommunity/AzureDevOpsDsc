@@ -43,6 +43,7 @@ Function Get-AzManagedIdentityToken {
         Method = 'Get'
         Headers = @{ Metadata="true" }
         ContentType = 'Application/json'
+        NoAuthentication = $true
     }
 
     Write-Verbose "[Get-AzManagedIdentityToken] Invoking the Azure Instance Metadata Service to get the access token."

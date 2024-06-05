@@ -31,6 +31,7 @@ Function Test-AzToken {
         Headers = @{
             Authorization ="Bearer {0}" -f $Token.Get()
         }
+        NoAuthentication = $true
     }
 
     # Call the Azure DevOps REST API with the Managed Identity Bearer token

@@ -28,7 +28,7 @@ Function New-AzDoAuthenticationProvider {
 
         # Personal Access Token
         [Parameter(Mandatory, ParameterSetName = 'PersonalAccessToken')]
-        [Alias('PersonalAccessToken')]
+        [Alias('PAT')]
         [String]
         $PersonalAccessToken,
 
@@ -75,7 +75,6 @@ Function New-AzDoAuthenticationProvider {
         Write-Verbose "[New-AzDoAuthenticationProvider] Creating a new Azure Managed Identity with OrganizationName $OrganizationName."
         # If the Token is not Valid. Get a new Token.
         $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName -Verify
-        return
     }
     #
     # If the parameterset is SecureStringPersonalAccessToken
@@ -119,6 +118,6 @@ Function New-AzDoAuthenticationProvider {
     }
 
     # Export the Object to the Cache Directory
-    $objectSettings | Export-Clixml -LiteralPath $moduleSettingsPath
+    $objectSettings | Export-Clixml -LiteralPath $moduleSettingsPath -Depth 5
 
 }

@@ -8,13 +8,13 @@ Describe 'Get-AzManagedIdentityToken' {
     It 'Successfully retrieves a managed identity token without verification' {
         $result = Get-AzManagedIdentityToken -OrganizationName "Contoso"
         $result.AccessToken | Should -Be "fake-access-token"
-        $result.TokenType | Should -Be "Bearer"
+        $result.token_type | Should -Be "Bearer"
     }
 
     It 'Successfully retrieves a managed identity token with verification' {
         $result = Get-AzManagedIdentityToken -OrganizationName "Contoso" -Verify
         $result.AccessToken | Should -Be "fake-access-token"
-        $result.TokenType | Should -Be "Bearer"
+        $result.token_type | Should -Be "Bearer"
     }
 
     It 'Throws an error when access token is not returned' {

@@ -10,7 +10,7 @@ Function Add-AuthenticationHTTPHeader {
         {$null} {
             throw "[Add-AuthenticationHTTPHeader] Error. The authentication token is null. Please ensure that the authentication token is set."
         }
-        {$_ -is [PersonalAccessToken]} {
+        {$_ -eq 'PersonalAccessToken'} {
 
             #
             # Personal Access Token
@@ -19,7 +19,7 @@ Function Add-AuthenticationHTTPHeader {
             $headerValue = "Authorization: Basic {0}" -f $Global:DSCAZDO_AuthenticationToken.Get()
             break
         }
-        {$_ -is [ManagedIdentityToken]} {
+        {$_ -eq 'ManagedIdentity'} {
 
             #
             # Managed Identity Token

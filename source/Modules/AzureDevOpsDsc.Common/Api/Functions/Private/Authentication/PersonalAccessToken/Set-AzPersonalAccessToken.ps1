@@ -30,9 +30,9 @@ Function Set-AzPersonalAccessToken {
     Write-Verbose "[Set-PersonalAccessToken] Setting the Personal Access Token for the organization $OrganizationName."
 
     # If a SecureString Personal Access Token is provided, parse it and set as the Token
-    if ($SecureStringPersonalAccessToken.IsPresent()) {
+    if ($SecureStringPersonalAccessToken) {
         $Token = New-PersonalAccessToken -SecureStringPersonalAccessToken $PersonalAccessToken
-    } elseif ($PersonalAccessToken.IsPresent()) {
+    } elseif ($PersonalAccessToken) {
         # TypeCast the response to a PersonalAccessToken object
         $Token = New-PersonalAccessToken -PersonalAccessToken $PersonalAccessToken
     } else {

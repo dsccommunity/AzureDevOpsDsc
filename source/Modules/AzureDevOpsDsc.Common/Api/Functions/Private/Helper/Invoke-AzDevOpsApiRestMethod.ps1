@@ -89,7 +89,11 @@ function Invoke-AzDevOpsApiRestMethod
 
         [Parameter()]
         [String]
-        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
+
+        [Parameter()]
+        [Switch]
+        $NoAuthentication
 
     )
 
@@ -149,7 +153,11 @@ function Invoke-AzDevOpsApiRestMethod
             #
             # Add the Authentication Header
 
-            $invokeRestMethodParameters.Headers.Authorization = Add-AuthenticationHTTPHeader
+            # If the 'NoAuthentication' switch is NOT PRESENT and the 'Authentication' header is empty, add the authentication header
+            if (([String]::IsNullOrEmpty($invokeRestMethodParameters.Headers.Authentication)) -and (-not $NoAuthentication.IsPresent))
+            {
+                $invokeRestMethodParameters.Headers.Authorization = Add-AuthenticationHTTPHeader
+            }
 
             #
             # Invoke the REST method

@@ -5,12 +5,12 @@ Class PersonalAccessToken : AuthenticationToken {
     hidden [SecureString]$access_token
 
     PersonalAccessToken([String]$PersonalAccessToken) {
-        $this.tokenType = [TokenType].PersonalAccessToken
+        $this.tokenType = [TokenType]::PersonalAccessToken
         $this.access_token = ConvertTo-Base64String -InputObject ":$($PersonalAccessToken)" | ConvertTo-SecureString -AsPlainText -Force
     }
 
     PersonalAccessToken([SecureString]$SecureStringPersonalAccessToken) {
-        $this.tokenType = [TokenType].PersonalAccessToken
+        $this.tokenType = [TokenType]::PersonalAccessToken
         $this.access_token = $SecureStringPersonalAccessToken
     }
 
