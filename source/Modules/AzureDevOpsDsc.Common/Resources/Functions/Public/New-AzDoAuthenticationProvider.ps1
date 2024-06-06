@@ -43,6 +43,12 @@ Function New-AzDoAuthenticationProvider {
         [Switch]
         $useManagedIdentity,
 
+        # Don't verify the Token
+        [Parameter(ParameterSetName = 'ManagedIdentity')]
+        [Parameter(ParameterSetName = 'PersonalAccessToken')]
+        [Switch]
+        $NoVerify,
+
         # Do not export the Token
         # Used by Resources that do not require the Token to be exported.
         [Parameter(ParameterSetName = 'PersonalAccessToken')]
@@ -65,16 +71,30 @@ Function New-AzDoAuthenticationProvider {
     #
     # If the parameterset is PersonalAccessToken
     if ($PSCmdlet.ParameterSetName -eq 'PersonalAccessToken') {
+
         Write-Verbose "[New-AzDoAuthenticationProvider] Creating a new Personal Access Token with OrganizationName $OrganizationName."
-        # If the Token is not Valid. Get a new Token.
-        $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken
+
+        # if the NoVerify switch is not set, verify the Token.
+        if ($NoVerify) {
+            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken
+        } else {
+            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken -Verify
+        }
+
     }
     #
     # If the parameterset is ManagedIdentity
     elseif ($PSCmdlet.ParameterSetName -eq 'ManagedIdentity') {
+
         Write-Verbose "[New-AzDoAuthenticationProvider] Creating a new Azure Managed Identity with OrganizationName $OrganizationName."
         # If the Token is not Valid. Get a new Token.
-        $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName -Verify
+
+        if ($NoVerify) {
+            $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName
+        } else {
+            $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName -Verify
+        }
+
     }
     #
     # If the parameterset is SecureStringPersonalAccessToken
@@ -113,7 +133,7 @@ Function New-AzDoAuthenticationProvider {
     Write-Verbose "[New-AzDoAuthenticationProvider] Exporting the Module Settings to $moduleSettingsPath."
 
     $objectSettings = [PSCustomObject]@{
-        OrganizationName = $AzureDevopsOrganizationName
+        OrganizationName = $Global:DSCAZDO_OrganizationName
         Token = $Global:DSCAZDO_AuthenticationToken
     }
 

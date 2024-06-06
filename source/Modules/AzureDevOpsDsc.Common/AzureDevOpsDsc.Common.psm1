@@ -75,7 +75,7 @@ Export-ModuleMember -Function 'Get-CacheItem'
 Export-ModuleMember -Function 'Get-AzDoAPIGroupCache'
 Export-ModuleMember -Function 'Get-AzDoAPIProjectCache'
 Export-ModuleMember -Function 'Initialize-CacheObject'
-
+Export-ModuleMember -Function 'Get-AzDoCacheObjects'
 Export-ModuleMember -Function '*-xAzDoProjectGroup'
 
 # Stop processing

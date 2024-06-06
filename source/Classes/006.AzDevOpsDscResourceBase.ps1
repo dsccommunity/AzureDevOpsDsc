@@ -14,22 +14,30 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     hidden Construct()
     {
+        Import-Module AzureDevOpsDsc.Common -ArgumentList @($true)
+
         # Ensure that $ENV:AZDODSC_CACHE_DIRECTORY is set. If not, throw an error.
         if (-not($ENV:AZDODSC_CACHE_DIRECTORY))
         {
+            Write-Verbose "[AzDevOpsDscResourceBase] The Environment Variable 'AZDODSC_CACHE_DIRECTORY' is not set."
             Throw "[AzDevOpsDscResourceBase] The Environment Variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the Environment Variable 'AZDODSC_CACHE_DIRECTORY' to the Cache Directory."
         }
 
         # Attempt to import the ModuleSettings.clixml file. If it does not exist, throw an error.
         $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
+        Write-Verbose "[AzDevOpsDscResourceBase] Looking for ModuleSettings.clixml at path: $moduleSettingsPath"
+
         # Check if the ModuleSettings.clixml file exists in the Cache Directory. If not, throw an error.
         if (-not(Test-Path -Path $moduleSettingsPath))
         {
             Throw "[AzDevOpsDscResourceBase] The ModuleSettings.clixml file does not exist in the Cache Directory. Please ensure that the file exists."
         }
 
+        Write-Verbose "[AzDevOpsDscResourceBase] Found ModuleSettings.clixml file."
+
         # Import the ModuleSettings.clixml file
         $objectSettings = Import-Clixml -LiteralPath $moduleSettingsPath
+        Write-Verbose "[AzDevOpsDscResourceBase] Successfully imported ModuleSettings.clixml."
 
         #
         # Import the Token information from the Cache Directory
@@ -38,47 +46,54 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         $tokenObject = $objectSettings.Token
         $access_token = $tokenObject.access_token
 
-        $Global:DSCAZDO_OrganizationName
-
         # Ensure that the access_token is not null or empty. If it is, throw an error.
         if ([String]::IsNullOrEmpty($access_token))
         {
             Throw "[AzDevOpsDscResourceBase] The Token information does not exist in the Cache Directory. Please ensure that the Token information exists."
         }
 
+        Write-Verbose "[AzDevOpsDscResourceBase] Access token retrieved successfully."
+
         #
         # Determine the type of Token (PersonalAccessToken or ManagedIdentity)
+
+        $tokenObject.tokenType.ToString() | Set-Content "C:\Temp\token.txt"
 
         switch ($tokenObject.tokenType.ToString()) {
 
             # If the Token is empty
             { [String]::IsNullOrEmpty($_) } {
+                Write-Verbose "[AzDevOpsDscResourceBase] Token type is null or empty."
                 Throw "[AzDevOpsDscResourceBase] The Token information does not exist in the Cache Directory. Please ensure that the Token information exists."
-                break;
             }
             # If the Token is a Personal Access Token
             { $_ -eq 'PersonalAccessToken' } {
-                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -SecureStringPersonalAccessToken $access_token -isResource
-                break;
+                Write-Verbose "[AzDevOpsDscResourceBase] Token type is Personal Access Token."
+                New-AzDoAuthenticationProvider -OrganizationName $organizationName -SecureStringPersonalAccessToken $access_token -isResource -NoVerify
             }
             # If the Token is a Managed Identity Token
             { $_ -eq 'ManagedIdentity' } {
-                # Create a Managed Identity Token
-                New-AzDoAuthenticationProvider -OrganizationName $OrganizationName -useManagedIdentity -isResource
-                break;
+                Write-Verbose "[AzDevOpsDscResourceBase] Token type is Managed Identity."
+                New-AzDoAuthenticationProvider -OrganizationName $organizationName -useManagedIdentity -isResource -NoVerify
             }
             # Default
             default {
+                Write-Verbose "[AzDevOpsDscResourceBase] Unknown token type."
                 Throw "[AzDevOpsDscResourceBase] The Token information does not exist in the Cache Directory. Please ensure that the Token information exists."
             }
 
         }
+
+        "123" | Export-CLixml "C:\Temp\a.txt"
+        Get-AzDoCacheObjects | Export-Clixml "C:\Temp\a.clixml"
 
         #
         # Initialize the cache objects. Don't delete the cache objects since they are used by other resources.
         Get-AzDoCacheObjects | ForEach-Object {
             Initialize-CacheObject -CacheType $_ -BypassFileCheck -Debug
+            Write-Verbose "[AzDevOpsDscResourceBase] Initialized cache object of type: $_"
         }
+
 
     }
 

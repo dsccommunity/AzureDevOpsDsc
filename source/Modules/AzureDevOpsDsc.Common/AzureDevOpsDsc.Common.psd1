@@ -32,6 +32,7 @@
         'Initialize-CacheObject',
 
         'New-AzDoAuthenticationProvider',
+        'Get-AzDoCacheObjects',
         'AzDoAPI_0_ProjectCache',
         'AzDoAPI_1_GroupCache',
         'AzDoAPI_2_UserCache',
