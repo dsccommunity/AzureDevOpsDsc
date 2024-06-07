@@ -24,11 +24,14 @@ Function Remove-xAzDoGroupMember {
 
     )
 
-    # Fetch the Group Identity
+    # Group Identity
     $GroupIdentity = Find-AzDoIdentity $GroupName
 
-    # Retrieve the group members from the cache
-    $CachedGroupMembers = Get-CacheObject -CacheType 'LiveGroupMembers'
+    # Format the  According to the Group Name
+    $Key = Format-AzDoProjectName -GroupName $GroupName -OrganizationName $Global:DSCAZDO_OrganizationName
+
+    # Check the cache for the group
+    $LiveGroupMembers = @(Get-CacheItem -Key $Key -Type 'LiveGroupMembers')
 
     $params = @{
         GroupIdentity = $GroupIdentity
@@ -36,27 +39,26 @@ Function Remove-xAzDoGroupMember {
     }
 
     Write-Verbose "[Remove-xAzDoGroupMember] Starting group member removal process for group '$GroupName'."
-    Write-Verbose "[Remove-xAzDoGroupMember] Group members: $($GroupMembers -join ',')."
+    Write-Verbose "[Remove-xAzDoGroupMember] Group members: $($LiveGroupMembers.principalName -join ',')."
 
     # Define the members
     $members = [System.Collections.Generic.List[object]]::new()
 
     # Fetch the group members and perform a lookup of the members
-    ForEach ($MemberIdentity in $GroupMembers) {
+    ForEach ($MemberIdentity in $LiveGroupMembers) {
 
         # Use the Find-AzDoIdentity function to search for an Azure DevOps identity that matches the given $MemberIdentity.
-        Write-Verbose "[Remove-xAzDoGroupMember] Looking up identity for member '$MemberIdentity'."
-        $identity = Find-AzDoIdentity -Identity $MemberIdentity
+        Write-Verbose "[Remove-xAzDoGroupMember] Looking up identity for member '$($MemberIdentity.principalName)'."
+        $identity = Find-AzDoIdentity -Identity $MemberIdentity.principalName
 
         # If the identity is not found, write a warning message to the console and continue to the next member.
         if ($null -eq $identity) {
-            Write-Warning "[Remove-xAzDoGroupMember] Unable to find identity for member '$MemberIdentity'."
+            Write-Warning "[Remove-xAzDoGroupMember] Unable to find identity for member '$($MemberIdentity.principalName)'."
             continue
         }
-        Write-Verbose "[Remove-xAzDoGroupMember] Found identity for member '$MemberIdentity'."
 
         # Call the New-DevOpsGroupMember function with a hashtable of parameters to add the found identity as a new member to a group.
-        Write-Verbose "[Remove-xAzDoGroupMember] Removing member '$MemberIdentity' to group '$($params.GroupIdentity.displayName)'."
+        Write-Verbose "[Remove-xAzDoGroupMember] Removing member '$($MemberIdentity.principalName)' from group '$($params.GroupIdentity.displayName)'."
 
         $result = Remove-DevOpsGroupMember @params -MemberIdentity $identity
 

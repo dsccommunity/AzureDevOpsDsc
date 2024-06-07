@@ -23,6 +23,9 @@ Function Set-xAzDoGroupMember {
 
     )
 
+
+    $LookupResult | Export-Clixml C:\Temp\test.xml
+
     "TRIGGERED" | Out-File "C:\Temp\Set-xAzDoGroupMember.txt"
 
     $return

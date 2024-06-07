@@ -69,15 +69,17 @@ Function Get-xAzDoGroupMember {
     }
 
     #
-    # Test if there are no group memebers in parameters
+    # Test if there are no group members in parameters
     if ($GroupMembers.Count -eq 0) {
+
+        Write-Verbose "[Get-xAzDoGroupMember] Group '$GroupName' not found in the parameters."
 
         # If there are no live group members, the group is unchanged.
         if ($livegroupMembers.Count -eq 0) {
             $getGroupResult.status = [DSCGetSummaryState]::Unchanged
         } else {
             # If there are live group members, the groups members are to be removed.
-            $getGroupResult.status = [DSCGetSummaryState]::Changed
+            $getGroupResult.status = [DSCGetSummaryState]::Missing
         }
 
         # Return the result
@@ -119,6 +121,8 @@ Function Get-xAzDoGroupMember {
         $getGroupResult.status = [DSCGetSummaryState]::Unchanged
 
     } else {
+
+        $getGroupResult | Export-Clixml "C:\Temp\Get-GroupResult.clixml"
 
         # Users on the left side are in the comparison object but not in the reference object are to be added.
         # Users on the right side are in the reference object but not in the comparison object are to be removed.

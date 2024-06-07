@@ -84,9 +84,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
         }
 
-        "123" | Export-CLixml "C:\Temp\a.txt"
-        Get-AzDoCacheObjects | Export-Clixml "C:\Temp\a.clixml"
-
         #
         # Initialize the cache objects. Don't delete the cache objects since they are used by other resources.
         Get-AzDoCacheObjects | ForEach-Object {
@@ -219,17 +216,19 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                     if ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::NotFound)
                     {
                         $dscRequiredAction = [RequiredAction]::New
-                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                        break
                     }
                     # If the resource has been renamed or changed, it is not in state. The resource needs to be updated.
                     if ($currentProperties.LookupResult.Status -in ([DSCGetSummaryState]::Changed, [DSCGetSummaryState]::Renamed))
                     {
                         $dscRequiredAction = [RequiredAction]::Set
-                        Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                        break
+                    }
+                    # If the resource has been removed, it is not in state. The resource needs to be added.
+                    if ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::Missing)
+                    {
+                        $dscRequiredAction = [RequiredAction]::Remove
                     }
 
+                    Write-Verbose "DscActionRequired='$dscRequiredAction'"
                     return $dscRequiredAction
                     break
 
