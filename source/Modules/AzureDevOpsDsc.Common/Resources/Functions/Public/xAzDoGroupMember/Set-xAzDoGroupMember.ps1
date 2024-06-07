@@ -23,6 +23,8 @@ Function Set-xAzDoGroupMember {
 
     )
 
+    #
+    # Add
 
     $LookupResult | Export-Clixml C:\Temp\test.xml
 

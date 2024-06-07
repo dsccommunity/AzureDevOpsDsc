@@ -92,8 +92,8 @@ Function Get-xAzDoGroupMember {
     # Compare the members of the live group with the parameters.
 
     # Format the parameters
-    $FormattedLiveGroups = [Array]($livegroupMembers | Where-Object { ($_.Key -replace "^(\[)|(\])", "") -eq $GroupName }).Value.principalName
-    $FormattedParametersGroups = $GroupMembers
+    $FormattedLiveGroups = @($livegroupMembers)
+    $FormattedParametersGroups = $GroupMembers | ForEach-Object { Find-AzDoIdentity $_ }
 
     # If the formatted live groups is empty. Modify the formatted live groups to be an empty array.
     if ($null -eq $FormattedLiveGroups) {
@@ -106,6 +106,7 @@ Function Get-xAzDoGroupMember {
     $params = @{
         ReferenceObject = $FormattedParametersGroups
         DifferenceObject = $FormattedLiveGroups
+        Property = 'originId'
     }
 
     #
@@ -122,14 +123,15 @@ Function Get-xAzDoGroupMember {
 
     } else {
 
-        $getGroupResult | Export-Clixml "C:\Temp\Get-GroupResult.clixml"
-
         # Users on the left side are in the comparison object but not in the reference object are to be added.
         # Users on the right side are in the reference object but not in the comparison object are to be removed.
         $getGroupResult.propertiesChanged += $members | ForEach-Object {
+            $originId = $_.originId
             @{
                 action = ($_.SideIndicator -eq '<=') ? 'Add' : 'Remove'
-                value = $_.InputObject
+                value = ($FormattedParametersGroups | Where-Object { $_.originId -eq $originId }) ??
+                        ($FormattedLiveGroups | Where-Object { $_.originId -eq $originId })
+
             }
         }
 
