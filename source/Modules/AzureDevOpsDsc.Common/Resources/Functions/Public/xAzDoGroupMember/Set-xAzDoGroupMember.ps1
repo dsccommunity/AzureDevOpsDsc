@@ -29,7 +29,8 @@ Function Set-xAzDoGroupMember {
     # Format the  According to the Group Name
     $Key = Format-AzDoProjectName -GroupName $GroupName -OrganizationName $Global:DSCAZDO_OrganizationName
     # Check the cache for the group
-    $members = @(Get-CacheItem -Key $Key -Type 'LiveGroupMembers')
+    $members = [System.Collections.ArrayList]::New()
+    Get-CacheItem -Key $Key -Type 'LiveGroupMembers' | ForEach-Object { $members.Add($_) }
 
     # If the lookup result is not provided, we need to look it up.
     if ($null -eq $LookupResult.propertiesChanged) {

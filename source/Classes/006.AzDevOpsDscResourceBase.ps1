@@ -57,8 +57,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         #
         # Determine the type of Token (PersonalAccessToken or ManagedIdentity)
 
-        $tokenObject.tokenType.ToString() | Set-Content "C:\Temp\token.txt"
-
         switch ($tokenObject.tokenType.ToString()) {
 
             # If the Token is empty
