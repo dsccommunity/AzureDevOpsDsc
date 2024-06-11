@@ -1,4 +1,14 @@
 function Get-AzDoCacheObjects
 {
-    return 'Group', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers'
+    return @(
+        'Project',
+        'Team',
+        'Group',
+        'SecurityDescriptor',
+        'LiveGroups',
+        'LiveProjects',
+        'LiveUsers',
+        'LiveGroupMembers',
+        'LiveGitRepositories'
+
 }

@@ -19,7 +19,7 @@ Function Initialize-CacheObject {
     param(
         # Specifies the type of cache to initialize. Valid values are 'Project', 'Team', 'Group', and 'SecurityDescriptor'.
         [Parameter(Mandatory,ValueFromPipeline)]
-        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers')]
+        [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]$CacheType,
         # Used to bypass the file deletion check for live caches. Needed for DSC Resources to import the cache.
         [Parameter()]

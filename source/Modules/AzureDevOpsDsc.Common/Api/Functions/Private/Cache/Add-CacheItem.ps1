@@ -32,7 +32,7 @@ Function Add-CacheItem {
         $Value,
 
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers')]
+        [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]
         $Type
     )

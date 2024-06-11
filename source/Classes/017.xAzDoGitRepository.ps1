@@ -1,8 +1,5 @@
-
-#[DscResource()]
-#[DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
-class xAzDoGitPermission : AzDevOpsDscResourceBase
+class xAzDoGitRepository : AzDevOpsDscResourceBase
 {
     [DscProperty(Key, Mandatory)]
     [Alias('Name')]
@@ -10,11 +7,11 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
 
     [DscProperty(Key, Mandatory)]
     [Alias('Repository')]
-    [System.String]$RepositoryName
+    [System.String]$GitRepositoryName
 
-    [DscProperty(Mandatory)]
-    [Alias('Members')]
-    [System.String[]]$Permissions
+    [DscProperty()]
+    [Alias('Source')]
+    [System.String]$SourceRepository
 
     xAzDoGroupMember()
     {
@@ -40,8 +37,9 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
         # If the resource object is null, return the properties
         if ($null -eq $CurrentResourceObject) { return $properties }
 
-        $properties.GroupName           = $CurrentResourceObject.GroupName
-        $properties.GroupMembers        = $CurrentResourceObject.GroupMembers
+        $properties.ProjectName         = $CurrentResourceObject.Name
+        $properties.GitRepositoryName   = $CurrentResourceObject.Repository
+        $properties.SourceRepository    = $CurrentResourceObject.Source
         $properties.Ensure              = $CurrentResourceObject.Ensure
         $properties.LookupResult        = $CurrentResourceObject.LookupResult
 

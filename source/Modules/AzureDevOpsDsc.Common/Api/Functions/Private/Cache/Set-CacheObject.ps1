@@ -38,7 +38,7 @@ function Set-CacheObject
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [ValidateSet('Project','Team', 'Group', 'SecurityDescriptor', 'LiveGroups', 'LiveProjects', 'LiveUsers', 'LiveGroupMembers')]
+        [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]$CacheType,
 
         [Parameter()]
