@@ -1,5 +1,6 @@
 
-function List-DevOpsProjects {
+function List-DevOpsProjects
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -19,7 +20,8 @@ function List-DevOpsProjects {
     # Invoke the Rest API to get the groups
     $groups = Invoke-AzDevOpsApiRestMethod @params
 
-    if ($null -eq $groups.value) {
+    if ($null -eq $groups.value)
+    {
         return $null
     }
 
