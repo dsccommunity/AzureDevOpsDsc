@@ -37,7 +37,7 @@ function AzDoAPI_4_GitRepositoryCache
                 # Log the addition of each repository to the cache
                 Write-Verbose "[AzDoAPI_4_GitRepositoryCache] Adding Repository '$($repository.Name)' to the cache."
                 # Add the repository to the cache with its name as the key
-                Add-CacheItem -Key "[$ProjectName]\$($repository.Name)" -Value -Type 'LiveRepositories'
+                Add-CacheItem -Key "$ProjectName\$($repository.Name)" -Value -Type 'LiveRepositories'
             }
 
         }

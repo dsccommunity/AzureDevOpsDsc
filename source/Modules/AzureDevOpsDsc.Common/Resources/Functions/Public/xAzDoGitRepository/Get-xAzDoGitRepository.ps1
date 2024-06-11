@@ -30,21 +30,37 @@ Function Get-xAzDoGitRepository {
     )
 
     #
-    # Attempt to retrive the Project Group from the Live and Local Cache.
+    # Construct a hashtable detailing the group
 
-    Write-Verbose "[Get-xAzDoGitRepository] Retriving the Project Group from the Live and Local Cache."
-
-    # Retrive the Project
-    $project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
-
-    # If the Project is not found in the Live Cache, write a warning
-    if (-not $project) {
-        Write-Warning "[Get-xAzDoGitRepository] The Project '$ProjectName' was not found in the Live Cache."
+    $getRepositoryResult = @{
+        #Reasons = $()
+        Ensure = [Ensure]::Absent
+        liveCache = $livegroup
+        propertiesChanged = @()
+        status = $null
     }
 
-    # Attempt to retrive the Git Repository from the Live Cache.
 
+    #
+    # Attempt to retrive the Project Group from the Live and Local Cache.
+    Write-Verbose "[Get-xAzDoGitRepository] Retriving the Project Group from the Live and Local Cache."
 
+    # Format the Key for the Project Group.
+    $projectGroupKey = "$ProjectName\$RepositoryName"
 
+    # Retrive the Repositories from the Live Cache.
+    $repository = Get-CacheItem -Key $projectGroupKey -Type 'LiveRepositories'
+
+    # If the Repository exists in the Live Cache, return the Repository object.
+    if ($repository) {
+        Write-Verbose "[Get-xAzDoGitRepository] The Repository '$RepositoryName' was found in the Live Cache."
+        $getRepositoryResult.status = [DSCGetSummaryState]::Unchanged
+    } else {
+        Write-Verbose "[Get-xAzDoGitRepository] The Repository '$RepositoryName' was not found in the Live Cache."
+        $getRepositoryResult.status = [DSCGetSummaryState]::NotFound
+    }
+
+    # Return the Repository object.
+    return $getRepositoryResult
 
 }
