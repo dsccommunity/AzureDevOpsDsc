@@ -75,7 +75,7 @@ Function Remove-xAzDoGroupMember {
     Remove-CacheItem -Key $GroupIdentity.principalName -Type 'LiveGroupMembers'
 
     Write-Verbose "[Remove-xAzDoGroupMember] Updated global cache with live group information."
-    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroupMembers'
+    Set-CacheObject -Content $Global:AzDoLiveGroupMembers -CacheType 'LiveGroupMembers'
 
     # Write a verbose log message indicating that the function has completed the group member removal process.
     Write-Verbose "[Remove-xAzDoGroupMember] Completed group member removal process for group '$GroupName'."

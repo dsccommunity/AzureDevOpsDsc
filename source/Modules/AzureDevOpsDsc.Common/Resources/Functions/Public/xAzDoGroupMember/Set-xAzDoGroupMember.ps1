@@ -109,6 +109,6 @@ Function Set-xAzDoGroupMember {
     Add-CacheItem -Key $GroupIdentity.principalName -Value $members -Type 'LiveGroupMembers'
 
     Write-Verbose "[Set-xAzDoGroupMember] Updated global cache with live group information."
-    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroupMembers'
+    Set-CacheObject -Content $Global:AzDoLiveGroupMembers -CacheType 'LiveGroupMembers'
 
 }

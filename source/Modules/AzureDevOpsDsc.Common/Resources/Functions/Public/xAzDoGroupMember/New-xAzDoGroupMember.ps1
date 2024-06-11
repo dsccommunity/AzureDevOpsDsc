@@ -88,7 +88,7 @@ Function New-xAzDoGroupMember {
     Add-CacheItem -Key $GroupIdentity.principalName -Value $members -Type 'LiveGroupMembers'
 
     Write-Verbose "[New-xAzDoGroupMember] Updated global cache with live group information."
-    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroupMembers'
+    Set-CacheObject -Content $Global:AzDoLiveGroupMembers -CacheType 'LiveGroupMembers'
 
     # Write a verbose log message indicating that the function has completed the group member addition process.
     Write-Verbose "[New-xAzDoGroupMember] Completed group member addition process for group '$GroupName'."
