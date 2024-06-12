@@ -13,7 +13,7 @@ Function Remove-GitRepository {
         [Object]$Project,
 
         [Parameter(Mandatory)]
-        [Alias('Repository')]
+        [Alias('Repo')]
         [Object]$Repository,
 
         [Parameter()]

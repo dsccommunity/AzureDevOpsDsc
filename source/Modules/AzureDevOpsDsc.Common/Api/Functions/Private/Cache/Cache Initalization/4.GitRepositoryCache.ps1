@@ -43,7 +43,7 @@ function AzDoAPI_4_GitRepositoryCache
         }
 
         # Export the cache to a file
-        Export-CacheObject -CacheType 'LiveGroupMembers' -Content $AzDoLiveRepositories
+        Export-CacheObject -CacheType 'LiveRepositories' -Content $AzDoLiveRepositories
         Write-Verbose "[AzDoAPI_4_GitRepositoryCache] Completed adding groups to cache."
 
     }

@@ -34,14 +34,15 @@ Function Remove-xAzDoGitRepository
     $params = @{
         ApiUri = "https://dev.azure.com/{0}/" -f $Global:DSCAZDO_OrganizationName
         Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
-        Repository  = Get-CacheItem -Key "$ProjectName\$RepositoryName" -Type 'LiveProjects'
+        Repository  = Get-CacheItem -Key "$ProjectName\$RepositoryName" -Type 'LiveRepositories'
     }
 
     # Create a new repository
     $value = Remove-GitRepository @params
 
     # Add the repository to the LiveRepositories cache and write to verbose log
-    Add-CacheItem -Key "$ProjectName\$RepositoryName" -Value $value -Type 'LiveRepositories'
+    Remove-CacheItem -Key "$ProjectName\$RepositoryName" -Type 'LiveRepositories'
+    Export-CacheObject -CacheType 'LiveRepositories' -Content $AzDoLiveRepositories
     Write-Verbose "[Remove-xAzDoGitRepository] Added new group to LiveGroups cache with key: '$($value.Name)'"
 
 }
