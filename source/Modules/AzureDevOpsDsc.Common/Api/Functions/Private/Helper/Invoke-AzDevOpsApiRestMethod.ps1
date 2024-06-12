@@ -177,6 +177,8 @@ function Invoke-AzDevOpsApiRestMethod
                     # Update the Rate Limit information
                     $Global:DSCAZDO_APIRateLimit = $null
 
+                    Write-Verbose "[Invoke-AzDevOpsApiRestMethod] No continuation token found. Breaking loop."
+
                     return $results
 
                 }

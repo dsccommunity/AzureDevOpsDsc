@@ -8,7 +8,7 @@ Function New-xAzDoGitRepository {
     (
         [Parameter(Mandatory)]
         [Alias('Name')]
-        [System.String]$ProjectName
+        [System.String]$ProjectName,
 
         [Parameter(Mandatory)]
         [Alias('Repository')]
@@ -16,7 +16,7 @@ Function New-xAzDoGitRepository {
 
         [Parameter()]
         [Alias('Source')]
-        [System.String]$SourceRepository
+        [System.String]$SourceRepository,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -34,7 +34,7 @@ Function New-xAzDoGitRepository {
     # Define parameters for creating a new DevOps group
     $params = @{
         ApiUri = "https://dev.azure.com/{0}/" -f $Global:DSCAZDO_OrganizationName
-        ProjectName = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+        Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
         RepositoryName = $RepositoryName
         SourceRepository = $SourceRepository
     }
@@ -43,7 +43,7 @@ Function New-xAzDoGitRepository {
     $value = New-GitRepository @params
 
     # Add the repository to the LiveRepositories cache and write to verbose log
-    Add-CacheItem -Key "$ProjectName\$RepositoryName" -Value $value -Type 'LiveRepositories'
+   # Add-CacheItem -Key "$ProjectName\$RepositoryName" -Value $value -Type 'LiveRepositories'
     Write-Verbose "[New-xAzDoGitRepository] Added new group to LiveGroups cache with key: '$($value.Name)'"
 
 }

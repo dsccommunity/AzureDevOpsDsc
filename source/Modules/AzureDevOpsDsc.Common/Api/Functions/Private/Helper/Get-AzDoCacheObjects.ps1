@@ -9,6 +9,7 @@ function Get-AzDoCacheObjects
         'LiveProjects',
         'LiveUsers',
         'LiveGroupMembers',
-        'LiveGitRepositories'
+        'LiveRepositories'
+    )
 
 }

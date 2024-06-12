@@ -64,6 +64,9 @@
         'Remove-xAzDoGroupMember',
         'Test-xAzDoGroupMember'
 
+        'Get-xAzDoGitRepository',
+        'New-xAzDoGitRepository',
+        'Remove-xAzDoGitRepository'
 
     )
 

@@ -20,14 +20,18 @@ Function New-GitRepository {
         [Alias('Source')]
         [System.String]$SourceRepository,
 
+        [Parameter()]
+        [String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+
     )
 
     Write-Verbose "[New-GitRepository] Creating new repository '$($RepositoryName)' in project '$($Project.name)'"
 
     # Define parameters for creating a new DevOps group
     $params = @{
-        ApiUri = "{0}/{1}/_apis/git/repositories" -f $ApiUri, $Project.name
-        Method = 'Post'
+        ApiUri = "{0}/{1}/_apis/git/repositories?api-version={2}" -f $ApiUri, $Project.name, $ApiVersion
+        Method = 'POST'
         ContentType = 'application/json'
         Body = @{
             name = $RepositoryName
@@ -40,6 +44,7 @@ Function New-GitRepository {
     # Try to invoke the REST method to create the group and return the result
     try {
         $repo = Invoke-AzDevOpsApiRestMethod @params
+        Write-Verbose "[New-GitRepository] Repository Created: '$($repo.name)'"
         return $repo
     }
     # Catch any exceptions and write an error message

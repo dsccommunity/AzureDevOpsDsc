@@ -6,7 +6,7 @@ Function Remove-xAzDoGitRepository
     (
         [Parameter(Mandatory)]
         [Alias('Name')]
-        [System.String]$ProjectName
+        [System.String]$ProjectName,
 
         [Parameter(Mandatory)]
         [Alias('Repository')]
@@ -14,7 +14,7 @@ Function Remove-xAzDoGitRepository
 
         [Parameter()]
         [Alias('Source')]
-        [System.String]$SourceRepository
+        [System.String]$SourceRepository,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -33,7 +33,7 @@ Function Remove-xAzDoGitRepository
     # Define parameters for creating a new DevOps group
     $params = @{
         ApiUri = "https://dev.azure.com/{0}/" -f $Global:DSCAZDO_OrganizationName
-        ProjectName = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+        Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
         Repository  = Get-CacheItem -Key "$ProjectName\$RepositoryName" -Type 'LiveProjects'
     }
 

@@ -47,13 +47,13 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDoGitRepository : AzDevOpsDscResourceBase
 {
-    [DscProperty(Key, Mandatory)]
+    [DscProperty(Mandatory)]
     [Alias('Name')]
     [System.String]$ProjectName
 
     [DscProperty(Key, Mandatory)]
     [Alias('Repository')]
-    [System.String]$GitRepositoryName
+    [System.String]$RepositoryName
 
     [DscProperty()]
     [Alias('Source')]

@@ -45,6 +45,8 @@ Function Add-AuthenticationHTTPHeader {
 
     }
 
+    Write-Verbose "[Add-AuthenticationHTTPHeader] Adding Header"
+
     # Return the header value
     return $headerValue
 

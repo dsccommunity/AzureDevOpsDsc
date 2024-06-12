@@ -8,7 +8,7 @@ Function Get-xAzDoGitRepository {
     (
         [Parameter(Mandatory)]
         [Alias('Name')]
-        [System.String]$ProjectName
+        [System.String]$ProjectName,
 
         [Parameter(Mandatory)]
         [Alias('Repository')]
@@ -16,7 +16,7 @@ Function Get-xAzDoGitRepository {
 
         [Parameter()]
         [Alias('Source')]
-        [System.String]$SourceRepository
+        [System.String]$SourceRepository,
 
         [Parameter()]
         [HashTable]$LookupResult,

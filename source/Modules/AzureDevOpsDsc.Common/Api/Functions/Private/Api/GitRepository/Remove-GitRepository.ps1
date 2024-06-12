@@ -14,7 +14,11 @@ Function Remove-GitRepository {
 
         [Parameter(Mandatory)]
         [Alias('Repository')]
-        [Object]$Repository
+        [Object]$Repository,
+
+        [Parameter()]
+        [String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
 
     )
 
@@ -22,7 +26,7 @@ Function Remove-GitRepository {
 
     # Define parameters for creating a new DevOps group
     $params = @{
-        ApiUri = "{0}/{1}/_apis/git/repositories/{2}" -f $ApiUri, $Project.name, $Repository.id
+        ApiUri = "{0}/{1}/_apis/git/repositories/{2}?api-version={3}" -f $ApiUri, $Project.name, $Repository.id , $ApiVersion
         Method = 'Delete'
     }
 
