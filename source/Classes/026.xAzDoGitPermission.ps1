@@ -16,9 +16,9 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
     [Alias('Inherited')]
     [System.Boolean]$isInherited=$true
 
-    [DscProperty(Mandatory)]
-    [Alias('Members')]
-    [HashTable[]]$Permissions
+    [DscProperty()]
+    [Alias('Permissions')]
+    [Permission[]]$PermissionsList
 
     xAzDoGroupMember()
     {
@@ -44,10 +44,12 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
         # If the resource object is null, return the properties
         if ($null -eq $CurrentResourceObject) { return $properties }
 
-        $properties.GroupName           = $CurrentResourceObject.GroupName
-        $properties.GroupMembers        = $CurrentResourceObject.GroupMembers
-        $properties.Ensure              = $CurrentResourceObject.Ensure
-        $properties.LookupResult        = $CurrentResourceObject.LookupResult
+        $properties.ProjectName           = $CurrentResourceObject.ProjectName
+        $properties.RepositoryName        = $CurrentResourceObject.RepositoryName
+        $properties.isInherited           = $CurrentResourceObject.isInherited
+        $properties.PermissionsList           = $CurrentResourceObject.PermissionsList
+        $properties.lookupResult          = $CurrentResourceObject.lookupResult
+        $properties.Ensure                = $CurrentResourceObject.Ensure
 
         Write-Verbose "[xAzDoProjectGroup] Current state properties: $($properties | Out-String)"
 

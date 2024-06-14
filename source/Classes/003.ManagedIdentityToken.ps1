@@ -14,7 +14,7 @@ Class ManagedIdentityToken : AuthenticationToken {
         $this.tokenType = [TokenType]::ManagedIdentity
 
         # Validate that ManagedIdentityTokenObj is a HashTable and Contains the correct keys
-        if (-not $this.isValid($ManagedIdentityTokenObj)) { throw "The ManagedIdentityTokenObj is not valid." }
+        if (-not $this.isValid($ManagedIdentityTokenObj)) { throw "[ManagedIdentityToken] The ManagedIdentityTokenObj is not valid." }
 
         $epochStart = [datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)
 
