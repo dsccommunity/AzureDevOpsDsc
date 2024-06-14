@@ -8,13 +8,17 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
     [Alias('Name')]
     [System.String]$ProjectName
 
-    [DscProperty(Key, Mandatory)]
+    [DscProperty(Mandatory)]
     [Alias('Repository')]
     [System.String]$RepositoryName
 
+    [DscProperty()]
+    [Alias('Inherited')]
+    [System.Boolean]$isInherited=$true
+
     [DscProperty(Mandatory)]
     [Alias('Members')]
-    [System.String[]]$Permissions
+    [HashTable[]]$Permissions
 
     xAzDoGroupMember()
     {
