@@ -1,6 +1,47 @@
+<#
+.SYNOPSIS
+    This class represents an Azure DevOps DSC resource for managing Git permissions.
 
-#[DscResource()]
-#[DscResource()]
+.DESCRIPTION
+    The xAzDoGitPermission class is a DSC resource that allows you to manage Git permissions in Azure DevOps. It inherits from the AzDevOpsDscResourceBase class and provides properties and methods for managing Git permissions.
+
+.PARAMETER ProjectName
+    Specifies the name of the Azure DevOps project.
+
+.PARAMETER RepositoryName
+    Specifies the name of the Git repository.
+
+.PARAMETER isInherited
+    Specifies whether the permissions are inherited from the parent repository. Default value is $true.
+
+.PARAMETER PermissionsList
+    Specifies the list of permissions to be set for the repository.
+
+.NOTES
+    This class is part of the AzureDevOpsDSC module.
+
+.LINK
+    https://github.com/Azure/AzureDevOpsDSC
+
+.EXAMPLE
+    This example shows how to use the xAzDoGitPermission class to manage Git permissions in Azure DevOps.
+
+    Configuration Example {
+        Import-DscResource -ModuleName AzureDevOpsDSC
+
+        Node localhost {
+            xAzDoGitPermission GitPermission {
+                ProjectName = 'MyProject'
+                RepositoryName = 'MyRepository'
+                PermissionsList = @('Read', 'Contribute')
+                Ensure = 'Present'
+            }
+        }
+    }
+
+#>
+
+[DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDoGitPermission : AzDevOpsDscResourceBase
 {
@@ -17,17 +58,16 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
     [System.Boolean]$isInherited=$true
 
     [DscProperty()]
-    [Alias('Permissions')]
-    [Permission[]]$PermissionsList
+    [HashTable[]]$Permissions
 
-    xAzDoGroupMember()
+    xAzDoGitPermission()
     {
         $this.Construct()
     }
 
-    [xAzDoGroupMember] Get()
+    [xAzDoGitPermission] Get()
     {
-        return [xAzDoGroupMember]$($this.GetDscCurrentStateProperties())
+        return [xAzDoGitPermission]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
@@ -47,11 +87,11 @@ class xAzDoGitPermission : AzDevOpsDscResourceBase
         $properties.ProjectName           = $CurrentResourceObject.ProjectName
         $properties.RepositoryName        = $CurrentResourceObject.RepositoryName
         $properties.isInherited           = $CurrentResourceObject.isInherited
-        $properties.PermissionsList           = $CurrentResourceObject.PermissionsList
+        $properties.Permissions           = $CurrentResourceObject.Permissions
         $properties.lookupResult          = $CurrentResourceObject.lookupResult
         $properties.Ensure                = $CurrentResourceObject.Ensure
 
-        Write-Verbose "[xAzDoProjectGroup] Current state properties: $($properties | Out-String)"
+        Write-Verbose "[xAzDoGitPermission] Current state properties: $($properties | Out-String)"
 
         return $properties
     }

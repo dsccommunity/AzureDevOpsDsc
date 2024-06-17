@@ -41,56 +41,43 @@ Class Permission {
     }
 
     # Constructor
-    Permission([HashTable]$Permission, [DescriptorType]$DescriptorType) {
+    Permission([HashTable]$Permission, [DescriptorType]$DescriptorType, [Object]$Actions) {
 
         $this.Identity = $Permission.Identity
         $this.DescriptorType = $DescriptorType
-        $this.Permissions = FormatPermissions($Permission.Permissions)
+        $this.Permissions = $this.FormatPermissions($Permission.permission, $Actions)
 
     }
 
+
+
     # Function to format the permissions
-    FormatPermissions([HashTable[]]$Permissions) {
+    [System.Collections.Generic.List[HashTable]]FormatPermissions([HashTable]$Permissions, [Object]$Actions) {
 
         # Define an Array List
         $formattedPermissions = [System.Collections.Generic.List[HashTable]]::new()
 
         # Test if the Permissions is an array
-        if ($Permissions -isnot [System.Array]) {
+        if ($Actions -isnot [System.Array]) {
             throw "[Permission] Unable to convert the Permissions to a Permission object. The Permissions is not an array."
         }
 
         # Test if the Permissions is empty
-        if ($Permissions.Length -eq 0) {
+        if ($Permissions.Count -eq 0) {
             throw "[Permission] Unable to convert the Permissions to a Permission object. The Permissions array is empty."
         }
 
-        # Depending on the DescriptorType, the permissions set will be different
-        $moduleSettingsPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "ModuleSettings.clixml"
-        # Import the ModuleSettings file
-        $ModuleSettings = Import-Clixml -LiteralPath $moduleSettingsPath
-        # Import the DescriptorTypes Module
-        $DescriptorTypes = Import-Module -LiteralPath $ModuleSettings.DescriptorTypes | Where-Object { $_.Name -eq $this.DescriptorType }
-
+        #
         # Iterate through each of the descriptor types and match them against the list.
-        ForEach ($Permission in $Permissions) {
+        ForEach ($PermissionKey in $Permissions.Keys) {
 
-            $Key = $Permission.Keys
-            $Value = $Permission.Values
-
-            # Check that the Permission key existing within the descriptor types list.
-            if ($DescriptorTypes.Names -notcontains $Key) {
-                Write-Warning "[Permission] The Permission key: $($Key) does not exist within the DescriptorTypes list. It will be excluded from the Permission object."
-                continue
-            }
-            # Check that the Permission value is a valid value for the descriptor type.
-            if ($DescriptorTypes[$Key].Values -notcontains $Value) {
-                Write-Warning "[Permission] The Permission value: $($Permissions[$Permission]) is not a valid value for the DescriptorType: $this.DescriptorType. It will be excluded from the Permission object."
-                continue
-            }
+            $Value = $Permissions."$($PermissionKey)"
+           # $action = $Actions | Where-Object { $_.displayName -eq $PermissionKey }
 
             # Add the Permission
-            $formattedPermissions.Add(@{ $Key = $Value})
+            $formattedPermissions.Add(
+                @{ $PermissionKey = $Value }
+            )
 
         }
         # Return the formatted permissions
@@ -100,31 +87,59 @@ Class Permission {
 
     #
     # Function to convert the imported Permissions list into a Permission object list
-    static [Permission[]] ConvertTo([Object]$Permissions, [DescriptorType]$DescriptorType) {
+    static [Permission[]] ConvertTo([HashTable[]]$Permissions, [String]$DescriptorType, [Object]$SecurityNamespace) {
 
-        #
-        # Test if the Permission
-
-        # Test if the Permissions is an array
-        if ($Permissions -isnot [System.Array]) {
-            throw "[Permission] Unable to convert the Permissions to a Permission object. The Permissions is not an array."
-        }
-
-        # Test if the Permissions is empty
-        if ($Permissions.Length -eq 0) {
-            throw "[Permission] Unable to convert the Permissions to a Permission object. The Permissions array is empty."
-        }
-
-        # Iterate through each of the array items and convert them to a Permission object
+        # Define an Array List
         $convertedPermissions = [System.Collections.Generic.List[Permission]]::new()
 
+        # Test if the Namespace is empty
+        if ($null -eq $SecurityNamespace) {
+            Write-Warning "[Permission] Unable to convert the Permissions to a Permission object. The Namespace is empty."
+            return $convertedPermissions
+        }
+
+        # Test if the Actions within the namespace is empty
+        if ($SecurityNamespace.actions.count -eq 0) {
+            Write-Warning "[Permission] Unable to convert the Permissions to a Permission object. The Permissions array is empty."
+            return $convertedPermissions
+        }
+
+        #
+        # Iterate through each of the descriptor types and match them against the list.
+        $actions = $SecurityNamespace.Actions | Select-Object *, @{Name="FormattedName";Expression={$_.Name.Replace("_", "")}}
+
+        $Permissions | Export-Clixml C:\Temp\Permissions.clixml
+        $actions | Export-Clixml C:\Temp\Actions.clixml
         foreach ($permission in $Permissions) {
-            $convertedPermissions.Add([Permission]::new($permission, $DescriptorType))
+            $convertedPermissions.Add([Permission]::new($permission, $DescriptorType, $actions))
         }
 
         # Return the converted permissions
         return $convertedPermissions
 
     }
+
+}
+
+Function Global:ConvertTo-Permission {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [HashTable[]]$Permissions,
+
+        [Parameter(Mandatory)]
+        [String]$DescriptorType,
+
+        [Parameter(Mandatory)]
+        [Object]$SecurityNamespace
+    )
+
+    Write-Verbose "[ConvertTo-Permission] Started."
+
+    # Convert the Permissions to a Permission object
+    $convertedPermissions = [Permission]::ConvertTo($Permissions, $DescriptorType, $SecurityNamespace)
+
+    # Return the converted permissions
+    return $convertedPermissions
 
 }

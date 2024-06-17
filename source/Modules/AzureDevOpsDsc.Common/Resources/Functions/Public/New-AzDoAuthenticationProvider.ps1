@@ -135,6 +135,7 @@ Function New-AzDoAuthenticationProvider {
     $objectSettings = [PSCustomObject]@{
         OrganizationName = $Global:DSCAZDO_OrganizationName
         Token = $Global:DSCAZDO_AuthenticationToken
+        SecurityDescriptorTypes = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "SecurityDescriptors.clixml"
     }
 
     # Export the Object to the Cache Directory

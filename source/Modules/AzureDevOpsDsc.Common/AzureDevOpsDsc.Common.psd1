@@ -66,7 +66,12 @@
 
         'Get-xAzDoGitRepository',
         'New-xAzDoGitRepository',
-        'Remove-xAzDoGitRepository'
+        'Remove-xAzDoGitRepository',
+
+        'Get-xAzDoGitPermission',
+        'New-xAzDoGitPermission',
+        'Remove-xAzDoGitPermission',
+        'Set-xAzDoGitPermission'
 
     )
 

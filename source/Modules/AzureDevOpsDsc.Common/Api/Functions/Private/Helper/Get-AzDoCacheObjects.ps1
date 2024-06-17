@@ -9,7 +9,8 @@ function Get-AzDoCacheObjects
         'LiveProjects',
         'LiveUsers',
         'LiveGroupMembers',
-        'LiveRepositories'
+        'LiveRepositories',
+        'SecurityNamespaces'
     )
 
 }

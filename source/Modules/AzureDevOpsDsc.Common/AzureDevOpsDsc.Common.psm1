@@ -80,4 +80,3 @@ Export-ModuleMember -Function '*-xAzDoProjectGroup'
 
 # Stop processing
 if ($isClass) { return }
-
