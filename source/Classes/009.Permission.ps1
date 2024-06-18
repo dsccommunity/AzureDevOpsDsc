@@ -139,7 +139,7 @@ Class Permission {
 
     }
 
-    static [System.Collections.Generic.List[Permission]] ConvertFrom([Object]$ACLList, [String]$DescriptorType) {
+    static [System.Collections.Generic.List[Permission]] ConvertFrom([Object]$ACLList) {
 
         # Define an Array List
         $convertedPermissions = [System.Collections.Generic.List[Permission]]::new()
