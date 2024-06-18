@@ -60,9 +60,7 @@ Function Get-xAzDoGitPermission {
 
     Write-Verbose "[Get-xAzDoGitPermission] Converting Permissions to Permission object."
 
-    $permissions = ConvertTo-Permission @params
+    $var = ConvertTo-Permission @params
 
-
-    "triggered" | Set-Content -Path C:\Temp\triggered.txt
 }
 

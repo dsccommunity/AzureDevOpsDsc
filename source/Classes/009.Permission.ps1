@@ -34,7 +34,7 @@
 Class Permission {
 
     [String]$Identity
-    [HashTable[]]$Permissions
+    [System.Collections.Generic.List[HashTable]]$Permissions
     hidden [DescriptorType]$DescriptorType
 
     Permission() {
@@ -45,41 +45,61 @@ Class Permission {
 
         $this.Identity = $Permission.Identity
         $this.DescriptorType = $DescriptorType
-        $this.Permissions = $this.FormatPermissions($Permission.permission, $Actions)
+        $this.Permissions = $this.FormatPermissions($Permission.permissions, $Actions)
 
     }
 
 
-
+    #
     # Function to format the permissions
-    [System.Collections.Generic.List[HashTable]]FormatPermissions([HashTable]$Permissions, [Object]$Actions) {
+    [System.Collections.Generic.List[HashTable]]FormatPermissions([Object]$Permissions, [Object]$Actions) {
+
+        Write-Verbose "[Permission]::FormatPermissions() Started."
 
         # Define an Array List
         $formattedPermissions = [System.Collections.Generic.List[HashTable]]::new()
 
         # Test if the Permissions is an array
-        if ($Actions -isnot [System.Array]) {
-            throw "[Permission] Unable to convert the Permissions to a Permission object. The Permissions is not an array."
+        if ($Actions.GetType().BaseType.Name -eq 'Array') {
+            Write-Warning "[Permission] Unable to convert the Permissions to a Permission object. The Permissions is not an array. The Permissions will be ignored."
+            return $formattedPermissions
         }
 
         # Test if the Permissions is empty
         if ($Permissions.Count -eq 0) {
-            throw "[Permission] Unable to convert the Permissions to a Permission object. The Permissions array is empty."
+            Write-Warning "[Permission] Unable to convert the Permissions to a Permission object. The Permissions array is empty. The Permissions will be ignored."
+            return $formattedPermissions
         }
 
         #
         # Iterate through each of the descriptor types and match them against the list.
         ForEach ($PermissionKey in $Permissions.Keys) {
 
-            $Value = $Permissions."$($PermissionKey)"
-           # $action = $Actions | Where-Object { $_.displayName -eq $PermissionKey }
+            Write-Verbose "[Permission]::FormatPermissions() Processing permission '$PermissionKey'."
+
+            $enumValue = $null
+            # Get the value of the permission
+            $value = $Permissions."$($PermissionKey)"
+
+            # Test to make sure the permission key is part of the actions
+            if ($Actions.DisplayName -notcontains $PermissionKey) {
+                Write-Warning "[Permission] The permission '$PermissionKey' is not part of the actions. The permission will be ignored."
+                continue
+            }
+
+            # Attempt to typecast the value to an ACLPermission
+            if (-not([System.Enum]::TryParse([ACLPermission], $Value, [ref]$enumValue))) {
+                Write-Warning "[Permission] Unable to convert the value '$Value' to an ACLPermission. The value will be ignored."
+                continue
+            }
 
             # Add the Permission
             $formattedPermissions.Add(
-                @{ $PermissionKey = $Value }
+                @{ $PermissionKey = $value }
             )
 
         }
+
         # Return the formatted permissions
         return $formattedPermissions
 
@@ -87,7 +107,7 @@ Class Permission {
 
     #
     # Function to convert the imported Permissions list into a Permission object list
-    static [Permission[]] ConvertTo([HashTable[]]$Permissions, [String]$DescriptorType, [Object]$SecurityNamespace) {
+    static [System.Collections.Generic.List[Permission]] ConvertTo([HashTable[]]$Permissions, [String]$DescriptorType, [Object]$SecurityNamespace) {
 
         # Define an Array List
         $convertedPermissions = [System.Collections.Generic.List[Permission]]::new()
@@ -106,16 +126,36 @@ Class Permission {
 
         #
         # Iterate through each of the descriptor types and match them against the list.
-        $actions = $SecurityNamespace.Actions | Select-Object *, @{Name="FormattedName";Expression={$_.Name.Replace("_", "")}}
+        foreach ($permission in $permissions) {
 
-        $Permissions | Export-Clixml C:\Temp\Permissions.clixml
-        $actions | Export-Clixml C:\Temp\Actions.clixml
-        foreach ($permission in $Permissions) {
-            $convertedPermissions.Add([Permission]::new($permission, $DescriptorType, $actions))
+            $hashTable = [HashTable]$permission
+            $convertedPermissions.Add(
+                [Permission]::new($hashTable, $DescriptorType, $SecurityNamespace.actions)
+            )
         }
 
         # Return the converted permissions
         return $convertedPermissions
+
+    }
+
+    static [System.Collections.Generic.List[Permission]] ConvertFrom([Object]$ACLList, [String]$DescriptorType) {
+
+        # Define an Array List
+        $convertedPermissions = [System.Collections.Generic.List[Permission]]::new()
+
+        #
+        # Test that the ACLList is not empty
+        if ($ACLList.Count -eq 0) {
+            Write-Warning "[Permission] Unable to convert the ACLList to a Permission object. The ACLList is empty."
+            return $convertedPermissions
+        }
+
+        #
+        # Iterate through each of the tokens
+
+
+
 
     }
 

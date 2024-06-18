@@ -52,6 +52,6 @@ enum AzDoBuild {
     ViewBuildDefinition = 1024
     EditBuildDefinition = 2048
     DeleteBuildDefinition = 4096
-    OvverideBuildCheckinValidation = 8192
+    OverideBuildCheckinValidation = 8192
     AdministerBuildPermissions = 16384
 }
