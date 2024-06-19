@@ -23,18 +23,25 @@ Function Add-CacheItem {
     #>
     [CmdletBinding()]
     param (
+        # The key of the cache item to add
         [Parameter(Mandatory)]
         [string]
         $Key,
 
+        # The value of the cache item to add
         [Parameter(Mandatory)]
         [object]
         $Value,
 
+        # The type of the cache item to add
         [Parameter(Mandatory)]
         [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]
-        $Type
+        $Type,
+
+        # Suppress warning messages
+        [switch]
+        $SuppressWarning
     )
 
     Write-Verbose "[Add-CacheItem] Retrieving the current cache."
@@ -54,8 +61,17 @@ Function Add-CacheItem {
     $existingItem = $cache | Where-Object { $_.Key -eq $Key }
 
     if ($existingItem) {
-        Write-Warning "[Add-CacheItem] A cache item with the key '$Key' already exists. Flushing key from the cache."
+
+        # If the cache already contains the key, remove the existing item
+        if ($SuppressWarning.IsPresent) {
+            Write-Verbose "[Add-CacheItem] A cache item with the key '$Key' already exists. Flushing key from the cache."
+        } else {
+            Write-Warning "[Add-CacheItem] A cache item with the key '$Key' already exists. Flushing key from the cache."
+        }
+
+        # Remove the existing cache item
         Remove-CacheItem -Key $Key -Type $Type
+
         # Refresh the cache
         [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
     }

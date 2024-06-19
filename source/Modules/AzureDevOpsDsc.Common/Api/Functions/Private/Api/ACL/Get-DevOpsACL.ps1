@@ -1,7 +1,26 @@
-function Get-AzDevOpsACL {
+<#
+function Get-AzDevOpsACL
+{
     param (
+        [Parameter(Mandatory)]
+        [string]$OrganizationName,
+
+        [Parameter(Mandatory)]
+        [String]$SecruityDescriptorType,
+
+        [Parameter(Mandatory)]
+
+
+    )
+
+
+
+
+    param (
+        [Parameter(Mandatory=$true)]
         [string]$Organization,
-        [string]$Project, # Optional: specify if the security namespace is scoped to a project
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectName, # Optional: specify if the security namespace is scoped to a project
         [string]$SecurityNamespaceId,
         [string]$Token, # Optional: specify if you want to filter ACLs for a specific token
         [string]$Descriptors, # Optional: comma-separated list of descriptors to filter
@@ -9,6 +28,18 @@ function Get-AzDevOpsACL {
         [bool]$Recurse = $false, # Optional: set to $true to recurse and get all children
         [string]$PersonalAccessToken
     )
+
+    $params = @{
+
+    }
+
+
+
+
+
+
+
+
 
     # Construct the URL for the API call
     $projectSegment = if ($Project) { "/$Project" } else { "" }
@@ -51,3 +82,5 @@ function Get-AzDevOpsACL {
 
 # Usage example:
 # Get-AccessControlLists -Organization "your-organization" -SecurityNamespaceId "your-security-namespace-id" -PersonalAccessToken "your-PAT"
+
+#>

@@ -47,6 +47,12 @@ Function Get-xAzDoGitPermission {
     Write-Verbose "[Get-xAzDoGitPermission] Started."
 
     #
+    # Perform Lookup of the Permissions for the Repository
+
+
+
+
+    #
     # TypeCast the Permissions to a Permission[] array
 
     $descriptorType = 'GitRepositories'

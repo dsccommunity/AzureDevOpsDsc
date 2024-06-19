@@ -139,6 +139,7 @@ Class Permission {
 
     }
 
+    <#
     static [System.Collections.Generic.List[Permission]] ConvertFrom([Object]$ACLList) {
 
         # Define an Array List
@@ -154,10 +155,9 @@ Class Permission {
         #
         # Iterate through each of the tokens
 
-
-
-
     }
+    #>
+
 
 }
 
