@@ -49,6 +49,16 @@ Function Get-xAzDoGitPermission {
     #
     # Perform Lookup of the Permissions for the Repository
 
+    $ACLLookupParams = @{
+        OrganizationName        = $OrganizationName
+        SecruityDescriptorId    = (Get-CacheItem -Key 'GitRepositories' -Type 'SecurityNamespaces').value.namespaceId
+    }
+
+    # Get the ACL List
+    $ACLList = Get-DevOpsACL @ACLLookupParams
+
+    #
+    # Process the ACL list breaking down by ACL it's inhertance and permissions
 
 
 
