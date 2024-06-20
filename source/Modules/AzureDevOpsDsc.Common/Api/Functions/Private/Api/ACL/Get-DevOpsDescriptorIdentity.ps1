@@ -38,12 +38,12 @@ Function Get-DevOpsDescriptorIdentity {
     #
     # Construct the URL for the API call
     $params = @{
-        Uri = "https://vssps.dev.azure.com/{0}/_apis/identities?subjectDescriptors={1}" -f $OrganizationName, $SubjectDescriptor
+        Uri = "https://vssps.dev.azure.com/{0}/_apis/identities?subjectDescriptors={1}&api-version={2}" -f $OrganizationName, $SubjectDescriptor, $ApiVersion
         Method = 'Get'
     }
 
     # Invoke the REST API call
-    $identity = Invoke-AzDevOpsRestApi @params
+    $identity = Invoke-AzDevOpsApiRestMethod @params
 
     if (($null -eq $identity.value) -or ($identity.count -gt 1)) {
         return $null
