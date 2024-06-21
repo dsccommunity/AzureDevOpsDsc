@@ -10,6 +10,7 @@ function Get-AzDoCacheObjects
         'LiveUsers',
         'LiveGroupMembers',
         'LiveRepositories',
+        'LiveServicePrinciples',
         'SecurityNamespaces'
     )
 

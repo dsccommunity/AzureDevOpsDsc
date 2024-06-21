@@ -45,8 +45,11 @@ Function Get-xAzDoGitPermission {
     Write-Verbose "[Get-xAzDoGitPermission] Started."
 
     # Define the Descriptor Type and Organization Name
-    $descriptorType = 'Git Repositories'
-    $OrganizationName = $Global:AZDOOrganizationName
+    $SecurityNamespace = 'Git Repositories'
+    $OrganizationName = $Global:DSCAZDO_OrganizationName
+
+    Write-Verbose "[Get-xAzDoGitPermission] Security Namespace: $SecurityNamespace"
+    Write-Verbose "[Get-xAzDoGitPermission] Organization Name: $OrganizationName"
 
     #
     # Construct a hashtable detailing the group
@@ -59,21 +62,34 @@ Function Get-xAzDoGitPermission {
         repositoryName = $RepositoryName
     }
 
+    Write-Verbose "[Get-xAzDoGitPermission] Group result hashtable constructed."
+
     #
     # Perform Lookup of the Permissions for the Repository
+    Write-Verbose "[Get-xAzDoGitPermission] Performing lookup of permissions for the repository."
+
+    $namespace = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
+    Write-Verbose "[Get-xAzDoGitPermission] Retrieved namespace: $($namespace.namespaceId)"
 
     $ACLLookupParams = @{
         OrganizationName        = $OrganizationName
-        SecruityDescriptorId    = (Get-CacheItem -Key 'GitRepositories' -Type 'SecurityNamespaces').value.namespaceId
+        SecruityDescriptorId    = $namespace.namespaceId
     }
 
-    # Get the ACL List
-    $ACLList = Get-DevOpsACL @ACLLookupParams
+    Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
 
+    # Get the ACL List and format the ACLS
+    $ACLList = Get-DevOpsACL @ACLLookupParams | ForEach-Object {
+        Format-ACL -ACL $_ -SecurityNamespace $SecurityNamespace
+    }
 
+    Write-Verbose "[Get-xAzDoGitPermission] ACL List retrieved and formatted."
 
+    $ACLList | Export-CLixml C:\Temp\ACLList.clixml
+    Write-Verbose "[Get-xAzDoGitPermission] ACL List exported to C:\Temp\ACLList.clixml"
 
     return $getGroupResult
+
 
 
 }

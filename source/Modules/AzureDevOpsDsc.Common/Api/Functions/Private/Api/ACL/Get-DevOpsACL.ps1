@@ -15,7 +15,7 @@ function Get-DevOpsACL
     #
     # Construct the URL for the API call
     $params = @{
-        Uri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}" -f $OrganizationName, $SubjectDescriptor, $ApiVersion
+        Uri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}" -f $OrganizationName, $SecruityDescriptorId, $ApiVersion
         Method = 'Get'
     }
 

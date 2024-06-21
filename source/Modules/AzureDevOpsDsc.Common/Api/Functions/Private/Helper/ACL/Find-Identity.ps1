@@ -32,13 +32,15 @@ Function Find-Identity {
 
     $CachedGroups = Get-CacheObject -CacheType 'LiveGroups'
     $CachedUsers = Get-CacheObject -CacheType 'LiveUsers'
+    $CachedServicePrincipals = Get-CacheObject -CacheType 'LiveServicePrinciples'
 
     $groupIdentity = $CachedGroups | Where-Object { $_.value.ACLIdentity.descriptor -eq $Name }
     $userIdentity = $CachedUsers | Where-Object { $_.value.ACLIdentity.descriptor -eq $Name }
+    $servicePrincipalIdentity = $CachedServicePrincipals | Where-Object { $_.value.ACLIdentity.descriptor -eq $Name }
 
     # Check if multiple identities were found.
     # While this is not a common scenario, there is a possibility that a user and a group have the same name.
-    if ($groupIdentity -and $userIdentity) {
+    if ($groupIdentity -and $userIdentity -and $servicePrincipalIdentity) {
         Write-Warning "[Find-Identity] Found multiple identities with the name '$Name'. Returning null."
         return $null
     }
@@ -48,10 +50,13 @@ Function Find-Identity {
 
     if ($groupIdentity) {
         Write-Verbose "[Find-Identity] Found group identity for '$Name'."
-        return $groupIdentity.value.ACLIdentity
+        return $groupIdentity
     } elseif ($userIdentity) {
         Write-Verbose "[Find-Identity] Found group identity for '$Name'."
-        return $userIdentity.value.ACLIdentity
+        return $userIdentity
+    } elseif ($servicePrincipalIdentity) {
+        Write-Verbose "[Find-Identity] Found group identity for '$Name'."
+        return $servicePrincipalIdentity
     }
 
     # Return null if no identity was found

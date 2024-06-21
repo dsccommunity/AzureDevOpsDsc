@@ -32,9 +32,9 @@ Function Format-ACEs
     param
     (
         [Parameter()]
-        [bool]$Allow=0,
+        [Int]$Allow=0,
         [Parameter()]
-        [bool]$Deny=0,
+        [Int]$Deny=0,
         [Parameter(Mandatory)]
         [string]$SecurityNamespace
     )
