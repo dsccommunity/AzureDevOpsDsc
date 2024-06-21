@@ -11,8 +11,10 @@ Function Format-ACLs {
     # Logging
     Write-Verbose "[Format-ACL] Started."
 
+    $formattedACLs = [System.Collections.Generic.List[HashTable]]::new()
+
     #
-    # Iterate Through each ACLs
+    # Iterate through the ACLs
 
     foreach ($ACL in $ACLs) {
 
@@ -37,9 +39,16 @@ Function Format-ACLs {
             $ACE."Permissions" = Format-ACEs -Allow $ACE.value.allow -Deny $ACE.value.deny -Type $DescriptorType
         }
 
+        # Add the ACL to the new ACLs
+        $formattedACLs.Add([HashTable]@{
+            token = Resolve-ACLToken -Token $ACL.token
+            inherited = $ACL.inheritPermissions
+            aces = $ACEs
+        })
+
     }
 
-    #
-    #
+    # Return the Formatted ACLs
+    return $formattedACLs
 
 }

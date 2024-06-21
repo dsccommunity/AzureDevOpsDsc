@@ -42,9 +42,22 @@ Function Get-xAzDoGitPermission {
         $Force
     )
 
-    #
-    #
     Write-Verbose "[Get-xAzDoGitPermission] Started."
+
+    # Define the Descriptor Type and Organization Name
+    $descriptorType = 'Git Repositories'
+    $OrganizationName = $Global:AZDOOrganizationName
+
+    #
+    # Construct a hashtable detailing the group
+    $getGroupResult = @{
+        #Reasons = $()
+        Ensure = [Ensure]::Absent
+        propertiesChanged = @()
+        status = $null
+        project = $project
+        repositoryName = $RepositoryName
+    }
 
     #
     # Perform Lookup of the Permissions for the Repository
@@ -57,26 +70,11 @@ Function Get-xAzDoGitPermission {
     # Get the ACL List
     $ACLList = Get-DevOpsACL @ACLLookupParams
 
-    #
-    # Process the ACL list breaking down by ACL it's inhertance and permissions
 
 
 
-    #
-    # TypeCast the Permissions to a Permission[] array
+    return $getGroupResult
 
-    $descriptorType = 'GitRepositories'
-
-    $formatDescriptorType = Format-DescriptorType -DescriptorType $descriptorType
-    $params = @{
-        Permissions = $Permissions
-        DescriptorType = $descriptorType
-        SecurityNamespace = Get-CacheItem -Key $formatDescriptorType -Type 'SecurityNamespaces'
-    }
-
-    Write-Verbose "[Get-xAzDoGitPermission] Converting Permissions to Permission object."
-
-    $var = ConvertTo-Permission @params
 
 }
 

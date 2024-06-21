@@ -25,6 +25,7 @@ $functionSubDirectoryPaths = @(
 
     # Data
     "$ModuleRoot\Api\Data\",
+    "$ModuleRoot\LocalizedData\",
 
     # Api
     "$ModuleRoot\Api\Functions\Private\Api",
