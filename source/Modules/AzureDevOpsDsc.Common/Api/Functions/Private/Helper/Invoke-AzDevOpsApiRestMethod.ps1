@@ -106,6 +106,9 @@ function Invoke-AzDevOpsApiRestMethod
         ResponseHeadersVariable     = 'responseHeaders'
     }
 
+    Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Invoking the Azure DevOps API REST method '{0}'." -f $HttpMethod)
+    Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] API URI: {0}" -f $ApiUri)
+
     # Remove the 'Body' and 'ContentType' if not relevant to request
     if ($HttpMethod -in $('Get','Delete'))
     {

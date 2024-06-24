@@ -4,7 +4,9 @@ Function Format-ACL {
         [Parameter(Mandatory)]
         [Object]$ACL,
         [Parameter(Mandatory)]
-        [String]$SecurityNamespace
+        [String]$SecurityNamespace,
+        [Parameter(Mandatory)]
+        [String]$OrganizationName
     )
 
     #
@@ -38,11 +40,11 @@ Function Format-ACL {
     foreach ($ACE in $ACEs) {
         Write-Verbose "[Format-ACL] Matching identity for ACE: $($ACE.Name)"
         # Find the Identity and attach to the ACE
-        $ACE."Identity" = Find-Identity -Name $ACE.Name
+        $ACE."Identity" = Find-Identity -Name $ACE.Name -OrganizationName $OrganizationName
 
         Write-Verbose "[Format-ACL] Formatting ACE: $($ACE.Name) - Allow $($ACE.value.allow) - Deny $($ACE.value.allow)"
         # Format the ACE
-        $ACE."Permissions" = Format-ACEs -Allow $ACE.value.allow -Deny $ACE.value.allow -SecurityNamespace $SecurityNamespace
+        $ACE."Permissions" = Format-ACEs -Allow $ACE.value.allow -Deny $ACE.value.deny -SecurityNamespace $SecurityNamespace
     }
 
     # Add the ACL to the new ACL

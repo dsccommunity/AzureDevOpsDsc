@@ -66,6 +66,7 @@ Function Get-xAzDoGitPermission {
 
     #
     # Perform Lookup of the Permissions for the Repository
+
     Write-Verbose "[Get-xAzDoGitPermission] Performing lookup of permissions for the repository."
 
     $namespace = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
@@ -80,13 +81,13 @@ Function Get-xAzDoGitPermission {
 
     # Get the ACL List and format the ACLS
     $ACLList = Get-DevOpsACL @ACLLookupParams | ForEach-Object {
-        Format-ACL -ACL $_ -SecurityNamespace $SecurityNamespace
+        Format-ACL -ACL $_ -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
     }
 
     Write-Verbose "[Get-xAzDoGitPermission] ACL List retrieved and formatted."
-
-    $ACLList | Export-CLixml C:\Temp\ACLList.clixml
     Write-Verbose "[Get-xAzDoGitPermission] ACL List exported to C:\Temp\ACLList.clixml"
+
+    $ACLList | Export-Clixml C:\Temp\ACLList.clixml
 
     return $getGroupResult
 

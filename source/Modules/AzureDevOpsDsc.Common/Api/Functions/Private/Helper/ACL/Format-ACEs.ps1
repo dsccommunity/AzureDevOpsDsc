@@ -45,13 +45,13 @@ Function Format-ACEs
 
     #
     # Perform a Lookup of the Security Namespace
-    $SecurityNamespace = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
+    $namespace = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
 
     # Create a new ACE Object
     $ACE = @{
-        Allow = $SecurityNamespace.actions | Where-Object { $_.bit -band $Allow }
-        Deny = $SecurityNamespace.actions | Where-Object { $_.bit -band $Deny }
-        DescriptorType = $DescriptorType
+        Allow = $namespace.actions | Where-Object { $_.bit -band $Allow }
+        Deny = $namespace.actions | Where-Object { $_.bit -band $Deny }
+        DescriptorType = $SecurityNamespace
     }
 
     #

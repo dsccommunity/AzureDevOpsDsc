@@ -22,23 +22,35 @@ This example retrieves the identity associated with the subject descriptor "subj
 #>
 Function Get-DevOpsDescriptorIdentity {
 
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [Parameter(Mandatory, ParameterSetName = 'Descriptors')]
         [string]$OrganizationName,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Default')]
         [String]$SubjectDescriptor,
 
-        [Parameter()]
+        [Parameter(Mandatory, ParameterSetName = 'Descriptors')]
+        [String]$Descriptor,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Descriptors')]
         [String]
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
+    # Determine the query parameter based on the parameter set
+    if ($SubjectDescriptor) {
+        $query = "subjectDescriptors=$SubjectDescriptor"
+    } else {
+        $query = "descriptors=$Descriptor"
+    }
 
     #
     # Construct the URL for the API call
     $params = @{
-        Uri = "https://vssps.dev.azure.com/{0}/_apis/identities?subjectDescriptors={1}&api-version={2}" -f $OrganizationName, $SubjectDescriptor, $ApiVersion
+        Uri = "https://vssps.dev.azure.com/{0}/_apis/identities?{1}&api-version={2}" -f $OrganizationName, $query, $ApiVersion
         Method = 'Get'
     }
 

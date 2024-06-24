@@ -24,7 +24,9 @@
 Function Find-Identity {
     param(
         [Parameter(Mandatory)]
-        [string]$Name
+        [string]$Name,
+        [Parameter(Mandatory)]
+        [string]$OrganizationName
     )
 
     # Logging
@@ -43,6 +45,22 @@ Function Find-Identity {
     if ($groupIdentity -and $userIdentity -and $servicePrincipalIdentity) {
         Write-Warning "[Find-Identity] Found multiple identities with the name '$Name'. Returning null."
         return $null
+    }
+
+    # If nothing was found
+    if (-not $groupIdentity -and -not $userIdentity -and -not $servicePrincipalIdentity) {
+        Write-Warning "[Find-Identity] No identity found for '$Name'. Performing a lookup via the API."
+
+        # Perform a lookup via the API
+        $params = @{
+            OrganizationName = $OrganizationName
+            Descriptor = $Name
+        }
+
+        # Get the identity
+        $identity = Get-DevOpsDescriptorIdentity @params
+
+        return $identity
     }
 
     # If the group identity was found, return the ACLIdentity.
