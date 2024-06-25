@@ -11,8 +11,8 @@ Function Format-ACL {
 
     #
     # Logging
-    Write-Verbose "[Format-ACL] Started."
 
+    Write-Verbose "[Format-ACL] Started."
     Write-Verbose "[Format-ACL] Processing ACL: $($ACL.token)"
 
     # Create a new ACL Object

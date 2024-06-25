@@ -1,15 +1,15 @@
-data LocalizedDataAzTokenPatten
+data LocalizedDataAzACLTokenPatten
 {
 @'
 
 #
-# Git Token Patterns
+# Git ACL Token Patterns
 #
 
 # Organizational Level Token
 OrganizationGit = ^repoV2$
 # Project-Level Git Repository Token
-ProjectGit = ^(repoV2)\/(?<ProjectId>[A-Za-z0-9-]+)$
+GitProject = ^(repoV2)\/(?<ProjectId>[A-Za-z0-9-]+)$
 # Git Repository Token
 GitRepository = ^(repoV2)\/(?<ProjectId>[A-Za-z0-9-]+)\/(?<RepoId>[A-Za-z0-9-]+)$
 # Git Branch Token

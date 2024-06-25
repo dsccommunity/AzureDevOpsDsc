@@ -9,22 +9,22 @@ Function Resolve-ACLToken {
 
     # Match the Token with the Regex Patterns
     switch -regex ($Token.Trim()) {
-        $LocalizedDataAzTokenPatten.OrganizationGit {
+        $LocalizedDataAzACLTokenPatten.OrganizationGit {
             $result.type = 'OrganizationGit'
             break;
         }
 
-        $LocalizedDataAzTokenPatten.ProjectGit {
-            $result.type = 'ProjectGit'
+        $LocalizedDataAzACLTokenPatten.GitProject {
+            $result.type = 'GitProject'
             break;
         }
 
-        $LocalizedDataAzTokenPatten.GitRepository {
+        $LocalizedDataAzACLTokenPatten.GitRepository {
             $result.type = 'GitRepository'
             break;
         }
 
-        $LocalizedDataAzTokenPatten.GitBranch {
+        $LocalizedDataAzACLTokenPatten.GitBranch {
             $result.type = 'GitBranch'
             break;
         }

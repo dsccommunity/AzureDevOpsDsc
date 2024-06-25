@@ -57,17 +57,22 @@ Function Get-xAzDoGitPermission {
         #Reasons = $()
         Ensure = [Ensure]::Absent
         propertiesChanged = @()
+        aclList = $null
+        permissions = $null
         status = $null
         project = $project
         repositoryName = $RepositoryName
     }
 
     Write-Verbose "[Get-xAzDoGitPermission] Group result hashtable constructed."
+    Write-Verbose "[Get-xAzDoGitPermission] Performing lookup of permissions for the repository."
+
+    # Define the ACL List
+    $ACLList = [System.Collections.Generic.List[Hashtable]]::new()
+
 
     #
     # Perform Lookup of the Permissions for the Repository
-
-    Write-Verbose "[Get-xAzDoGitPermission] Performing lookup of permissions for the repository."
 
     $namespace = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
     Write-Verbose "[Get-xAzDoGitPermission] Retrieved namespace: $($namespace.namespaceId)"
@@ -87,7 +92,14 @@ Function Get-xAzDoGitPermission {
     Write-Verbose "[Get-xAzDoGitPermission] ACL List retrieved and formatted."
     Write-Verbose "[Get-xAzDoGitPermission] ACL List exported to C:\Temp\ACLList.clixml"
 
-    $ACLList | Export-Clixml C:\Temp\ACLList.clixml
+    # Export the ACL List to a file
+    $getGroupResult.aclList = $ACLList
+
+    $ACL = @{
+        token = Resolve-ACLToken -Token $ACL.token
+        inherited =
+        aces = @{}
+    }
 
     return $getGroupResult
 
