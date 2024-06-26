@@ -85,9 +85,7 @@ Function Get-xAzDoGitPermission {
     Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
 
     # Get the ACL List and format the ACLS
-    $ACLList = Get-DevOpsACL @ACLLookupParams | ForEach-Object {
-        Format-ACL -ACL $_ -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
-    }
+    $ReferenceACLs = Get-DevOpsACL @ACLLookupParams | Format-ACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
 
     Write-Verbose "[Get-xAzDoGitPermission] ACL List retrieved and formatted."
     Write-Verbose "[Get-xAzDoGitPermission] ACL List exported to C:\Temp\ACLList.clixml"
@@ -95,11 +93,19 @@ Function Get-xAzDoGitPermission {
     # Export the ACL List to a file
     $getGroupResult.aclList = $ACLList
 
-    $ACL = @{
-        token = Resolve-ACLToken -Token $ACL.token
-        inherited =
-        aces = @{}
+    #
+    # Convert the Permissions into an ACL Token
+
+    $params = @{
+        Permissions         = $Permissions
+        SecurityNamespace   = $SecurityNamespace
+        isInherited         = $isInherited
+        OrganizationName    = $OrganizationName
     }
+
+    $DifferenceACLs = ConvertTo-ACL @params
+
+
 
     return $getGroupResult
 
