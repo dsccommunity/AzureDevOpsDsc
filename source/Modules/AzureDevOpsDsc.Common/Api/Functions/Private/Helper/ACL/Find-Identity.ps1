@@ -49,6 +49,9 @@ Function Find-Identity {
 
     # Logging
     Write-Verbose "[Find-Identity] Started."
+    Write-Verbose "[Find-Identity] Name: $Name"
+    Write-Verbose "[Find-Identity] Organization Name: $OrganizationName"
+    Write-Verbose "[Find-Identity] Search Type: $SearchType"
 
     try {
         $CachedGroups = Get-CacheObject -CacheType 'LiveGroups'

@@ -50,6 +50,8 @@ Function Format-ACL {
     process {
         # Logging
         Write-Verbose "[Format-ACL] Processing ACL: $($ACL.token)"
+        Write-Verbose "[Format-ACL] ACL: $($ACL.ToString())"
+
         $ACEs = [System.Collections.Generic.List[HashTable]]::new()
         $ACEEntries = $ACL.acesDictionary.psObject.properties.name
         Write-Verbose "[Format-ACL] Found ACE entries: $($ACEEntries.Count)"

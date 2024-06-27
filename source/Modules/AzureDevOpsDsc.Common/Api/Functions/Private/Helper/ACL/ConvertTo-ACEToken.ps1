@@ -55,10 +55,12 @@ Function ConvertTo-ACEToken {
         [Object[]]$ACEPermissions
     )
 
-    Write-Verbose "[ConvertTo-ACEToken] Initializing the ACL Token"
+    Write-Verbose "[ConvertTo-ACEToken] Initializing the ACL Token."
     $hashTableArray = [System.Collections.Generic.List[HashTable]]::new()
 
-    Write-Verbose "[ConvertTo-ACEToken] Performing a Lookup for the Security Descriptor"
+    Write-Verbose "[ConvertTo-ACEToken] Performing a Lookup for the Security Descriptor."
+    Write-Verbose "[ConvertTo-ACEToken] Security Namespace: $SecurityNamespace"
+
     $SecurityDescriptor = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
 
     # Check if the Security Descriptor was found
@@ -67,14 +69,16 @@ Function ConvertTo-ACEToken {
         return
     }
 
-    Write-Verbose "[ConvertTo-ACEToken] Iterating through each of the ACE Permissions"
+    Write-Verbose "[ConvertTo-ACEToken] Iterating through each of the ACE Permissions."
     ForEach ($ACEPermission in $ACEPermissions) {
 
-        Write-Verbose "[ConvertTo-ACEToken] Filtering Allow and Deny permissions"
-        $AllowPermissions = $ACEPermission.Permission.Keys | Where-Object { $ACEPermission.Permission."$_" -eq 'Allow' }
-        $DenyPermissions  = $ACEPermission.Permission.Keys | Where-Object { $ACEPermission.Permission."$_" -eq 'Deny'  }
+        Write-Verbose "[ConvertTo-ACEToken] ACEPermission: $($ACEPermission | ConvertTo-Json)"
+        Write-Verbose "[ConvertTo-ACEToken] Filtering Allow and Deny permissions."
 
-        Write-Verbose "[ConvertTo-ACEToken] Iterating through the Allow and Deny Permissions and computing actions"
+        $AllowPermissions = $ACEPermission.Keys | Where-Object { $ACEPermission."$_" -eq 'Allow' }
+        $DenyPermissions  = $ACEPermission.Keys | Where-Object { $ACEPermission."$_" -eq 'Deny'  }
+
+        Write-Verbose "[ConvertTo-ACEToken] Iterating through the Allow and Deny Permissions and computing actions."
         $AllowBits = $SecurityDescriptor.actions | Where-Object { $_.displayName -in $AllowPermissions }
         $DenyBits  = $SecurityDescriptor.actions | Where-Object { $_.displayName -in $DenyPermissions }
 

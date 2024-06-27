@@ -34,10 +34,6 @@ Function ConvertTo-ACE {
         [Parameter(Mandatory)]
         [string]$SecurityNamespace,
 
-        # Mandatory parameter: the identity associated with the ACE.
-        [Parameter(Mandatory)]
-        [string]$Identity,
-
         # Mandatory parameter: an array of permissions objects.
         [Parameter(Mandatory)]
         [Object[]]$Permissions,
@@ -68,7 +64,7 @@ Function ConvertTo-ACE {
         $aceTokenParams = @{
             SecurityNamespace = $SecurityNamespace
             Identity          = $Permission.Identity
-            ACEPermissions    = $Permission.Permissions
+            ACEPermissions    = $Permission.Permission
         }
 
         # Convert the Permission to an ACE.
@@ -80,4 +76,7 @@ Function ConvertTo-ACE {
         # Add the constructed ACE to the ACEs list.
         $ACEs.Add($ht)
     }
+
+    return $ACEs
+
 }

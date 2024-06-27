@@ -27,8 +27,6 @@
 Function BorArray {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [int[]]$integers
     )
 

@@ -58,56 +58,43 @@ Function ConvertTo-ACL {
 
         # Mandatory parameter: the organization name as a string.
         [Parameter(Mandatory = $true)]
-        [string]$OrganizationName
+        [string]$OrganizationName,
+
+        # Mandatory parameter: the token name as a string.
+        [Parameter(Mandatory = $true)]
+        [string]$TokenName
     )
 
     # Verbose output indicating the start of the function.
     Write-Verbose "[ConvertTo-ACL] Started."
 
-    # Initialize an empty list to hold ACLs.
-    $ACLs = [System.Collections.Generic.List[HashTable]]::new()
-
-    # Iterate through each permission in the provided Permissions array.
-    ForEach ($Permission in $Permissions) {
-        Write-Verbose "[ConvertTo-ACL] Processing permission: $($Permission | Out-String)"
-
-        # Check if the permission contains 'Identity' and 'Permissions' keys.
-        if (-not $Permission.ContainsKey('Identity') -or -not $Permission.ContainsKey('Permissions')) {
-            Throw "[ConvertTo-ACL] Each permission must contain 'Identity' and 'Permissions' keys."
-        }
-
-        # Create a hash table for ACL token parameters.
-        $ACLTokenParams = @{
-            SecurityNamespace = $SecurityNamespace
-            Identity          = $Permission.Identity
-        }
-        Write-Verbose "[ConvertTo-ACL] ACL Token Params: $($ACLTokenParams | Out-String)"
-
-        # Create a hash table for ACE parameters.
-        $ACEParams = @{
-            SecurityNamespace = $SecurityNamespace
-            Identity          = $Permission.Identity
-            Permissions       = $Permission.Permissions
-            OrganizationName  = $OrganizationName
-        }
-        Write-Verbose "[ConvertTo-ACL] ACE Params: $($ACEParams | Out-String)"
-
-        # Convert the Permission to an ACL Token and create the ACL hash table.
-        $ACL = @{
-            token     = ConvertTo-ACLToken @ACLTokenParams
-            aces      = ConvertTo-ACE @ACEParams
-            inherited = $isInherited
-        }
-        Write-Verbose "[ConvertTo-ACL] Created ACL: $($ACL | Out-String)"
-
-        # Add the created ACL to the ACL list.
-        $ACLs.Add($ACL)
-        Write-Verbose "[ConvertTo-ACL] Added ACL to list."
+    # Create a hash table for ACL token parameters.
+    $ACLTokenParams = @{
+        SecurityNamespace  = $SecurityNamespace
+        TokenName          = $TokenName
     }
+
+    Write-Verbose "[ConvertTo-ACL] ACL Token Params: $($ACLTokenParams | Out-String)"
+
+    # Create a hash table for ACE parameters.
+    $ACEParams = @{
+        SecurityNamespace = $SecurityNamespace
+        Permission        = $Permissions
+        OrganizationName  = $OrganizationName
+    }
+    Write-Verbose "[ConvertTo-ACL] ACE Params: $($ACEParams | Out-String)"
+
+    # Convert the Permission to an ACL Token and create the ACL hash table.
+    $ACL = @{
+        token     = ConvertTo-ACLToken @ACLTokenParams
+        aces      = ConvertTo-ACE @ACEParams
+        inherited = $isInherited
+    }
+    Write-Verbose "[ConvertTo-ACL] Created ACL: $($ACL | Out-String)"
 
     # Verbose output indicating the completion of the function.
     Write-Verbose "[ConvertTo-ACL] Completed. Returning ACLs."
 
     # Return the list of ACLs.
-    return $ACLs
+    return $ACL
 }

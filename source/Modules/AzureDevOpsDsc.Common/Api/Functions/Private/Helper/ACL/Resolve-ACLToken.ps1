@@ -7,6 +7,9 @@ Function Resolve-ACLToken {
 
     $result = @{}
 
+    Write-Verbose "[Resolve-ACLToken] Started."
+    Write-Verbose "[Resolve-ACLToken] Token: $Token"
+
     # Match the Token with the Regex Patterns
     switch -regex ($Token.Trim()) {
         $LocalizedDataAzACLTokenPatten.OrganizationGit {
