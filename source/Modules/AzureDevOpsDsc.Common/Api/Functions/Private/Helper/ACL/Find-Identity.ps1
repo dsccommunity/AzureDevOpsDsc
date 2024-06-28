@@ -89,7 +89,7 @@ Function Find-Identity {
         }
         'principalName' {
             $lookup = @{
-                groupIdentitySB             = { $_.value.principalName -eq $Name }
+                groupIdentitySB             = { $_.value.principalName.replace('[','').replace(']','') -eq $Name }
                 userIdentitySB              = { $_.value.principalName -eq $Name }
                 servicePrincipalIdentitySB  = { $_.value.principalName -eq $Name }
             }

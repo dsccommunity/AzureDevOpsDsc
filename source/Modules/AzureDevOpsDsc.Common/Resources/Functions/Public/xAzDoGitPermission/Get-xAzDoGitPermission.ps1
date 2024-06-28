@@ -53,6 +53,7 @@ Function Get-xAzDoGitPermission {
 
     #
     # Construct a hashtable detailing the group
+
     $getGroupResult = @{
         #Reasons = $()
         Ensure = [Ensure]::Absent
@@ -70,6 +71,15 @@ Function Get-xAzDoGitPermission {
     # Define the ACL List
     $ACLList = [System.Collections.Generic.List[Hashtable]]::new()
 
+    #
+    # Perform a Lookup within the Cache for the Repository
+    $repository = Get-CacheItem -Key $("{0}\{1}" -f $ProjectName, $RepositoryName) -Type 'LiveRepositories'
+
+    # Test if the Repository was found
+    if (-not $repository) {
+        Throw "[Get-xAzDoGitPermission] Repository not found: $RepositoryName"
+        return
+    }
 
     #
     # Perform Lookup of the Permissions for the Repository
@@ -82,12 +92,17 @@ Function Get-xAzDoGitPermission {
         SecruityDescriptorId    = $namespace.namespaceId
     }
 
-    Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
-
     # Get the ACL List and format the ACLS
-    $ReferenceACLs = Get-DevOpsACL @ACLLookupParams | Format-ACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
+    Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
+    $ReferenceACLs = Get-DevOpsACL @ACLLookupParams | Format-ACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName | Where-Object {
+        ($_.Token.Type -eq 'GitRepository') -and ($_.Token.RepoId -eq $repository.id)
+    }
 
-    $ReferenceACLs | Export-Clixml 'C:\Temp\ACLList.clixml'
+    # Ensure that the Reference ACLs are not null
+    if (-not $ReferenceACLs) {
+        Throw "[Get-xAzDoGitPermission] No ACLs found for the repository: $RepositoryName"
+        return
+    }
 
     Write-Verbose "[Get-xAzDoGitPermission] ACL List retrieved and formatted."
     Write-Verbose "[Get-xAzDoGitPermission] ACL List exported to C:\Temp\ACLList.clixml"
@@ -106,15 +121,16 @@ Function Get-xAzDoGitPermission {
         TokenName           = "[{0}]\{1}" -f $ProjectName, $RepositoryName
     }
 
+    # Convert the Permissions to an ACL Token
     $DifferenceACLs = ConvertTo-ACL @params
-
-    $DifferenceACLs | Export-CLixml C:\Temp\DifferenceACLs.clixml
-
     $getGroupResult.DifferenceACLs = $DifferenceACLs
 
+    #
+    # Compare the Reference ACLs to the Difference ACLs
+    $DifferenceACLs | Export-Clixml 'C:\Temp\DifferenceACLs.clixml'
+    $ReferenceACLs | Export-Clixml 'C:\Temp\ReferenceACLs.clixml'
+
     return $getGroupResult
-
-
 
 }
 

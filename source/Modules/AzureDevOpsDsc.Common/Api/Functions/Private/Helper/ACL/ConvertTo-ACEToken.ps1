@@ -69,9 +69,20 @@ Function ConvertTo-ACEToken {
         return
     }
 
+    # Iterate through each of the ACEs and construct the ACE Object
     Write-Verbose "[ConvertTo-ACEToken] Iterating through each of the ACE Permissions."
+
     ForEach ($ACEPermission in $ACEPermissions) {
 
+        # Check to see if there are any permissions that are not found in the Security Descriptor
+        $missingPermissions = $ACEPermission.Keys | Where-Object {
+            ($_ -notin $SecurityDescriptor.actions.displayName) -and
+            ($_ -notin $SecurityDescriptor.actions.name)
+        } | ForEach-Object {
+            Write-Verbose "[ConvertTo-ACEToken] Permission '$_' not found in the Security Descriptor for namespace: $SecurityNamespace"
+        }
+
+        # Filter the Allow and Deny permissions
         Write-Verbose "[ConvertTo-ACEToken] ACEPermission: $($ACEPermission | ConvertTo-Json)"
         Write-Verbose "[ConvertTo-ACEToken] Filtering Allow and Deny permissions."
 
@@ -79,8 +90,8 @@ Function ConvertTo-ACEToken {
         $DenyPermissions  = $ACEPermission.Keys | Where-Object { $ACEPermission."$_" -eq 'Deny'  }
 
         Write-Verbose "[ConvertTo-ACEToken] Iterating through the Allow and Deny Permissions and computing actions."
-        $AllowBits = $SecurityDescriptor.actions | Where-Object { $_.displayName -in $AllowPermissions }
-        $DenyBits  = $SecurityDescriptor.actions | Where-Object { $_.displayName -in $DenyPermissions }
+        $AllowBits = $SecurityDescriptor.actions | Where-Object { ($_.displayName -in $AllowPermissions) -or ($_.name -in $AllowPermissions) }
+        $DenyBits  = $SecurityDescriptor.actions | Where-Object { ($_.displayName -in $DenyPermissions) -or ($_.name -in $DenyPermissions) }
 
         # Compute the bitwise OR for the permissions
         $hashTable = @{
@@ -97,4 +108,5 @@ Function ConvertTo-ACEToken {
 
     # Return the hashtable array
     return $hashTableArray
+
 }

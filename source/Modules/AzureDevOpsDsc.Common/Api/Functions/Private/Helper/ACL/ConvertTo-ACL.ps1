@@ -90,6 +90,10 @@ Function ConvertTo-ACL {
         aces      = ConvertTo-ACE @ACEParams
         inherited = $isInherited
     }
+
+    # Group the ACEs by the identity removing any duplicates.
+    $ACL.aces = Group-ACEs -ACEs $ACL.aces
+
     Write-Verbose "[ConvertTo-ACL] Created ACL: $($ACL | Out-String)"
 
     # Verbose output indicating the completion of the function.

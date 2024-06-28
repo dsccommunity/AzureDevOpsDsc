@@ -30,6 +30,9 @@ Function BorArray {
         [int[]]$integers
     )
 
+    Write-Verbose "[BorArray] Started."
+    Write-Verbose "[BorArray] Integers: $integers"
+
     $result = 0
 
     if ($integers.Count -eq 0) {

@@ -73,8 +73,20 @@ Function ConvertTo-ACE {
             Permissions = ConvertTo-ACEToken @aceTokenParams
         }
 
+        # If the Identity is not found, log a warning.
+        if (-not $ht.Identity) {
+            Write-Warning "[ConvertTo-ACLToken] Identity $($Permission.Identity) was not found. This will not be added to the ACEs list."
+            continue
+        }
+        # If the Permissions are not found, log a warning.
+        if (-not $ht.Permissions) {
+            Write-Warning "[ConvertTo-ACLToken] Permissions for $($Permission.Identity) were not found. This will not be added to the ACEs list."
+            continue
+        }
+
         # Add the constructed ACE to the ACEs list.
         $ACEs.Add($ht)
+
     }
 
     return $ACEs
