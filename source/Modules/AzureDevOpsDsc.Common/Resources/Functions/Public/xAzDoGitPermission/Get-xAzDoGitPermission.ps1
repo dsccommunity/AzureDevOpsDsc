@@ -105,7 +105,6 @@ Function Get-xAzDoGitPermission {
     }
 
     Write-Verbose "[Get-xAzDoGitPermission] ACL List retrieved and formatted."
-    Write-Verbose "[Get-xAzDoGitPermission] ACL List exported to C:\Temp\ACLList.clixml"
 
     # Export the ACL List to a file
     $getGroupResult.ReferenceACLs = $ReferenceACLs
