@@ -96,8 +96,8 @@ Function ConvertTo-ACEToken {
         # Compute the bitwise OR for the permissions
         $hashTable = @{
             DescriptorType = $SecurityNamespace
-            Allow          = BorArray -integers $AllowBits.bit
-            Deny           = BorArray -integers $DenyBits.bit
+            Allow          = $AllowBits
+            Deny           = $DenyBits
         }
 
         Write-Verbose "[ConvertTo-ACEToken] Adding computed hash table to the array"

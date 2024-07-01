@@ -47,8 +47,8 @@ Function Group-ACEs {
         $ht = @{
             Identity    = $_.Group[0].Identity
             Permissions = @{
-                Deny            = BorArray $_.Group.Permissions.Deny
-                Allow           = BorArray $_.Group.Permissions.Allow
+                Deny            = Group-Object -Property { $_.Group.Permissions.Deny } -NoElement
+                Allow           = Group-Object -Property { $_.Group.Permissions.Allow } -NoElement
                 DescriptorType  = $_.Group[0].Permissions.DescriptorType
             }
         }
