@@ -45,8 +45,8 @@ Function ConvertTo-ACL {
     [CmdletBinding()]
     param (
         # Mandatory parameter: an array of hash tables containing permissions.
-        [Parameter(Mandatory = $true)]
-        [HashTable[]]$Permissions,
+        [Parameter()]
+        [HashTable[]]$Permissions=@(),
 
         # Mandatory parameter: the security namespace as a string.
         [Parameter(Mandatory = $true)]

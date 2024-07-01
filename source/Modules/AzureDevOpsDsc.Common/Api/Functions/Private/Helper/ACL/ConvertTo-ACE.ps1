@@ -35,8 +35,8 @@ Function ConvertTo-ACE {
         [string]$SecurityNamespace,
 
         # Mandatory parameter: an array of permissions objects.
-        [Parameter(Mandatory)]
-        [Object[]]$Permissions,
+        [Parameter()]
+        [Object[]]$Permissions = @(),
 
         # Mandatory parameter: the organization name as a string.
         [Parameter(Mandatory)]

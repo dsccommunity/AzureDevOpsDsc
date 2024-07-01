@@ -92,20 +92,11 @@ Function Get-xAzDoGitPermission {
 
     # Get the ACL List and format the ACLS
     Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
-    $ReferenceACLs = Get-DevOpsACL @ACLLookupParams | Format-ACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName | Where-Object {
+    $DifferenceACLs = Get-DevOpsACL @ACLLookupParams | Format-ACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName | Where-Object {
         ($_.Token.Type -eq 'GitRepository') -and ($_.Token.RepoId -eq $repository.id)
     }
 
-    # Ensure that the Reference ACLs are not null
-    if (-not $ReferenceACLs) {
-        Throw "[Get-xAzDoGitPermission] No ACLs found for the repository: $RepositoryName"
-        return
-    }
-
     Write-Verbose "[Get-xAzDoGitPermission] ACL List retrieved and formatted."
-
-    # Export the ACL List to a file
-    $getGroupResult.ReferenceACLs = $ReferenceACLs
 
     #
     # Convert the Permissions into an ACL Token
@@ -119,13 +110,16 @@ Function Get-xAzDoGitPermission {
     }
 
     # Convert the Permissions to an ACL Token
-    $DifferenceACLs = ConvertTo-ACL @params
-    $getGroupResult.DifferenceACLs = $DifferenceACLs
+    $ReferenceACLs = ConvertTo-ACL @params
 
     # Compare the Reference ACLs to the Difference ACLs
     $compareResult = Compare-ACLs -ReferenceObject $ReferenceACLs -DifferenceObject $DifferenceACLs
     $getGroupResult.propertiesChanged = $compareResult.propertiesChanged
     $getGroupResult.status = [DSCGetSummaryState]::"$($compareResult.status)"
+
+    # Export the ACL List to a file
+    $getGroupResult.ReferenceACLs = $ReferenceACLs
+    $getGroupResult.DifferenceACLs = $DifferenceACLs
 
     # Return the Group Result
     return $getGroupResult
