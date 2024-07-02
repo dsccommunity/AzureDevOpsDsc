@@ -55,7 +55,6 @@ Function Get-xAzDoGitPermission {
     # Construct a hashtable detailing the group
 
     $getGroupResult = @{
-        #Reasons = $()
         Ensure = [Ensure]::Absent
         propertiesChanged = @()
         project = $ProjectName
@@ -85,6 +84,9 @@ Function Get-xAzDoGitPermission {
     $namespace = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
     Write-Verbose "[Get-xAzDoGitPermission] Retrieved namespace: $($namespace.namespaceId)"
 
+    # Add to the ACL Lookup Params
+    $getGroupResult.namespace = $namespace
+
     $ACLLookupParams = @{
         OrganizationName        = $OrganizationName
         SecruityDescriptorId    = $namespace.namespaceId
@@ -110,7 +112,7 @@ Function Get-xAzDoGitPermission {
     }
 
     # Convert the Permissions to an ACL Token
-    $ReferenceACLs = ConvertTo-ACL @params
+    $ReferenceACLs = ConvertTo-ACL @params | Where-Object { $_.token.Type -ne 'GitUnknown' }
 
     # Compare the Reference ACLs to the Difference ACLs
     $compareResult = Compare-ACLs -ReferenceObject $ReferenceACLs -DifferenceObject $DifferenceACLs

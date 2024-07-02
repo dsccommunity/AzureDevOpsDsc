@@ -35,11 +35,11 @@ Function Compare-ACLs
         Write-Verbose "[Compare-ACLs] Reference ACL is null."
         $result.propertiesChanged += @{
             Name = 'ReferenceACL'
-            ReferenceValue = $null
-            DifferenceValue = $DifferenceObject
+            ReferenceObject = $null
+            DifferenceObject = $DifferenceObject
         }
         $result.status = "Missing"
-        return $result.propertiesChanged
+        return $result
     }
 
     # If the Difference ACL is null, set the status to changed.
@@ -48,11 +48,11 @@ Function Compare-ACLs
         Write-Verbose "[Compare-ACLs] Difference ACL is null."
         $result.propertiesChanged += @{
             Name = 'DifferenceACL'
-            ReferenceValue = $ReferenceObject
-            DifferenceValue = $null
+            ReferenceObject = $ReferenceObject
+            DifferenceObject = $null
         }
         $result.status = "NotFound"
-        return $result.propertiesChanged
+        return $result
     }
 
     #
@@ -64,8 +64,8 @@ Function Compare-ACLs
         Write-Verbose "[Compare-ACLs] ACLs are not inherited."
         $result.propertiesChanged += @{
             Name = 'isInherited'
-            ReferenceValue = $ReferenceObject.isInherited
-            DifferenceValue = $DifferenceObject.isInherited
+            ReferenceObject = $ReferenceObject
+            DifferenceObject = $DifferenceObject
         }
         # Set the status to changed.
         $result.status = "Changed"
@@ -88,8 +88,10 @@ Function Compare-ACLs
             Write-Verbose "[Compare-ACLs] ACE not found in Difference ACL."
             $result.propertiesChanged += @{
                 Name = 'ACE'
-                ReferenceValue = $ReferenceACE
-                DifferenceValue = $null
+                ReferenceObject = $ReferenceObject
+                DifferenceObject = $DifferenceObject
+                ReferenceACE = $ReferenceACE
+                DifferenceACE = $null
             }
             # Set the status to changed.
             $result.status = "Changed"
@@ -114,8 +116,8 @@ Function Compare-ACLs
             $result.propertiesChanged += @{
                 Name = 'ACEAllow'
                 Identity = $ReferenceACE.Identity
-                ReferenceValue = $ReferenceAllow
-                DifferenceValue = $DifferenceAllow
+                ReferenceObject = $ReferenceAllow
+                DifferenceObject = $DifferenceAllow
             }
             # Set the status to changed.
             $result.status = "Changed"
@@ -133,8 +135,8 @@ Function Compare-ACLs
             $result.propertiesChanged += @{
                 Name = 'ACEDeny'
                 Identity = $ReferenceACE.Identity
-                ReferenceValue = $ReferenceDeny
-                DifferenceValue = $DifferenceDeny
+                ReferenceObject = $ReferenceDeny
+                DifferenceObject = $DifferenceDeny
             }
             # Set the status to changed.
             $result.status = "Changed"
@@ -153,8 +155,8 @@ Function Compare-ACLs
             Write-Verbose "[Compare-ACLs] ACE not found in Reference ACL."
             $result.propertiesChanged += @{
                 Name = 'ACE'
-                ReferenceValue = $null
-                DifferenceValue = $DifferenceACE
+                ReferenceObject = $null
+                DifferenceObject = $DifferenceACE
             }
             # Set the status to changed.
             $result.status = "Changed"

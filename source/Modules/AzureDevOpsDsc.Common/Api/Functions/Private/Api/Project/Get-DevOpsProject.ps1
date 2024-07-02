@@ -1,4 +1,5 @@
-function Get-DevOpsProject {
+function Get-DevOpsProject
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
@@ -14,7 +15,8 @@ function Get-DevOpsProject {
     $encodedPAT = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PersonalAccessToken)"))
     $uri = "https://dev.azure.com/$Organization/_apis/projects/$ProjectId?api-version=7.2-preview.1"
 
-    try {
+    try
+    {
         $headers = @{
             Authorization = "Basic $encodedPAT"
             'Content-Type' = 'application/json'
@@ -24,7 +26,8 @@ function Get-DevOpsProject {
 
         # Output the response which contains the project details
         return $response
-    } catch {
+    } catch
+    {
         Write-Error "Failed to get the Azure DevOps project: $_"
     }
 }

@@ -39,9 +39,12 @@ Function ConvertTo-ACLToken {
 
     )
 
+    $TokenName = $TokenName.Replace('[', '').Replace(']', '')
+
     Write-Verbose "[ConvertTo-ACLToken] Started."
     Write-Verbose "[ConvertTo-ACLToken] Security Namespace: $SecurityNamespace"
     Write-Verbose "[ConvertTo-ACLToken] Token Name: $TokenName"
+
 
     $result = @{}
 
@@ -59,12 +62,12 @@ Function ConvertTo-ACLToken {
             } elseif ($TokenName -match $LocalizedDataAzResourceTokenPatten.GitProject) {
                 # Derive the Token Type GitProject
                 $result.type = 'GitProject'
-                $result.projectId = (Get-CacheItem -Key $matches.ProjectName.Trim() -Type 'Projects').id
+                $result.projectId = (Get-CacheItem -Key $matches.ProjectName.Trim() -Type 'LiveProjects').id
 
             } elseif ($TokenName -match $LocalizedDataAzResourceTokenPatten.GitRepository) {
                 # Derive the Token Type GitRepository
                 $result.type = 'GitRepository'
-                $result.projectId = (Get-CacheItem -Key $matches.ProjectName.Trim() -Type 'Projects').id
+                $result.projectId = (Get-CacheItem -Key $matches.ProjectName.Trim() -Type 'LiveProjects').id
                 $result.RepoId = (Get-CacheItem -Key $TokenName -Type 'LiveRepositories').id
 
             } else {

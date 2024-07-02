@@ -73,8 +73,10 @@ Function Format-ACL {
         }
 
         Write-Verbose "[Format-ACL] Adding formatted ACL: $($ACL.token)"
+
         $formattedACL = [HashTable]@{
             token     = Resolve-ACLToken -Token $ACL.token
+            ACL       = $ACL
             inherited = $ACL.inheritPermissions
             aces      = $ACEs
         }

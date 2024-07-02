@@ -27,6 +27,7 @@ function Get-DevOpsACL
         return $null
     }
 
+    $ACLList.value | Export-CLixml "C:\Temp\ACLList.clixml"
     return $ACLList.value
 
 }

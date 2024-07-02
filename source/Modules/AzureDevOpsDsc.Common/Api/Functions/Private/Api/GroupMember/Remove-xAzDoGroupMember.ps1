@@ -43,9 +43,9 @@ Function Remove-DevOpsGroupMember {
     try {
         # Call the Invoke-AzDevOpsApiRestMethod function with the parameters defined above.
         # The "@" symbol is used to pass the hashtable as splatting parameters.
-        Write-Verbose "[Remove-DevOpsGroupMember] Attempting to invoke REST method to add group member."
+        Write-Verbose "[Remove-DevOpsGroupMember] Attempting to invoke REST method to remove group member."
         $member = Invoke-AzDevOpsApiRestMethod @params
-        Write-Verbose "[Remove-DevOpsGroupMember] Member added successfully."
+        Write-Verbose "[Remove-DevOpsGroupMember] Member removed successfully."
 
     } catch {
         # If an exception occurs, write an error message to the console with details about the issue.

@@ -28,4 +28,9 @@ Function New-xAzDoGitPermission {
 
     "Triggered-New" | Out-File -FilePath "C:\Temp\verbose_log.txt" -Append
 
+
+    # Iterate Through the Lookup Result and Construct the Permissions List
+
+
+
 }
