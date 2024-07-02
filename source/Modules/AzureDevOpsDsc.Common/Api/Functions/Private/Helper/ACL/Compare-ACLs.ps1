@@ -21,6 +21,9 @@ Function Compare-ACLs
     }
 
     #
+    # TODO: REFACTOR LOGIC TO INCLUDE REFERENCE OR DIFFERENCE TOKENS. THIS IS IMPORTANT FOR USE WHEN CREATING ACLS.
+
+    #
     # Test if the Reference and Difference ACLs are null.
 
     if ($ReferenceObject -eq $null -and $DifferenceObject -eq $null)
