@@ -23,6 +23,9 @@ Function Compare-ACLs
     #
     # TODO: REFACTOR LOGIC TO INCLUDE REFERENCE OR DIFFERENCE TOKENS. THIS IS IMPORTANT FOR USE WHEN CREATING ACLS.
 
+    $ReferenceObject | Export-CLixml C:\Temp\Ref.clixml
+    $DifferenceObject | Export-CLixml C:\Temp\Diff.clixml
+
     #
     # Test if the Reference and Difference ACLs are null.
 
@@ -32,12 +35,16 @@ Function Compare-ACLs
         return $result.propertiesChanged
     }
 
+    # Get the Token
+    $Token = Get-ACLToken $ReferenceObject $DifferenceObject
+
     # If the Reference ACL is null, set the status to changed.
     if ($null -eq $ReferenceObject)
     {
         Write-Verbose "[Compare-ACLs] Reference ACL is null."
         $result.propertiesChanged += @{
             Name = 'ReferenceACL'
+            Token = $Token
             ReferenceObject = $null
             DifferenceObject = $DifferenceObject
         }
@@ -51,6 +58,7 @@ Function Compare-ACLs
         Write-Verbose "[Compare-ACLs] Difference ACL is null."
         $result.propertiesChanged += @{
             Name = 'DifferenceACL'
+            Token = $Token
             ReferenceObject = $ReferenceObject
             DifferenceObject = $null
         }
@@ -67,6 +75,7 @@ Function Compare-ACLs
         Write-Verbose "[Compare-ACLs] ACLs are not inherited."
         $result.propertiesChanged += @{
             Name = 'isInherited'
+            Token = $Token
             ReferenceObject = $ReferenceObject
             DifferenceObject = $DifferenceObject
         }
@@ -81,6 +90,8 @@ Function Compare-ACLs
     ForEach ($ReferenceACE in $ReferenceObject.ACEs)
     {
 
+
+
         # Check if the ACE is found in the Difference ACL.
         $identity = $DifferenceObject.ACEs | Where-Object { $_.Identity.value.originId -eq $ReferenceACE.Identity.value.originId }
 
@@ -91,8 +102,7 @@ Function Compare-ACLs
             Write-Verbose "[Compare-ACLs] ACE not found in Difference ACL."
             $result.propertiesChanged += @{
                 Name = 'ACE'
-                ReferenceObject = $ReferenceObject
-                DifferenceObject = $DifferenceObject
+                Token = $Token
                 ReferenceACE = $ReferenceACE
                 DifferenceACE = $null
             }
@@ -118,6 +128,7 @@ Function Compare-ACLs
             Write-Verbose "[Compare-ACLs] Allow ACEs are not equal."
             $result.propertiesChanged += @{
                 Name = 'ACEAllow'
+                Token = $Token
                 Identity = $ReferenceACE.Identity
                 ReferenceObject = $ReferenceAllow
                 DifferenceObject = $DifferenceAllow
@@ -138,6 +149,7 @@ Function Compare-ACLs
             $result.propertiesChanged += @{
                 Name = 'ACEDeny'
                 Identity = $ReferenceACE.Identity
+                Token = $Token
                 ReferenceObject = $ReferenceDeny
                 DifferenceObject = $DifferenceDeny
             }
@@ -158,6 +170,7 @@ Function Compare-ACLs
             Write-Verbose "[Compare-ACLs] ACE not found in Reference ACL."
             $result.propertiesChanged += @{
                 Name = 'ACE'
+                Token = $Token
                 ReferenceObject = $null
                 DifferenceObject = $DifferenceACE
             }

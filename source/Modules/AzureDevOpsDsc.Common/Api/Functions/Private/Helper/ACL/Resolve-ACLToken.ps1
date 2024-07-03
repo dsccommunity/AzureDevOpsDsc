@@ -42,6 +42,8 @@ Function Resolve-ACLToken {
         $result."$_" = $matches."$_"
     }
 
+    $result._token = $Token
+
     return $result
 
 }

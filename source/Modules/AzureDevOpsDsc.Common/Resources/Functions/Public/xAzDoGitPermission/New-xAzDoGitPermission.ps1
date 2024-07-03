@@ -26,7 +26,24 @@ Function New-xAzDoGitPermission {
 
     Write-Verbose "[New-xAzDoGitPermission] Started."
 
-    "Triggered-New" | Out-File -FilePath "C:\Temp\verbose_log.txt" -Append
+
+    # Iterate Through each of the Permissions and remove them from the Repository
+    ForEach ($Property in $LookupResult.propertiesChanged) {
+
+        Write-Verbose "[New-xAzDoGitPermission] Adding Permission: $($Property.Token)"
+
+        # Construct the ACL Token Parameters
+        $ACLTokenParams = @{
+            OrganizationName    = $Global:DSCAZDO_OrganizationName
+            SecurityNamespaceID = $LookupResult.namespace.namespaceId
+            TokenNames          = $Property.Token
+        }
+
+        # Remove the Permission from the Repository
+        Remove-GitRepositoryPermission @ACLTokenParams
+
+    }
+
 
 
     # Iterate Through the Lookup Result and Construct the Permissions List
