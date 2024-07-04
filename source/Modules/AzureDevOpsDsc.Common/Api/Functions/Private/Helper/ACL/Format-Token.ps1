@@ -21,39 +21,42 @@ Format-Token -Token $token
 This function assumes that the token type is either 'GitOrganization', 'GitProject', or 'GitRepository'. If the token type is not one of these, the function will not format the token and will return an empty string.
 #>
 
-Function Format-Token
-{
+Function Format-Token {
     [CmdletBinding()]
-    param
-    (
+    param (
+        # Define a mandatory parameter named 'Token' of type Object array
         [Parameter(Mandatory)]
         [Object[]]$Token
     )
 
+    # Output verbose message indicating the function has started
     Write-Verbose "[Format-Token] Started."
 
-    # Derive the Token Type GitProject
-    $result.type = 'GitProject'
+    # Initialize variable to store formatted token string
+    $string = ""
 
-    switch ($Token)
-    {
+    # Determine the type of the token and format accordingly
+    switch ($Token) {
+        # If the token type is 'GitOrganization'
         {$_.type -eq 'GitOrganization'} {
             $string = 'repoV2'
             break
         }
+        # If the token type is 'GitProject'
         {$_.type -eq 'GitProject'} {
             $string = 'repoV2/{0}' -f $Token.projectId
             break
         }
-        # If the token is a Git Repository
+        # If the token type is 'GitRepository'
         {$_.type -eq 'GitRepository'} {
-            $string = 'repoV2/{0}/{1}' -f $Token.projectId, $Token.repositoryId
+            $string = 'repoV2/{0}/{1}' -f $Token.projectId, $Token.RepoId
             break
         }
-
     }
 
+    # Output verbose message with the token value
     Write-Verbose "[Format-Token] Token: $Token"
-    return $string
 
+    # Return the formatted token string
+    return $string
 }

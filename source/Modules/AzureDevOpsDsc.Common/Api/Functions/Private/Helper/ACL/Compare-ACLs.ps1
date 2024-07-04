@@ -20,6 +20,8 @@ Function Compare-ACLs
         propertiesChanged = @()
     }
 
+    $changedItems = [System.Collections.ArrayList]::new()
+
     #
     # TODO: REFACTOR LOGIC TO INCLUDE REFERENCE OR DIFFERENCE TOKENS. THIS IS IMPORTANT FOR USE WHEN CREATING ACLS.
 
@@ -42,12 +44,14 @@ Function Compare-ACLs
     if ($null -eq $ReferenceObject)
     {
         Write-Verbose "[Compare-ACLs] Reference ACL is null."
+
         $result.propertiesChanged += @{
             Name = 'ReferenceACL'
             Token = $Token
             ReferenceObject = $null
             DifferenceObject = $DifferenceObject
         }
+
         $result.status = "Missing"
         return $result
     }
@@ -62,6 +66,7 @@ Function Compare-ACLs
             ReferenceObject = $ReferenceObject
             DifferenceObject = $null
         }
+
         $result.status = "NotFound"
         return $result
     }
@@ -72,12 +77,18 @@ Function Compare-ACLs
     # Check if the Reference ACL and Difference ACL are inherited.
     if ($ReferenceObject.isInherited -ne $DifferenceObject.isInherited)
     {
+
+        # Ignore the rest of the ACEs if the ACL has changed. Update the ACL.
+
+        # TODO: Refactor the logic to test for changes in the ACLs and ACE's. If there are changes, construct the new ACL.
+
         Write-Verbose "[Compare-ACLs] ACLs are not inherited."
         $result.propertiesChanged += @{
             Name = 'isInherited'
             Token = $Token
             ReferenceObject = $ReferenceObject
-            DifferenceObject = $DifferenceObject
+            ReferenceACE = $ReferenceObject
+            DifferenceACE = $DifferenceObject
         }
         # Set the status to changed.
         $result.status = "Changed"
@@ -89,8 +100,6 @@ Function Compare-ACLs
     # Check if the ACLs are not found.
     ForEach ($ReferenceACE in $ReferenceObject.ACEs)
     {
-
-
 
         # Check if the ACE is found in the Difference ACL.
         $identity = $DifferenceObject.ACEs | Where-Object { $_.Identity.value.originId -eq $ReferenceACE.Identity.value.originId }

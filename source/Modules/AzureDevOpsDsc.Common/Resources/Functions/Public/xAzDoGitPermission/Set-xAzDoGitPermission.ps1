@@ -26,6 +26,37 @@ Function Set-xAzDoGitPermission {
 
     Write-Verbose "[Set-xAzDoGitPermission] Started."
 
-    "Triggered-Set" | Out-File -FilePath "C:\Temp\verbose_log.txt" -Append
+    #
+    #
+
+    #
+    # Security Namespace ID
+
+    $SecurityNamespace = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
+
+    #
+    # Import the ACL list
+
+    $ACLPermissions = $LookupResult
+
+    #
+    # Serialize the ACLs
+
+    $serializeACLParams = @{
+        ReferenceACLs = $LookupResult.ReferenceACLs
+        DescriptorACLList = $ACLPermissions
+        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $ProjectName)
+    }
+
+    $params = @{
+        OrganizationName = $Global:DSCAZDO_OrganizationName
+        SecurityNamespaceID = $SecurityNamespace.namespaceId
+        SerializedACLs = Serialize-ACLList @serializeACLParams
+    }
+
+    #
+    # Set the Git Repository Permissions
+
+    Set-GitRepositoryPermission @params
 
 }

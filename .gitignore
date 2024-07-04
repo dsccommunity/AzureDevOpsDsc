@@ -21,7 +21,6 @@ package-lock.json
 
 CodeCoverage.JaCoCo.xml
 .vscode/launch.json
-Temp/A.ps1
-Temp/V.ps1
+Temp/*
 TestProject.yml
 TestProject2.yml
