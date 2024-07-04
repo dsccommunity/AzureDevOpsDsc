@@ -3,7 +3,7 @@
     Performs a bitwise OR operation on an array of integers.
 
 .DESCRIPTION
-    The BorArray function takes an array of integers as input and performs a bitwise OR operation on them. It returns the result of the operation.
+    The Get-BitwiseOrResult function takes an array of integers as input and performs a bitwise OR operation on them. It returns the result of the operation.
 
 .PARAMETER integers
     Specifies the array of integers on which the bitwise OR operation is performed.
@@ -16,7 +16,7 @@
 
 .EXAMPLE
     $inputArray = 1, 2, 4, 8
-    $result = BorArray -integers $inputArray
+    $result = Get-BitwiseOrResult -integers $inputArray
     $result
     # Output: 15
 
@@ -24,14 +24,14 @@
     Author: Your Name
     Date:   Current Date
 #>
-Function BorArray {
+Function Get-BitwiseOrResult {
     [CmdletBinding()]
     param (
         [int[]]$integers
     )
 
-    Write-Verbose "[BorArray] Started."
-    Write-Verbose "[BorArray] Integers: $integers"
+    Write-Verbose "[Get-BitwiseOrResult] Started."
+    Write-Verbose "[Get-BitwiseOrResult] Integers: $integers"
 
     $result = 0
 

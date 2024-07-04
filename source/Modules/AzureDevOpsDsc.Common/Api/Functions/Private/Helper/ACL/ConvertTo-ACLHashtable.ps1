@@ -3,7 +3,7 @@
 Serializes the ACL list based on the provided reference ACLs, descriptor ACL list, and descriptor match token.
 
 .DESCRIPTION
-The Serialize-ACLList function captures the ACLs that are relevant to the Git Repository by matching the descriptor match token. If the descriptor ACL list is empty, it falls back to using the reference ACLs. It then constructs an ACL object for each ACL in the ACL list, including properties like inheritPermissions, token, and acesDictionary. The acesDictionary contains ACE objects with properties like allow, deny, and descriptor. Finally, it returns the constructed ACLs hashtable.
+The ConvertTo-ACLHashtable function captures the ACLs that are relevant to the Git Repository by matching the descriptor match token. If the descriptor ACL list is empty, it falls back to using the reference ACLs. It then constructs an ACL object for each ACL in the ACL list, including properties like inheritPermissions, token, and acesDictionary. The acesDictionary contains ACE objects with properties like allow, deny, and descriptor. Finally, it returns the constructed ACLs hashtable.
 
 .PARAMETER ReferenceACLs
 The reference ACLs to be used as a fallback if the descriptor ACL list is empty.
@@ -69,15 +69,14 @@ $descriptorACLList = @(
 
 $descriptorMatchToken = "token2"
 
-Serialize-ACLList -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
+ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
 
 .OUTPUTS
 System.Collections.Hashtable
 The constructed ACLs hashtable containing the serialized ACLs.
-
 #>
 
-Function Serialize-ACLList {
+Function ConvertTo-ACLHashtable {
     param(
         [Parameter(Mandatory)]
         [Object[]]
@@ -92,67 +91,67 @@ Function Serialize-ACLList {
         $DescriptorMatchToken
     )
 
-   Write-Verbose "[Serialize-ACLList] Started."
+   Write-Verbose "[ConvertTo-ACLHashtable] Started."
 
    # Initialize the ACLs hashtable with a count and a list to hold ACL objects
    Write-Verbose "Initializing the ACLs hashtable."
-   $ACLs = @{
+   $ACLHashtable = @{
        Count = 0
-       value = [System.Collections.Generic.List[Object]]::new()
+       ACLList = [System.Collections.Generic.List[Object]]::new()
    }
 
    # Filter out all ACLs that don't match the descriptor match token. These are needed to construct the ACLs object
    # Otherwise, the existing ACLs will be removed.
    Write-Verbose "Filtering descriptor ACLs that do not match the descriptor match token."
-   $FilteredDescriptorACLS = $DescriptorACLList | Where-Object { $_.token -notmatch $DescriptorMatchToken }
+   $RelevantDescriptorACLs = $DescriptorACLList | Where-Object { $_.token -notmatch $DescriptorMatchToken }
 
    # Iterate through the filtered descriptor ACLs to construct the ACLs object
    Write-Verbose "Iterating through the filtered descriptor ACLs to construct the ACLs object."
-   ForEach ($acl in $FilteredDescriptorACLS) {
+   ForEach ($DescriptorACL in $RelevantDescriptorACLs) {
        Write-Verbose "Adding filtered ACL to the ACLs object."
-       $ACLs.value.Add($acl)
+       $ACLHashtable.ACLList.Add($DescriptorACL)
    }
 
    # Construct the ACLs object from the reference ACLs
    Write-Verbose "Constructing the ACLs object from the reference ACLs."
 
-   # Iterate through the ACLs in the aclList
-   ForEach ($acl in $ReferenceACLs) {
+   # Iterate through the ACLs in the ReferenceACLs
+   ForEach ($ReferenceACL in $ReferenceACLs) {
        Write-Verbose "Processing reference ACL."
 
        # Construct the ACL Object with properties inheritPermissions, token, and acesDictionary
-       $ht = @{
-           inheritPermissions = $acl.inherited
-           token = Format-Token -Token $acl.token
+       $ACLObject = @{
+           inheritPermissions = $ReferenceACL.inherited
+           token = ConvertTo-FormattedToken -Token $ReferenceACL.token
            acesDictionary = @{}
        }
 
        # Iterate through the ACEs in the current ACL to construct the ACEs Dictionary
-       ForEach ($ace in $acl.aces) {
+       ForEach ($ACE in $ReferenceACL.aces) {
            Write-Verbose "Constructing ACE Object."
 
            # Construct the ACE Object with properties allow, deny, and descriptor
-           $newace = @{
-               allow       = BorArray $ace.permissions.allow.bit
-               deny        = BorArray $ace.permissions.deny.bit
-               descriptor  = $ace.Identity.value.ACLIdentity.descriptor
+           $ACEObject = @{
+               allow       = Get-BitwiseOrResult $ACE.permissions.allow.bit
+               deny        = Get-BitwiseOrResult $ACE.permissions.deny.bit
+               descriptor  = $ACE.Identity.value.ACLIdentity.descriptor
            }
            # Add the ACE to the ACEs Dictionary using the descriptor as the key
            Write-Verbose "Adding ACE to the ACEs Dictionary."
-           $ht.acesDictionary.Add($ace.Identity.value.ACLIdentity.descriptor, $newace)
+           $ACLObject.acesDictionary.Add($ACE.Identity.value.ACLIdentity.descriptor, $ACEObject)
        }
 
-       # Add the constructed ACL object (ht) to the ACL List
+       # Add the constructed ACL object (ACLObject) to the ACL List
        Write-Verbose "Adding constructed ACL object to the ACL List."
-       $ACLs.value.Add($ht)
+       $ACLHashtable.ACLList.Add($ACLObject)
    }
 
    # Update the ACL Count with the number of ACLs in the list
    Write-Verbose "Updating the ACL Count."
-   $ACLs.Count = $ACLs.value.Count
+   $ACLHashtable.Count = $ACLHashtable.ACLList.Count
 
    # Return the constructed ACLs hashtable
-   Write-Verbose "[Serialize-ACLList] Completed."
-   Write-Output $ACLs
+   Write-Verbose "[ConvertTo-ACLHashtable] Completed."
+   Write-Output $ACLHashtable
 
 }

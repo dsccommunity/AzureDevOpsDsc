@@ -43,7 +43,7 @@ Function Set-xAzDoGitPermission {
     # Serialize the ACLs
 
     $serializeACLParams = @{
-        ReferenceACLs = $LookupResult.ReferenceACLs
+        ReferenceACLs = $LookupResult.propertiesChanged
         DescriptorACLList = $ACLPermissions
         DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $ProjectName)
     }
@@ -51,7 +51,7 @@ Function Set-xAzDoGitPermission {
     $params = @{
         OrganizationName = $Global:DSCAZDO_OrganizationName
         SecurityNamespaceID = $SecurityNamespace.namespaceId
-        SerializedACLs = Serialize-ACLList @serializeACLParams
+        SerializedACLs = ConvertTo-ACLHashtable @serializeACLParams
     }
 
     #
