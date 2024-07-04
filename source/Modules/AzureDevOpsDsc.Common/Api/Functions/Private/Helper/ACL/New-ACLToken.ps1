@@ -3,7 +3,7 @@
 Converts a security TokenName to an ACL token based on the security namespace.
 
 .DESCRIPTION
-The ConvertTo-ACLToken function converts a security TokenName to an ACL token based on the specified security namespace. It is used in the Azure DevOps DSC module to derive the token type and other relevant information for Git repositories.
+The New-ACLToken function converts a security TokenName to an ACL token based on the specified security namespace. It is used in the Azure DevOps DSC module to derive the token type and other relevant information for Git repositories.
 
 .PARAMETER SecurityNamespace
 Specifies the security namespace for which the ACL token needs to be generated.
@@ -19,7 +19,7 @@ The function returns a hashtable containing the following properties:
 - RepoId: The ID of the repository associated with the ACL token (applicable for GitRepository type).
 
 .EXAMPLE
-ConvertTo-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Contoso/Org/Project'
+New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Contoso/Org/Project'
 
 This example converts the security TokenName 'Contoso/Org/Project' to an ACL token for the 'Git Repositories' security namespace. The resulting ACL token will have the type 'GitProject' and the project ID will be retrieved from the cache.
 
@@ -27,7 +27,7 @@ This example converts the security TokenName 'Contoso/Org/Project' to an ACL tok
 This function is part of the AzureDevOpsDsc.Common module and is used internally by other functions in the module.
 #>
 
-Function ConvertTo-ACLToken {
+Function New-ACLToken {
     [CmdletBinding()]
     param
     (
@@ -41,9 +41,9 @@ Function ConvertTo-ACLToken {
 
     $TokenName = $TokenName.Replace('[', '').Replace(']', '')
 
-    Write-Verbose "[ConvertTo-ACLToken] Started."
-    Write-Verbose "[ConvertTo-ACLToken] Security Namespace: $SecurityNamespace"
-    Write-Verbose "[ConvertTo-ACLToken] Token Name: $TokenName"
+    Write-Verbose "[New-ACLToken] Started."
+    Write-Verbose "[New-ACLToken] Security Namespace: $SecurityNamespace"
+    Write-Verbose "[New-ACLToken] Token Name: $TokenName"
 
 
     $result = @{}
@@ -73,19 +73,19 @@ Function ConvertTo-ACLToken {
             } else {
                 # Derive the Token Type GitUnknown
                 $result.type = 'GitUnknown'
-                Write-Warning "[ConvertTo-ACLToken] TokenName '$TokenName' does not match any known Git ACL Token Patterns."
+                Write-Warning "[New-ACLToken] TokenName '$TokenName' does not match any known Git ACL Token Patterns."
             }
             break;
         }
 
         default {
-            Write-Warning "[ConvertTo-ACLToken] SecurityNamespace '$SecurityNamespace' is not recognized."
+            Write-Warning "[New-ACLToken] SecurityNamespace '$SecurityNamespace' is not recognized."
             $result.type = 'UnknownSecurityNamespace'
         }
 
     }
 
-    Write-Verbose "[ConvertTo-ACLToken] ACL Token: $($result | Out-String)"
+    Write-Verbose "[New-ACLToken] ACL Token: $($result | Out-String)"
 
     # Return the ACL Token
     return $result

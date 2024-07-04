@@ -1,49 +1,26 @@
-Function Resolve-ACLToken {
+function Resolve-ACLToken
+{
+    param (
+        # Reference ACL
+        [Parameter()]
+        [Object[]]
+        $ReferenceObject,
 
-    param(
-        [Parameter(Mandatory)]
-        [String]$Token
+        # Difference ACL
+        [Parameter()]
+        [Object[]]
+        $DifferenceObject
     )
 
-    $result = @{}
-
     Write-Verbose "[Resolve-ACLToken] Started."
-    Write-Verbose "[Resolve-ACLToken] Token: $Token"
 
-    # Match the Token with the Regex Patterns
-    switch -regex ($Token.Trim()) {
-        $LocalizedDataAzACLTokenPatten.OrganizationGit {
-            $result.type = 'OrganizationGit'
-            break;
-        }
-
-        $LocalizedDataAzACLTokenPatten.GitProject {
-            $result.type = 'GitProject'
-            break;
-        }
-
-        $LocalizedDataAzACLTokenPatten.GitRepository {
-            $result.type = 'GitRepository'
-            break;
-        }
-
-        $LocalizedDataAzACLTokenPatten.GitBranch {
-            $result.type = 'GitBranch'
-            break;
-        }
-
-        default {
-            throw "Token '$Token' is not recognized."
-        }
+    # Prefer the Difference ACL if it is not null. This is because the Difference ACL contains the most recent information.
+    if ($null -ne $DifferenceObject)
+    {
+        Write-Verbose "[Resolve-ACLToken] Difference ACL is not null."
+        return $DifferenceObject.token._token
     }
 
-    # Get all Capture Groups and add them into a hashtable
-    $matches.keys | Where-Object { $_.Length -gt 1 } | ForEach-Object {
-        $result."$_" = $matches."$_"
-    }
-
-    $result._token = $Token
-
-    return $result
-
+    Write-Verbose "[Resolve-ACLToken] Difference ACL is null."
+    return $ReferenceObject.token._token
 }

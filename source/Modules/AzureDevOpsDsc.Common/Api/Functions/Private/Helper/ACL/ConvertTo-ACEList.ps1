@@ -3,7 +3,7 @@
 Converts permissions to an Access Control Entry (ACE) token.
 
 .DESCRIPTION
-The ConvertTo-ACE function converts permissions to an Access Control Entry (ACE) token. It takes the security namespace, identity, an array of permissions objects, and the organization name as mandatory parameters. It constructs the ACE token for each permission and adds it to the list of ACEs.
+The ConvertTo-ACEList function converts permissions to an Access Control Entry (ACE) token. It takes the security namespace, identity, an array of permissions objects, and the organization name as mandatory parameters. It constructs the ACE token for each permission and adds it to the list of ACEs.
 
 .PARAMETER SecurityNamespace
 The security namespace as a string. This parameter is mandatory.
@@ -18,7 +18,7 @@ An array of permissions objects. This parameter is mandatory.
 The organization name as a string. This parameter is mandatory.
 
 .EXAMPLE
-ConvertTo-ACE -SecurityNamespace "Namespace" -Identity "User1" -Permissions @("Read", "Write") -OrganizationName "MyOrg"
+ConvertTo-ACEList -SecurityNamespace "Namespace" -Identity "User1" -Permissions @("Read", "Write") -OrganizationName "MyOrg"
 
 This example converts the permissions "Read" and "Write" for the identity "User1" in the specified security namespace and organization name to an ACE token.
 
@@ -27,7 +27,7 @@ Author: Your Name
 Date: Today's Date
 #>
 
-Function ConvertTo-ACE {
+Function ConvertTo-ACEList {
     [CmdletBinding()]
     param (
         # Mandatory parameter: the security namespace as a string.
@@ -44,7 +44,7 @@ Function ConvertTo-ACE {
     )
 
     # Log the start of the function.
-    Write-Verbose "[ConvertTo-ACLToken] Started."
+    Write-Verbose "[New-ACLToken] Started."
 
     # Initialize an empty list to hold the ACEs (Access Control Entries).
     $ACEs = [System.Collections.Generic.List[HashTable]]::new()
@@ -70,17 +70,17 @@ Function ConvertTo-ACE {
         # Convert the Permission to an ACE.
         $ht = @{
             Identity    = Find-Identity @indentityParams
-            Permissions = ConvertTo-ACEToken @aceTokenParams
+            Permissions = ConvertTo-ACETokenList @aceTokenParams
         }
 
         # If the Identity is not found, log a warning.
         if (-not $ht.Identity) {
-            Write-Warning "[ConvertTo-ACLToken] Identity $($Permission.Identity) was not found. This will not be added to the ACEs list."
+            Write-Warning "[New-ACLToken] Identity $($Permission.Identity) was not found. This will not be added to the ACEs list."
             continue
         }
         # If the Permissions are not found, log a warning.
         if (-not $ht.Permissions) {
-            Write-Warning "[ConvertTo-ACLToken] Permissions for $($Permission.Identity) were not found. This will not be added to the ACEs list."
+            Write-Warning "[New-ACLToken] Permissions for $($Permission.Identity) were not found. This will not be added to the ACEs list."
             continue
         }
 

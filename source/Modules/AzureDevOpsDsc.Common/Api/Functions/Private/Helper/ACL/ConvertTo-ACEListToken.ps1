@@ -3,7 +3,7 @@
 Converts ACE permissions into an ACL token.
 
 .DESCRIPTION
-The ConvertTo-ACEToken function converts Access Control Entry (ACE) permissions into an ACL token. It takes a security namespace, an identity, and an array of ACE permissions objects as input parameters. It then initializes the ACL token, performs a lookup for the security descriptor, iterates through each ACE permission, filters allow and deny permissions, computes actions, and adds the computed hash table to the array. Finally, it returns the hashtable array.
+The ConvertTo-ACETokenList function converts Access Control Entry (ACE) permissions into an ACL token. It takes a security namespace, an identity, and an array of ACE permissions objects as input parameters. It then initializes the ACL token, performs a lookup for the security descriptor, iterates through each ACE permission, filters allow and deny permissions, computes actions, and adds the computed hash table to the array. Finally, it returns the hashtable array.
 
 .PARAMETER SecurityNamespace
 The security namespace as a string. This parameter is mandatory.
@@ -32,7 +32,7 @@ $acePermissions = @(
     }
 )
 
-ConvertTo-ACEToken -SecurityNamespace $securityNamespace -Identity $identity -ACEPermissions $acePermissions
+ConvertTo-ACETokenList -SecurityNamespace $securityNamespace -Identity $identity -ACEPermissions $acePermissions
 
 .NOTES
 This function requires the Get-CacheItem cmdlet to be available in the session.
@@ -42,7 +42,7 @@ https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/
 
 #>
 
-Function ConvertTo-ACEToken {
+Function ConvertTo-ACETokenList {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -55,11 +55,11 @@ Function ConvertTo-ACEToken {
         [Object[]]$ACEPermissions
     )
 
-    Write-Verbose "[ConvertTo-ACEToken] Initializing the ACL Token."
+    Write-Verbose "[ConvertTo-ACETokenList] Initializing the ACL Token."
     $hashTableArray = [System.Collections.Generic.List[HashTable]]::new()
 
-    Write-Verbose "[ConvertTo-ACEToken] Performing a Lookup for the Security Descriptor."
-    Write-Verbose "[ConvertTo-ACEToken] Security Namespace: $SecurityNamespace"
+    Write-Verbose "[ConvertTo-ACETokenList] Performing a Lookup for the Security Descriptor."
+    Write-Verbose "[ConvertTo-ACETokenList] Security Namespace: $SecurityNamespace"
 
     $SecurityDescriptor = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
 
@@ -70,7 +70,7 @@ Function ConvertTo-ACEToken {
     }
 
     # Iterate through each of the ACEs and construct the ACE Object
-    Write-Verbose "[ConvertTo-ACEToken] Iterating through each of the ACE Permissions."
+    Write-Verbose "[ConvertTo-ACETokenList] Iterating through each of the ACE Permissions."
 
     ForEach ($ACEPermission in $ACEPermissions) {
 
@@ -79,17 +79,17 @@ Function ConvertTo-ACEToken {
             ($_ -notin $SecurityDescriptor.actions.displayName) -and
             ($_ -notin $SecurityDescriptor.actions.name)
         } | ForEach-Object {
-            Write-Verbose "[ConvertTo-ACEToken] Permission '$_' not found in the Security Descriptor for namespace: $SecurityNamespace"
+            Write-Verbose "[ConvertTo-ACETokenList] Permission '$_' not found in the Security Descriptor for namespace: $SecurityNamespace"
         }
 
         # Filter the Allow and Deny permissions
-        Write-Verbose "[ConvertTo-ACEToken] ACEPermission: $($ACEPermission | ConvertTo-Json)"
-        Write-Verbose "[ConvertTo-ACEToken] Filtering Allow and Deny permissions."
+        Write-Verbose "[ConvertTo-ACETokenList] ACEPermission: $($ACEPermission | ConvertTo-Json)"
+        Write-Verbose "[ConvertTo-ACETokenList] Filtering Allow and Deny permissions."
 
         $AllowPermissions = $ACEPermission.Keys | Where-Object { $ACEPermission."$_" -eq 'Allow' }
         $DenyPermissions  = $ACEPermission.Keys | Where-Object { $ACEPermission."$_" -eq 'Deny'  }
 
-        Write-Verbose "[ConvertTo-ACEToken] Iterating through the Allow and Deny Permissions and computing actions."
+        Write-Verbose "[ConvertTo-ACETokenList] Iterating through the Allow and Deny Permissions and computing actions."
         $AllowBits = $SecurityDescriptor.actions | Where-Object { ($_.displayName -in $AllowPermissions) -or ($_.name -in $AllowPermissions) }
         $DenyBits  = $SecurityDescriptor.actions | Where-Object { ($_.displayName -in $DenyPermissions) -or ($_.name -in $DenyPermissions) }
 
@@ -100,11 +100,11 @@ Function ConvertTo-ACEToken {
             Deny           = $DenyBits
         }
 
-        Write-Verbose "[ConvertTo-ACEToken] Adding computed hash table to the array"
+        Write-Verbose "[ConvertTo-ACETokenList] Adding computed hash table to the array"
         $hashTableArray.Add($hashTable)
     }
 
-    Write-Verbose "[ConvertTo-ACEToken] Completed processing ACE Permissions"
+    Write-Verbose "[ConvertTo-ACETokenList] Completed processing ACE Permissions"
 
     # Return the hashtable array
     return $hashTableArray
