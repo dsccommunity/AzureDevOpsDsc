@@ -39,7 +39,7 @@ Function Test-ACLListforChanges
     }
 
     # Get the Token
-    $Token = Get-ACLToken $ReferenceACLs $DifferenceACLs
+    #$Token = Get-ACLToken $ReferenceACLs $DifferenceACLs
 
     # If the Reference ACL is null, set the status to changed.
     if ($null -eq $ReferenceACLs)
@@ -114,8 +114,8 @@ Function Test-ACLListforChanges
             #
             # Compare the Allow ACEs
 
-            $ReferenceAllow = BorArray $ReferenceACE.Permissions.Allow.Bit
-            $DifferenceACLs = BorArray $ace.Permissions.Allow.Bit
+            $ReferenceAllow = Get-BitwiseOrResult $ReferenceACE.Permissions.Allow.Bit
+            $DifferenceACLs = Get-BitwiseOrResult $ace.Permissions.Allow.Bit
 
             # Test if the integers are not equal.
             if ($ReferenceAllow -ne $DifferenceAllow)
@@ -128,8 +128,8 @@ Function Test-ACLListforChanges
             #
             # Compare the Deny ACEs
 
-            $ReferenceDeny = BorArray $ReferenceACE.Permissions.Deny.Bit
-            $DifferenceDeny = BorArray $ace.Permissions.Deny.Bit
+            $ReferenceDeny = Get-BitwiseOrResult $ReferenceACE.Permissions.Deny.Bit
+            $DifferenceDeny = Get-BitwiseOrResult $ace.Permissions.Deny.Bit
 
             # Test if the integers are not equal.
             if ($ReferenceDeny -ne $DifferenceDeny)

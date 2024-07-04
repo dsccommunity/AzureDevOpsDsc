@@ -3,7 +3,7 @@
 Formats an Access Control List (ACL) object.
 
 .DESCRIPTION
-The Format-ACL function takes an ACL object and formats it into a structured format. It matches identities, formats permissions, and creates a formatted ACL object.
+The ConvertTo-FormattedACL function takes an ACL object and formats it into a structured format. It matches identities, formats permissions, and creates a formatted ACL object.
 
 .PARAMETER ACL
 The ACL object from the pipeline.
@@ -16,9 +16,9 @@ The organization name as a string.
 
 .EXAMPLE
 $myACL = Get-ACL -Path "C:\Temp"
-$formattedACL = $myACL | Format-ACL -SecurityNamespace "MyNamespace" -OrganizationName "MyOrganization"
+$formattedACL = $myACL | ConvertTo-FormattedACL -SecurityNamespace "MyNamespace" -OrganizationName "MyOrganization"
 
-This example retrieves an ACL object for a specific path and formats it using the Format-ACL function.
+This example retrieves an ACL object for a specific path and formats it using the ConvertTo-FormattedACL function.
 
 .OUTPUTS
 [System.Collections.Generic.List[HashTable]]
@@ -75,7 +75,7 @@ Function ConvertTo-FormattedACL {
         Write-Verbose "[ConvertTo-FormattedACL] Adding formatted ACL: $($ACL.token)"
 
         $formattedACL = [HashTable]@{
-            token     = Resolve-ACLToken -Token $ACL.token
+            token     = Parse-ACLToken -Token $ACL.token
             ACL       = $ACL
             inherited = $ACL.inheritPermissions
             aces      = $ACEs

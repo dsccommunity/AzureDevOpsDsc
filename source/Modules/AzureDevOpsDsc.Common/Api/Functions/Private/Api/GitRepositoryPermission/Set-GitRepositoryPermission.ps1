@@ -58,7 +58,7 @@ Function Set-GitRepositoryPermission
         # Set the method to PUT.
         Method = 'POST'
         # Set the body of the request to the serialized ACLs.
-        Body = $SerializedACLs | ConvertTo-Json
+        Body = $SerializedACLs | ConvertTo-Json -Depth 4
     }
 
     try {

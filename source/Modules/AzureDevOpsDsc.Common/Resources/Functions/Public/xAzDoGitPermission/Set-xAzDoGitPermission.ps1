@@ -27,24 +27,16 @@ Function Set-xAzDoGitPermission {
     Write-Verbose "[Set-xAzDoGitPermission] Started."
 
     #
-    #
-
-    #
     # Security Namespace ID
 
     $SecurityNamespace = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
-
-    #
-    # Import the ACL list
-
-    $ACLPermissions = $LookupResult
 
     #
     # Serialize the ACLs
 
     $serializeACLParams = @{
         ReferenceACLs = $LookupResult.propertiesChanged
-        DescriptorACLList = $ACLPermissions
+        DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'ACLs'
         DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $ProjectName)
     }
 

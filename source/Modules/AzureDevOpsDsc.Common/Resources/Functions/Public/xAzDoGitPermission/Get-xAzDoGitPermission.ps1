@@ -89,12 +89,12 @@ Function Get-xAzDoGitPermission {
 
     $ACLLookupParams = @{
         OrganizationName        = $OrganizationName
-        SecruityDescriptorId    = $namespace.namespaceId
+        SecurityDescriptorId    = $namespace.namespaceId
     }
 
     # Get the ACL List and format the ACLS
     Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
-    $DifferenceACLs = Get-DevOpsACL @ACLLookupParams | Format-ACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName | Where-Object {
+    $DifferenceACLs = Get-DevOpsACL @ACLLookupParams | ConvertTo-FormattedACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName | Where-Object {
         ($_.Token.Type -eq 'GitRepository') -and ($_.Token.RepoId -eq $repository.id)
     }
 
@@ -115,7 +115,7 @@ Function Get-xAzDoGitPermission {
     $ReferenceACLs = ConvertTo-ACL @params | Where-Object { $_.token.Type -ne 'GitUnknown' }
 
     # Compare the Reference ACLs to the Difference ACLs
-    $compareResult = Test-ACLListforChanges -ReferenceObject $ReferenceACLs -DifferenceObject $DifferenceACLs
+    $compareResult = Test-ACLListforChanges -ReferenceACLs $ReferenceACLs -DifferenceACLs $DifferenceACLs
     $getGroupResult.propertiesChanged = $compareResult.propertiesChanged
     $getGroupResult.status = [DSCGetSummaryState]::"$($compareResult.status)"
 

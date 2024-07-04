@@ -5,7 +5,7 @@ function Get-DevOpsACL
         [string]$OrganizationName,
 
         [Parameter(Mandatory)]
-        [String]$SecruityDescriptorId,
+        [String]$SecurityDescriptorId,
 
         [Parameter()]
         [String]
@@ -15,7 +15,7 @@ function Get-DevOpsACL
     #
     # Construct the URL for the API call
     $params = @{
-        Uri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}" -f $OrganizationName, $SecruityDescriptorId, $ApiVersion
+        Uri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}" -f $OrganizationName, $SecurityDescriptorId, $ApiVersion
         Method = 'Get'
     }
 
@@ -26,6 +26,10 @@ function Get-DevOpsACL
     {
         return $null
     }
+
+    #
+    # Cache the ACL List. Use the SecurityDescriptorId as the key
+    Add-CacheItem -Key $SecurityDescriptorId -Value $ACLList.value -Type 'ACLList'
 
     $ACLList.value | Export-CLixml "C:\Temp\ACLList.clixml"
     return $ACLList.value
