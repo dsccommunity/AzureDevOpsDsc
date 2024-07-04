@@ -29,9 +29,8 @@ function Get-DevOpsACL
 
     #
     # Cache the ACL List. Use the SecurityDescriptorId as the key
-    Add-CacheItem -Key $SecurityDescriptorId -Value $ACLList.value -Type 'ACLList'
+    Add-CacheItem -Key $SecurityDescriptorId -Value $ACLList.value -Type 'ACLList' -Write
 
-    $ACLList.value | Export-CLixml "C:\Temp\ACLList.clixml"
     return $ACLList.value
 
 }

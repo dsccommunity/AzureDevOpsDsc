@@ -41,7 +41,11 @@ Function Add-CacheItem {
 
         # Suppress warning messages
         [switch]
-        $SuppressWarning
+        $SuppressWarning,
+
+        # Write the cache to disk
+        [Switch]
+        $Write
     )
 
     Write-Verbose "[Add-CacheItem] Retrieving the current cache."
@@ -81,6 +85,12 @@ Function Add-CacheItem {
 
     # Update the memory cache
     Set-Variable -Name "AzDo$Type" -Value $cache -Scope Global
+
+    # Write the cache to disk
+    if ($Write.IsPresent) {
+        Write-Verbose "[Add-CacheItem] Writing cache to disk."
+        Set-CacheObject -Content $cache -CacheType $Type
+    }
 
     Write-Verbose "[Add-CacheItem] Cache item with key: '$Key' successfully added."
 }
