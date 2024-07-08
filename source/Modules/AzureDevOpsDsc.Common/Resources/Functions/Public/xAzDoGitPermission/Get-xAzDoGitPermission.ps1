@@ -94,6 +94,12 @@ Function Get-xAzDoGitPermission {
 
     # Get the ACL List and format the ACLS
     Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
+
+    @{
+        SecurityNamespace   = $SecurityNamespace
+        OrganizationName = $OrganizationName
+    } | Export-Clixml 'C:\Temp\Get-xAzDoGitPermission-params.clixml'
+
     $DifferenceACLs = Get-DevOpsACL @ACLLookupParams | ConvertTo-FormattedACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName | Where-Object {
         ($_.Token.Type -eq 'GitRepository') -and ($_.Token.RepoId -eq $repository.id)
     }

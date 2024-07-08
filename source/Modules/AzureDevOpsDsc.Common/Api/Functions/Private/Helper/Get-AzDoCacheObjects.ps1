@@ -11,8 +11,8 @@ function Get-AzDoCacheObjects
         'LiveGroupMembers',
         'LiveRepositories',
         'LiveServicePrinciples',
-        'SecurityNamespaces',
-        'ACLList'
+        'LiveACLList',
+        'SecurityNamespaces'
     )
 
 }

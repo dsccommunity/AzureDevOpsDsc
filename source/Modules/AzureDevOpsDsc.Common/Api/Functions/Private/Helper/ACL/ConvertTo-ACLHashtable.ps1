@@ -97,7 +97,7 @@ Function ConvertTo-ACLHashtable {
     Write-Verbose "Initializing the ACLs hashtable."
     $ACLHashtable = @{
         Count = 0
-        ACLList = [System.Collections.Generic.List[Object]]::new()
+        value = [System.Collections.Generic.List[Object]]::new()
     }
 
     # Filter out all ACLs that don't match the descriptor match token. These are needed to construct the ACLs object
@@ -109,7 +109,7 @@ Function ConvertTo-ACLHashtable {
     Write-Verbose "Iterating through the filtered descriptor ACLs to construct the ACLs object."
     ForEach ($DescriptorACL in $FilteredDescriptorACLs) {
         Write-Verbose "Adding filtered ACL to the ACLs object."
-        $ACLHashtable.ACLList.Add($DescriptorACL)
+        $ACLHashtable.value.Add($DescriptorACL)
     }
 
     # Construct the ACLs object from the reference ACLs
@@ -143,12 +143,12 @@ Function ConvertTo-ACLHashtable {
 
         # Add the constructed ACL object (ACLObject) to the ACL List
         Write-Verbose "Adding constructed ACL object to the ACL List."
-        $ACLHashtable.ACLList.Add($ACLObject)
+        $ACLHashtable.value.Add($ACLObject)
     }
 
     # Update the ACL Count with the number of ACLs in the list
     Write-Verbose "Updating the ACL Count."
-    $ACLHashtable.Count = $ACLHashtable.ACLList.Count
+    $ACLHashtable.Count = $ACLHashtable.value.Count
 
     # Return the constructed ACLs hashtable
     Write-Verbose "[ConvertTo-ACLHashtable] Completed."

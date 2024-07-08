@@ -30,14 +30,15 @@ Function Set-xAzDoGitPermission {
     # Security Namespace ID
 
     $SecurityNamespace = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
+    $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
     #
     # Serialize the ACLs
 
     $serializeACLParams = @{
         ReferenceACLs = $LookupResult.propertiesChanged
-        DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'ACLs'
-        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $ProjectName)
+        DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
+        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $Project.id)
     }
 
     $params = @{
