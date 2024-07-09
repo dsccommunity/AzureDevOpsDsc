@@ -80,7 +80,6 @@ class AzDevOpsApiDscResourceBase : DscResourceBase
                 [RequiredAction]::Test))
         {
             $result = "$($RequiredAction)-$($this.ResourceName)"
-            Flush-
             return $result
         }
 
