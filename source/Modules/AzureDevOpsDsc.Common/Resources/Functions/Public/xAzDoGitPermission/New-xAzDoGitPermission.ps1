@@ -39,8 +39,6 @@ Function New-xAzDoGitPermission {
             TokenNames          = $Property.Token
         }
 
-      #  $ACLTokenParams | Export-Clixml 'C:\Temp\ddddddd-params.clixml'
-
         # Remove the Permission from the Repository
        # Remove-GitRepositoryPermission @ACLTokenParams
 

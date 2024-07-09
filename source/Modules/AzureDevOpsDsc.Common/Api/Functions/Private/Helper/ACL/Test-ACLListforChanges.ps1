@@ -26,9 +26,6 @@ Function Test-ACLListforChanges
         propertiesChanged = @()
     }
 
-    $ReferenceACLs | Export-CLixml C:\Temp\Ref.clixml
-    $DifferenceACLs | Export-CLixml C:\Temp\Diff.clixml
-
     #
     # Test if the Reference and Difference ACLs are null.
 

@@ -65,15 +65,6 @@ Function ConvertTo-ACL {
         [string]$TokenName
     )
 
-    @{
-        SecurityNamespace = $SecurityNamespace
-        TokenName         = $TokenName
-        isInherited       = $isInherited
-        OrganizationName  = $OrganizationName
-        Permissions       = $Permissions
-    } | Export-Clixml C:\Temp\params.clixml
-
-
     # Verbose output indicating the start of the function.
     Write-Verbose "[ConvertTo-ACL] Started."
 

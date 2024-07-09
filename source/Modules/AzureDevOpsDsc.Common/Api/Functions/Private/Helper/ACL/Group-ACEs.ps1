@@ -39,17 +39,17 @@ Function Group-ACEs {
     Write-Verbose "[Group-ACE] Grouping multiple identities by permissions."
 
     # Group the multiple identities by the permissions
-    $Multiple | ForEach-Object {
+    ForEach ($item in $Multiple) {
 
-        Write-Verbose "[Group-ACE] Processing multiple identity: $($_.Group[0].Identity)"
+        Write-Verbose "[Group-ACE] Processing multiple identity: $($item.Group[0].Identity)"
 
         # Create a new hash table for the group
         $ht = @{
-            Identity    = $_.Group[0].Identity
+            Identity    = $item.Group[0].Identity
             Permissions = @{
-                Deny            = Group-Object -Property { $_.Group.Permissions.Deny } -NoElement
-                Allow           = Group-Object -Property { $_.Group.Permissions.Allow } -NoElement
-                DescriptorType  = $_.Group[0].Permissions.DescriptorType
+                Deny            = $item.Group.Permissions.Deny | Sort-Object -Unique Bit
+                Allow           = $item.Group.Permissions.Allow | Sort-Object -Unique Bit
+                DescriptorType  = $item.Group[0].Permissions.DescriptorType
             }
         }
 

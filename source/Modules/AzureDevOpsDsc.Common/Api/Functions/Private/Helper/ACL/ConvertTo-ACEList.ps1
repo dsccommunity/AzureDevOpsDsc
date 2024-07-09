@@ -52,6 +52,8 @@ Function ConvertTo-ACEList {
     # Iterate through each of the permissions and construct the ACE token.
     ForEach ($Permission in $Permissions) {
 
+        Write-Verbose "[New-ACLToken] Constructing ACE for $($Permission.Identity)."
+
         # Define the parameters for the Find-Identity function.
         $indentityParams = @{
             # The name of the identity to search for. Remove any square brackets (e.g., [TEAM FOUNDATION]\Project Collection Administrators).
@@ -63,7 +65,6 @@ Function ConvertTo-ACEList {
         # Define the parameters for the ACE Token.
         $aceTokenParams = @{
             SecurityNamespace = $SecurityNamespace
-            Identity          = $Permission.Identity
             ACEPermissions    = $Permission.Permission
         }
 

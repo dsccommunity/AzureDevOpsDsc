@@ -1,55 +1,10 @@
-<#
-.SYNOPSIS
-Converts ACE permissions into an ACL token.
 
-.DESCRIPTION
-The ConvertTo-ACETokenList function converts Access Control Entry (ACE) permissions into an ACL token. It takes a security namespace, an identity, and an array of ACE permissions objects as input parameters. It then initializes the ACL token, performs a lookup for the security descriptor, iterates through each ACE permission, filters allow and deny permissions, computes actions, and adds the computed hash table to the array. Finally, it returns the hashtable array.
-
-.PARAMETER SecurityNamespace
-The security namespace as a string. This parameter is mandatory.
-
-.PARAMETER Identity
-The identity associated with the ACE. This parameter is mandatory.
-
-.PARAMETER ACEPermissions
-An array of ACE permissions objects. This parameter is mandatory.
-
-.EXAMPLE
-$securityNamespace = "MySecurityNamespace"
-$identity = "User1"
-$acePermissions = @(
-    @{
-        Permission = @{
-            Read = "Allow"
-            Write = "Deny"
-        }
-    },
-    @{
-        Permission = @{
-            Read = "Allow"
-            Write = "Allow"
-        }
-    }
-)
-
-ConvertTo-ACETokenList -SecurityNamespace $securityNamespace -Identity $identity -ACEPermissions $acePermissions
-
-.NOTES
-This function requires the Get-CacheItem cmdlet to be available in the session.
-
-.LINK
-https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-cacheitem?view=powershell-7.1
-
-#>
 
 Function ConvertTo-ACETokenList {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$SecurityNamespace,
-
-        [Parameter(Mandatory)]
-        [string]$Identity,
 
         [Parameter(Mandatory)]
         [Object[]]$ACEPermissions
@@ -101,6 +56,7 @@ Function ConvertTo-ACETokenList {
         }
 
         Write-Verbose "[ConvertTo-ACETokenList] Adding computed hash table to the array"
+        Write-Verbose "[ConvertTo-ACETokenList] Hash Table: $($hashTable | ConvertTo-Json)"
         $hashTableArray.Add($hashTable)
     }
 
