@@ -1,0 +1,51 @@
+Function Write-Log
+{
+    [CmdletBinding()]
+    param
+    (
+        # The message to be logged.
+        [Parameter(Mandatory)]
+        [string]$Message,
+
+        # The type of log message.
+        [Parameter(Mandatory)]
+        [ValidateSet('Verbose', 'Warning')]
+        [string]$Type
+    )
+
+    Write-Verbose "[Write-Log] Started."
+
+    # Get the current date and time
+    $DateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+    # Construct the log message
+    $LogMessage = "[$DateTime] $Message"
+
+    # Write the log message to the appropriate log file
+    switch ($Type)
+    {
+        'Verbose' { $Global:AZDO_VerboseLog.Add($LogMessage) }
+        'Warning' { $Global:AZDO_WarningLog.Add($LogMessage) }
+        'Error'   { $Global:AZDO_ErrorLog.Add($LogMessage) }
+    }
+
+    # Increment the log count
+    $Global:AZDO_LogSettings."$Type"Count++
+
+    # Check if the log count limit has been reached
+    if ($Global:AZDO_LogSettings."$Type"Count -ge $Global:AZDO_LogSettings.LogCountLimit)
+    {
+        # Write the log messages to the log file
+        Write-Verbose "[Write-Log] Writing log messages to log file."
+        $LogFilePath = $Global:AZDO_LogSettings."$Type"LogFilePath
+        $LogMessages = $Global:AZDO_"$Type"Log
+        $LogMessages | Out-File -FilePath $LogFilePath -Append
+
+        # Clear the log messages
+        $Global:AZDO_"$Type"Log = [System.Collections.Generic.List[String]]::new()
+        $Global:AZDO_LogSettings."$Type"Count = 0
+    }
+
+    Write-Verbose "[Write-Log] Log message written to log file."
+
+}

@@ -126,6 +126,10 @@ Function Get-xAzDoGitPermission {
     $getGroupResult.ReferenceACLs = $ReferenceACLs
     $getGroupResult.DifferenceACLs = $DifferenceACLs
 
+    # Write
+    Write-Verbose "[Get-xAzDoGitPermission] Result Status: $($getGroupResult.status)"
+    Write-Verbose "[Get-xAzDoGitPermission] Returning Group Result."
+
     # Return the Group Result
     return $getGroupResult
 

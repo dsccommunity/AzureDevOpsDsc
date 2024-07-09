@@ -79,7 +79,9 @@ class AzDevOpsApiDscResourceBase : DscResourceBase
                 [RequiredAction]::Remove,
                 [RequiredAction]::Test))
         {
-            return "$($RequiredAction)-$($this.ResourceName)"
+            $result = "$($RequiredAction)-$($this.ResourceName)"
+            Flush-
+            return $result
         }
 
         return $null
