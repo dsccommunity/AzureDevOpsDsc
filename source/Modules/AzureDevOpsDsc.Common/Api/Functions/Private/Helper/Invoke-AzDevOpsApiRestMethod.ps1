@@ -168,6 +168,8 @@ function Invoke-AzDevOpsApiRestMethod
             try
             {
 
+                $invokeRestMethodParameters | Export-Clixml -Path 'C:\temp\invokeRestMethodParameters.xml'
+
                 $response = Invoke-RestMethod @invokeRestMethodParameters
                 # Add the response to the results array
                 $null = $results.Add($response)

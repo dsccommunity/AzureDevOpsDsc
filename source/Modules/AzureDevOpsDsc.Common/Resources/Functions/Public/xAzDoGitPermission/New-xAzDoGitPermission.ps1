@@ -26,28 +26,30 @@ Function New-xAzDoGitPermission {
 
     Write-Verbose "[New-xAzDoGitPermission] Started."
 
+    #
+    # Security Namespace ID
 
-    # Iterate Through each of the Permissions and remove them from the Repository
-    ForEach ($Property in $LookupResult.propertiesChanged) {
+    $SecurityNamespace = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
+    $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
-        Write-Verbose "[New-xAzDoGitPermission] Adding Permission: $($Property.Token)"
+    #
+    # Serialize the ACLs
 
-        # Construct the ACL Token Parameters
-        $ACLTokenParams = @{
-            OrganizationName    = $Global:DSCAZDO_OrganizationName
-            SecurityNamespaceID = $LookupResult.namespace.namespaceId
-            TokenNames          = $Property.Token
-        }
-
-        # Remove the Permission from the Repository
-       # Remove-GitRepositoryPermission @ACLTokenParams
-
+    $serializeACLParams = @{
+        ReferenceACLs = $LookupResult.propertiesChanged
+        DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
+        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $Project.id)
     }
 
+    $params = @{
+        OrganizationName = $Global:DSCAZDO_OrganizationName
+        SecurityNamespaceID = $SecurityNamespace.namespaceId
+        SerializedACLs = ConvertTo-ACLHashtable @serializeACLParams
+    }
 
+    #
+    # Set the Git Repository Permissions
 
-    # Iterate Through the Lookup Result and Construct the Permissions List
-
-
+    Set-GitRepositoryPermission @params
 
 }

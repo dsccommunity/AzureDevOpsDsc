@@ -24,22 +24,35 @@ Function Remove-xAzDoGitPermission {
         $Force
     )
 
-    Write-Verbose "[Remove-xAzDoGitPermission] Started."
+    Write-Verbose "[New-xAzDoGitPermission] Started."
 
-    # Iterate Through each of the Permissions and remove them from the Repository
-    ForEach ($Property in $LookupResult.propertiesChanged) {
+    #
+    # Security Namespace ID
 
-        Write-Verbose "[Remove-xAzDoGitPermission] Removing Permission: $($Property.Token)"
+    $SecurityNamespace  = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
+    $Project            = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+    $Repository         = Get-CacheItem -Key $RepositoryName -Type 'LiveRepositories'
+    $DescriptorACLList  = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
 
-        # Construct the ACL Token Parameters
-        $ACLTokenParams = @{
-            OrganizationName    = $Global:DSCAZDO_OrganizationName
-            SecurityNamespaceID = $LookupResult.namespace.namespaceId
-            TokenNames          = $Property.Token
+    #
+    # Filter the ACLs that pertain to the Git Repository
+
+    $searchString = "repoV2/{0}/{1}" -f $Project.id, $Repository.id
+
+    # Test if the Token exists
+    $Filtered = $DescriptorACLList | Where-Object { $_.token -eq $searchString }
+
+    # If the ACLs are not null, remove them
+    if ($Filtered) {
+
+        $params = @{
+            OrganizationName = $Global:DSCAZDO_OrganizationName
+            SecurityNamespaceID = $SecurityNamespace.id
+            TokenNames = @($searchString)
         }
 
-        # Remove the Permission from the Repository
-        Remove-GitRepositoryPermission @ACLTokenParams
+        # Remove the ACLs
+        Remove-GitRepositoryPermission @params
 
     }
 

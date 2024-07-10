@@ -78,7 +78,7 @@ The constructed ACLs hashtable containing the serialized ACLs.
 
 Function ConvertTo-ACLHashtable {
     param(
-        [Parameter(Mandatory)]
+        [Parameter()]
         [Object[]]
         $ReferenceACLs,
 

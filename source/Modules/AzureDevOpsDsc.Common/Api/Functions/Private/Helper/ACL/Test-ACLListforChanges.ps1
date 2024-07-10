@@ -32,17 +32,17 @@ Function Test-ACLListforChanges
     #
     # Test if the Reference and Difference ACLs are null.
 
-    if ($ReferenceACLs -eq $null -and $DifferenceACLs -eq $null)
+    if (($ReferenceACLs.aces -eq $null) -and ($DifferenceACLs -eq $null))
     {
         Write-Verbose "[Test-ACLListforChanges] ACLs are null."
-        return $result.propertiesChanged
+        return $result
     }
 
     # Get the Token
     #$Token = Get-ACLToken $ReferenceACLs $DifferenceACLs
 
     # If the Reference ACL is null, set the status to changed.
-    if ($null -eq $ReferenceACLs)
+    if (($null -eq $ReferenceACLs) -or ($null -eq $ReferenceACLs.aces))
     {
         Write-Verbose "[Test-ACLListforChanges] Reference ACL is null."
         $result.status = "Missing"
