@@ -60,6 +60,7 @@ Function Get-xAzDoGitPermission {
         project = $ProjectName
         repositoryName = $RepositoryName
         status = $null
+        reason = $null
     }
 
     Write-Verbose "[Get-xAzDoGitPermission] Group result hashtable constructed."
@@ -121,6 +122,7 @@ Function Get-xAzDoGitPermission {
     $compareResult = Test-ACLListforChanges -ReferenceACLs $ReferenceACLs -DifferenceACLs $DifferenceACLs
     $getGroupResult.propertiesChanged = $compareResult.propertiesChanged
     $getGroupResult.status = [DSCGetSummaryState]::"$($compareResult.status)"
+    $getGroupResult.reason = $compareResult.reason
 
     # Export the ACL List to a file
     $getGroupResult.ReferenceACLs = $ReferenceACLs

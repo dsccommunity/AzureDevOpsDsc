@@ -23,6 +23,9 @@ Function Test-ACLListforChanges
 
     $result = @{
         status = "Unchanged"
+        reason = @(
+            @{ Value = "No changes detected."; Reason = "No changes detected." }
+        )
         propertiesChanged = @()
     }
 
@@ -44,6 +47,10 @@ Function Test-ACLListforChanges
         Write-Verbose "[Test-ACLListforChanges] Reference ACL is null."
         $result.status = "Missing"
         $result.propertiesChanged = $DifferenceACLs
+        $result.reason += @{
+            Value = $DifferenceACLs
+            Reason = "Reference ACL is null."
+        }
         return $result
     }
 
@@ -53,6 +60,10 @@ Function Test-ACLListforChanges
         Write-Verbose "[Test-ACLListforChanges] Difference ACL is null."
         $result.status = "NotFound"
         $result.propertiesChanged = $ReferenceACLs
+        $result.reason += @{
+            Value = $ReferenceACLs
+            Reason = "Difference ACL is null."
+        }
         return $result
     }
 
@@ -66,6 +77,10 @@ Function Test-ACLListforChanges
     {
         Write-Verbose "[Test-ACLListforChanges] ACLs count is not equal."
         $result.status = "Changed"
+        $result.reason + @{
+            Value = $ReferenceACLs
+            Reason = "ACLs count is not equal."
+        }
         $result.propertiesChanged = $ReferenceACLs
         return $result
     }
@@ -81,6 +96,10 @@ Function Test-ACLListforChanges
         if ($null -eq $acl) {
             $result.status = "Changed"
             $result.propertiesChanged = $ReferenceACLs
+            $result.reason += @{
+                Value = $ReferenceACL
+                Reason = "ACL not found in Difference ACL."
+            }
             return $result
         }
 
@@ -88,6 +107,10 @@ Function Test-ACLListforChanges
         if ($ReferenceACL.isInherited -ne $acl.isInherited) {
             $result.status = "Changed"
             $result.propertiesChanged = $ReferenceACLs
+            $result.reason += @{
+                Value = $ReferenceACL
+                Reason = "Inherited flag is not equal."
+            }
             return $result
         }
 
@@ -96,12 +119,16 @@ Function Test-ACLListforChanges
         ForEach ($ReferenceACE in $ReferenceACL.ACEs) {
 
             # Check if the ACE is found in the Difference ACL.
-            $ace = $DifferenceACLs.ACEs | Where-Object { $_.Identity.value.originId -eq $ReferenceACE.ACEs.Identity.value.originId }
+            $ace = $DifferenceACLs.ACEs | Where-Object { $_.Identity.value.originId -eq $ReferenceACE.Identity.value.originId }
 
             # Check if the ACE is not found in the Difference ACL.
             if ($null -eq $ace) {
                 $result.status = "Changed"
                 $result.propertiesChanged = $ReferenceACLs
+                $result.reason += @{
+                    Value = $ReferenceACE
+                    Reason = "ACE not found in Difference ACL."
+                }
                 return $result
             }
 
@@ -112,13 +139,20 @@ Function Test-ACLListforChanges
             # Compare the Allow ACEs
 
             $ReferenceAllow = Get-BitwiseOrResult $ReferenceACE.Permissions.Allow.Bit
-            $DifferenceACLs = Get-BitwiseOrResult $ace.Permissions.Allow.Bit
+            $DifferenceAllow = Get-BitwiseOrResult $ace.Permissions.Allow.Bit
 
             # Test if the integers are not equal.
             if ($ReferenceAllow -ne $DifferenceAllow)
             {
                 Write-Verbose "[Test-ACLListforChanges] Allow ACEs are not equal."
                 $result.propertiesChanged = $ReferenceACLs
+                $result.reason += @{
+                    Value = @{
+                        ReferenceAllow = $ReferenceAllow
+                        DifferenceAllow = $DifferenceAllow
+                    }
+                    Reason = "Allow ACEs are not equal."
+                }
                 $result.status = "Changed"
             }
 
@@ -133,6 +167,13 @@ Function Test-ACLListforChanges
             {
                 Write-Verbose "[Test-ACLListforChanges] Deny ACEs are not equal."
                 $result.propertiesChanged = $ReferenceACLs
+                $result.reason += @{
+                    Value = @{
+                        ReferenceDeny = $ReferenceDeny
+                        DifferenceDeny = $DifferenceDeny
+                    }
+                    Reason = "Deny ACEs are not equal."
+                }
                 $result.status = "Changed"
             }
 
@@ -150,6 +191,10 @@ Function Test-ACLListforChanges
         # Test if the ACL is not found in the Reference ACL.
         if ($null -eq $acl) {
             $result.status = "Changed"
+            $result.reason += @{
+                Value = $DifferenceACL
+                Reason = "ACL not found in Reference ACL."
+            }
             $result.propertiesChanged = $ReferenceACLs
             return $result
         }
