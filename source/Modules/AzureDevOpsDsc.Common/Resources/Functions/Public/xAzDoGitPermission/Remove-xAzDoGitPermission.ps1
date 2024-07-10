@@ -31,7 +31,7 @@ Function Remove-xAzDoGitPermission {
 
     $SecurityNamespace  = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
     $Project            = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
-    $Repository         = Get-CacheItem -Key $RepositoryName -Type 'LiveRepositories'
+    $Repository         = Get-CacheItem -Key "$ProjectName\$RepositoryName" -Type 'LiveRepositories'
     $DescriptorACLList  = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
 
     #
@@ -47,8 +47,8 @@ Function Remove-xAzDoGitPermission {
 
         $params = @{
             OrganizationName = $Global:DSCAZDO_OrganizationName
-            SecurityNamespaceID = $SecurityNamespace.id
-            TokenNames = @($searchString)
+            SecurityNamespaceID = $SecurityNamespace.namespaceId
+            TokenName = $searchString
         }
 
         # Remove the ACLs

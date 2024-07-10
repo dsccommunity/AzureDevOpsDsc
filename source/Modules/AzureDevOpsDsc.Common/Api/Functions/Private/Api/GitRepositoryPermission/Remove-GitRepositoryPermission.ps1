@@ -8,7 +8,7 @@ Function Remove-GitRepositoryPermission
         [string]$SecurityNamespaceID,
 
         [Parameter(Mandatory)]
-        [string[]]$TokenNames,
+        [string]$TokenName,
 
         [Parameter()]
         [String]
@@ -23,7 +23,7 @@ Function Remove-GitRepositoryPermission
         # It includes the API endpoint, group identity, member identity, and the API version.
         Uri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?tokens={2}&recurse=False&api-version={3}" -f  $OrganizationName,
                                                                                                                     $SecurityNamespaceID,
-                                                                                                                    $TokenNames -join ',',
+                                                                                                                    $TokenName,
                                                                                                                     $ApiVersion
         # Set the method to DELETE.
         Method = 'DELETE'
