@@ -20,8 +20,8 @@ Describe 'PersonalAccessToken Class' {
             $pat = [PersonalAccessToken]::new($personalAccessToken)
 
             # Assert
-            $pat.tokenType | Should -Be [TokenType]::PersonalAccessToken
-            $pat.ConvertFromSecureString($pat.access_token) | Should -Be ":TestToken"
+            $pat.tokenType | Should -Be 'PersonalAccessToken'
+            $pat.ConvertFromSecureString($pat.access_token) | Should -Be "OlRlc3RUb2tlbg=="
         }
     }
 
@@ -34,7 +34,7 @@ Describe 'PersonalAccessToken Class' {
             $pat = [PersonalAccessToken]::new($secureStringPAT)
 
             # Assert
-            $pat.tokenType | Should -Be [TokenType]::PersonalAccessToken
+            $pat.tokenType | Should -Be 'PersonalAccessToken'
             $pat.access_token | Should -Be $secureStringPAT
         }
     }
@@ -63,7 +63,7 @@ Describe 'New-PersonalAccessToken Function' {
 
         # Assert
         $pat | Should -BeOfType [PersonalAccessToken]
-        $pat.ConvertFromSecureString($pat.access_token) | Should -Be ":TestToken"
+        $pat.ConvertFromSecureString($pat.access_token) | Should -Be "OlRlc3RUb2tlbg=="
     }
 
     It 'Should create a new PersonalAccessToken object with a secure string token' {
