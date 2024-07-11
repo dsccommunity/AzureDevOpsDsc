@@ -4,6 +4,7 @@ Class AuthenticationToken {
 
     [TokenType]$tokenType
     hidden [bool]$linux = $isLinux
+    hidden [SecureString]$access_token
 
     # Function to convert a SecureString to a String
     hidden [String]ConvertFromSecureString([SecureString]$SecureString) {

@@ -21,7 +21,7 @@ $functionSubDirectoryPaths = @(
     "$ModuleRoot\Api\Classes\",
 
     # Enum
-    "$ModuleRoot\Api\Enums\",
+    #"$ModuleRoot\Api\Enums\",
 
     # Data
     "$ModuleRoot\Api\Data\",

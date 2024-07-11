@@ -18,16 +18,17 @@ $base64String
 Author: GitHub Copilot
 Date: September 2021
 #>
-function ConvertTo-Base64String {
+function ConvertTo-Base64String
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [Byte[]]
+        [String]
         $InputObject
     )
 
     process {
-        [System.Convert]::ToBase64String($InputObject)
+        [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($InputObject))
     }
 }

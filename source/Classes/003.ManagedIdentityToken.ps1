@@ -2,7 +2,6 @@
 
 Class ManagedIdentityToken : AuthenticationToken {
 
-    hidden [SecureString]$access_token
     [DateTime]$expires_on
     [Int]$expires_in
     [String]$resource

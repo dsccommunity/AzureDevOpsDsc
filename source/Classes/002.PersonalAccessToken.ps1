@@ -2,7 +2,7 @@
 
 Class PersonalAccessToken : AuthenticationToken {
 
-    hidden [SecureString]$access_token
+
 
     PersonalAccessToken([String]$PersonalAccessToken) {
         $this.tokenType = [TokenType]::PersonalAccessToken
