@@ -31,6 +31,9 @@
     $convertedPermissions = [Permission]::ConvertTo($formattedPermissions, $permission.DescriptorType)
 #>
 
+# This class is not needed. Commented out pending deletion
+
+<#
 Class Permission {
 
     [String]$Identity
@@ -156,7 +159,7 @@ Class Permission {
         # Iterate through each of the tokens
 
     }
-    #>
+
 
 
 }
@@ -183,3 +186,4 @@ Function Global:ConvertTo-Permission {
     return $convertedPermissions
 
 }
+#>
