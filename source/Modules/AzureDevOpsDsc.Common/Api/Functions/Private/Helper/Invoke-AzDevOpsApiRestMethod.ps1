@@ -170,7 +170,11 @@ function Invoke-AzDevOpsApiRestMethod
 
                 $invokeRestMethodParameters | Export-Clixml -Path 'C:\temp\invokeRestMethodParameters.xml'
 
-                $response = Invoke-RestMethod @invokeRestMethodParameters
+                # Invoke the REST method. If the 'Verbose' switch is present, set it to $false.
+                # This is to prevent the output from being displayed in the console.
+                $response = Invoke-RestMethod @invokeRestMethodParameters -Verbose:$false
+                # Zero out the 'Authorization' header
+                $invokeRestMethodParameters.Headers.Authorization = $null
                 # Add the response to the results array
                 $null = $results.Add($response)
 
@@ -202,6 +206,8 @@ function Invoke-AzDevOpsApiRestMethod
             }
             catch
             {
+                # Zero out the 'Authorization' header
+                $invokeRestMethodParameters.Headers.Authorization = $null
 
                 # Check to see if it is an HTTP 429 (Too Many Requests) error
                 if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::TooManyRequests)
