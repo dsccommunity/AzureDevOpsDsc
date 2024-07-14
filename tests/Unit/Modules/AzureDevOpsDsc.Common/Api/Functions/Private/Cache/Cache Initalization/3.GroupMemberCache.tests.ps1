@@ -1,8 +1,8 @@
-powershell
+
 Import-Module Pester
 
 Describe "AzDoAPI_3_GroupMemberCache" {
-    
+
     Mock -CommandName Get-CacheObject {
         if ($args[0].CacheType -eq 'LiveGroups') {
             return @(

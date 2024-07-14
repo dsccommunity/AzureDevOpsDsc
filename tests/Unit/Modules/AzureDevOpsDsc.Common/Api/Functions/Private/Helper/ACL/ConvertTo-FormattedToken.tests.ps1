@@ -1,4 +1,4 @@
-powershell
+
 Describe "ConvertTo-FormattedToken" {
     BeforeAll {
         Import-Module "$PSScriptRoot\path_to_your_module.psm1"

@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Remove-xAzDoOrganizationGroup Tests' {
 
     Mock Remove-DevOpsGroup

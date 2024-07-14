@@ -1,10 +1,10 @@
-powershell
+
 Describe 'Test-xAzDoProjectGroup' {
-    
+
     Mock -CommandName 'Format-AzDoGroup' {
         return "groupKey"
     }
-    
+
     Mock -CommandName 'Get-CacheItem' {
         param ($Key, $Type)
         if ($Key -eq "groupKey" -and $Type -eq 'LiveGroups') {

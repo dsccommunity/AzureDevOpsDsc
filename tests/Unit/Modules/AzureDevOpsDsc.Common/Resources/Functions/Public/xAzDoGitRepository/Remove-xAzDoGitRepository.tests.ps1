@@ -1,6 +1,6 @@
-powershell
+
 Describe 'Remove-xAzDoGitRepository' {
-    
+
     Mock -CommandName Get-CacheItem {
         return @{
             Key   = "$ProjectName\$RepositoryName"

@@ -1,15 +1,15 @@
-powershell
+
 # Import the Pester module
 Import-Module Pester
 
 # Pester tests for New-xAzDoGitRepository function
 Describe "New-xAzDoGitRepository Tests" {
-    # Mock external cmdlets/functions 
+    # Mock external cmdlets/functions
     Mock Get-CacheItem { return @{ Name = "TestProject" } }
     Mock New-GitRepository { return @{ Name = $RepositoryName } }
     Mock Add-CacheItem { }
     Mock Export-CacheObject { }
-    
+
     Context "When mandatory parameters are provided" {
         BeforeEach {
             $Global:DSCAZDO_OrganizationName = "TestOrg"
@@ -21,27 +21,27 @@ Describe "New-xAzDoGitRepository Tests" {
                 RepositoryName  = 'TestRepo'
             }
             New-xAzDoGitRepository @params
-            
+
             Assert-MockCalled New-GitRepository -Exactly -Times 1
         }
-        
+
         It "should call Add-CacheItem" {
             $params = @{
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
             }
             New-xAzDoGitRepository @params
-            
+
             Assert-MockCalled Add-CacheItem -Exactly -Times 1
         }
-        
+
         It "should call Export-CacheObject" {
             $params = @{
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
             }
             New-xAzDoGitRepository @params
-            
+
             Assert-MockCalled Export-CacheObject -Exactly -Times 1
         }
     }
@@ -54,7 +54,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 SourceRepository= 'SourceRepo'
             }
             New-xAzDoGitRepository @params
-            
+
             Assert-MockCalled New-GitRepository -ParameterFilter { $RepositoryName -eq 'TestRepo' -and $SourceRepository -eq 'SourceRepo' }
         }
 
@@ -65,7 +65,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 Force           = $true
             }
             New-xAzDoGitRepository @params
-            
+
             # Since Force is not used in function logic directly, verifying other aspects
             Assert-MockCalled New-GitRepository -Exactly -Times 1
         }

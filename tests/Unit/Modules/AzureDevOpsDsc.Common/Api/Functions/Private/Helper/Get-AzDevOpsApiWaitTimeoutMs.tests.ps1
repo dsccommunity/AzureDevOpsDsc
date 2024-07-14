@@ -1,4 +1,4 @@
-powershell
+
 Describe "Get-AzDevOpsApiWaitTimeoutMs" {
     It "should return 300000" {
         $result = Get-AzDevOpsApiWaitTimeoutMs

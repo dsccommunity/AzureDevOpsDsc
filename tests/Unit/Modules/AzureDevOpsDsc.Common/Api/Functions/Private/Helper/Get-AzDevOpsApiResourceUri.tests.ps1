@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-AzDevOpsApiResourceUri' {
     Mock Get-AzDevOpsApiVersion { return '6.0' }
     Mock Test-AzDevOpsApiUri { param($ApiUri) return $true }

@@ -1,10 +1,10 @@
-powershell
+
 Describe 'AzDoAPI_1_GroupCache' {
     Mock List-DevOpsGroups { return @(
         @{ PrincipalName = 'Group1'; OtherProperty = 'Value1' },
         @{ PrincipalName = 'Group2'; OtherProperty = 'Value2' }
     ) }
-    
+
     Mock Add-CacheItem
     Mock Export-CacheObject
 
@@ -26,7 +26,7 @@ Describe 'AzDoAPI_1_GroupCache' {
             Assert-MockCalled Export-CacheObject -Exactly 1 -Scope It
         }
     }
-    
+
     Context 'When organization name is not provided as parameter' {
         It 'should use global variable for organization name' {
             $Global:DSCAZDO_OrganizationName = 'GlobalOrganization'

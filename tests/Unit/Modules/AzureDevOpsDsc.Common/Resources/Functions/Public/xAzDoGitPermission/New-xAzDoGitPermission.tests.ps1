@@ -1,4 +1,4 @@
-powershell
+
 Describe 'New-xAzDoGitPermission' {
     Mock Get-CacheItem
     Mock ConvertTo-ACLHashtable

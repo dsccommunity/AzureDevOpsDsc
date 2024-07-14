@@ -1,4 +1,4 @@
-powershell
+
 Describe "Resolve-ACLToken" {
     It "should return token from DifferenceObject when DifferenceObject is not null" {
         $ReferenceObject = @()

@@ -1,6 +1,6 @@
-powershell
+
 Describe 'Test-xAzDoGroupMember' {
-    
+
     $GroupName = "TestGroup"
     $GroupMembers = @('User1', 'User2')
     $LookupResult = @{ User1 = 'ID1'; User2 = 'ID2' }

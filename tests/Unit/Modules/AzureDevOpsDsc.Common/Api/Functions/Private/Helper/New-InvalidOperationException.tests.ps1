@@ -1,4 +1,4 @@
-powershell
+
 # Unit Tests for New-InvalidOperationException function using Pester v5
 
 Describe 'New-InvalidOperationException' {
@@ -11,7 +11,7 @@ Describe 'New-InvalidOperationException' {
         It 'Should return an ErrorRecord object' {
             $Message = "An error has occurred"
             $result = New-InvalidOperationException -Message $Message
-            
+
             $result | Should -BeOfType 'System.Management.Automation.ErrorRecord'
             $result.Exception.Message | Should -Be $Message
             $result.FullyQualifiedErrorId | Should -Be 'System.InvalidOperationException'

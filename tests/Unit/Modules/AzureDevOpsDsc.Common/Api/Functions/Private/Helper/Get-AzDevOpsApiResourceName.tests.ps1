@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-AzDevOpsApiResourceName' {
     It 'Returns an array of strings' {
         $result = Get-AzDevOpsApiResourceName

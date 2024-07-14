@@ -1,23 +1,23 @@
-powershell
+
 Describe 'Set-xAzDoGroupMember' {
-    Mock -CommandName 'Find-AzDoIdentity' -MockWith { 
-        return @{ principalName = "GroupName"; originId = "GroupOriginId"; displayName = "Test Group" } 
+    Mock -CommandName 'Find-AzDoIdentity' -MockWith {
+        return @{ principalName = "GroupName"; originId = "GroupOriginId"; displayName = "Test Group" }
     }
-    Mock -CommandName 'Format-AzDoProjectName' -MockWith { 
-        return "FormattedProjectName" 
+    Mock -CommandName 'Format-AzDoProjectName' -MockWith {
+        return "FormattedProjectName"
     }
-    Mock -CommandName 'Get-CacheItem' -MockWith { 
-        return @() 
+    Mock -CommandName 'Get-CacheItem' -MockWith {
+        return @()
     }
-    Mock -CommandName 'New-DevOpsGroupMember' -MockWith { 
-        return $true 
+    Mock -CommandName 'New-DevOpsGroupMember' -MockWith {
+        return $true
     }
-    Mock -CommandName 'Remove-DevOpsGroupMember' -MockWith { 
-        return $true 
+    Mock -CommandName 'Remove-DevOpsGroupMember' -MockWith {
+        return $true
     }
     Mock -CommandName 'Add-CacheItem'
     Mock -CommandName 'Set-CacheObject'
-    
+
     $LookupResult = @{
         propertiesChanged = @(
             @{ action = 'Add'; value = @{ principalName = 'user1'; originId = 'user1OriginId'; displayName = 'User 1' } },
@@ -31,14 +31,14 @@ Describe 'Set-xAzDoGroupMember' {
 
             $params = @{
                 GroupIdentity = @{
-                    principalName = "GroupName"; 
-                    originId = "GroupOriginId"; 
+                    principalName = "GroupName";
+                    originId = "GroupOriginId";
                     displayName = "Test Group"
                 }
                 ApiUri = 'https://vssps.dev.azure.com/{0}/' -f $Global:DSCAZDO_OrganizationName
                 MemberIdentity = @{
-                    principalName = 'user1'; 
-                    originId = 'user1OriginId'; 
+                    principalName = 'user1';
+                    originId = 'user1OriginId';
                     displayName = 'User 1'
                 }
             }
@@ -51,14 +51,14 @@ Describe 'Set-xAzDoGroupMember' {
 
             $params = @{
                 GroupIdentity = @{
-                    principalName = "GroupName"; 
-                    originId = "GroupOriginId"; 
+                    principalName = "GroupName";
+                    originId = "GroupOriginId";
                     displayName = "Test Group"
                 }
                 ApiUri = 'https://vssps.dev.azure.com/{0}/' -f $Global:DSCAZDO_OrganizationName
                 MemberIdentity = @{
-                    principalName = 'user2'; 
-                    originId = 'user2OriginId'; 
+                    principalName = 'user2';
+                    originId = 'user2OriginId';
                     displayName = 'User 2'
                 }
             }

@@ -1,4 +1,4 @@
-powershell
+
 Describe 'New-ACLToken Function Tests' {
     $LocalizedDataAzResourceTokenPatten = @{
         OrganizationGit = 'Contoso'

@@ -1,8 +1,8 @@
-powershell
+
 # ConvertTo-FormattedACL.Tests.ps1
 
 Describe "ConvertTo-FormattedACL" {
-    
+
     BeforeAll {
         function Find-Identity {
             param (
@@ -11,7 +11,7 @@ Describe "ConvertTo-FormattedACL" {
             )
             return "$Name@$OrganizationName"
         }
-        
+
         function Format-ACEs {
             param (
                 [string]$Allow,
@@ -20,7 +20,7 @@ Describe "ConvertTo-FormattedACL" {
             )
             return "Allow: $Allow, Deny: $Deny, Namespace: $SecurityNamespace"
         }
-        
+
         function Parse-ACLToken {
             param (
                 [string]$Token
@@ -42,7 +42,7 @@ Describe "ConvertTo-FormattedACL" {
             }
             inheritPermissions = $true
         }
-        
+
         $SecurityNamespace = "MyNamespace"
         $OrganizationName = "MyOrganization"
     }

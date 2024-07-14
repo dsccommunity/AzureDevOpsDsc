@@ -1,4 +1,4 @@
-powershell
+
 # Pester Unit Tests for Test-ACLListforChanges
 
 Describe "Test-ACLListforChanges" {

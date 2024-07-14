@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Format-AzDoGroup' {
     It 'Should format with valid Prefix and GroupName' {
         $result = Format-AzDoGroup -Prefix "Contoso" -GroupName "Developers"

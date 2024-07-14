@@ -1,4 +1,4 @@
-powershell
+
 # Pester tests for Get-BitwiseOrResult function
 Describe "Get-BitwiseOrResult" {
     BeforeAll {

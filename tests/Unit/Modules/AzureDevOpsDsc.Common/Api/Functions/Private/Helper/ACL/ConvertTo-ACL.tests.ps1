@@ -1,4 +1,4 @@
-powershell
+
 # ConvertTo-ACL.Tests.ps1
 
 # Import the module containing the ConvertTo-ACL function

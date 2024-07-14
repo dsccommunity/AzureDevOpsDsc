@@ -1,4 +1,4 @@
-powershell
+
 Describe "AzDoAPI_4_GitRepositoryCache Unit Tests" {
     Mock Get-CacheObject {
         return @(

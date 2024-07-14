@@ -1,4 +1,4 @@
-powershell
+
 # Define the function mock and the tests for Set-AzDevOpsProject
 function Test-AzDevOpsApiUri {
     param($ApiUri)
@@ -75,7 +75,7 @@ Describe 'Set-AzDevOpsProject' {
                             -ProjectName 'SomeProjectName' `
                             -ProjectDescription 'SomeProjectDescription' `
                             -Force
-                            
+
         Assert-MockCalled Test-AzDevOpsApiUri -Exactly 1 -Scope It
     }
 
@@ -86,7 +86,7 @@ Describe 'Set-AzDevOpsProject' {
                             -ProjectName 'SomeProjectName' `
                             -ProjectDescription 'SomeProjectDescription' `
                             -Force
-                            
+
         Assert-MockCalled Test-AzDevOpsPat -Exactly 1 -Scope It
     }
 
@@ -97,7 +97,7 @@ Describe 'Set-AzDevOpsProject' {
                             -ProjectName 'SomeProjectName' `
                             -ProjectDescription 'SomeProjectDescription' `
                             -Force
-                            
+
         Assert-MockCalled Test-AzDevOpsProjectId -Exactly 1 -Scope It
     }
 
@@ -108,7 +108,7 @@ Describe 'Set-AzDevOpsProject' {
                             -ProjectName 'SomeProjectName' `
                             -ProjectDescription 'SomeProjectDescription' `
                             -Force
-                            
+
         Assert-MockCalled Set-AzDevOpsApiResource -Exactly 1 -Scope It
     }
 
@@ -119,7 +119,7 @@ Describe 'Set-AzDevOpsProject' {
                             -ProjectName 'SomeProjectName' `
                             -ProjectDescription 'SomeProjectDescription' `
                             -Force
-                            
+
         Assert-MockCalled Get-AzDevOpsProject -Exactly 1 -Scope It
     }
 }

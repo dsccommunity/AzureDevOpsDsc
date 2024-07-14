@@ -1,6 +1,6 @@
-powershell
+
 Describe "Format-AzDoProjectName Tests" {
-    
+
     # Test: Correct format with backslash
     It "Should format 'Project1\Group1' correctly" {
         $result = Format-AzDoProjectName -GroupName 'Project1\Group1' -OrganizationName 'Org')

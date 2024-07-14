@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Remove-xAzDoGroupMember Tests' {
 
     Mock -CommandName Find-AzDoIdentity -MockWith {

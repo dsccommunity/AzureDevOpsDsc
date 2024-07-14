@@ -1,4 +1,4 @@
-powershell
+
 Describe "ConvertTo-ACLHashtable" {
     $referenceACLs = @(
         [PSCustomObject]@{
@@ -56,13 +56,13 @@ Describe "ConvertTo-ACLHashtable" {
 
     It "should return an ACL Hashtable with correct structure and values" {
         $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
-        
+
         $result | Should -Not -BeNullOrEmpty
         $result | Should -BeOfType Hashtable
         $result.ContainsKey('Count') | Should -BeTrue
         $result.ContainsKey('value') | Should -BeTrue
         $result.Count | Should -Be 1
-        
+
         $acl = $result.value[0]
         $acl.token | Should -Be "token2"
         $acl.acesDictionary.ContainsKey("descriptor2") | Should -BeTrue
@@ -75,13 +75,13 @@ Describe "ConvertTo-ACLHashtable" {
     It "should handle empty descriptor ACL list and use reference ACLs" {
         $descriptorACLList = @()
         $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
-        
+
         $result | Should -Not -BeNullOrEmpty
         $result | Should -BeOfType Hashtable
         $result.ContainsKey('Count') | Should -BeTrue
         $result.ContainsKey('value') | Should -BeTrue
         $result.Count | Should -Be 1
-        
+
         $acl = $result.value[0]
         $acl.token | Should -Be "token1"
         $acl.acesDictionary.ContainsKey("descriptor1") | Should -BeTrue
@@ -94,7 +94,7 @@ Describe "ConvertTo-ACLHashtable" {
     It "should return empty ACL Hashtable for unmatched descriptor match token" {
         $descriptorMatchToken = "non-existent"
         $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
-        
+
         $result | Should -Not -BeNullOrEmpty
         $result | Should -BeOfType Hashtable
         $result.ContainsKey('Count') | Should -BeTrue

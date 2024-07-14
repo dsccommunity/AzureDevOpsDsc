@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Remove-xAzDoProjectGroup Tests' {
     Mock Remove-DevOpsGroup
     Mock Remove-CacheItem

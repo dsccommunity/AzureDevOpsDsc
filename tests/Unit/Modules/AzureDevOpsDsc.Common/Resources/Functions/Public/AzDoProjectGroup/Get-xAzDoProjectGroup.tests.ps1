@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-xAzDoProjectGroup' {
     Mock Get-CacheItem
     Mock Remove-CacheItem

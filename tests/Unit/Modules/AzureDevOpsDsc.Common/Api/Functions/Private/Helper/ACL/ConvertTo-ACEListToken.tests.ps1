@@ -1,6 +1,6 @@
-powershell
+
 Describe "ConvertTo-ACETokenList Tests" {
-    
+
     Mock Get-CacheItem
 
     Context "When Security Descriptor is not found" {

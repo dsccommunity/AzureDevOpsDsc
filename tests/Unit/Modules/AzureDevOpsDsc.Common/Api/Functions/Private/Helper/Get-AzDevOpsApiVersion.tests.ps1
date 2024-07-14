@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-AzDevOpsApiVersion' {
     Context 'When called without parameters' {
         It 'Should return all supported API versions' {

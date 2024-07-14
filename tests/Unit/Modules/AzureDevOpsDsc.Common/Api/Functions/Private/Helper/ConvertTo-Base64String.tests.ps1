@@ -1,4 +1,4 @@
-powershell
+
 Describe 'ConvertTo-Base64String' {
     It 'should convert byte array to Base64 string correctly' {
         $bytes = [System.Text.Encoding]::UTF8.GetBytes("Hello, World!")

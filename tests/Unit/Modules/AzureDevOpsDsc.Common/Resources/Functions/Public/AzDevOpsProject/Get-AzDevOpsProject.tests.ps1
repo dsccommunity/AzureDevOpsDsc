@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-AzDevOpsProject' {
     Param (
         [string]$ApiUri = 'https://dev.azure.com/test_org/_apis/',

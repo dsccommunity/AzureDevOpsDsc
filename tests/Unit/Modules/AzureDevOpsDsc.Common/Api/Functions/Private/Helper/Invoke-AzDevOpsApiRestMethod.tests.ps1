@@ -1,4 +1,4 @@
-powershell
+
 Describe "Invoke-AzDevOpsApiRestMethod Tests" {
 
     Mock Invoke-RestMethod {

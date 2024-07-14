@@ -1,4 +1,4 @@
-powershell
+
 Describe "Get-xAzDoGitRepository Tests" {
     Mock Get-CacheItem
 

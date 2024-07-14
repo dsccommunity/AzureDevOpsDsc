@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-AzDevOpsApiUriAreaName' {
     Mock -CommandName Test-AzDevOpsApiResourceName -MockWith { $true }
 

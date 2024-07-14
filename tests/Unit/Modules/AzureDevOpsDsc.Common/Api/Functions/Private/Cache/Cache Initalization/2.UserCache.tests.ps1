@@ -1,14 +1,14 @@
-powershell
+
 Describe 'AzDoAPI_2_UserCache' {
-    Mock List-UserCache { 
+    Mock List-UserCache {
         return @(
             [pscustomobject]@{ PrincipalName = 'user1@domain.com'; }
             [pscustomobject]@{ PrincipalName = 'user2@domain.com'; }
-        ) 
+        )
     }
-    
+
     Mock Add-CacheItem { }
-    
+
     Mock Export-CacheObject { }
 
     BeforeEach {

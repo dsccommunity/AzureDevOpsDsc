@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-xAzDoGitPermission Tests' {
     BeforeAll {
         $Global:DSCAZDO_OrganizationName = 'TestOrganization'
@@ -57,10 +57,10 @@ Describe 'Get-xAzDoGitPermission Tests' {
                 [Parameter(Mandatory)]
                 $DifferenceACLs
             )
-            return @{ 
-                propertiesChanged = @('Permission'); 
-                status = 'Changed'; 
-                reason = 'Permission mismatch' 
+            return @{
+                propertiesChanged = @('Permission');
+                status = 'Changed';
+                reason = 'Permission mismatch'
             }
         }
 
@@ -76,7 +76,7 @@ Describe 'Get-xAzDoGitPermission Tests' {
         $RepositoryName = 'TestRepository'
         $isInherited = $true
         $Permissions = @(@{ 'Permission' = 'Deny' })
-        
+
         $result = Get-xAzDoGitPermission -ProjectName $ProjectName -RepositoryName $RepositoryName -isInherited $isInherited -Permissions $Permissions
 
         $result | Should -Not -BeNullOrEmpty

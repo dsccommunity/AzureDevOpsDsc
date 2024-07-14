@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Group-ACEs' {
     Mock -ModuleName Pester -MemberName Group-Object -MockWith {
         return @(
@@ -6,7 +6,7 @@ Describe 'Group-ACEs' {
             [PSCustomObject]@{ Count = 2; Group = @(@{ Identity = [PSCustomObject]@{ value = [PSCustomObject]@{ originId = 'user2' } }; Permissions = [PSCustomObject]@{ Deny = @(1); Allow = @(2); DescriptorType = 'TypeB' } }, @{ Identity = [PSCustomObject]@{ value = [PSCustomObject]@{ originId = 'user2' } }; Permissions = [PSCustomObject]@{ Deny = @(); Allow = @(2, 3); DescriptorType = 'TypeB' } }) }
         )
     }
-    
+
     It 'Returns empty list if no ACEs are provided' {
         $result = Group-ACEs -ACEs @()
         $result | Should -BeNullOrEmpty

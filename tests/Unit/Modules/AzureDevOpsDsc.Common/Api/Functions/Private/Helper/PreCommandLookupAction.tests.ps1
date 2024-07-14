@@ -1,4 +1,4 @@
-powershell
+
 Describe 'PreCommandLookupAction Tests' {
     BeforeAll {
         $global:ExecutionContext.InvokeCommand.PreCommandLookupAction = {

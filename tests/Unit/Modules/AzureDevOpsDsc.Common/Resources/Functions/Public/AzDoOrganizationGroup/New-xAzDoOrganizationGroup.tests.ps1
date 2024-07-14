@@ -1,4 +1,4 @@
-powershell
+
 Describe 'New-xAzDoOrganizationGroup' {
     Mock -CommandName New-DevOpsGroup -MockWith {
         return [PSCustomObject]@{
@@ -7,31 +7,31 @@ Describe 'New-xAzDoOrganizationGroup' {
             GroupDescription = $GroupDescription
         }
     }
-    
+
     Mock -CommandName Add-CacheItem
     Mock -CommandName Set-CacheObject
 
     BeforeEach {
         $Global:DSCAZDO_OrganizationName = 'TestOrganization'
     }
-    
+
     It 'Should create a new DevOps group and update caches' {
         $GroupName = 'TestGroup'
         $GroupDescription = 'Test Description'
-        
+
         $result = New-xAzDoOrganizationGroup -GroupName $GroupName -GroupDescription $GroupDescription
-    
+
         Assert-MockCalled -CommandName New-DevOpsGroup -Exactly 1 -Scope It
         Assert-MockCalled -CommandName Add-CacheItem -Exactly 2 -Scope It
         Assert-MockCalled -CommandName Set-CacheObject -Exactly 2 -Scope It
-        
+
         $result | Should -Not -BeNullOrEmpty
     }
 
     It 'Should pass the correct parameters to New-DevOpsGroup' {
         $GroupName = 'TestGroup'
         $GroupDescription = 'Test Description'
-        
+
         New-xAzDoOrganizationGroup -GroupName $GroupName -GroupDescription $GroupDescription
 
         $params = @{

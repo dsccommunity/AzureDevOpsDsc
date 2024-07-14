@@ -1,4 +1,4 @@
-powershell
+
 Describe 'AzDoAPI_6_ServicePrinciple' {
     BeforeAll {
         function List-DevOpsServicePrinciples {

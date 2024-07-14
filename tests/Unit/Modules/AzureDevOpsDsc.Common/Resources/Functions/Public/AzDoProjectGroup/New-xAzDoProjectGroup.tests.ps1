@@ -1,4 +1,4 @@
-powershell
+
 Describe 'New-xAzDoProjectGroup' {
 
     Mock -ModuleName Microsoft.PowerShell.Utility -CommandName Write-Verbose
@@ -17,7 +17,7 @@ Describe 'New-xAzDoProjectGroup' {
     Context 'when ProjectScopeDescriptor is found' {
 
         BeforeEach {
-            Mock Get-CacheItem { 
+            Mock Get-CacheItem {
                 return @{
                     ProjectDescriptor = 'ProjectDescriptor123'
                 }

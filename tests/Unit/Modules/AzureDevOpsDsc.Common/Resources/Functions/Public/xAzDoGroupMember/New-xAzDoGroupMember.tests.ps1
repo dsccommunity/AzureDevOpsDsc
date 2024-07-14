@@ -1,4 +1,4 @@
-powershell
+
 Describe "New-xAzDoGroupMember" {
 
     Mock -ModuleName 'AzDoModule' -CommandName 'Find-AzDoIdentity' {

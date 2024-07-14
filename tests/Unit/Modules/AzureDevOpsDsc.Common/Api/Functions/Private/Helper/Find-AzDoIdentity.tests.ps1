@@ -1,4 +1,4 @@
-powershell
+
 Describe "Find-AzDoIdentity" {
 
     BeforeAll {
@@ -49,7 +49,7 @@ Describe "Find-AzDoIdentity" {
     It "Should return warning if multiple users with same display name" {
         $Global:AZDOLiveUsers += [PSCustomObject]@{ value = [PSCustomObject]@{ displayName = "Duplicate Name"; UPN = "dup1@example.com" } }
         $Global:AZDOLiveUsers += [PSCustomObject]@{ value = [PSCustomObject]@{ displayName = "Duplicate Name"; UPN = "dup2@example.com" } }
-        
+
         { Find-AzDoIdentity -Identity "Duplicate Name" } | Should -Throw
     }
 

@@ -1,4 +1,4 @@
-powershell
+
 Describe "Get-AzDevOpsApiWaitIntervalMs" {
     It "Should return an integer" {
         $result = Get-AzDevOpsApiWaitIntervalMs

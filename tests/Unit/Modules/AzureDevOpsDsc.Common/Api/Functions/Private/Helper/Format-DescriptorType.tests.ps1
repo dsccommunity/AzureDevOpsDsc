@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Format-DescriptorType' {
     It 'should return "Git Repositories" when passed "GitRepositories"' {
         $result = Format-DescriptorType -DescriptorType "GitRepositories"

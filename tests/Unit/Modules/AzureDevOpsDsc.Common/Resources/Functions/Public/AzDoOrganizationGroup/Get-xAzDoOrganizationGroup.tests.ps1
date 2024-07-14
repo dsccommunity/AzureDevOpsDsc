@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-xAzDoOrganizationGroup' {
     Mock Get-CacheItem { return $null }
 

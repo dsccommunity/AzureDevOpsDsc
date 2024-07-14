@@ -1,4 +1,4 @@
-powershell
+
 Describe "Get-xAzDoGroupMember Tests" {
 
     # Mock dependencies

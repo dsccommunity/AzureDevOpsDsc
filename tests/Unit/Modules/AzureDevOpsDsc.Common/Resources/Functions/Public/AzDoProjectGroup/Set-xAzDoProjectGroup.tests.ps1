@@ -1,6 +1,6 @@
-powershell
+
 Describe 'Set-xAzDoProjectGroup Tests' {
-    
+
     $GroupName = "TestGroup"
     $GroupDescription = "Description"
     $ProjectName = "TestProject"
@@ -35,7 +35,7 @@ Describe 'Set-xAzDoProjectGroup Tests' {
     It 'Should call Write-Warning and return when LookupResult.Status is Renamed' {
         $SampleLookupResult.Status = [DSCGetSummaryState]::Renamed
         Set-xAzDoProjectGroup -GroupName $GroupName -GroupDescription $GroupDescription -ProjectName $ProjectName -LookupResult $SampleLookupResult -Ensure "Present"
-        
+
         Assert-MockCalled Write-Warning -Exactly 1 -Scope It
     }
 

@@ -1,4 +1,4 @@
-powershell
+
 # Mocked function - simulating Azure DevOps API call
 Function Test-xAzDoOrganizationGroup {
     param(
@@ -28,7 +28,7 @@ Function Test-xAzDoOrganizationGroup {
 
 # Pester tests
 Describe "Test-xAzDoOrganizationGroup" {
-    
+
     Context "when the group exists" {
         It "should return true" {
             # Mock Test-xAzDoOrganizationGroup function to simulate group existence
@@ -48,24 +48,24 @@ Describe "Test-xAzDoOrganizationGroup" {
             $result | Should -Be $false
         }
     }
-    
+
     Context "when there is an empty GroupName parameter" {
         It "should throw an error" {
             { Test-xAzDoOrganizationGroup -GroupName '' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg' } | Should -Throw
         }
     }
-    
+
     Context "when there is an empty Pat parameter" {
         It "should throw an error" {
             { Test-xAzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat '' -ApiUri 'https://dev.azure.com/myorg' } | Should -Throw
         }
     }
-    
+
     Context "when there is an empty ApiUri parameter" {
         It "should throw an error" {
             { Test-xAzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat 'dummyPat' -ApiUri '' } | Should -Throw
         }
     }
-    
+
 }
 

@@ -1,4 +1,4 @@
-powershell
+
 Describe "Test-AzDevOpsProject" {
     $fakeUri = "https://dev.azure.com/fakeOrganization/_apis/"
     $fakePat = "fakePat"

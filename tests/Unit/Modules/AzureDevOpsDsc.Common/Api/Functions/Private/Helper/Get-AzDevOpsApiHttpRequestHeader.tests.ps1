@@ -1,4 +1,4 @@
-powershell
+
 # Import Pester module for testing
 Import-Module Pester
 
@@ -22,13 +22,13 @@ Describe 'Get-AzDevOpsApiHttpRequestHeader Tests' {
                 [System.String]
                 $Pat
             )
-    
+
             [Hashtable]$apiHttpRequestHeader = @{
                 Authorization = 'Basic ' +
                     [Convert]::ToBase64String(
                         [Text.Encoding]::ASCII.GetBytes(":$Pat"))
             }
-    
+
             return $apiHttpRequestHeader
         }
     }

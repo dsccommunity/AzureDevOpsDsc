@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-AzDoCacheObjects' {
     It 'Should return an array of cache objects' {
         $expectedObjects = @(

@@ -1,4 +1,4 @@
-powershell
+
 Describe "Remove-AzDevOpsProject" {
     Mock -CommandName Test-AzDevOpsApiUri {
         return $true

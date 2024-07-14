@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Format-ACEs Tests' {
     BeforeAll {
         Function Get-CacheItem {

@@ -1,8 +1,8 @@
-powershell
+
 Describe "Remove-xAzDoGitPermission" {
     Mock -ModuleName 'ModuleName' -Name 'Get-CacheItem'
     Mock -ModuleName 'ModuleName' -Name 'Remove-GitRepositoryPermission'
-    
+
     $Global:DSCAZDO_OrganizationName = 'TestOrg'
 
     BeforeEach {
@@ -24,7 +24,7 @@ Describe "Remove-xAzDoGitPermission" {
             }
         }
     }
-    
+
     It "Removes ACLs if Filtered is not null" {
         Remove-xAzDoGitPermission -ProjectName $ProjectName -RepositoryName $RepositoryName -isInherited $isInherited -Permissions $Permissions -LookupResult $LookupResult -Ensure $Ensure -Force:$Force
 

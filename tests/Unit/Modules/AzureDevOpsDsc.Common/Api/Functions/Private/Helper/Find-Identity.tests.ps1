@@ -1,13 +1,13 @@
-powershell
+
 Describe 'Find-Identity Tests' {
     $mockCacheGroups = @{
         'group1' = [PSCustomObject]@{ value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'groupDes1'; id = 'groupId1'; originId = 'groupOrigin1'; principalName = 'groupPN1'; displayName = 'groupDisplayName1' } } }
     }
-    
+
     $mockCacheUsers = @{
         'user1' = [PSCustomObject]@{ value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'userDes1'; id = 'userId1'; originId = 'userOrigin1'; principalName = 'userPN1'; displayName = 'userDisplayName1' } } }
     }
-    
+
     $mockCacheServicePrincipals = @{
         'sp1' = [PSCustomObject]@{ value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'spDes1'; id = 'spId1'; originId = 'spOrigin1'; principalName = 'spPN1'; displayName = 'spDisplayName1' } } }
     }

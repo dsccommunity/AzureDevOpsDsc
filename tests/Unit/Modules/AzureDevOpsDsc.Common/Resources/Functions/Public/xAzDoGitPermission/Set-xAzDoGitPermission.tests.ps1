@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Set-xAzDoGitPermission' {
     Mock -CommandName Get-CacheItem
     Mock -CommandName ConvertTo-ACLHashtable
@@ -40,8 +40,8 @@ Describe 'Set-xAzDoGitPermission' {
     It 'Calls Set-GitRepositoryPermission with the correct parameters' {
         Set-xAzDoGitPermission -ProjectName $ProjectName -RepositoryName $RepositoryName -isInherited $isInherited -Permissions $Permissions -LookupResult $LookupResult -Ensure $Ensure
         Assert-MockCalled Set-GitRepositoryPermission -Exactly 1 -ParameterFilter {
-            $_.OrganizationName -eq 'TestOrg' -and 
-            $_.SecurityNamespaceID -eq 'SampleNamespaceId' -and 
+            $_.OrganizationName -eq 'TestOrg' -and
+            $_.SecurityNamespaceID -eq 'SampleNamespaceId' -and
             $_.SerializedACLs -eq 'SerializedACLs'
         }
     }

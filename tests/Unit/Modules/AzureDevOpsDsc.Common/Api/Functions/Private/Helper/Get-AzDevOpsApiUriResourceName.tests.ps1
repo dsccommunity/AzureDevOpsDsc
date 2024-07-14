@@ -1,4 +1,4 @@
-powershell
+
 Describe 'Get-AzDevOpsApiUriResourceName' {
     Context 'No Parameter' {
         It 'Should return all Azure DevOps API URI resource names' {

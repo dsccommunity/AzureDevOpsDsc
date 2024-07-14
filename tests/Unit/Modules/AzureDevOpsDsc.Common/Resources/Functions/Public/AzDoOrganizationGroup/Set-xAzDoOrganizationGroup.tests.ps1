@@ -1,4 +1,4 @@
-powershell
+
 Describe "Set-xAzDoOrganizationGroup Tests" {
     Mock -CommandName Set-DevOpsGroup
     Mock -CommandName Remove-CacheItem
@@ -24,9 +24,9 @@ Describe "Set-xAzDoOrganizationGroup Tests" {
 
     It "Should warn and return when the group has been renamed" {
         $params.LookupResult.Status = [DSCGetSummaryState]::Renamed
-        
+
         $result = Set-xAzDoOrganizationGroup @params
-    
+
         Assert-MockCalled Write-Warning -Exactly -Times 1 -Scope It
         $result | Should -BeNullOrEmpty
     }
