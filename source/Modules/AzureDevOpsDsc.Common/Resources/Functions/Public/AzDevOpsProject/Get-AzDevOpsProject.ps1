@@ -50,36 +50,64 @@ function Get-AzDevOpsProject
     param
     (
         [Parameter()]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
-        [System.String]
-        $ApiUri,
-
-        [Parameter()]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
-
-        [Parameter()]
-        [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
-        [Alias('ResourceId','Id')]
-        [System.String]
-        $ProjectId,
-
-        [Parameter()]
         [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid -AllowWildcard })]
         [Alias('Name')]
         [System.String]
-        $ProjectName
+        $ProjectName,
+
+        [Parameter()]
+        [Alias('Description')]
+        [System.String]
+        $ProjectDescription,
+
+        [Parameter()]
+        [ValidateSet('Git','Tfvc')]
+        [System.String]
+        $SourceControlType = 'Git'
+
     )
+
+
+    $OrganizationName = $Global:DSCAZDO_OrganizationName
+
+    #
+    # Construct a hashtable detailing the group
+    $getGroupResult = @{
+        #Reasons = $()
+        Ensure = [Ensure]::Absent
+        ProjectName = $ProjectName
+        ProjectDescription = $ProjectDescription
+        SourceControlType = $SourceControlType
+        propertiesChanged = @()
+        status = $null
+    }
 
     #
     # Check the cache for the group
     $group = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
     #
+    # Test if the group is not in the cache
+    if ($null -eq $group)
+    {
+        $getGroupResult.Status = [DSCGetSummaryState]::NotFound
+        return $getGroupResult
+    }
+
+    #
+    # Test if the group description has changed
+
+    if ($group.Description -ne $ProjectDescription)
+    {
+        $getGroupResult.Status = [DSCGetSummaryState]::Changed
+        $getGroupResult.propertiesChanged += 'description'
+        return $getGroupResult
+    }
+
+    $getGroupResult.status = [DSCGetSummaryState]::Unchanged
+
+    #
     # Return the group from the cache
-    return $group.Value
+    return ([PSCustomObject]$getGroupResult)
 
 }

@@ -24,10 +24,6 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDevOpsProject : AzDevOpsDscResourceBase
 {
-    [DscProperty()]
-    [Alias('Id')]
-    [System.String]$ProjectId
-
     [DscProperty(Key, Mandatory)]
     [Alias('Name')]
     [System.String]$ProjectName
@@ -66,7 +62,6 @@ class xAzDevOpsProject : AzDevOpsDscResourceBase
             {
                 $properties.Ensure = [Ensure]::Present
             }
-            $properties.ProjectId = $CurrentResourceObject.id
             $properties.ProjectName = $CurrentResourceObject.name
             $properties.ProjectDescription = $CurrentResourceObject.description
             $properties.SourceControlType = $CurrentResourceObject.capabilities.versioncontrol.sourceControlType
