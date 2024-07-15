@@ -52,6 +52,10 @@ Function Remove-xAzDoGitPermission {
             TokenName = $searchString
         }
 
+        #
+        # TODO: Refactor Remove-GitRepostioryPermission to be more generic
+        # For instance: Remove-AzDoPermission
+
         # Remove the ACLs
         Remove-GitRepositoryPermission @params
 

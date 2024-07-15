@@ -78,6 +78,26 @@ Function New-ACLToken {
             break;
         }
 
+        # Identity
+        'Identity' {
+
+            # Derive the Token Type Identity
+            if ($TokenName -match $LocalizedDataAzResourceTokenPatten.GroupPermission) {
+                # Derive the Token Type Identity
+                $result.type = 'GitGroupPermission'
+                $result.projectId = $matches.ProjectId
+                $result.groupId = $matches.GroupId
+
+            } else {
+                # Derive the Token Type Identity
+                $result.type = 'GroupUnknown'
+                Write-Warning "[New-ACLToken] TokenName '$TokenName' does not match any known Identity ACL Token Patterns."
+            }
+
+            $result.type = 'Identity'
+            break;
+        }
+
         default {
             Write-Warning "[New-ACLToken] SecurityNamespace '$SecurityNamespace' is not recognized."
             $result.type = 'UnknownSecurityNamespace'

@@ -55,6 +55,7 @@ Function Get-xAzDoProjectGroupPermission {
     #
     # Perform a Lookup within the Cache for the Group
     $group = Get-CacheItem -Key $('[{0}]\{1}' -f $ProjectName, $GroupName) -Type 'LiveGroups'
+    $project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
     # Test if the Group was found
     if (-not $group) {
@@ -95,13 +96,12 @@ Function Get-xAzDoProjectGroupPermission {
         SecurityNamespace   = $SecurityNamespace
         isInherited         = $isInherited
         OrganizationName    = $OrganizationName
-        TokenName           = "{0}\\{1}"
+        TokenName           = "{0}\\{1}" -f $project.id, $group.id
         "[{0}]\{1}" -f $ProjectName, $GroupName
     }
 
     # Convert the Permissions to an ACL Token
-    $ReferenceACLs = ConvertTo-ACL @params | Where-Object { $_.token.Type -ne 'GitUnknown' }
-
+    $ReferenceACLs = ConvertTo-ACL @params | Where-Object { $_.token.Type -ne 'GroupUnknown' }
 
     # Compare the Reference ACLs to the Difference ACLs
     $compareResult = Test-ACLListforChanges -ReferenceACLs $ReferenceACLs -DifferenceACLs $DifferenceACLs

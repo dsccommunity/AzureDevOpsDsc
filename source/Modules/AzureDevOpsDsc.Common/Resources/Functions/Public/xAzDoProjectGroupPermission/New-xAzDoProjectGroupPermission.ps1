@@ -32,6 +32,7 @@ Function New-xAzDoProjectGroupPermission {
 
     $SecurityNamespace = Get-CacheItem -Key 'Identity' -Type 'SecurityNamespaces'
     $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+    $Group = Get-CacheItem -Key $('[{0}]\{1}' -f $ProjectName, $GroupName) -Type 'LiveGroups'
 
     #
     # Serialize the ACLs
@@ -40,7 +41,7 @@ Function New-xAzDoProjectGroupPermission {
     $serializeACLParams = @{
         ReferenceACLs = $LookupResult.propertiesChanged
         DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
-        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $Project.id)
+        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GroupPermission -f $Project.id, $Group.id)
     }
 
     $params = @{
@@ -52,6 +53,6 @@ Function New-xAzDoProjectGroupPermission {
     #
     # Set the Git Repository Permissions
 
-    Set-GitRepositoryPermission @params
+    Set-xAzDoGroupPermissions @params
 
 }
