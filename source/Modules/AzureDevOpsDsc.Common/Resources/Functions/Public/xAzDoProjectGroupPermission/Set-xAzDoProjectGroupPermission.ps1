@@ -30,7 +30,7 @@ Function Set-xAzDoGitPermission {
     #
     # Security Namespace ID
 
-    $SecurityNamespace = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
+    $SecurityNamespace = Get-CacheItem -Key 'Identity' -Type 'SecurityNamespaces'
     $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
     #

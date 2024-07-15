@@ -28,7 +28,7 @@ Function Get-xAzDoProjectGroupPermission {
     Write-Verbose "[Get-xAzDoProjectGroupPermission] Started."
 
     # Define the Descriptor Type and Organization Name
-    $SecurityNamespace = 'Project'
+    $SecurityNamespace = 'Identity'
     $OrganizationName = $Global:DSCAZDO_OrganizationName
 
     Write-Verbose "[Get-xAzDoProjectGroupPermission] Security Namespace: $SecurityNamespace"
@@ -95,7 +95,8 @@ Function Get-xAzDoProjectGroupPermission {
         SecurityNamespace   = $SecurityNamespace
         isInherited         = $isInherited
         OrganizationName    = $OrganizationName
-        TokenName           = "[{0}]\{1}" -f $ProjectName, $GroupName
+        TokenName           = "{0}\\{1}"
+        "[{0}]\{1}" -f $ProjectName, $GroupName
     }
 
     # Convert the Permissions to an ACL Token

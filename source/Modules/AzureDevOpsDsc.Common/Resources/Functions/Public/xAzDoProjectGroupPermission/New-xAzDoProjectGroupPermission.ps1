@@ -30,7 +30,7 @@ Function New-xAzDoProjectGroupPermission {
     #
     # Security Namespace ID
 
-    $SecurityNamespace = Get-CacheItem -Key 'Project' -Type 'SecurityNamespaces'
+    $SecurityNamespace = Get-CacheItem -Key 'Identity' -Type 'SecurityNamespaces'
     $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
     #
