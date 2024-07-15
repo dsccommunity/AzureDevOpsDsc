@@ -1,4 +1,4 @@
-Function Remove-GitRepositoryPermission
+Function Remove-xAzDoGitPermission
 {
     param(
         [Parameter(Mandatory)]
@@ -15,7 +15,7 @@ Function Remove-GitRepositoryPermission
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
-    Write-Verbose "[Remove-GitRepositoryPermission] Started."
+    Write-Verbose "[Remove-xAzDoGitPermission] Started."
 
     # Define a hashtable to store parameters for the Invoke-AzDevOpsApiRestMethod function.
     $params = @{
@@ -33,17 +33,17 @@ Function Remove-GitRepositoryPermission
     try {
         # Call the Invoke-AzDevOpsApiRestMethod function with the parameters defined above.
         # The "@" symbol is used to pass the hashtable as splatting parameters.
-        Write-Verbose "[Remove-GitRepositoryPermission] Attempting to invoke REST method to remove ACLs."
+        Write-Verbose "[Remove-xAzDoGitPermission] Attempting to invoke REST method to remove ACLs."
         $member = Invoke-AzDevOpsApiRestMethod @params
         if ($member -ne $true) {
-            Write-Error "[Remove-GitRepositoryPermission] Failed to remove ACLs."
+            Write-Error "[Remove-xAzDoGitPermission] Failed to remove ACLs."
         } else {
-            Write-Verbose "[Remove-GitRepositoryPermission] ACLs removed successfully."
+            Write-Verbose "[Remove-xAzDoGitPermission] ACLs removed successfully."
         }
 
     } catch {
         # If an exception occurs, write an error message to the console with details about the issue.
-        Write-Error "[Remove-GitRepositoryPermission] Failed to add member to group: $($_.Exception.Message)"
+        Write-Error "[Remove-xAzDoGitPermission] Failed to add member to group: $($_.Exception.Message)"
     }
 
 

@@ -57,7 +57,7 @@ Function Remove-xAzDoGitPermission {
         # For instance: Remove-AzDoPermission
 
         # Remove the ACLs
-        Remove-GitRepositoryPermission @params
+        Remove-xAzDoGitPermission @params
 
     }
 

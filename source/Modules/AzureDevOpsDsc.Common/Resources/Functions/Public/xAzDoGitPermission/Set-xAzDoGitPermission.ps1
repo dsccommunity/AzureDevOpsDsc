@@ -50,6 +50,6 @@ Function Set-xAzDoGitPermission {
     #
     # Set the Git Repository Permissions
 
-    Set-GitRepositoryPermission @params
+    Set-xAzDoGitPermission @params
 
 }

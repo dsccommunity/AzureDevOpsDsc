@@ -53,6 +53,6 @@ Function New-xAzDoProjectGroupPermission {
     #
     # Set the Git Repository Permissions
 
-    Set-xAzDoGroupPermissions @params
+    Set-xAzDoGitPermission @params
 
 }
