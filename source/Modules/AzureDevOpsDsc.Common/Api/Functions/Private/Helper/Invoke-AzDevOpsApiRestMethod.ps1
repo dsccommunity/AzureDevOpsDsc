@@ -167,9 +167,6 @@ function Invoke-AzDevOpsApiRestMethod
 
             try
             {
-
-                $invokeRestMethodParameters | Export-Clixml -Path 'C:\temp\invokeRestMethodParameters.xml'
-
                 # Invoke the REST method. If the 'Verbose' switch is present, set it to $false.
                 # This is to prevent the output from being displayed in the console.
                 $response = Invoke-RestMethod @invokeRestMethodParameters -Verbose:$false

@@ -2,7 +2,7 @@ Function New-xAzDoProjectGroupPermission {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [HashTable[]]$GroupName
+        [string]$GroupName,
 
         [Parameter(Mandatory)]
         [string]$ProjectName,

@@ -50,7 +50,7 @@ Function ConvertTo-FormattedACL {
     process {
         # Logging
         Write-Verbose "[ConvertTo-FormattedACL] Processing ACL: $($ACL.token)"
-        Write-Verbose "[ConvertTo-FormattedACL] ACL: $($ACL.ToString())"
+        Write-Verbose "[ConvertTo-FormattedACL] ACL: $($ACL | ConvertTo-Json)"
 
         $ACEs = [System.Collections.Generic.List[HashTable]]::new()
         $ACEEntries = $ACL.acesDictionary.psObject.properties.name
@@ -75,7 +75,7 @@ Function ConvertTo-FormattedACL {
         Write-Verbose "[ConvertTo-FormattedACL] Adding formatted ACL: $($ACL.token)"
 
         $formattedACL = [HashTable]@{
-            token     = Parse-ACLToken -Token $ACL.token
+            token     = Parse-ACLToken -Token $ACL.token -SecurityNamespace $SecurityNamespace
             ACL       = $ACL
             inherited = $ACL.inheritPermissions
             aces      = $ACEs

@@ -21,6 +21,8 @@ GitBranch = \^\(repoV2\)\\/\(\?<ProjectId>\[A-Za-z0-9-]\+\)\\/\(\?<RepoId>\[A-Za
 
 # Group Permission Token
 GroupPermission = ^(?<ProjectId>[A-Za-z0-9-_]+)\\{2}(?<GroupId>[A-Za-z0-9-_]+)$
+# Resource (Project or Identity) Permission
+ResourcePermission = \^\(\?<ProjectId>\[A-Za-z0-9-_]\+\)\$
 
 '@ | ConvertFrom-StringData
 }

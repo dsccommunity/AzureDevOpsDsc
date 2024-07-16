@@ -1,43 +1,69 @@
 Function Parse-ACLToken {
     param(
         [Parameter(Mandatory)]
-        [String]$Token
+        [String]$Token,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Identity', 'Git Repositories')]
+        [String]$SecurityNamespace
     )
 
     $result = @{}
 
     Write-Verbose "[Parse-ACLToken] Started."
     Write-Verbose "[Parse-ACLToken] Token: $Token"
+    Write-Verbose "[Parse-ACLToken] Security Namespace: $SecurityNamespace"
 
-    # Match the Token with the Regex Patterns
-    switch -regex ($Token.Trim()) {
-        $LocalizedDataAzACLTokenPatten.OrganizationGit {
-            $result.type = 'OrganizationGit'
-            break;
+    #
+    # Git Repositories
+    if ($SecurityNamespace -eq 'Git Repositories') {
+        # Match the Token with the Regex Patterns
+        switch -regex ($Token.Trim()) {
+            $LocalizedDataAzACLTokenPatten.OrganizationGit {
+                $result.type = 'OrganizationGit'
+                break;
+            }
+
+            $LocalizedDataAzACLTokenPatten.GitProject {
+                $result.type = 'GitProject'
+                break;
+            }
+
+            $LocalizedDataAzACLTokenPatten.GitRepository {
+                $result.type = 'GitRepository'
+                break;
+            }
+
+            $LocalizedDataAzACLTokenPatten.GitBranch {
+                $result.type = 'GitBranch'
+                break;
+            }
+
+            default {
+                throw "Token '$Token' is not recognized."
+            }
         }
 
-        $LocalizedDataAzACLTokenPatten.GitProject {
-            $result.type = 'GitProject'
-            break;
-        }
+    #
+    # Identity
+    } elseif ($SecurityNamespace -eq 'Identity') {
 
-        $LocalizedDataAzACLTokenPatten.GitRepository {
-            $result.type = 'GitRepository'
-            break;
-        }
+        # Match the Token with the Regex Patterns
+        switch -regex ($Token.Trim()) {
 
-        $LocalizedDataAzACLTokenPatten.GitBranch {
-            $result.type = 'GitBranch'
-            break;
-        }
+            $LocalizedDataAzACLTokenPatten.ResourcePermission {
+                $result.type = 'ResourcePermission'
+                break;
+            }
 
-        $LocalizedDataAzACLTokenPatten.GroupPermission {
-            $result.type = 'GroupPermission'
-            break;
-        }
+            $LocalizedDataAzACLTokenPatten.GroupPermission {
+                $result.type = 'GroupPermission'
+                break;
+            }
 
-        default {
-            throw "Token '$Token' is not recognized."
+            default {
+                throw "Token '$Token' is not recognized."
+            }
         }
     }
 

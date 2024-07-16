@@ -2,7 +2,7 @@ Function Set-xAzDoGitPermission {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [HashTable[]]$GroupName
+        [string]$GroupName,
 
         [Parameter(Mandatory)]
         [string]$ProjectName,
