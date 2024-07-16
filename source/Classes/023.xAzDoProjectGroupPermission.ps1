@@ -3,44 +3,39 @@
     This class represents a DSC resource for managing Azure DevOps project group permissions.
 
 .DESCRIPTION
-    The xAzDoProjectGroupPermission class is a DSC resource that allows you to manage permissions for Azure DevOps project groups.
-    It inherits from the AzDevOpsDscResourceBase class and provides properties and methods to configure project group permissions.
+    The xAzDoProjectGroupPermission class is a DSC resource that allows you to manage permissions for a group in an Azure DevOps project.
+    It inherits from the AzDevOpsDscResourceBase class and provides properties and methods for managing project group permissions.
+
+.NOTES
+    Author: Your Name
+    Date:   Current Date
+
+.LINK
+    GitHub Repository: <link to the GitHub repository>
 
 .PARAMETER GroupName
-    Specifies the name of the Azure DevOps project group.
+    Specifies the name of the group for which the permissions are being managed.
     This parameter is mandatory.
 
 .PARAMETER ProjectName
-    Specifies the name of the Azure DevOps project.
+    Specifies the name of the Azure DevOps project for which the permissions are being managed.
     This parameter is mandatory.
 
 .PARAMETER isInherited
-    Specifies whether the permissions are inherited from parent groups.
-    The default value is $true.
+    Specifies whether the permissions are inherited from a parent group.
+    By default, this parameter is set to $true.
 
 .PARAMETER Permission
-    Specifies the permissions to be assigned to the project group.
+    Specifies the permissions to be assigned to the group.
     This parameter is mandatory and should be a hashtable.
 
-.METHODS
-    Get()
-        Retrieves the current state of the xAzDoProjectGroupPermission resource.
-
-.NOTES
-    This class is a DSC resource and should be used with the Azure DevOps DSC module.
-
-.LINK
-    https://github.com/Azure/AzureDevOpsDSC
-
 .EXAMPLE
-    Configuration Example
-    {
+    Configuration Example {
         Import-DscResource -ModuleName AzureDevOpsDSC
 
         Node localhost
         {
-            xAzDoProjectGroupPermission MyProjectGroupPermission
-            {
+            xAzDoProjectGroupPermission MyProjectGroupPermission {
                 GroupName = 'MyGroup'
                 ProjectName = 'MyProject'
                 Permission = @{
@@ -51,7 +46,15 @@
             }
         }
     }
+
+.INPUTS
+    None
+
+.OUTPUTS
+    None
+
 #>
+
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
