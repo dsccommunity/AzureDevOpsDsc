@@ -11,7 +11,7 @@ Function Remove-xAzDoGitPermission {
         [bool]$isInherited,
 
         [Parameter()]
-        [HashTable[]]$Permissions,
+        [HashTable]$Permission,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -51,10 +51,6 @@ Function Remove-xAzDoGitPermission {
             SecurityNamespaceID = $SecurityNamespace.namespaceId
             TokenName = $searchString
         }
-
-        #
-        # TODO: Refactor Remove-GitRepostioryPermission to be more generic
-        # For instance: Remove-AzDoPermission
 
         # Remove the ACLs
         Remove-xAzDoGitPermission @params

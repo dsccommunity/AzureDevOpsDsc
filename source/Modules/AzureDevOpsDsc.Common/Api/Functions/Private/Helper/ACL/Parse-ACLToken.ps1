@@ -31,6 +31,11 @@ Function Parse-ACLToken {
             break;
         }
 
+        $LocalizedDataAzACLTokenPatten.GroupPermission {
+            $result.type = 'GroupPermission'
+            break;
+        }
+
         default {
             throw "Token '$Token' is not recognized."
         }

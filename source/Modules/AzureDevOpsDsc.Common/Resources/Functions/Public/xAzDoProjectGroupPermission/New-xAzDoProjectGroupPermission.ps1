@@ -11,7 +11,7 @@ Function New-xAzDoProjectGroupPermission {
         [bool]$isInherited,
 
         [Parameter()]
-        [HashTable[]]$Permissions,
+        [HashTable]$Permission,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -37,7 +37,6 @@ Function New-xAzDoProjectGroupPermission {
     #
     # Serialize the ACLs
 
-    # TODO UPDATE SerializeACLs
     $serializeACLParams = @{
         ReferenceACLs = $LookupResult.propertiesChanged
         DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'

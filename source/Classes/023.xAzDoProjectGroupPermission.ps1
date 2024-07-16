@@ -16,7 +16,7 @@ class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
     [System.Boolean]$isInherited=$true
 
     [DscProperty(Mandatory)]
-    [HashTable[]]$Permissions
+    [HashTable]$Permission
 
     xAzDoProjectGroupPermission()
     {
@@ -46,11 +46,11 @@ class xAzDoProjectGroupPermission : AzDevOpsDscResourceBase
         $properties.ProjectName           = $CurrentResourceObject.ProjectName
         $properties.GroupName             = $CurrentResourceObject.GroupName
         $properties.isInherited           = $CurrentResourceObject.isInherited
-        $properties.Permissions           = $CurrentResourceObject.Permissions
+        $properties.Permission            = $CurrentResourceObject.Permission
         $properties.lookupResult          = $CurrentResourceObject.lookupResult
         $properties.Ensure                = $CurrentResourceObject.Ensure
 
-        Write-Verbose "[xAzDoGitPermission] Current state properties: $($properties | Out-String)"
+        Write-Verbose "[xAzDoProjectGroupPermission] Current state properties: $($properties | Out-String)"
 
         return $properties
     }

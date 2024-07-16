@@ -12,7 +12,7 @@ Function Get-xAzDoProjectGroupPermission {
         [bool]$isInherited,
 
         [Parameter()]
-        [HashTable[]]$Permissions,
+        [HashTable]$Permission,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -30,6 +30,14 @@ Function Get-xAzDoProjectGroupPermission {
     # Define the Descriptor Type and Organization Name
     $SecurityNamespace = 'Identity'
     $OrganizationName = $Global:DSCAZDO_OrganizationName
+
+    # Format the Permissions to be a standard array
+    $Permissions = @(
+        @{
+            Identity = "{0}\{1}" -f $ProjectName, $GroupName
+            Permission = $Permission
+        }
+    )
 
     Write-Verbose "[Get-xAzDoProjectGroupPermission] Security Namespace: $SecurityNamespace"
     Write-Verbose "[Get-xAzDoProjectGroupPermission] Organization Name: $OrganizationName"
@@ -97,7 +105,6 @@ Function Get-xAzDoProjectGroupPermission {
         isInherited         = $isInherited
         OrganizationName    = $OrganizationName
         TokenName           = "{0}\\{1}" -f $project.id, $group.id
-        "[{0}]\{1}" -f $ProjectName, $GroupName
     }
 
     # Convert the Permissions to an ACL Token

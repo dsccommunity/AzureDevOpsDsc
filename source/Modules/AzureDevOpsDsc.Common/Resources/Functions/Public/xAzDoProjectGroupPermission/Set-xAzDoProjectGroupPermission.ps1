@@ -11,7 +11,7 @@ Function Set-xAzDoGitPermission {
         [bool]$isInherited,
 
         [Parameter()]
-        [HashTable[]]$Permissions,
+        [HashTable]$Permission,
 
         [Parameter()]
         [HashTable]$LookupResult,
