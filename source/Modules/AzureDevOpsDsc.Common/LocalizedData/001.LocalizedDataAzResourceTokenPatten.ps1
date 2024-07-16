@@ -17,7 +17,7 @@ GitRepository = \(\?<ProjectName>\[A-Za-z0-9-_]\+\)\(\\/\|\\\\\)\(\?<GitRepoName
 # Identity Permissions
 
 # Group Permission
-GroupPermission = \^\(\?<ProjectId>\[A-Za-z0-9-_]\+\)\\\\\{2}\(\?<GroupId>\[A-Za-z0-9-_]\+\)\$
+GroupPermission = \^\(\?<ProjectId>\[A-Za-z0-9-_]\+\)\\\\\(\?<GroupId>\[A-Za-z0-9-_]\+\)\$
 
 # Project Permissions
 ProjectPermission = \^\\\$PROJECT:vstfs:\\/\{3}Classification\\/TeamProject\\/\(\?<ProjectId>\[A-Za-z0-9-_]\+\)\$
