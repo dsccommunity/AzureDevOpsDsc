@@ -24,7 +24,7 @@ Function Set-xAzDoGitPermission {
         $Force
     )
 
-    Write-Verbose "[Set-xAzDoGitPermission] Started."
+    Write-Verbose "[Set-xAzDoPermission] Started."
 
     #
     # Security Namespace ID
@@ -50,6 +50,6 @@ Function Set-xAzDoGitPermission {
     #
     # Set the Git Repository Permissions
 
-    Set-xAzDoGitPermission @params
+    Set-xAzDoPermission @params
 
 }

@@ -34,7 +34,7 @@ Mock ConvertTo-ACLHashtable {
     }
 }
 
-Mock Set-xAzDoGitPermission {
+Mock Set-xAzDoPermission {
     param (
         [string]$OrganizationName,
         [string]$SecurityNamespaceID,
@@ -84,7 +84,7 @@ Describe 'New-xAzDoGroupPermission Tests' {
                 }
             }
 
-            Mock Set-xAzDoGitPermission {
+            Mock Set-xAzDoPermission {
                 param (
                     [string]$OrganizationName,
                     [string]$SecurityNamespaceID,

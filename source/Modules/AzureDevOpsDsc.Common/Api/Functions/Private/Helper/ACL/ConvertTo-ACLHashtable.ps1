@@ -94,7 +94,7 @@ Function ConvertTo-ACLHashtable {
     Write-Verbose "[ConvertTo-ACLHashtable] Started."
 
     # Initialize the ACLs hashtable with a count and a list to hold ACL objects
-    Write-Verbose "Initializing the ACLs hashtable."
+    Write-Verbose "[ConvertTo-ACLHashtable] Initializing the ACLs hashtable."
     $ACLHashtable = @{
         Count = 0
         value = [System.Collections.Generic.List[Object]]::new()
@@ -102,22 +102,22 @@ Function ConvertTo-ACLHashtable {
 
     # Filter out all ACLs that don't match the descriptor match token. These are needed to construct the ACLs object
     # Otherwise, the existing ACLs will be removed.
-    Write-Verbose "Filtering descriptor ACLs that do not match the descriptor match token."
+    Write-Verbose "[ConvertTo-ACLHashtable] Filtering descriptor ACLs that do not match the descriptor match token."
     $FilteredDescriptorACLs = $DescriptorACLList | Where-Object { $_.token -notmatch $DescriptorMatchToken }
 
     # Iterate through the filtered descriptor ACLs to construct the ACLs object
-    Write-Verbose "Iterating through the filtered descriptor ACLs to construct the ACLs object."
+    Write-Verbose "[ConvertTo-ACLHashtable] Iterating through the filtered descriptor ACLs to construct the ACLs object."
     ForEach ($DescriptorACL in $FilteredDescriptorACLs) {
         Write-Verbose "Adding filtered ACL to the ACLs object."
         $ACLHashtable.value.Add($DescriptorACL)
     }
 
     # Construct the ACLs object from the reference ACLs
-    Write-Verbose "Constructing the ACLs object from the reference ACLs."
+    Write-Verbose "[ConvertTo-ACLHashtable] Constructing the ACLs object from the reference ACLs."
 
     # Iterate through the ACLs in the ReferenceACLs
     ForEach ($ReferenceACL in $ReferenceACLs) {
-        Write-Verbose "Processing reference ACL."
+        Write-Verbose "[ConvertTo-ACLHashtable] Processing reference ACL."
 
         # Construct the ACL Object with properties inheritPermissions, token, and acesDictionary
         $ACLObject = [PSCustomObject]@{
@@ -128,7 +128,7 @@ Function ConvertTo-ACLHashtable {
 
         # Iterate through the ACEs in the current ACL to construct the ACEs Dictionary
         ForEach ($ACE in $ReferenceACL.aces) {
-            Write-Verbose "Constructing ACE Object."
+            Write-Verbose "[ConvertTo-ACLHashtable] Constructing ACE Object."
 
             # Construct the ACE Object with properties allow, deny, and descriptor
             $ACEObject = @{
@@ -137,17 +137,17 @@ Function ConvertTo-ACLHashtable {
                 descriptor  = $ACE.Identity.value.ACLIdentity.descriptor
             }
             # Add the ACE to the ACEs Dictionary using the descriptor as the key
-            Write-Verbose "Adding ACE to the ACEs Dictionary."
+            Write-Verbose "[ConvertTo-ACLHashtable] Adding ACE to the ACEs Dictionary."
             $ACLObject.acesDictionary.Add($ACE.Identity.value.ACLIdentity.descriptor, $ACEObject)
         }
 
         # Add the constructed ACL object (ACLObject) to the ACL List
-        Write-Verbose "Adding constructed ACL object to the ACL List."
+        Write-Verbose "[ConvertTo-ACLHashtable] Adding constructed ACL object to the ACL List."
         $ACLHashtable.value.Add($ACLObject)
     }
 
     # Update the ACL Count with the number of ACLs in the list
-    Write-Verbose "Updating the ACL Count."
+    Write-Verbose "[ConvertTo-ACLHashtable] Updating the ACL Count."
     $ACLHashtable.Count = $ACLHashtable.value.Count
 
     # Return the constructed ACLs hashtable

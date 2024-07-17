@@ -58,7 +58,7 @@ Describe 'xAzDoGitPermission' {
             Write-Output "Git permissions updated for: $ProjectName/$RepositoryName"
         }
 
-        function Remove-xAzDoGitPermission
+        function Remove-xAzDoPermission
         {
             param (
                 [string]$ProjectName,

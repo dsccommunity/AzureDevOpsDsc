@@ -25,6 +25,22 @@ Function Remove-xAzDoGroupPermission {
     Write-Verbose "[New-xAzDoGitPermission] Started."
 
     #
+    # Format the Group Name
+
+    # Split the Group Name
+    $split = $GroupName.Split('\').Split('/')
+
+    # Test if the Group Name is valid
+    if ($split.Count -ne 2) {
+        Write-Warning "[Get-xAzDoProjectGroupPermission] Invalid Group Name: $GroupName"
+        return
+    }
+
+    # Define the Project and Group Name
+    $ProjectName = $split[0]
+    $GroupName = $split[1]
+
+    #
     # Security Namespace ID
 
     $SecurityNamespace  = Get-CacheItem -Key 'Identity' -Type 'SecurityNamespaces'
@@ -50,7 +66,7 @@ Function Remove-xAzDoGroupPermission {
         }
 
         # Remove the ACLs
-        Remove-xAzDoGitPermission @params
+        Remove-xAzDoPermission @params
 
     }
 

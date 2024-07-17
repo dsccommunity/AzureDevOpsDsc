@@ -55,7 +55,7 @@ Function ConvertTo-FormattedToken {
     }
 
     # Output verbose message with the token value
-    Write-Verbose "[ConvertTo-FormattedToken] Token: $Token"
+    Write-Verbose "[ConvertTo-FormattedToken] Token: $string"
 
     # Return the formatted token string
     return $string

@@ -25,7 +25,7 @@ Mock Get-CacheItem {
     }
 }
 
-Mock Remove-xAzDoGitPermission {
+Mock Remove-xAzDoPermission {
     param (
         [string]$OrganizationName,
         [string]$SecurityNamespaceID,
@@ -69,7 +69,7 @@ Describe 'Remove-xAzDoGroupPermission Tests' {
                 TokenName = 'repoV2/project-id/repository-id'
             }
 
-            Mock Remove-xAzDoGitPermission {
+            Mock Remove-xAzDoPermission {
                 param (
                     [string]$OrganizationName,
                     [string]$SecurityNamespaceID,
@@ -83,7 +83,7 @@ Describe 'Remove-xAzDoGroupPermission Tests' {
             Remove-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true
         }
 
-        It 'Should not call Remove-xAzDoGitPermission if no matching ACLs are found' {
+        It 'Should not call Remove-xAzDoPermission if no matching ACLs are found' {
             Mock Get-CacheItem {
                 param (
                     [string]$Key,
@@ -98,7 +98,7 @@ Describe 'Remove-xAzDoGroupPermission Tests' {
                 }
             }
 
-            Mock Remove-xAzDoGitPermission {
+            Mock Remove-xAzDoPermission {
                 # This should never be called
                 throw "This should not be called"
             }

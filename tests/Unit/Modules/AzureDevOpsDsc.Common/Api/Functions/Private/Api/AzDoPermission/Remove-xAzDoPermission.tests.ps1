@@ -1,5 +1,5 @@
 powershell
-Describe 'Remove-xAzDoGitPermission' {
+Describe 'Remove-xAzDoPermission' {
 
     Mock Get-AzDevOpsApiVersion { return "5.1-preview.1" }
     Mock Invoke-AzDevOpsApiRestMethod { return $true }
@@ -12,7 +12,7 @@ Describe 'Remove-xAzDoGitPermission' {
             $TokenName = 'Token'
             $ApiVersion = '5.1-preview.1'
 
-            { Remove-xAzDoGitPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion } | Should -Not -Throw
+            { Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion } | Should -Not -Throw
             Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
                 $Uri -eq 'https://dev.azure.com/Org/_apis/accesscontrollists/NamespaceID?tokens=Token&recurse=False&api-version=5.1-preview.1' -and
                 $Method -eq 'DELETE'
@@ -28,7 +28,7 @@ Describe 'Remove-xAzDoGitPermission' {
             $SecurityNamespaceID = 'NamespaceID'
             $TokenName = 'Token'
 
-            { Remove-xAzDoGitPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName } | Should -Throw | Should -Contain '[Remove-xAzDoGitPermission] Failed to remove ACLs.'
+            { Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName } | Should -Throw | Should -Contain '[Remove-xAzDoPermission] Failed to remove ACLs.'
         }
     }
 
@@ -40,7 +40,7 @@ Describe 'Remove-xAzDoGitPermission' {
             $SecurityNamespaceID = 'NamespaceID'
             $TokenName = 'Token'
 
-            { Remove-xAzDoGitPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName } | Should -Throw | Should -Contain '[Remove-xAzDoGitPermission] Failed to add member to group: An error occurred'
+            { Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName } | Should -Throw | Should -Contain '[Remove-xAzDoPermission] Failed to add member to group: An error occurred'
         }
     }
 }

@@ -1,6 +1,6 @@
 
 
-Function Set-xAzDoGitPermission
+Function Set-xAzDoPermission
 {
     param(
         [Parameter(Mandatory)]
@@ -17,7 +17,7 @@ Function Set-xAzDoGitPermission
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
-    Write-Verbose "[Set-xAzDoGitPermission] Started."
+    Write-Verbose "[Set-xAzDoPermission] Started."
 
     # Define a hashtable to store parameters for the Invoke-AzDevOpsApiRestMethod function.
 
@@ -36,12 +36,12 @@ Function Set-xAzDoGitPermission
     try {
         # Call the Invoke-AzDevOpsApiRestMethod function with the parameters defined above.
         # The "@" symbol is used to pass the hashtable as splatting parameters.
-        Write-Verbose "[Set-xAzDoGitPermission] Attempting to invoke REST method to set ACLs."
+        Write-Verbose "[Set-xAzDoPermission] Attempting to invoke REST method to set ACLs."
         $null = Invoke-AzDevOpsApiRestMethod @params
 
     } catch {
         # If an exception occurs, write an error message to the console with details about the issue.
-        Write-Error "[Set-xAzDoGitPermission] Failed to set ACLs: $($_.Exception.Message)"
+        Write-Error "[Set-xAzDoPermission] Failed to set ACLs: $($_.Exception.Message)"
     }
 
 }

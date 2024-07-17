@@ -25,6 +25,23 @@ Function Set-xAzDoGroupPermission {
     Write-Verbose "[Set-xAzDoGroupPermission] Started."
 
     #
+    # Format the Group Name
+
+    # Split the Group Name
+    $split = $GroupName.Split('\').Split('/')
+
+    # Test if the Group Name is valid
+    if ($split.Count -ne 2) {
+        Write-Warning "[Get-xAzDoProjectGroupPermission] Invalid Group Name: $GroupName"
+        return
+    }
+
+    # Define the Project and Group Name
+    $ProjectName = $split[0]
+    $GroupName = $split[1]
+
+
+    #
     # Security Namespace ID
 
     $SecurityNamespace = Get-CacheItem -Key 'Identity' -Type 'SecurityNamespaces'
@@ -48,6 +65,6 @@ Function Set-xAzDoGroupPermission {
     #
     # Set the Git Repository Permissions
 
-    Set-xAzDoGroupPermission @params
+    Set-xAzDoPermission @params
 
 }
