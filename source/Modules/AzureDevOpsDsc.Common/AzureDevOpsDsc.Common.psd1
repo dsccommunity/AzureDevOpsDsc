@@ -73,10 +73,10 @@
         'Remove-xAzDoGitPermission',
         'Set-xAzDoGitPermission',
 
-        'Get-xAzDoProjectGroupPermission',
-        'New-xAzDoProjectGroupPermission',
-        'Remove-xAzDoProjectGroupPermission',
-        'Set-xAzDoProjectGroupPermission'
+        'Get-xAzDoGroupPermission',
+        'New-xAzDoGroupPermission',
+        'Remove-xAzDoGroupPermission',
+        'Set-xAzDoGroupPermission'
 
 
     )

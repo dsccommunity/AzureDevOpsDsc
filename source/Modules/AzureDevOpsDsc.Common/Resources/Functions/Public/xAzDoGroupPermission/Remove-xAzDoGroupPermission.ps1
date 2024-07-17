@@ -1,17 +1,14 @@
-Function Remove-xAzDoGitPermission {
+Function Remove-xAzDoGroupPermission {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$GroupName,
 
         [Parameter(Mandatory)]
-        [string]$ProjectName,
-
-        [Parameter(Mandatory)]
         [bool]$isInherited,
 
         [Parameter()]
-        [HashTable]$Permission,
+        [HashTable[]]$Permissions,
 
         [Parameter()]
         [HashTable]$LookupResult,

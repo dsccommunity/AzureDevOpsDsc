@@ -1,18 +1,15 @@
 
-Function Get-xAzDoProjectGroupPermission {
+Function Get-xAzDoGroupPermission {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$GroupName,
 
         [Parameter(Mandatory)]
-        [string]$ProjectName,
-
-        [Parameter(Mandatory)]
         [bool]$isInherited,
 
         [Parameter()]
-        [HashTable]$Permission,
+        [HashTable[]]$Permissions,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -30,14 +27,21 @@ Function Get-xAzDoProjectGroupPermission {
     # Define the Descriptor Type and Organization Name
     $SecurityNamespace = 'Identity'
     $OrganizationName = $Global:DSCAZDO_OrganizationName
+    # Split the Group Name
+    $split = $GroupName.Split('\').Split('/')
 
-    # Format the Permissions to be a standard array
-    $Permissions = @(
-        @{
-            Identity = "{0}\{1}" -f $ProjectName, $GroupName
-            Permission = $Permission
-        }
-    )
+    # Test if the Group Name is valid
+    if ($split.Count -ne 2) {
+        Write-Warning "[Get-xAzDoProjectGroupPermission] Invalid Group Name: $GroupName"
+        return
+    }
+
+    # Define the Project and Group Name
+    $ProjectName = $split[0]
+    $GroupName = $split[1]
+
+    # If the Project Name contains 'organization'. Update the Project Name
+
 
     Write-Verbose "[Get-xAzDoProjectGroupPermission] Security Namespace: $SecurityNamespace"
     Write-Verbose "[Get-xAzDoProjectGroupPermission] Organization Name: $OrganizationName"
@@ -89,9 +93,18 @@ Function Get-xAzDoProjectGroupPermission {
     Write-Verbose "[Get-xAzDoProjectGroupPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
 
     $DifferenceACLs = Get-DevOpsACL @ACLLookupParams | ConvertTo-FormattedACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
-
     $DifferenceACLs = $DifferenceACLs | Where-Object {
-        ($_.Token.Type -eq $SecurityNamespace) -and ($_.Token.Id -eq $group.ACLIdentity.id)
+        ($_.Token.Type -eq 'GroupPermission') -and
+        ($_.Token.GroupId -eq $group.originId) -and
+        ($_.Token.ProjectId -eq $project.id)
+    }
+
+    #
+    # Iterate through each of the Permissions and append the permission identity if it contains 'Self' or 'This'
+    forEach ($Permission in $Permissions) {
+        if ($Permission.Identity -in 'self', 'this') {
+            $Permission.Identity = '[{0}]\{1}' -f $ProjectName, $GroupName
+        }
     }
 
     Write-Verbose "[Get-xAzDoProjectGroupPermission] ACL List retrieved and formatted."
@@ -109,6 +122,12 @@ Function Get-xAzDoProjectGroupPermission {
 
     # Convert the Permissions to an ACL Token
     $ReferenceACLs = ConvertTo-ACL @params | Where-Object { $_.token.Type -ne 'GroupUnknown' }
+
+    # if the ACEs are empty, skip
+    if ($ReferenceACLs.aces.Count -eq 0) {
+        Write-Verbose "[Get-xAzDoProjectGroupPermission] No ACEs found for the group."
+        return
+    }
 
     # Compare the Reference ACLs to the Difference ACLs
     $compareResult = Test-ACLListforChanges -ReferenceACLs $ReferenceACLs -DifferenceACLs $DifferenceACLs

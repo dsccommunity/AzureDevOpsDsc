@@ -1,17 +1,14 @@
-Function Set-xAzDoGitPermission {
+Function New-xAzDoGroupPermission {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$GroupName,
 
         [Parameter(Mandatory)]
-        [string]$ProjectName,
-
-        [Parameter(Mandatory)]
         [bool]$isInherited,
 
         [Parameter()]
-        [HashTable]$Permission,
+        [HashTable[]]$Permissions,
 
         [Parameter()]
         [HashTable]$LookupResult,
@@ -25,13 +22,14 @@ Function Set-xAzDoGitPermission {
     )
 
 
-    Write-Verbose "[Set-xAzDoGitPermission] Started."
+    Write-Verbose "[New-xAzDoProjectGroupPermission] Started."
 
     #
     # Security Namespace ID
 
     $SecurityNamespace = Get-CacheItem -Key 'Identity' -Type 'SecurityNamespaces'
     $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+    $Group = Get-CacheItem -Key $('[{0}]\{1}' -f $ProjectName, $GroupName) -Type 'LiveGroups'
 
     #
     # Serialize the ACLs
@@ -39,7 +37,7 @@ Function Set-xAzDoGitPermission {
     $serializeACLParams = @{
         ReferenceACLs = $LookupResult.propertiesChanged
         DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
-        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GitRepository -f $Project.id)
+        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GroupPermission -f $Project.id, $Group.id)
     }
 
     $params = @{

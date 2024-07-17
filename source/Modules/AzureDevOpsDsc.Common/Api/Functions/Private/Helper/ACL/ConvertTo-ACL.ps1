@@ -79,9 +79,10 @@ Function ConvertTo-ACL {
     # Create a hash table for ACE parameters.
     $ACEParams = @{
         SecurityNamespace = $SecurityNamespace
-        Permission        = $Permissions
+        Permissions       = $Permissions
         OrganizationName  = $OrganizationName
     }
+
     Write-Verbose "[ConvertTo-ACL] ACE Params: $($ACEParams | Out-String)"
 
     # Convert the Permission to an ACL Token and create the ACL hash table.
@@ -89,6 +90,12 @@ Function ConvertTo-ACL {
         token     = New-ACLToken @ACLTokenParams
         aces      = ConvertTo-ACEList @ACEParams
         inherited = $isInherited
+    }
+
+    # If the ACEs are empty, write a warning and return.
+    if ($ACL.aces.Count -eq 0) {
+        Write-Warning "[ConvertTo-ACL] No ACEs were created. Returning."
+        return $ACL
     }
 
     # Group the ACEs by the identity removing any duplicates.
