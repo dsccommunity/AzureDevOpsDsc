@@ -52,6 +52,13 @@ Function ConvertTo-FormattedACL {
         Write-Verbose "[ConvertTo-FormattedACL] Processing ACL: $($ACL.token)"
         Write-Verbose "[ConvertTo-FormattedACL] ACL: $($ACL | ConvertTo-Json)"
 
+        # If the token is empty, skip it.
+        if (-not $ACL.token) {
+            Write-Verbose "[ConvertTo-FormattedACL] Current token is empty. Skipping."
+            Write-Warning "[ConvertTo-FormattedACL] Current token is empty. Skipping. ACL: $($ACL | ConvertTo-Json)"
+            return
+        }
+
         $ACEs = [System.Collections.Generic.List[HashTable]]::new()
         $ACEEntries = $ACL.acesDictionary.psObject.properties.name
         Write-Verbose "[ConvertTo-FormattedACL] Found ACE entries: $($ACEEntries.Count)"

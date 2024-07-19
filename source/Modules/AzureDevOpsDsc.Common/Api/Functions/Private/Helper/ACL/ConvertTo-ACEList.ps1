@@ -44,7 +44,10 @@ Function ConvertTo-ACEList {
     )
 
     # Log the start of the function.
-    Write-Verbose "[New-ACLToken] Started."
+    Write-Verbose "[ConvertTo-ACEList] Started."
+    Write-Verbose "[ConvertTo-ACEList] Security Namespace: $SecurityNamespace"
+    Write-Verbose "[ConvertTo-ACEList] Organization Name: $OrganizationName"
+    Write-Verbose "[ConvertTo-ACEList] Permissions: $($Permissions | ConvertTo-Json)"
 
     # Initialize an empty list to hold the ACEs (Access Control Entries).
     $ACEs = [System.Collections.Generic.List[HashTable]]::new()
@@ -52,7 +55,7 @@ Function ConvertTo-ACEList {
     # Iterate through each of the permissions and construct the ACE token.
     ForEach ($Permission in $Permissions) {
 
-        Write-Verbose "[New-ACLToken] Constructing ACE for $($Permission.Identity)."
+        Write-Verbose "[ConvertTo-ACEList] Constructing ACE for $($Permission.Identity)."
 
         # Define the parameters for the Find-Identity function.
         $indentityParams = @{
@@ -76,12 +79,12 @@ Function ConvertTo-ACEList {
 
         # If the Identity is not found, log a warning.
         if (-not $ht.Identity) {
-            Write-Warning "[New-ACLToken] Identity $($Permission.Identity) was not found. This will not be added to the ACEs list."
+            Write-Warning "[ConvertTo-ACEList] Identity $($Permission.Identity) was not found. This will not be added to the ACEs list."
             continue
         }
         # If the Permissions are not found, log a warning.
         if (-not $ht.Permissions) {
-            Write-Warning "[New-ACLToken] Permissions for $($Permission.Identity) were not found. This will not be added to the ACEs list."
+            Write-Warning "[ConvertTo-ACEList] Permissions for $($Permission.Identity) were not found. This will not be added to the ACEs list."
             continue
         }
 

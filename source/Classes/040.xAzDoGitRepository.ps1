@@ -83,9 +83,9 @@ class xAzDoGitRepository : AzDevOpsDscResourceBase
         # If the resource object is null, return the properties
         if ($null -eq $CurrentResourceObject) { return $properties }
 
-        $properties.ProjectName         = $CurrentResourceObject.Name
-        $properties.GitRepositoryName   = $CurrentResourceObject.Repository
-        $properties.SourceRepository    = $CurrentResourceObject.Source
+        $properties.ProjectName         = $CurrentResourceObject.ProjectName
+        $properties.RepositoryName      = $CurrentResourceObject.RepositoryName
+        $properties.SourceRepository    = $CurrentResourceObject.SourceRepository
         $properties.Ensure              = $CurrentResourceObject.Ensure
         $properties.LookupResult        = $CurrentResourceObject.LookupResult
 
