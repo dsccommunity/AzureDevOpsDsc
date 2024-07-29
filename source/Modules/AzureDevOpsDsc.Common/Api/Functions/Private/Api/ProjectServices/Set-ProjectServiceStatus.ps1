@@ -9,15 +9,25 @@ function Set-ProjectServiceStatus
         [string]$ProjectId,
 
         [Parameter(Mandatory = $true)]
-        [string]$ServiceName
+        [string]$ServiceName,
+
+        [Parameter(Mandatory = $true)]
+        [Object]$Body,
+
+        [Parameter()]
+        [String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
     # Get the project
     # Construct the URI with optional state filter
     $params = @{
-        Uri = 'https://dev.azure.com/{0}/_apis/FeatureManagement/FeatureStates/host/project/{1}/{2}' -f $Organization, $ProjectId, $ServiceName
+        Uri = 'https://dev.azure.com/{0}/_apis/FeatureManagement/FeatureStates/host/project/{1}/{2}?api-version={3}' -f $Organization, $ProjectId, $ServiceName, $ApiVersion
         Method = 'PATCH'
+        Body = $Body | ConvertTo-Json
     }
+
+    $params | Export-CLixml C:\Temp\aaa.clixml
 
     try
     {

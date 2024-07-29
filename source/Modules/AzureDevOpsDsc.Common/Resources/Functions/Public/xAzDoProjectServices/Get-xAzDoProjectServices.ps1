@@ -69,7 +69,7 @@ Function Get-xAzDoProjectServices {
 
     $params = @{
         Organization = $Global:DSCAZDO_OrganizationName
-        ProjectId    = $Project.ProjectId
+        ProjectId    = $Project.id
     }
 
     # Enumerate the Project Services.
@@ -82,25 +82,42 @@ Function Get-xAzDoProjectServices {
     }
 
     # Compare the Project Services with the desired state.
-    if ($GitRepositories -ne $ProjectServices.Repos) {
+    if ($GitRepositories -ne $Result.LiveServices.Repos.state) {
         $Result.Status = [DSCGetSummaryState]::Changed
-        $Result.propertiesChanged += 'Repos'
+        $Result.propertiesChanged += @{
+            Expected = $GitRepositories
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Repos
+        }
     }
-    if ($WorkBoards -ne $ProjectServices.Boards) {
+    if ($WorkBoards -ne $Result.LiveServices.Boards.state) {
         $Result.Status = [DSCGetSummaryState]::Changed
-        $Result.propertiesChanged += 'Boards'
+        $Result.propertiesChanged += @{
+            Expected = $WorkBoards
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Boards
+        }
     }
-    if ($BuildPipelines -ne $ProjectServices.Pipelines) {
+    if ($BuildPipelines -ne $Result.LiveServices.Pipelines.state) {
         $Result.Status = [DSCGetSummaryState]::Changed
-        $Result.propertiesChanged += 'Pipelines'
+        $Result.propertiesChanged += @{
+            Expected = $BuildPipelines
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Pipelines
+        }
     }
-    if ($TestPlans -ne $ProjectServices.Tests) {
+    if ($TestPlans -ne $Result.LiveServices.Tests.state) {
         $Result.Status = [DSCGetSummaryState]::Changed
-        $Result.propertiesChanged += 'Tests'
+        $Result.propertiesChanged += @{
+            Expected = $TestPlans
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_TestPlans
+        }
     }
-    if ($AzureArtifact -ne $ProjectServices.Artifacts) {
+    if ($AzureArtifact -ne $Result.LiveServices.Artifacts.state) {
         $Result.Status = [DSCGetSummaryState]::Changed
-        $Result.propertiesChanged += 'Artifacts'
+        $Result.propertiesChanged += @{
+            Expected = $AzureArtifact
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Artifacts
+        }
     }
+
+    return $Result
 
 }

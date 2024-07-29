@@ -44,16 +44,23 @@ Function Set-xAzDoProjectServices {
         $Force
     )
 
+    # Retrive the Repositories from the Live Cache.
+    $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+
     # Construct a hashtable detailing the group
     ForEach ($PropertyChanged in $LookupResult.propertiesChanged) {
 
         $params = @{
-            $Organization = $Global:DSCAZDO_OrganizationName
-            $ProjectId = $ProjectId
-            $ServiceName = $ServiceName
+            Organization = $Global:DSCAZDO_OrganizationName
+            ProjectId    = $Project.id
+            ServiceName  = $PropertyChanged.FeatureId
+            Body         = $LookupResult.LiveServices.Keys | Where-Object { $LookupResult.LiveServices[$_].featureId -eq $PropertyChanged.FeatureId } | ForEach-Object { $LookupResult.LiveServices[$_] }
         }
 
-        Set-ProjectServiceStatus
+        # Set the Project Service Status
+        $params.Body.state = ($PropertyChanged.Expected -eq 'Enabled') ? 1 : 0
+
+        Set-ProjectServiceStatus @params
 
     }
 
