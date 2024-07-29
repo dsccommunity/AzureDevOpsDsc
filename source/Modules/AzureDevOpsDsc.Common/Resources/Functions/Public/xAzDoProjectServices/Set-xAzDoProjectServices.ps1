@@ -1,4 +1,4 @@
-Function Set-xAzDevOpsProjectServices {
+Function Set-xAzDoProjectServices {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]

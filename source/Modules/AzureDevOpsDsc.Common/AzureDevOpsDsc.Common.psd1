@@ -76,8 +76,12 @@
         'Get-xAzDoGroupPermission',
         'New-xAzDoGroupPermission',
         'Remove-xAzDoGroupPermission',
-        'Set-xAzDoGroupPermission'
+        'Set-xAzDoGroupPermission',
 
+        'Get-xAzDoProjectServices',
+        'Set-xAzDoProjectServices',
+        'Test-xAzDoProjectServices',
+        'Remove-xAzDoProjectServices'
 
     )
 
