@@ -1,8 +1,7 @@
 
-function Get-AzDevOpsProject
+function Get-xAzDoProject
 {
     [CmdletBinding()]
-    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
         [Parameter()]
@@ -27,9 +26,18 @@ function Get-AzDevOpsProject
 
         [Parameter()]
         [ValidateSet('Public', 'Private')]
-        [System.String]$Visibility = 'Private'
+        [System.String]$Visibility = 'Private',
+
+        [Parameter()]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure
+
 
     )
+
+    Write-Verbose "[Get-AzDevOpsProject] Started."
 
     # Set the organization name
     $OrganizationName = $Global:DSCAZDO_OrganizationName
@@ -37,7 +45,6 @@ function Get-AzDevOpsProject
     #
     # Construct a hashtable detailing the group
     $result = @{
-        #Reasons = $()
         Ensure              = [Ensure]::Absent
         ProjectName         = $ProjectName
         ProjectDescription  = $ProjectDescription
@@ -51,7 +58,7 @@ function Get-AzDevOpsProject
     #
     # Perform a lookup to see if the group exists in Azure DevOps
     $project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
-    $processTemplate = Get-CacheItem -Key $ProcessTemplate -Type 'LiveProcesses'
+    $processTemplateObj = Get-CacheItem -Key $ProcessTemplate -Type 'LiveProcesses'
 
     # Test if the project exists. If the project does not exist, return NotFound
     if (($null -eq $project) -and ($null -ne $ProjectName))
@@ -61,9 +68,9 @@ function Get-AzDevOpsProject
     }
 
     # Test if the process template exists. If the process template does not exist. Throw an error.
-    if ($null -eq $processTemplate)
+    if ($null -eq $processTemplateObj)
     {
-        throw "[Get-AzDevOpsProject] Process template '$ProcessTemplate' not found."
+        throw "[Get-AzDevOpsProject] Process template '$processTemplateObj' not found."
     }
 
     # Test if the project is using the same source control type. If the source control type is different, return a conflict.

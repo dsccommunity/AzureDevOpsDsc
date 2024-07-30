@@ -3,7 +3,7 @@
     This class represents an Azure DevOps project.
 
 .DESCRIPTION
-    The xAzDevOpsProject class is used to define and manage Azure DevOps projects. It inherits from the AzDevOpsDscResourceBase class.
+    The xAzDoProject class is used to define and manage Azure DevOps projects. It inherits from the AzDevOpsDscResourceBase class.
 
 .NOTES
     Author: Your Name
@@ -34,7 +34,7 @@
     None
 
 .EXAMPLE
-    $project = [xAzDevOpsProject]::Get()
+    $project = [xAzDoProject]::Get()
     $project.ProjectName = 'MyProject'
     $project.ProjectDescription = 'This is a sample project'
     $project.SourceControlType = 'Git'
@@ -46,7 +46,7 @@
 
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
-class xAzDevOpsProject : AzDevOpsDscResourceBase
+class xAzDoProject : AzDevOpsDscResourceBase
 {
     [DscProperty(Key, Mandatory)]
     [Alias('Name')]
@@ -68,9 +68,14 @@ class xAzDevOpsProject : AzDevOpsDscResourceBase
     [ValidateSet('Public', 'Private')]
     [System.String]$Visibility = 'Private'
 
-    [xAzDevOpsProject] Get()
+    xAzDoProject()
     {
-        return [xAzDevOpsProject]$($this.GetDscCurrentStateProperties())
+        $this.Construct()
+    }
+
+    [xAzDoProject] Get()
+    {
+        return [xAzDoProject]$($this.GetDscCurrentStateProperties())
     }
 
 
@@ -85,22 +90,21 @@ class xAzDevOpsProject : AzDevOpsDscResourceBase
             Ensure = [Ensure]::Absent
         }
 
-        if ($null -ne $CurrentResourceObject)
-        {
-            if (![System.String]::IsNullOrWhiteSpace($CurrentResourceObject.id))
-            {
-                $properties.Ensure = [Ensure]::Present
-            }
+        # If the resource object is null, return the properties
+        if ($null -eq $CurrentResourceObject) { return $properties }
 
-            $properties.ProjectName         = $CurrentResourceObject.ProjectName
-            $properties.ProjectDescription  = $CurrentResourceObject.ProjectDescription
-            $properties.SourceControlType   = $CurrentResourceObject.SourceControlType
-            $properties.ProcessTemplate     = $CurrentResourceObject.ProcessTemplate
-            $properties.Visibility          = $CurrentResourceObject.Visibility
+        $properties.ProjectName         = $CurrentResourceObject.ProjectName
+        $properties.ProjectDescription  = $CurrentResourceObject.ProjectDescription
+        $properties.SourceControlType   = $CurrentResourceObject.SourceControlType
+        $properties.ProcessTemplate     = $CurrentResourceObject.ProcessTemplate
+        $properties.Visibility          = $CurrentResourceObject.Visibility
+        $properties.LookupResult        = $CurrentResourceObject.LookupResult
+        $properties.Ensure              = $CurrentResourceObject.Ensure
 
-        }
+        Write-Verbose "[xAzDoGroupPermission] Current state properties: $($properties | Out-String)"
 
         return $properties
+
     }
 
 }

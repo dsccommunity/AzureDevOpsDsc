@@ -54,9 +54,10 @@ function New-DevOpsProject
         [Parameter()]
         [System.String]$Visibility,
 
+        # Get the latest API version. 7.1 is not supported by the API endpoint.
         [Parameter()]
         [String]
-        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+        $ApiVersion = $(Get-AzDevOpsApiVersion | Select-Object -Last 1)
 
     )
 
@@ -65,7 +66,7 @@ function New-DevOpsProject
         Method           = "POST"
         Body             = @{
             name         = $ProjectName
-            description  = $Description
+            description  = $ProjectDescription
             visibility   = $Visibility
             capabilities = @{
                 versioncontrol = @{
@@ -82,6 +83,11 @@ function New-DevOpsProject
     {
         # Invoke the Azure DevOps REST API to create the project
         $response = Invoke-AzDevOpsApiRestMethod @params
+
+        if ($null -eq $response) {
+            Throw "[New-DevOpsProject] Failed to create the Azure DevOps project: No response returned"
+        }
+
         # Output the response which contains the created project details
         return $response
     } catch

@@ -1,7 +1,6 @@
-function Remove-AzDevOpsProject
+function Remove-xAzDoProject
 {
     [CmdletBinding()]
-    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
         [Parameter()]
@@ -26,7 +25,17 @@ function Remove-AzDevOpsProject
 
         [Parameter()]
         [ValidateSet('Public', 'Private')]
-        [System.String]$Visibility = 'Private'
+        [System.String]$Visibility = 'Private',
+
+        [Parameter()]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 

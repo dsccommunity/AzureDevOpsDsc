@@ -22,10 +22,9 @@
     Date:   Current Date
 #>
 
-Function Wait-DevOpsProject
-{
+Function Wait-DevOpsProject {
+    [CmdletBinding()]
     param(
-
         [Parameter(Mandatory = $true)]
         [string]$OrganizationName,
 
@@ -38,26 +37,27 @@ Function Wait-DevOpsProject
     )
 
     $params = @{
-        Uri              = "{0}?api-version={1}" -f $ProjectId, $ApiVersion
-        Method           = "GET"
+        Uri    = "{0}?api-version={1}" -f $ProjectURL, $ApiVersion
+        Method = "GET"
     }
+
+    Write-Verbose "[Wait-DevOpsProject] URI: $($params.URI)"
 
     # Loop until the project is created
     $counter = 0
-    do
-    {
-
+    do {
+        Write-Verbose "[Wait-DevOpsProject] Sending request to check project status..."
         $response = Invoke-AzDevOpsApiRestMethod @params
         $project = $response
 
         # Check the status of the project
         switch ($response.status) {
             'creating' {
-                Write-Verbose "[Wait-DevOpsProject] Waiting for project to be created..."
+                Write-Verbose "[Wait-DevOpsProject] Project is still being created..."
                 Start-Sleep -Seconds 5
             }
             'wellFormed' {
-                Write-Verbose "[Wait-DevOpsProject] Project has been created"
+                Write-Verbose "[Wait-DevOpsProject] Project has been created successfully."
                 break
             }
             'failed' {
@@ -65,12 +65,12 @@ Function Wait-DevOpsProject
                 break
             }
             'notSet' {
-                Write-Error "[Wait-DevOpsProject] Project creation failed: $response"
+                Write-Error "[Wait-DevOpsProject] Project creation status is not set: $response"
                 break
             }
             default {
                 # Still creating
-                Write-Verbose "[Wait-DevOpsProject] Waiting for project to be created..."
+                Write-Verbose "[Wait-DevOpsProject] Project is still being created (default case)..."
                 Start-Sleep -Seconds 5
             }
         }
@@ -78,6 +78,9 @@ Function Wait-DevOpsProject
         # Increment the counter
         $counter++
 
-    } while ($counter -ne 10)
+    } while ($counter -lt 10)
 
+    if ($counter -ge 10) {
+        Write-Error "[Wait-DevOpsProject] Timed out waiting for project to be created."
+    }
 }

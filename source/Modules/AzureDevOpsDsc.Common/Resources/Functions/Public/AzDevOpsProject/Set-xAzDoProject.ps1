@@ -1,7 +1,6 @@
-function Set-AzDevOpsProject
+function Set-xAzDoProject
 {
     [CmdletBinding()]
-    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
         [Parameter()]
@@ -26,7 +25,17 @@ function Set-AzDevOpsProject
 
         [Parameter()]
         [ValidateSet('Public', 'Private')]
-        [System.String]$Visibility = 'Private'
+        [System.String]$Visibility = 'Private',
+
+        [Parameter()]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 
@@ -35,7 +44,7 @@ function Set-AzDevOpsProject
     #
     # Perform a lookup to see if the group exists in Azure DevOps
     $project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
-    $processTemplate = Get-CacheItem -Key $ProcessTemplate -Type 'LiveProcesses'
+    $processTemplateObj = Get-CacheItem -Key $ProcessTemplate -Type 'LiveProcesses'
 
     #
     # Construct the parameters for the API call
@@ -43,7 +52,7 @@ function Set-AzDevOpsProject
         organization = $OrganizationName
         projectId  = $project.id
         description  = $ProjectDescription
-        processTemplateId = $processTemplate.id
+        processTemplateId = $processTemplateObj.id
         visibility = $Visibility
     }
 
@@ -55,7 +64,7 @@ function Set-AzDevOpsProject
     #
     # Wait for the project to be updated
 
-    Wait-DevOpsProject -ProjectURL $projectJob.url -Organization $OrganizationName
+    Wait-DevOpsProject -ProjectURL $projectJob.url -OrganizationName $OrganizationName
 
     #
     # Once the project has been created, refresh the project cache.

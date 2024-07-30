@@ -1,7 +1,6 @@
-function Test-AzDevOpsProject
+function Test-xAzDoProject
 {
     [CmdletBinding()]
-    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
         [Parameter()]
@@ -26,7 +25,17 @@ function Test-AzDevOpsProject
 
         [Parameter()]
         [ValidateSet('Public', 'Private')]
-        [System.String]$Visibility = 'Private'
+        [System.String]$Visibility = 'Private',
+
+        [Parameter()]
+        [PSCustomObject]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
 
     )
 

@@ -40,11 +40,11 @@
 
         #
         # DSC Class Based Resources
-        'Get-AzDevOpsProject',
-        'New-AzDevOpsProject',
-        'Set-AzDevOpsProject',
-        'Remove-AzDevOpsProject',
-        'Test-AzDevOpsProject',
+        'Get-xAzDoProject',
+        'New-xAzDoProject',
+        'Set-xAzDoProject',
+        'Remove-xAzDoProject',
+        'Test-xAzDoProject',
 
         'Get-xAzDoProjectGroup',
         'New-xAzDoProjectGroup',
