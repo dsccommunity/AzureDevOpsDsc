@@ -1,25 +1,49 @@
 <#
-    .SYNOPSIS
-        A DSC Resource for Azure DevOps that represents the 'Project' resource.
+.SYNOPSIS
+    This class represents an Azure DevOps project.
 
-    .DESCRIPTION
-        A DSC Resource for Azure DevOps that represents the 'Project' resource.
+.DESCRIPTION
+    The xAzDevOpsProject class is used to define and manage Azure DevOps projects. It inherits from the AzDevOpsDscResourceBase class.
 
-    .PARAMETER ProjectId
-        The 'Id' of the Azure DevOps, 'Project' resource.
+.NOTES
+    Author: Your Name
+    Date:   Current Date
 
-    .PARAMETER ProjectName
-        The 'Name' of the Azure DevOps, 'Project' resource.
+.LINK
+    GitHub Repository: <link to the GitHub repository>
 
-    .PARAMETER ProjectDescription
-        The 'Description' of the Azure DevOps, 'Project' resource.
+.PARAMETER ProjectName
+    The name of the Azure DevOps project.
 
-    .PARAMETER SourceControlType
-        The 'SourceControlType' of the Azure DevOps, 'Project' resource.
+.PARAMETER ProjectDescription
+    The description of the Azure DevOps project.
 
-        If the 'Project' resource already exists in Azure DevOps, the parameter
-        `SourceControlType` cannot be used to change to another type.
+.PARAMETER SourceControlType
+    The type of source control for the project. Valid values are 'Git' and 'Tfvc'.
+
+.PARAMETER ProcessTemplate
+    The process template for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'.
+
+.PARAMETER Visibility
+    The visibility of the project. Valid values are 'Public' and 'Private'.
+
+.INPUTS
+    None
+
+.OUTPUTS
+    None
+
+.EXAMPLE
+    $project = [xAzDevOpsProject]::Get()
+    $project.ProjectName = 'MyProject'
+    $project.ProjectDescription = 'This is a sample project'
+    $project.SourceControlType = 'Git'
+    $project.ProcessTemplate = 'Agile'
+    $project.Visibility = 'Private'
+    $project | Set-AzDevOpsProject
+
 #>
+
 [DscResource()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
 class xAzDevOpsProject : AzDevOpsDscResourceBase
