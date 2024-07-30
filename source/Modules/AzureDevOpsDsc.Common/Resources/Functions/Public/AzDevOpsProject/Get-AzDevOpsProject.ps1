@@ -1,48 +1,4 @@
-<#
-    .SYNOPSIS
-        Returns an Azure DevOps 'Project' as identified by the 'ProjectId' and/or 'ProjectName' provided.
 
-    .PARAMETER ApiUri
-        The URI of the Azure DevOps API to be connected to. For example:
-
-          https://dev.azure.com/someOrganizationName/_apis/
-
-    .PARAMETER Pat
-        The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
-        against the Azure DevOps API. This PAT must have the relevant permissions assigned
-        for the subsequent operations being performed.
-
-    .PARAMETER ProjectId
-        The 'id' of the 'Project' being obtained/requested.
-
-    .PARAMETER ProjectName
-        The 'name' of the 'Project' being obtained/requested. Wildcards (e.g. '*') are allowed.
-
-    .EXAMPLE
-        Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere'
-
-        Returns all the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps.
-
-    .EXAMPLE
-        Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectName '*'
-
-        Returns all the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps.
-
-    .EXAMPLE
-        Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectId 'YourProjectIdHere'
-
-        Returns the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectId' value provided.
-
-    .EXAMPLE
-        Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectName 'YourProjectNameHere'
-
-        Returns the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectName' value provided.
-
-    .EXAMPLE
-        Get-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' -ProjectId 'YourProjectIdHere' -ProjectName 'YourProjectNameHere'
-
-        Returns the 'Project' resources (assocated with the Organization/ApiUrl) from Azure DevOps related to the 'ProjectId' and 'ProjectName' value provided.
-#>
 function Get-AzDevOpsProject
 {
     [CmdletBinding()]
@@ -63,51 +19,83 @@ function Get-AzDevOpsProject
         [Parameter()]
         [ValidateSet('Git','Tfvc')]
         [System.String]
-        $SourceControlType = 'Git'
+        $SourceControlType = 'Git',
+
+        [Parameter()]
+        [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
+        [System.String]$ProcessTemplate = 'Agile',
+
+        [Parameter()]
+        [ValidateSet('Public', 'Private')]
+        [System.String]$Visibility = 'Private'
 
     )
 
-
+    # Set the organization name
     $OrganizationName = $Global:DSCAZDO_OrganizationName
 
     #
     # Construct a hashtable detailing the group
-    $getGroupResult = @{
+    $result = @{
         #Reasons = $()
-        Ensure = [Ensure]::Absent
-        ProjectName = $ProjectName
-        ProjectDescription = $ProjectDescription
-        SourceControlType = $SourceControlType
-        propertiesChanged = @()
-        status = $null
+        Ensure              = [Ensure]::Absent
+        ProjectName         = $ProjectName
+        ProjectDescription  = $ProjectDescription
+        SourceControlType   = $SourceControlType
+        ProcessTemplate     = $ProcessTemplate
+        Visibility          = $Visibility
+        propertiesChanged   = @()
+        status              = $null
     }
 
     #
-    # Check the cache for the group
-    $group = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+    # Perform a lookup to see if the group exists in Azure DevOps
+    $project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+    $processTemplate = Get-CacheItem -Key $ProcessTemplate -Type 'LiveProcesses'
 
-    #
-    # Test if the group is not in the cache
-    if ($null -eq $group)
+    # Test if the project exists. If the project does not exist, return NotFound
+    if (($null -eq $project) -and ($null -ne $ProjectName))
     {
-        $getGroupResult.Status = [DSCGetSummaryState]::NotFound
-        return $getGroupResult
+        $result.Status = [DSCGetSummaryState]::NotFound
+        return $result
     }
 
-    #
-    # Test if the group description has changed
-
-    if ($group.Description -ne $ProjectDescription)
+    # Test if the process template exists. If the process template does not exist. Throw an error.
+    if ($null -eq $processTemplate)
     {
-        $getGroupResult.Status = [DSCGetSummaryState]::Changed
-        $getGroupResult.propertiesChanged += 'description'
-        return $getGroupResult
+        throw "[Get-AzDevOpsProject] Process template '$ProcessTemplate' not found."
     }
 
-    $getGroupResult.status = [DSCGetSummaryState]::Unchanged
+    # Test if the project is using the same source control type. If the source control type is different, return a conflict.
+    if ($SourceControlType -ne $project.SourceControlType)
+    {
+        Write-Warning "[Get-AzDevOpsProject] Source control type is different. Current: $($project.SourceControlType), Desired: $SourceControlType"
+        Write-Warning "[Get-AzDevOpsProject] Source control type cannot be changed. Please delete the project and recreate it."
+    }
+
+    # Test if the project is using the same process template. If the process template is different, return a conflict.
+    if ($Description -ne $project.Description)
+    {
+        $result.Status = [DSCGetSummaryState]::Changed
+        $result.propertiesChanged += 'Description'
+    }
+
+    # Test if the project is using the same process template. If the process template is different, return a conflict.
+    if ($ProcessTemplate -ne $project.ProcessTemplate)
+    {
+        $result.Status = [DSCGetSummaryState]::Changed
+        $result.propertiesChanged += 'ProcessTemplate'
+    }
+
+    # Test if the project visaibility is the same. If the visibility is different, return a conflict.
+    if ($Visibility -ne $project.Visibility)
+    {
+        $result.Status = [DSCGetSummaryState]::Changed
+        $result.propertiesChanged += 'Visibility'
+    }
 
     #
     # Return the group from the cache
-    return ([PSCustomObject]$getGroupResult)
+    return ([PSCustomObject]$result)
 
 }

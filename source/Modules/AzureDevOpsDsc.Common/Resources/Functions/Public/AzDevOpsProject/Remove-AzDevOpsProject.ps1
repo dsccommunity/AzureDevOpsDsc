@@ -1,65 +1,47 @@
-<#
-    .SYNOPSIS
-        Removes/deletes a Azure DevOps 'Project' with the provided 'ProjectId'.
-
-    .PARAMETER ApiUri
-        The URI of the Azure DevOps API to be connected to. For example:
-
-          https://dev.azure.com/someOrganizationName/_apis/
-
-    .PARAMETER Pat
-        The 'Personal Access Token' (PAT) to be used by any subsequent requests/operations
-        against the Azure DevOps API. This PAT must have the relevant permissions assigned
-        for the subsequent operations being performed.
-
-    .PARAMETER ProjectId
-        The 'id' of the 'Project' being deleted.
-
-    .PARAMETER Force
-        When this switch is used, any confirmation will be overidden/ignored.
-
-    .EXAMPLE
-        New-AzDevOpsProject -ApiUri 'YourApiUriHere' -Pat 'YourPatHere' `
-                            -ProjectName 'YourProjectNameHere' `
-                            -ProjectDescription 'YourProjectDescriptionHere' -SourceControlType 'Git'
-
-        Creates a 'Project' (assocated with the Organization/ApiUrl) in Azure DevOps using project-related, parameter values provided.
-#>
 function Remove-AzDevOpsProject
 {
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
-    [OutputType([System.Object])]
+    [CmdletBinding()]
+    [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
-        [Parameter(Mandatory = $true)]
-        [ValidateScript( { Test-AzDevOpsApiUri -ApiUri $_ -IsValid })]
-        [Alias('Uri')]
+        [Parameter()]
+        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid -AllowWildcard })]
+        [Alias('Name')]
         [System.String]
-        $ApiUri,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [Alias('PersonalAccessToken')]
-        [System.String]
-        $Pat,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateScript({ Test-AzDevOpsProjectId -ProjectId $_ -IsValid })]
-        [Alias('ResourceId','Id')]
-        [System.String]
-        $ProjectId,
+        $ProjectName,
 
         [Parameter()]
-        [System.Management.Automation.SwitchParameter]
-        $Force
+        [Alias('Description')]
+        [System.String]
+        $ProjectDescription,
+
+        [Parameter()]
+        [ValidateSet('Git','Tfvc')]
+        [System.String]
+        $SourceControlType = 'Git',
+
+        [Parameter()]
+        [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
+        [System.String]$ProcessTemplate = 'Agile',
+
+        [Parameter()]
+        [ValidateSet('Public', 'Private')]
+        [System.String]$Visibility = 'Private'
+
     )
 
-    if ($Force -or $PSCmdlet.ShouldProcess($ApiUri, $ResourceName))
-    {
-        Remove-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
-                                   -ResourceName 'Project' `
-                                   -ResourceId $ProjectId `
-                                   -Force:$Force -Wait | Out-Null
+    # Set the organization name
+    $OrganizationName = $Global:DSCAZDO_OrganizationName
 
-    }
+    #
+    # Perform a lookup to see if the group exists in Azure DevOps
+    $project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+
+    # Remove the project
+    Remove-DevOpsProject -Organization $OrganizationName -ProjectId $project.id
+
+    # Remove the project from the cache and export the cache
+    Remove-CacheItem -Key $ProjectName -Type 'LiveProjects'
+    Export-CacheObject -CacheType 'LiveProjects' -Content $AzDoLiveProjects
+
 }

@@ -29,70 +29,66 @@ Update-DevOpsProject -Organization "contoso" -ProjectId "MyProject" -NewName "Ne
 This example updates the project named "MyProject" in the "contoso" organization. It changes the project name to "NewProjectName", updates the description, sets the visibility to "public", and uses the specified personal access token for authentication.
 
 #>
-function Update-DevOpsProject {
+function Update-DevOpsProject
+{
     [CmdletBinding()]
     param (
-        # The name or ID of the Azure DevOps organization
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$Organization,
 
-        # The ID or name of the project to update
-        [Parameter(Mandatory)]
-        [string]$ProjectId, # Project ID or name
+        [Parameter()]
+        [Alias('Name')]
+        [System.String]
+        $ProjectId,
 
-        # The new name for the project
-        [Parameter(Mandatory = $false)]
-        [string]$NewName,
+        [Parameter()]
+        [Alias('Description')]
+        [System.String]
+        $ProjectDescription,
 
-        # The new description for the project
-        [Parameter(Mandatory = $false)]
-        [string]$Description,
+        [Parameter()]
+        [System.String]$ProcessTemplateId,
 
-        # The visibility of the project
-        [Parameter(Mandatory = $false)]
-        [ValidateSet('private', 'public')]
-        [string]$Visibility = 'private',
+        [Parameter()]
+        [System.String]$Visibility
 
-        # The personal access token (PAT) used for authentication
-        [Parameter(Mandatory = $false)]
-        [ValidateScript({ Test-AzDevOpsPat -Pat $_ -IsValid })]
-        [string]$PersonalAccessToken
     )
 
     Write-Verbose "[Update-DevOpsProject] Updating project '$ProjectId' in organization '$Organization'"
 
-    $body = @{}
-
-    if ($PSBoundParameters.ContainsKey('NewName')) {
-        $body.name = $NewName
+    # Construct the body of the request
+    $body = @{
+        name = $ProjectName
+        visibility = $Visibility
+        capabilities = @{
+            processTemplate = @{
+                templateTypeId = $ProcessTemplateId
+            }
+        }
     }
 
-    if ($PSBoundParameters.ContainsKey('Description')) {
-        $body.description = $Description
-    }
-
-    if ($PSBoundParameters.ContainsKey('Visibility')) {
-        $body.visibility = $Visibility
+    # Add the description if provided
+    if ($ProjectDescription)
+    {
+        $body.description = $ProjectDescription
     }
 
     # Construct the Paramters for the Invoke-AzDevOpsApiRestMethod function
     $params = @{
         Uri = "https://dev.azure.com/$Organization/_apis/projects/$ProjectId?api-version=7.2-preview.1"
         Body = $body | ConvertTo-Json
-        Method = 'Patch'
+        Method = 'PATCH'
         Headers = @{
             'Content-Type' = 'application/json'
         }
     }
 
-    # Only add Authorization header if Personal Access Token is provided
-    if ($PersonalAccessToken) {
-        $params.headers.Authorization = "Basic {0}" -f (ConvertTo-Base64String -InputObject ":$($PersonalAccessToken)")
-    }
-
-    try {
+    # Invoke the Azure DevOps REST API to update the project
+    try
+    {
         $response = Invoke-AvDevOpsApiRestMethod @params
-    } catch {
+    } catch
+    {
         Write-Error "Failed to update the Azure DevOps project: $_"
     }
 

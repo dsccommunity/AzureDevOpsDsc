@@ -34,8 +34,15 @@ class xAzDevOpsProject : AzDevOpsDscResourceBase
 
     [DscProperty()]
     [ValidateSet('Git', 'Tfvc')]
-    [System.String]$SourceControlType
+    [System.String]$SourceControlType = 'Git'
 
+    [DscProperty()]
+    [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
+    [System.String]$ProcessTemplate = 'Agile'
+
+    [DscProperty()]
+    [ValidateSet('Public', 'Private')]
+    [System.String]$Visibility = 'Private'
 
     [xAzDevOpsProject] Get()
     {
@@ -51,8 +58,6 @@ class xAzDevOpsProject : AzDevOpsDscResourceBase
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
     {
         $properties = @{
-            Pat = $this.Pat
-            ApiUri = $this.ApiUri
             Ensure = [Ensure]::Absent
         }
 
@@ -62,9 +67,13 @@ class xAzDevOpsProject : AzDevOpsDscResourceBase
             {
                 $properties.Ensure = [Ensure]::Present
             }
-            $properties.ProjectName = $CurrentResourceObject.name
-            $properties.ProjectDescription = $CurrentResourceObject.description
-            $properties.SourceControlType = $CurrentResourceObject.capabilities.versioncontrol.sourceControlType
+
+            $properties.ProjectName         = $CurrentResourceObject.ProjectName
+            $properties.ProjectDescription  = $CurrentResourceObject.ProjectDescription
+            $properties.SourceControlType   = $CurrentResourceObject.SourceControlType
+            $properties.ProcessTemplate     = $CurrentResourceObject.ProcessTemplate
+            $properties.Visibility          = $CurrentResourceObject.Visibility
+
         }
 
         return $properties

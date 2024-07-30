@@ -26,53 +26,67 @@ New-DevOpsProject -Organization "myorg" -ProjectName "MyProject" -Description "T
 This example creates a new private Azure DevOps project named "MyProject" with the description "This is a new project" in the organization "myorg" using the specified personal access token.
 
 #>
-function New-DevOpsProject {
+function New-DevOpsProject
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
         [string]$Organization,
 
-        [Parameter(Mandatory = $true)]
-        [string]$ProjectName,
+        [Parameter()]
+        [ValidateScript({ Test-AzDevOpsProjectName -ProjectName $_ -IsValid -AllowWildcard })]
+        [Alias('Name')]
+        [System.String]
+        $ProjectName,
 
-        [Parameter(Mandatory = $true)]
-        [string]$Description,
+        [Parameter()]
+        [Alias('Description')]
+        [System.String]
+        $ProjectDescription,
 
-        [Parameter(Mandatory = $true)]
-        [string]$Visibility, # "private" or "public"
+        [Parameter()]
+        [System.String]
+        $SourceControlType,
 
-        [Parameter(Mandatory = $true)]
-        [string]$PersonalAccessToken
+        [Parameter()]
+        [System.String]$ProcessTemplateId,
+
+        [Parameter()]
+        [System.String]$Visibility,
+
+        [Parameter()]
+        [String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+
     )
 
     $params = @{
         Uri              = "https://dev.azure.com/{0}/_apis/projects?api-version={1}" -f $Organization, $ApiVersion
-        Method           = "Post"
+        Method           = "POST"
         Body             = @{
             name         = $ProjectName
             description  = $Description
             visibility   = $Visibility
             capabilities = @{
                 versioncontrol = @{
-                    sourceControlType = "Git"
+                    sourceControlType = $SourceControlType
                 }
                 processTemplate = @{
-                    templateTypeId = "6b724908-ef14-45cf-84f8-768b5384da45" # This is the ID for the Agile process template
+                    templateTypeId = $ProcessTemplateId
                 }
             }
         } | ConvertTo-Json
     }
 
-
-    try {
-
+    try
+    {
         # Invoke the Azure DevOps REST API to create the project
         $response = Invoke-AzDevOpsApiRestMethod @params
         # Output the response which contains the created project details
         return $response
-
-    } catch {
-        Write-Error "Failed to create the Azure DevOps project: $_"
+    } catch
+    {
+        Write-Error "[New-DevOpsProject] Failed to create the Azure DevOps project: $_"
     }
 
 }

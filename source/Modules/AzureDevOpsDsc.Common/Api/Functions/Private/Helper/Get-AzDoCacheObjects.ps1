@@ -12,6 +12,7 @@ function Get-AzDoCacheObjects
         'LiveRepositories',
         'LiveServicePrinciples',
         'LiveACLList',
+        'LiveProcesses',
         'SecurityNamespaces'
     )
 
