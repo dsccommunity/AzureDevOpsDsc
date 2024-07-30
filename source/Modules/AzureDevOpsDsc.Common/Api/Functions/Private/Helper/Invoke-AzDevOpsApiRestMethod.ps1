@@ -170,6 +170,7 @@ function Invoke-AzDevOpsApiRestMethod
                 # Invoke the REST method. If the 'Verbose' switch is present, set it to $false.
                 # This is to prevent the output from being displayed in the console.
                 $response = Invoke-RestMethod @invokeRestMethodParameters -Verbose:$false
+
                 # Zero out the 'Authorization' header
                 $invokeRestMethodParameters.Headers.Authorization = $null
                 # Add the response to the results array

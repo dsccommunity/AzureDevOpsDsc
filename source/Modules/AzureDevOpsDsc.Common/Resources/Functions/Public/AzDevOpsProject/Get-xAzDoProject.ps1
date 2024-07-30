@@ -103,6 +103,6 @@ function Get-xAzDoProject
 
     #
     # Return the group from the cache
-    return ([PSCustomObject]$result)
+    return $result
 
 }

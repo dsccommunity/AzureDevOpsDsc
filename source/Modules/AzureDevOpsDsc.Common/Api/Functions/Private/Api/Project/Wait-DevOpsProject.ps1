@@ -33,7 +33,7 @@ Function Wait-DevOpsProject {
 
         [Parameter()]
         [String]
-        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+        $ApiVersion = $(Get-AzDevOpsApiVersion | Select-Object -Last 1)
     )
 
     $params = @{

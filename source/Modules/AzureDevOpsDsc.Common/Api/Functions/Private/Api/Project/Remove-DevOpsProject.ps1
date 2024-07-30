@@ -32,15 +32,19 @@ function Remove-DevOpsProject
 
         [Parameter()]
         [String]
-        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
+        $ApiVersion = $(Get-AzDevOpsApiVersion | Select-Object -Last 1)
 
     )
+
+    Write-Verbose "[Remove-DevOpsProject] Started."
 
     # Define the API version to use
     $params = @{
         Uri              = "https://dev.azure.com/{0}/_apis/projects/{1}?api-version={2}" -f $Organization, $ProjectId, $ApiVersion
         Method           = "DELETE"
     }
+
+    Write-Verbose "[Remove-DevOpsProject] Removing project $ProjectId from Azure DevOps organization $Organization"
 
     try
     {

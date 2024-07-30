@@ -50,7 +50,11 @@ function Update-DevOpsProject
         [System.String]$ProcessTemplateId,
 
         [Parameter()]
-        [System.String]$Visibility
+        [System.String]$Visibility,
+
+        [Parameter()]
+        [String]
+        $ApiVersion = $(Get-AzDevOpsApiVersion | Select-Object -Last 1)
 
     )
 
@@ -75,7 +79,7 @@ function Update-DevOpsProject
 
     # Construct the Paramters for the Invoke-AzDevOpsApiRestMethod function
     $params = @{
-        Uri = "https://dev.azure.com/$Organization/_apis/projects/$ProjectId?api-version=7.2-preview.1"
+        Uri = "https://dev.azure.com/$Organization/_apis/projects/$ProjectId?api-version=$ApiVersion"
         Body = $body | ConvertTo-Json
         Method = 'PATCH'
         Headers = @{
