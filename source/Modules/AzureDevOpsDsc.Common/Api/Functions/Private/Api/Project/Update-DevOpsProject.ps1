@@ -47,6 +47,11 @@ function Update-DevOpsProject
         $ProjectDescription,
 
         [Parameter()]
+        [Alias('Abbreviation')]
+        [System.String]
+        $ProjectAbbreviation,
+
+        [Parameter()]
         [System.String]$ProcessTemplateId,
 
         [Parameter()]
@@ -64,11 +69,14 @@ function Update-DevOpsProject
     $body = @{
         name = $ProjectName
         visibility = $Visibility
+        <#
+        TODO: ISSUE with updating the ProcessTemplateId.
         capabilities = @{
             processTemplate = @{
                 templateTypeId = $ProcessTemplateId
             }
         }
+        #>
     }
 
     # Add the description if provided
@@ -77,20 +85,23 @@ function Update-DevOpsProject
         $body.description = $ProjectDescription
     }
 
+    # Add the abbreviation if provided
+    if ($ProjectAbbreviation)
+    {
+        $body.abbreviation = $ProjectAbbreviation
+    }
+
     # Construct the Paramters for the Invoke-AzDevOpsApiRestMethod function
     $params = @{
-        Uri = "https://dev.azure.com/$Organization/_apis/projects/$ProjectId?api-version=$ApiVersion"
+        Uri = "https://dev.azure.com/{0}/_apis/projects/{1}?api-version={2}" -f $Organization, $ProjectId, $ApiVersion
         Body = $body | ConvertTo-Json
         Method = 'PATCH'
-        Headers = @{
-            'Content-Type' = 'application/json'
-        }
     }
 
     # Invoke the Azure DevOps REST API to update the project
     try
     {
-        $response = Invoke-AvDevOpsApiRestMethod @params
+        $response = Invoke-AzDevOpsApiRestMethod @params
     } catch
     {
         Write-Error "Failed to update the Azure DevOps project: $_"

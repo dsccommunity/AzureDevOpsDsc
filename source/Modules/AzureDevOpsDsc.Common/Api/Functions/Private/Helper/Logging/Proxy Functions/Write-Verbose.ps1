@@ -10,7 +10,7 @@ Function Write-Verbose {
 
     # Call the original Write-Verbose cmdlet to display the message if verbose preference is enabled
     $originalPreference = $VerbosePreference
-    $VerbosePreference = 'Continue'
+   # $VerbosePreference = 'Continue'
     Microsoft.PowerShell.Utility\Write-Verbose $Message
     $VerbosePreference = $originalPreference
 

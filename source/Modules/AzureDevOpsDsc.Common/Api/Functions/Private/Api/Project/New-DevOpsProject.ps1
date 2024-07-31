@@ -45,6 +45,11 @@ function New-DevOpsProject
         $ProjectDescription,
 
         [Parameter()]
+        [Alias('Abbreviation')]
+        [System.String]
+        $ProjectAbbreviation,
+
+        [Parameter()]
         [System.String]
         $SourceControlType,
 
@@ -61,6 +66,7 @@ function New-DevOpsProject
 
     )
 
+    # Validate the parameters
     $params = @{
         Uri              = "https://dev.azure.com/{0}/_apis/projects?api-version={1}" -f $Organization, $ApiVersion
         Method           = "POST"
@@ -76,8 +82,16 @@ function New-DevOpsProject
                     templateTypeId = $ProcessTemplateId
                 }
             }
-        } | ConvertTo-Json
+        }
     }
+
+    # Add the abbreviation if provided
+    if ($ProjectAbbreviation) {
+        $params.Body.abbreviation = $ProjectAbbreviation
+    }
+
+    # Seralize the Body to JSON
+    $params.Body = $params.Body | ConvertTo-Json
 
     try
     {

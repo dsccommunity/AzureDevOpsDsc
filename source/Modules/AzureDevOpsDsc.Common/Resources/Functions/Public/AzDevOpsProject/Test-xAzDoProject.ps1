@@ -20,6 +20,10 @@ function Test-xAzDoProject
         $SourceControlType = 'Git',
 
         [Parameter()]
+        [System.String]
+        $ProjectAbbreviation,
+
+        [Parameter()]
         [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
         [System.String]$ProcessTemplate = 'Agile',
 

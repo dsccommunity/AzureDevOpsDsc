@@ -16,6 +16,10 @@ function Remove-xAzDoProject
         [System.String] $SourceControlType = 'Git',
 
         [Parameter()]
+        [System.String]
+        $ProjectAbbreviation,
+
+        [Parameter()]
         [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
         [System.String] $ProcessTemplate = 'Agile',
 

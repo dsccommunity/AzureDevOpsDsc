@@ -21,6 +21,10 @@ function Get-xAzDoProject
         $SourceControlType = 'Git',
 
         [Parameter()]
+        [System.String]
+        $ProjectAbbreviation,
+
+        [Parameter()]
         [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
         [System.String]$ProcessTemplate = 'Agile',
 
@@ -51,6 +55,7 @@ function Get-xAzDoProject
         SourceControlType   = $SourceControlType
         ProcessTemplate     = $ProcessTemplate
         Visibility          = $Visibility
+        ProjectAbbreviation = $ProjectAbbreviation
         propertiesChanged   = @()
         status              = $null
     }
@@ -80,19 +85,28 @@ function Get-xAzDoProject
         Write-Warning "[Get-AzDevOpsProject] Source control type cannot be changed. Please delete the project and recreate it."
     }
 
-    # Test if the project is using the same process template. If the process template is different, return a conflict.
+    # Test the if the project is using the same abreivation. If the abbreviation is different, return a conflict.
+    if ($ProjectAbbreviation -ne $project.Abbreviation)
+    {
+        $result.Status = [DSCGetSummaryState]::Changed
+        $result.propertiesChanged += 'Abbreviation'
+    }
+
+    # Test if the project is using the same description. If the description is different, return a conflict.
     if ($Description -ne $project.Description)
     {
         $result.Status = [DSCGetSummaryState]::Changed
         $result.propertiesChanged += 'Description'
     }
 
+    <#
     # Test if the project is using the same process template. If the process template is different, return a conflict.
     if ($ProcessTemplate -ne $project.ProcessTemplate)
     {
         $result.Status = [DSCGetSummaryState]::Changed
         $result.propertiesChanged += 'ProcessTemplate'
     }
+    #>
 
     # Test if the project visaibility is the same. If the visibility is different, return a conflict.
     if ($Visibility -ne $project.Visibility)

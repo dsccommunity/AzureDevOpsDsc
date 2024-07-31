@@ -29,6 +29,7 @@ function Get-AzDevOpsApiVersion
         '6.0',
         '7.0-preview.1',
         '7.1-preview.1',
+        '7.1-preview.4',
         '7.2-preview.4'
 
     )

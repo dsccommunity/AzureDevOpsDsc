@@ -33,11 +33,11 @@ Function Wait-DevOpsProject {
 
         [Parameter()]
         [String]
-        $ApiVersion = $(Get-AzDevOpsApiVersion | Select-Object -Last 1)
+        $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
     $params = @{
-        Uri    = "{0}?api-version={1}" -f $ProjectURL, $ApiVersion
+        Uri    = "{0}" -f $ProjectURL
         Method = "GET"
     }
 
