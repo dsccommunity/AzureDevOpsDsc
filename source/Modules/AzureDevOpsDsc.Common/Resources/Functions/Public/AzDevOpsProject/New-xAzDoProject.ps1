@@ -20,10 +20,6 @@ function New-xAzDoProject
         $SourceControlType = 'Git',
 
         [Parameter()]
-        [System.String]
-        $ProjectAbbreviation,
-
-        [Parameter()]
         [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
         [System.String]$ProcessTemplate = 'Agile',
 
@@ -58,7 +54,6 @@ function New-xAzDoProject
         description  = $ProjectDescription
         sourceControlType = $SourceControlType
         processTemplateId = $processTemplateObj.id
-        ProjectAbbreviation = $ProjectAbbreviation
         visibility = $Visibility
     }
 

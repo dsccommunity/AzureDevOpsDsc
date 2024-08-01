@@ -47,11 +47,6 @@ function Update-DevOpsProject
         $ProjectDescription,
 
         [Parameter()]
-        [Alias('Abbreviation')]
-        [System.String]
-        $ProjectAbbreviation,
-
-        [Parameter()]
         [System.String]$ProcessTemplateId,
 
         [Parameter()]
@@ -83,12 +78,6 @@ function Update-DevOpsProject
     if ($ProjectDescription)
     {
         $body.description = $ProjectDescription
-    }
-
-    # Add the abbreviation if provided
-    if ($ProjectAbbreviation)
-    {
-        $body.abbreviation = $ProjectAbbreviation
     }
 
     # Construct the Paramters for the Invoke-AzDevOpsApiRestMethod function

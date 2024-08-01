@@ -45,11 +45,6 @@ function New-DevOpsProject
         $ProjectDescription,
 
         [Parameter()]
-        [Alias('Abbreviation')]
-        [System.String]
-        $ProjectAbbreviation,
-
-        [Parameter()]
         [System.String]
         $SourceControlType,
 
@@ -83,11 +78,6 @@ function New-DevOpsProject
                 }
             }
         }
-    }
-
-    # Add the abbreviation if provided
-    if ($ProjectAbbreviation) {
-        $params.Body.abbreviation = $ProjectAbbreviation
     }
 
     # Seralize the Body to JSON

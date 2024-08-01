@@ -57,10 +57,6 @@ class xAzDoProject : AzDevOpsDscResourceBase
     [System.String]$ProjectDescription
 
     [DscProperty()]
-    [Alias('Abbreviation')]
-    [System.String]$ProjectAbbreviation
-
-    [DscProperty()]
     [ValidateSet('Git', 'Tfvc')]
     [System.String]$SourceControlType = 'Git'
 
@@ -101,7 +97,6 @@ class xAzDoProject : AzDevOpsDscResourceBase
         $properties.ProjectDescription  = $CurrentResourceObject.ProjectDescription
         $properties.SourceControlType   = $CurrentResourceObject.SourceControlType
         $properties.ProcessTemplate     = $CurrentResourceObject.ProcessTemplate
-        $properties.ProjectAbbreviation = $CurrentResourceObject.ProjectAbbreviation
         $properties.Visibility          = $CurrentResourceObject.Visibility
         $properties.LookupResult        = $CurrentResourceObject.LookupResult
         $properties.Ensure              = $CurrentResourceObject.Ensure
