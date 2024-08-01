@@ -81,7 +81,7 @@ function Get-xAzDoProject
     }
 
     # Test if the project is using the same description. If the description is different, return a conflict.
-    if ($Description -ne $project.description)
+    if ($ProjectDescription.Trim() -ne $project.description.Trim())
     {
         $result.Status = [DSCGetSummaryState]::Changed
         $result.propertiesChanged += 'Description'
