@@ -33,7 +33,7 @@ Function Get-xAzDoGroupMember {
     $Key = Format-AzDoProjectName -GroupName $GroupName -OrganizationName $Global:DSCAZDO_OrganizationName
 
     # Check the cache for the group
-    $livegroupMembers = Get-CacheItem -Key $Key -Type 'LiveGroupMembers'
+    $livegroupMembers = Get-CacheItem -Key $GroupName -Type 'LiveGroupMembers'
 
     Write-Verbose "[Get-xAzDoGroupMember] GroupName: '$GroupName'"
 
@@ -42,8 +42,9 @@ Function Get-xAzDoGroupMember {
     $getGroupResult = @{
         #Reasons = $()
         Ensure = [Ensure]::Absent
-        localCache = $localgroup
-        liveCache = $livegroup
+        groupName = $GroupName
+        reference = $GroupMembers
+        difference = $livegroupMembers
         propertiesChanged = @()
         status = $null
     }

@@ -14,6 +14,11 @@ Function Format-AzDoProjectName {
     # Logging
     Write-Verbose "[Format-AzDoProjectName] Formatting GroupName."
 
+    # If the GroupName contains [Project|Organization]\GroupName, it's in the correct format.
+    if ($GroupName -match '^\[.*\]\\.*$') {
+        return $GroupName
+    }
+
     # Split the group name with a '\' or '/' and create an array.
     $splitGroupName = $GroupName -split '\\|\/'
 
