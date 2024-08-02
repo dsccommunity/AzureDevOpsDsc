@@ -86,8 +86,22 @@ Function Test-ACLListforChanges
     }
 
     #
-    # Test each of the ACLs
+    # Test if the inherited flag is not equal.
 
+    if ($ReferenceACLs.inherited -ne $DifferenceACLs.inherited)
+    {
+        Write-Verbose "[Test-ACLListforChanges] Inherited flag is not equal."
+        $result.status = "Changed"
+        $result.reason += @{
+            Value = $ReferenceACLs
+            Reason = "Inherited flag is not equal."
+        }
+        $result.propertiesChanged = $ReferenceACLs
+        return $result
+    }
+
+    #
+    # Test each of the Reference ACLs
     ForEach ($ReferenceACL in $ReferenceACLs) {
 
         $acl = $DifferenceACLs | Where-Object { $_.Identity.value.originId -eq $ReferenceACL.Identity.value.originId }

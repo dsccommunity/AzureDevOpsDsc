@@ -118,13 +118,14 @@ Function Get-xAzDoGitPermission {
     # Convert the Permissions to an ACL Token
     $ReferenceACLs = ConvertTo-ACL @params | Where-Object { $_.token.Type -ne 'GitUnknown' }
 
-    $DifferenceACLs | Export-CLixml C:\Temp\DifferenceACLs.clixml
-
     # Compare the Reference ACLs to the Difference ACLs
     $compareResult = Test-ACLListforChanges -ReferenceACLs $ReferenceACLs -DifferenceACLs $DifferenceACLs
     $getGroupResult.propertiesChanged = $compareResult.propertiesChanged
     $getGroupResult.status = [DSCGetSummaryState]::"$($compareResult.status)"
     $getGroupResult.reason = $compareResult.reason
+
+    Write-Verbose "[Get-xAzDoGitPermission] ACL Token converted."
+    Write-Verbose "[Get-xAzDoGitPermission] ACL Token Comparison Result: $($getGroupResult.status)"
 
     # Export the ACL List to a file
     $getGroupResult.ReferenceACLs = $ReferenceACLs

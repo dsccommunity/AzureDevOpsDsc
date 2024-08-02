@@ -92,6 +92,9 @@ Function ConvertTo-ACLHashtable {
     )
 
     Write-Verbose "[ConvertTo-ACLHashtable] Started."
+    Write-Verbose "[ConvertTo-ACLHashtable] Reference ACLs: $($ReferenceACLs | ConvertTo-Json -Depth 3)"
+    Write-Verbose "[ConvertTo-ACLHashtable] Descriptor ACL List: $($DescriptorACLList | ConvertTo-Json -Depth 3)"
+    Write-Verbose "[ConvertTo-ACLHashtable] Descriptor Match Token: $DescriptorMatchToken"
 
     # Initialize the ACLs hashtable with a count and a list to hold ACL objects
     Write-Verbose "[ConvertTo-ACLHashtable] Initializing the ACLs hashtable."
@@ -115,9 +118,12 @@ Function ConvertTo-ACLHashtable {
     # Construct the ACLs object from the reference ACLs
     Write-Verbose "[ConvertTo-ACLHashtable] Constructing the ACLs object from the reference ACLs."
 
+    $ReferenceACLs | Export-CLixml C:\Temp\aReferenceACLs.clixml
+
     # Iterate through the ACLs in the ReferenceACLs
     ForEach ($ReferenceACL in $ReferenceACLs) {
         Write-Verbose "[ConvertTo-ACLHashtable] Processing reference ACL."
+        Write-Verbose "[ConvertTo-ACLHashtable] Reference ACL: $($ReferenceACL | ConvertTo-Json -Depth 3)"
 
         # Construct the ACL Object with properties inheritPermissions, token, and acesDictionary
         $ACLObject = [PSCustomObject]@{
