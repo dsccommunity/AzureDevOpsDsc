@@ -52,11 +52,11 @@ Function Remove-DevOpsGroupMember {
         Write-Error "[Remove-DevOpsGroupMember] Failed to add member to group: $($_.Exception.Message)"
     }
 
-    Write-Verbose "[Remove-DevOpsGroupMember] Result $($member | ConvertTo-Json)."
+    #Write-Verbose "[Remove-DevOpsGroupMember] Result $($member | ConvertTo-Json)."
 
     # Return the result of the REST method invocation, which is stored in $member.
-    Write-Verbose "[Remove-DevOpsGroupMember] Returning result from REST method invocation."
-    return $member
+    #Write-Verbose "[Remove-DevOpsGroupMember] Returning result from REST method invocation."
+    #return $member
 
 
 }

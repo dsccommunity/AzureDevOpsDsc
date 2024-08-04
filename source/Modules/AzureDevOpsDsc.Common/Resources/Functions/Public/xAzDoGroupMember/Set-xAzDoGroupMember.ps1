@@ -93,7 +93,11 @@ Function Set-xAzDoGroupMember {
             $result = Remove-DevOpsGroupMember @params -MemberIdentity $identity
 
             # Remove the member from the list
-            $id = 0 .. $LiveGroupMembers.count | Where-Object { $LiveGroupMembers[$_].originId -eq $originId.id }
+
+            Write-Verbose "[Set-xAzDoGroupMember][REMOVE] Removing member '$($identity.displayName)' from the internal list."
+            Write-Verbose "[Set-xAzDoGroupMember][REMOVE] members count: $($members.count)"
+
+            $id = 0 .. $members.count | Where-Object { $members[$_].originId -eq $identity.originId }
             $members.RemoveAt($id)
             Write-Verbose "[Set-xAzDoGroupMember][REMOVE] Member '$($identity.displayName)' removed from the internal list."
 
