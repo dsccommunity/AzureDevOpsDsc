@@ -63,7 +63,10 @@ xAzDoGitPermission/Permissions/Permission
 
 # Common Properties
 
-Ensure: Specifies whether the project should exist. Defaults to 'Absent'.
+- __ProjectName__: The name of the Azure DevOps project.
+- __RepositoryName__: The name of the Git repository within the project.
+- __Permissions__: A HashTable that specifies the permissions to be set. Refer to: 'Permissions Syntax'.
+- __Ensure__: Specifies whether the repository should exist. Defaults to 'Absent'.
 
 # Additional Information
 

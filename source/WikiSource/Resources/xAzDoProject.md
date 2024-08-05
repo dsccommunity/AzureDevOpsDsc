@@ -18,11 +18,11 @@ xAzDoProject [string] #ResourceName
 
 Common Properties:
 
-- _ProjectName_: The name of the Azure DevOps project.
-- _ProjectDescription_: A description for the Azure DevOps project.
-- _SourceControlType_: The type of source control (Git or Tfvc). Default is Git.
-- _ProcessTemplate_: The process template to use (Agile, Scrum, CMMI, Basic). Default is Agile.
-- _Visibility_: The visibility of the project (Public or Private). Default is Private.
+- __ProjectName__: The name of the Azure DevOps project.
+- __ProjectDescription__: A description for the Azure DevOps project.
+- __SourceControlType__: The type of source control (Git or Tfvc). Default is Git.
+- __ProcessTemplate__: The process template to use (Agile, Scrum, CMMI, Basic). Default is Agile.
+- __Visibility__: The visibility of the project (Public or Private). Default is Private.
 
 # Additional Information
 
