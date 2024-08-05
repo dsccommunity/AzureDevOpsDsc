@@ -29,9 +29,9 @@ Common Properties:
 This resource is used to manage Azure DevOps projects using Desired State Configuration (DSC).
 It allows you to define the properties of an Azure DevOps project and ensures that the project is configured according to those properties.
 
-# Example
+# Examples
 
-__Sample Configuration for Azure DevOps Project using xAzDoProject Resource__
+## Example 1: Sample Configuration for Azure DevOps Project using xAzDoProject Resource
 
 ``` PowerShell
 Configuration ExampleConfig {
@@ -54,7 +54,7 @@ Start-DscConfiguration -Path ./ExampleConfig -Wait -Verbose
 
 ```
 
-__Sample Configuration for Azure DevOps Project using Invoke-DSCResource__
+## Example 2: Sample Configuration for Azure DevOps Project using Invoke-DSCResource
 
 ``` PowerShell
 # Return the current configuration for xAzDoProject
@@ -70,7 +70,7 @@ $properties = @{
 Invoke-DSCResource -Name 'xAzDoProject' -Method Get -Property $properties -ModuleName 'AzureDevOpsDsc'
 ```
 
-__Sample Configuration to remove/exclude an Azure DevOps Project using Invoke-DSCResource__
+## Example 3: Sample Configuration to remove/exclude an Azure DevOps Project using Invoke-DSCResource
 
 ``` PowerShell
 # Remove the Azure Devops Project and ensure that it is not recreated.
@@ -82,7 +82,7 @@ $properties = @{
 Invoke-DSCResource -Name 'xAzDoProject' -Method Set -Property $properties -ModuleName 'AzureDevOpsDsc'
 ```
 
-__Sample Configuration using xAzDoDSCDatum__
+## Example 4: Sample Configuration using xAzDoDSCDatum
 
 ``` YAML
 parameters: {}
