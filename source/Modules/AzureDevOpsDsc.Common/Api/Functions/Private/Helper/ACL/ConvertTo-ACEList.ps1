@@ -58,7 +58,7 @@ Function ConvertTo-ACEList {
         Write-Verbose "[ConvertTo-ACEList] Constructing ACE for $($Permission.Identity)."
 
         # Define the parameters for the Find-Identity function.
-        $indentityParams = @{
+        $identityParams = @{
             # The name of the identity to search for. Remove any square brackets (e.g., [TEAM FOUNDATION]\Project Collection Administrators).
             Name             = $Permission.Identity.Replace('[', '').Replace(']', '')
             OrganizationName = $OrganizationName
@@ -73,7 +73,7 @@ Function ConvertTo-ACEList {
 
         # Convert the Permission to an ACE.
         $ht = @{
-            Identity    = Find-Identity @indentityParams
+            Identity    = Find-Identity @identityParams
             Permissions = ConvertTo-ACETokenList @aceTokenParams
         }
 
