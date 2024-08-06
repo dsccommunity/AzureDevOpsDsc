@@ -120,6 +120,10 @@ Function ConvertTo-ACLHashtable {
 
     $ReferenceACLs | Export-CLixml C:\Temp\aReferenceACLs.clixml
 
+    #
+    # TODO: This is where the issue is. The $ReferenceACLs is not being processed correctly.
+    # It seems that the ReferenceACLs are an object not an array. This is causing the issue.
+
     # Iterate through the ACLs in the ReferenceACLs
     ForEach ($ReferenceACL in $ReferenceACLs) {
         Write-Verbose "[ConvertTo-ACLHashtable] Processing reference ACL."
@@ -143,7 +147,12 @@ Function ConvertTo-ACLHashtable {
                 descriptor  = $ACE.Identity.value.ACLIdentity.descriptor
             }
             # Add the ACE to the ACEs Dictionary using the descriptor as the key
+            Write-Verbose "[ConvertTo-ACLHashtable] ACEObject $($ACEObject | ConvertTo-Json)."
             Write-Verbose "[ConvertTo-ACLHashtable] Adding ACE to the ACEs Dictionary."
+
+            $ACLObject | Export-CLixml C:\Temp\ACLObject.clixml
+            $ACEObject | Export-CLixml C:\Temp\ACEObject.clixml
+
             $ACLObject.acesDictionary.Add($ACE.Identity.value.ACLIdentity.descriptor, $ACEObject)
         }
 
