@@ -75,8 +75,9 @@ Function Get-xAzDoGitPermission {
 
     # Test if the Repository was found
     if (-not $repository) {
-        Throw "[Get-xAzDoGitPermission] Repository not found: $RepositoryName"
-        return
+        Write-Warning "[Get-xAzDoGitPermission] Repository not found: $RepositoryName"
+        $getGroupResult.status = [DSCGetSummaryState]::NotFound
+        return $getGroupResult
     }
 
     #

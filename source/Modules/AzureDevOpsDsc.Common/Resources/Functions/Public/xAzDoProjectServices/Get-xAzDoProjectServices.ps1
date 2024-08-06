@@ -63,8 +63,9 @@ Function Get-xAzDoProjectServices {
 
     # If the Project does not exist in the Live Cache, return the Project object.
     if ($null -eq $Project) {
-        Write-Verbose "[Get-xAzDevOpsProjectServices] The Project '$ProjectName' was not found in the Live Cache."
-        Throw "[Get-xAzDevOpsProjectServices] The Project '$ProjectName' was not found in the Live Cache."
+        Write-Warning "[Get-xAzDevOpsProjectServices] The Project '$ProjectName' was not found in the Live Cache."
+        $Result.Status = [DSCGetSummaryState]::NotFound
+        return $Result
     }
 
     $params = @{

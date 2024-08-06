@@ -62,6 +62,14 @@ Function ConvertTo-FormattedACL {
         $ACEs = [System.Collections.Generic.List[HashTable]]::new()
         $ACEEntries = $ACL.acesDictionary.psObject.properties.name
         Write-Verbose "[ConvertTo-FormattedACL] Found ACE entries: $($ACEEntries.Count)"
+
+        # If the ACE entries are empty, skip it.
+        if ($ACEEntries.Count -eq 0) {
+            Write-Verbose "[ConvertTo-FormattedACL] Current ACE entries are empty. Skipping."
+            Write-Warning "[ConvertTo-FormattedACL] Current ACE entries are empty. Skipping. ACL: $($ACL | ConvertTo-Json)"
+            return
+        }
+
         $ACEEntries | ForEach-Object {
             Write-Verbose "[ConvertTo-FormattedACL] Processing ACE entry: $_"
             $ACEs.Add([HashTable]@{
@@ -70,6 +78,13 @@ Function ConvertTo-FormattedACL {
             })
         }
         Write-Verbose "[ConvertTo-FormattedACL] Found ACEs: $($ACEs.Count)"
+
+        # If the ACEs are empty, skip it.
+        if ($ACEs.Count -eq 0) {
+            Write-Verbose "[ConvertTo-FormattedACL] Current ACEs are empty. Skipping."
+            Write-Warning "[ConvertTo-FormattedACL] Current ACEs are empty. Skipping. ACL: $($ACL | ConvertTo-Json)"
+            return
+        }
 
         # Create the Formatted ACL Object
         foreach ($ACE in $ACEs) {
