@@ -45,8 +45,6 @@ Function Set-xAzDoGroupMember {
 
     Write-Verbose "[Set-xAzDoGroupMember] Starting group member addition process for group '$GroupName'."
 
-    $LookupResult.propertiesChanged | Export-Clixml -Path 'C:\temp\LookupResult.xml'
-
     # If the lookup result is not provided, we need to look it up.
     switch ($LookupResult.propertiesChanged) {
 

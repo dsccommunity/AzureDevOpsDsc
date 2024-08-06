@@ -52,12 +52,8 @@ Function New-xAzDoProjectGroup {
     # Write verbose log after group creation
     Write-Verbose "[New-xAzDoProjectGroup] New DevOps group created: $($group | Out-String)"
 
-    # Add the group to the cache
-    Add-CacheItem -Key $group.principalName -Value $group -Type 'LiveGroups'
-    Write-Verbose "[New-xAzDoProjectGroup] Added new group to LiveGroups cache with key: $($group.principalName)"
-
-    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
-    Write-Verbose "[New-xAzDoProjectGroup] Updated global AZDOLiveGroups cache object."
+    # Update the cache with the new group
+    Refresh-CacheIdentity -Identity $group -Key $group.principalName -CacheType 'LiveGroups'
 
     Add-CacheItem -Key $group.principalName -Value $group -Type 'Group'
     Write-Verbose "[New-xAzDoProjectGroup] Added new group to Group cache with key: $($group.principalName)"

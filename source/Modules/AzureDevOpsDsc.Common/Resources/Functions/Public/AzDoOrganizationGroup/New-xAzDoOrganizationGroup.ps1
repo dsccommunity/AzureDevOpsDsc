@@ -38,13 +38,8 @@ Function New-xAzDoOrganizationGroup {
     # Create a new group
     $group = New-DevOpsGroup @params
 
-    # Add the group to the LiveGroups cache and write to verbose log
-    Add-CacheItem -Key $group.principalName -Value $group -Type 'LiveGroups'
-    Write-Verbose "[New-xAzDoOrganizationGroup] Added new group to LiveGroups cache with key: '$($group.principalName)'"
-
-    # Update the global AZDOLiveGroups object and write to verbose log
-    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
-    Write-Verbose "[New-xAzDoOrganizationGroup] Updated global AZDOLiveGroups cache object."
+    # Update the cache with the new group
+    Refresh-CacheIdentity -Identity $group -Key $group.principalName -CacheType 'LiveGroups'
 
     # Add the group to the Group cache and write to verbose log
     Add-CacheItem -Key $group.principalName -Value $group -Type 'Group'

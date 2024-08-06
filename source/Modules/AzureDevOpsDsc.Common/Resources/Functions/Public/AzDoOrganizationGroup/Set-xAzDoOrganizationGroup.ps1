@@ -50,16 +50,12 @@ Function Set-xAzDoOrganizationGroup {
     }
 
     #
-    # Firstly Replace the live cache with the new group
-
-    if ($null -ne $LookupResult.liveCache) {
-        Remove-CacheItem -Key $LookupResult.liveCache.principalName -Type 'LiveGroups'
-    }
-    Add-CacheItem -Key $group.principalName -Value $group -Type 'LiveGroups'
-    Set-CacheObject -Content $Global:AZDOLiveGroups -CacheType 'LiveGroups'
+    # Update the cache with the new group
+    Refresh-CacheIdentity -Identity $group -Key $group.principalName -CacheType 'LiveGroups'
 
     #
     # Secondarily Replace the local cache with the new group
+
     if ($null -ne $LookupResult.localCache) {
         Remove-CacheItem -Key $LookupResult.localCache.principalName -Type 'Groups'
     }

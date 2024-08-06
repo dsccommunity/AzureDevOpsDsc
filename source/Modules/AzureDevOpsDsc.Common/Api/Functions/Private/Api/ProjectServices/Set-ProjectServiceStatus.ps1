@@ -27,8 +27,6 @@ function Set-ProjectServiceStatus
         Body = $Body | ConvertTo-Json
     }
 
-    $params | Export-CLixml C:\Temp\aaa.clixml
-
     try
     {
         $response = Invoke-AzDevOpsApiRestMethod @params
