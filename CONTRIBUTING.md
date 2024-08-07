@@ -660,9 +660,120 @@ catch {
 When writing API calls, utilize `Invoke-AzDevOpsApiRestMethod` to execute the call.
 This function will automatically inject authentication headers, manage pagination, and handle rate-limiting.
 
-# Adding Additional Authentication Mechanisms
+# Integrating Enhanced Authentication Mechanisms
 
+With the continuous release of new technologies by Microsoft, this module is engineered to support a variety of advanced authentication mechanisms.
+This ensures compatibility with the latest security standards and provides flexibility in choosing the most suitable authentication method for your needs.
 
+Important: The current authentication mechanism depends on the Authorization HTTP header.
+
+This means that all authentication requests must include the appropriate credentials within the Authorization header to ensure secure access.
+This method is crucial for maintaining the integrity and confidentiality of the data being transmitted.
+
+## 1. Create an Authentication Class
+
+To create an authentication class, you need to add a new class within the `source\Classes` directory.
+Ensure that this class is declared before the `[DSCResourceBase]` class.
+Additionally, include a global function named `New-ClassName` in this class, which will be invoked by nested modules.
+
+> **Important:** It's acceptable to adjust the execution order to accommodate the class.
+
+### Implementation Template
+
+Below is a template for creating a sample authentication class called `SampleAuthenticationType`.
+This class inherits from the `AuthenticationToken` base class and includes methods for validating tokens, checking expiration, and retrieving the access token.
+The global function `New-SampleAuthenticationType` is also provided to instantiate the class.
+
+```PowerShell
+# Define the SampleAuthenticationType class
+Class SampleAuthenticationType : AuthenticationToken {
+
+    # Property to store the value of the authentication token
+    [Property]$Value
+
+    # Constructor to initialize the SampleAuthenticationType instance
+    SampleAuthenticationType() {
+    }
+
+    # Hidden function to validate the ManagedIdentityTokenObj
+    Hidden [Bool]isValid($ManagedIdentityTokenObj) {
+    }
+
+    # Function to check if the token has expired
+    [Bool]isExpired() {
+    }
+
+    # Function to return the access token as a string
+    [String] Get() {
+    }
+}
+
+# Global function to create a new SampleAuthenticationType object
+Function global:New-SampleAuthenticationType ([PSCustomObject]$Obj) {
+    # Create and return a new SampleAuthenticationType object
+    return [SampleAuthenticationType]::New($Obj)
+}
+```
+
+### Detailed Explanation
+
+#### Class Definition
+
+* **Class Declaration**: The `SampleAuthenticationType` class is defined and inherits from the `AuthenticationToken` base class.
+  
+* **Properties**:
+  * `$Value`: A property to store the value of the authentication token.
+
+* **Constructor**:
+  * `SampleAuthenticationType()`: A constructor method to initialize instances of the `SampleAuthenticationType` class.
+
+* **Methods**:
+  * `isValid($ManagedIdentityTokenObj)`: A hidden method to validate the provided managed identity token object.
+  * `isExpired()`: A method to check if the current token has expired.
+  * `Get()`: A method to return the access token as a string.
+
+#### Global Function
+
+* **New-SampleAuthenticationType**:
+  * A global function that creates and returns a new instance of the `SampleAuthenticationType` class using a provided `PSCustomObject`.
+
+### Usage Example
+
+Here is an example of how to use the `SampleAuthenticationType` class and its associated global function:
+
+```PowerShell
+# Create a PSCustomObject with necessary properties
+$customObject = [PSCustomObject]@{
+    Property1 = "Value1"
+    Property2 = "Value2"
+}
+
+# Create a new SampleAuthenticationType object
+$authToken = New-SampleAuthenticationType -Obj $customObject
+
+# Check if the token is valid
+$isValid = $authToken.isValid($managedIdentityTokenObj)
+
+# Check if the token is expired
+$isExpired = $authToken.isExpired()
+
+# Get the access token
+$accessToken = $authToken.Get()
+```
+
+By following this template and detailed explanation, you can create a robust authentication class that integrates seamlessly with your PowerShell DSC resources and nested modules.
+
+## 2. Integrate the Authentication Mechanism into `New-AzDoAuthenticationProvider`
+
+In this step, you need to incorporate the authentication mechanism within the `New-AzDoAuthenticationProvider` function.
+Ensure that the necessary authentication protocols are properly implemented to facilitate secure access.
+
+## 3. Integrate Changes into `Add-AuthenticationHTTPHeader`
+
+Next, apply the changes to the `Add-AuthenticationHTTPHeader` function.
+This involves updating the function to include the new authentication headers, ensuring that each HTTP request is authenticated correctly.
+
+# Tests
 
 ## Running the Tests
 
