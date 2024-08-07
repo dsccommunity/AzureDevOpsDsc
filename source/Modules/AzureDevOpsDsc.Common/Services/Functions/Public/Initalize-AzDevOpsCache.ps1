@@ -16,7 +16,8 @@
 .NOTES
 
 #>
-function Initialize-Cache {
+function Initialize-Cache
+{
     [CmdletBinding()]
     param ()
 
