@@ -705,6 +705,13 @@ Class SampleAuthenticationType : AuthenticationToken {
 
     # Function to return the access token as a string
     [String] Get() {
+
+        # Test the caller
+        $this.TestCaller()
+
+        # Return the access token
+        return ($this.ConvertFromSecureString($this.access_token))
+
     }
 }
 
@@ -730,7 +737,9 @@ Function global:New-SampleAuthenticationType ([PSCustomObject]$Obj) {
 * **Methods**:
   * `isValid($ManagedIdentityTokenObj)`: A hidden method to validate the provided managed identity token object.
   * `isExpired()`: A method to check if the current token has expired.
-  * `Get()`: A method to return the access token as a string.
+  * `Get()`: A method to return the access token as a string. This is used by the Modules 
+
+  > **IMPORTANT**: All tokens must be stored as `[SecureString]` in memory to prevent accidental leakage. Additionally, the `Get()` method can only be invoked by approved functions/methods to further mitigate the risk.
 
 #### Global Function
 
