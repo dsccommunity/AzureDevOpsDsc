@@ -218,7 +218,451 @@ Export-CacheObject -CacheType 'LiveProjects' -Content $AzDoLiveProjects
 This command uses the `Export-CacheObject` cmdlet to save the data from the `$AzDoLiveProjects` variable into the `LiveProjects` cache.
 The `-CacheType` parameter specifies the type of cache, while the `-Content` parameter provides the actual data to be cached.
 
-## Creating your First Resource
+# Creating your First Resource
+
+## Resource Template
+
+Below is a template for creating a class-based DSC resource in PowerShell.
+
+```PowerShell
+[DscResource()]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCStandardDSCFunctionsInResource', '', Justification='Test() and Set() method are inherited from base, "AzDevOpsDscResourceBase" class')]
+class ClassName : AzDevOpsDscResourceBase
+{
+    [DscProperty(Key, Mandatory)]
+    [Alias('Parameter')]
+    [System.String]$ResourceParameter
+
+    ClassName()
+    {
+        $this.Construct()
+    }
+
+    [ClassName] Get()
+    {
+        return [xAzDoProject]$($this.GetDscCurrentStateProperties())
+    }
+
+    hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
+    {
+        # Properties that don't support Set, yet support New/Remove
+        return @('')
+    }
+
+    hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)
+    {
+        $properties = @{
+            Ensure = [Ensure]::Absent
+        }
+
+        # If the resource object is null, return the properties
+        if ($null -eq $CurrentResourceObject) { return $properties }
+
+        $properties.ResourceParameter   = $CurrentResourceObject.ResourceParameter
+        $properties.LookupResult        = $CurrentResourceObject.LookupResult
+        $properties.Ensure              = $CurrentResourceObject.Ensure
+
+        return $properties
+    }
+}
+```
+
+## Create the Class Based Resource
+
+To create a class-based DSC Resource, follow the template provided above.
+This will serve as the foundation for defining the resource's properties and methods.
+
+## Write Documentation for Resource
+
+### Overview
+
+When documenting your resource, it is essential to use the Get-Help format to ensure consistency and clarity.
+This format helps users understand each property and method of your resource, providing them with the necessary information to utilize it effectively. 
+
+### Naming the Resource
+
+The resource name must start with the prefix xAzDo, such as xAzDoProject.
+
+### Guidelines for Documentation
+
+1. **Clear and Concise Information**:
+   * Ensure that the description of each property and method is straightforward and easy to understand.
+   * Avoid unnecessary jargon or overly technical language that may confuse the user.
+
+1. **Detailed Descriptions**:
+   * Provide detailed explanations for each property and method.
+   * Explain what each property represents and how each method functions within the resource.
+
+1. **Examples**:
+   * Include examples where necessary to illustrate usage.
+   * Examples should be relevant and demonstrate common use cases to help users understand how to apply the resource in real-world scenarios.
+
+### Get-Help Format
+
+Below is a template you can follow to document your resource using the Get-Help format:
+
+``` PowerShell
+<#
+# .SYNOPSIS
+Briefly describe what the resource does.
+
+# .DESCRIPTION
+Provide a more detailed explanation of the resource, including its purpose and functionality.
+
+# .PARAMETER <ParameterName>
+Describe each parameter required by the resource. Include details such as data type, default values, and any constraints.
+
+# .EXAMPLE
+Show an example of how to use the resource. Include both the code and an explanation of what the example demonstrates.
+
+# .NOTES
+Include any additional information that might be relevant, such as author details, version history, or related resources.
+
+# .LINK
+Provide links to any related documentation or external resources.
+#>
+```
+
+### Example Documentation
+
+Here’s an example of how you might document a sample resource:
+
+```Powershell
+<#
+# .SYNOPSIS
+This resource manages the configuration of a web server.
+
+# .DESCRIPTION
+The WebServerResource allows administrators to configure various aspects of a web server, including setting up virtual hosts, managing security settings, and configuring modules.
+
+# .PARAMETER ServerName
+Specifies the name of the web server. This is a mandatory parameter.
+Type: String
+Default value: None
+
+# .PARAMETER Port
+Specifies the port on which the web server listens.
+Type: Integer
+Default value: 80
+
+# .EXAMPLE
+PS C:\> Set-WebServerConfiguration -ServerName "MyWebServer" -Port 8080
+
+This command configures the web server named 'MyWebServer' to listen on port 8080.
+
+# .NOTES
+Author: Jane Doe
+Version: 1.0.0
+
+# .LINK
+https://docs.example.com/WebServerResource
+#>
+```
+
+By following these guidelines and utilizing the Get-Help format, you can create comprehensive and user-friendly documentation for your resource.
+
+## Create `Get`, `Test`, `Set`, `New`, `Remove` Functions
+
+### Lifecycle Management Functions for DSC Resources
+
+These functions are crucial for managing the lifecycle of your Desired State Configuration (DSC) resource. They are located at:
+
+`source\Modules\AzureDevOpsDsc.Common\Resources\Functions\Public\ResourceName`
+
+When creating these functions, make sure to add them to the `FunctionsToExport` section in the file located at:
+
+`source\Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1`.
+
+#### Function Parameters
+
+The parameters of these functions must be consistent and should reflect the properties of the resource. For instance:
+
+##### Resource Definition
+```PowerShell
+class ClassName : AzDevOpsDscResourceBase {
+    [DscProperty(Key, Mandatory)]
+    [Alias('Parameter')]
+    [System.String]$ResourceParameter
+}
+```
+
+##### Get-Function Example
+```PowerShell
+Function Get-ClassName {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure
+    )
+}
+```
+
+#### Additional Parameters
+
+Include additional parameters such as `Ensure` and `LookupResult` to ensure comprehensive functionality.
+Here's an example:
+
+```PowerShell
+Function Get-ClassName {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [Alias('Name')]
+        [System.String]$ResourceParameter,
+
+        [Parameter()]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure
+    )
+}
+```
+
+By following this structure, you ensure that your DSC resource management functions are well-defined and consistent with the resource properties.
+
+#### The `Get` Function
+
+The `Get` function performs the lookup of the resource properties and calculates what has changed.
+The changed contents are stored within the `LookupResult.PropertiesChanged` property.
+
+```PowerShell
+Function Get-xAzDoProjectServices {
+
+    [CmdletBinding()]
+    [OutputType([System.Management.Automation.PSObject[]])]
+    param
+    (
+        [Parameter(Mandatory)]
+        [Alias('Name')]
+        [System.String]$ProjectName,
+
+        [Parameter()]
+        [Alias('Repos')]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]$GitRepositories = 'Enabled',
+
+        [Parameter()]
+        [Alias('Board')]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]$WorkBoards = 'Enabled',
+
+        [Parameter()]
+        [Alias('Pipelines')]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]$BuildPipelines = 'Enabled',
+
+        [Parameter()]
+        [Alias('Tests')]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]$TestPlans = 'Enabled',
+
+        [Parameter()]
+        [Alias('Artifacts')]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]$AzureArtifact = 'Enabled',
+
+        [Parameter()]
+        [HashTable]$LookupResult,
+
+        [Parameter()]
+        [Ensure]$Ensure,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
+    )
+
+    #
+    # Construct a hashtable detailing the group
+
+    $Result = @{
+        #Reasons = $()
+        Ensure = [Ensure]::Absent
+        propertiesChanged = @()
+        status = [DSCGetSummaryState]::Unchanged
+    }
+
+    #
+    # Attempt to retrive the Project from the Live Cache.
+    Write-Verbose "[Get-xAzDevOpsProjectServices] Retriving the Project from the Live Cache."
+
+    # Retrive the Repositories from the Live Cache.
+    $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+
+    # If the Project does not exist in the Live Cache, return the Project object.
+    if ($null -eq $Project) {
+        Write-Warning "[Get-xAzDevOpsProjectServices] The Project '$ProjectName' was not found in the Live Cache."
+        $Result.Status = [DSCGetSummaryState]::NotFound
+        return $Result
+    }
+
+    $params = @{
+        Organization = $Global:DSCAZDO_OrganizationName
+        ProjectId    = $Project.id
+    }
+
+    # Enumerate the Project Services.
+    $Result.LiveServices = @{
+        Repos       = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Repos
+        Boards      = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Boards
+        Pipelines   = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Pipelines
+        Tests       = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_TestPlans
+        Artifacts   = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Artifacts
+    }
+
+    # Compare the Project Services with the desired state.
+    if ($GitRepositories -ne $Result.LiveServices.Repos.state) {
+        $Result.Status = [DSCGetSummaryState]::Changed
+        $Result.propertiesChanged += @{
+            Expected = $GitRepositories
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Repos
+        }
+    }
+    if ($WorkBoards -ne $Result.LiveServices.Boards.state) {
+        $Result.Status = [DSCGetSummaryState]::Changed
+        $Result.propertiesChanged += @{
+            Expected = $WorkBoards
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Boards
+        }
+    }
+    if ($BuildPipelines -ne $Result.LiveServices.Pipelines.state) {
+        $Result.Status = [DSCGetSummaryState]::Changed
+        $Result.propertiesChanged += @{
+            Expected = $BuildPipelines
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Pipelines
+        }
+    }
+    if ($TestPlans -ne $Result.LiveServices.Tests.state) {
+        $Result.Status = [DSCGetSummaryState]::Changed
+        $Result.propertiesChanged += @{
+            Expected = $TestPlans
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_TestPlans
+        }
+    }
+    if ($AzureArtifact -ne $Result.LiveServices.Artifacts.state) {
+        $Result.Status = [DSCGetSummaryState]::Changed
+        $Result.propertiesChanged += @{
+            Expected = $AzureArtifact
+            FeatureId = $LocalizedDataAzURLParams.ProjectService_Artifacts
+        }
+    }
+
+    return $Result
+
+}
+```
+
+### The `LookupResult` Property
+
+The `LookupResult` property holds the results of the resource lookup and any changes detected.
+
+Example:
+
+```PowerShell
+# Enumerate the Project Services.
+$Result.LiveServices = @{
+    Repos       = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Repos
+    Boards      = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Boards
+    Pipelines   = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Pipelines
+    Tests       = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_TestPlans
+    Artifacts   = Get-ProjectServiceStatus @params -ServiceName $LocalizedDataAzURLParams.ProjectService_Artifacts
+}
+
+# Compare the Project Services with the desired state.
+if ($GitRepositories -ne $Result.LiveServices.Repos.state) {
+    $Result.Status = [DSCGetSummaryState]::Changed
+    $Result.propertiesChanged += @{
+        Expected = $GitRepositories
+        FeatureId = $LocalizedDataAzURLParams.ProjectService_Repos
+    }
+}
+```
+
+This example demonstrates how to enumerate project services and compare them against the desired state, updating the `LookupResult` property accordingly.
+
+#### The `Status` Property
+
+The `Status` property provides detailed information about the changes identified by the `get` method.
+This property indicates the specific status of the item being evaluated, allowing for a clear understanding of its current state.
+
+#### Possible Status Values
+
+* **Changed**: Indicates that the item has undergone modifications.
+* **Unchanged**: Signifies that the item remains in its original state with no alterations.
+* **NotFound**: Denotes that the item could not be located within AZDO.
+* **Renamed**: Implies that the item has been renamed from its original identifier.
+* **Missing**: Suggests that the item is absent or has been deleted within AZDO.
+
+Each status value aids in classifying the result of the `get` method, offering clear insights into the changes affecting the item.
+This information is utilized by the `Test` method, along with the `Ensure` enum, to determine the appropriate course of action.
+
+For Example:
+
+``` PowerShell
+#
+# Construct a hashtable detailing the group
+$result = @{
+    Ensure              = [Ensure]::Absent
+    ProjectName         = $ProjectName
+    # Other Key/Value items
+    propertiesChanged   = @()
+    status              = $null
+}
+
+# Test if the project exists. If the project does not exist, return NotFound
+if (($null -eq $project) -and ($null -ne $ProjectName))
+{
+    $result.Status = [DSCGetSummaryState]::NotFound
+    return $result
+}
+```
+
+#### Making API Calls
+
+API calls are not made directly within the Get, Set, Test, New, and Remove functions.
+Instead, they are abstracted to the `source\Modules\AzureDevOpsDsc.Common\Api\Functions\Private\Api` directory.
+This directory contains functions that handle API calls to the respective endpoints.
+
+Here are some sample code snippets:
+
+``` PowerShell
+Write-Verbose "[New-GitRepository] Creating new repository '$($RepositoryName)' in project '$($Project.name)'"
+
+# Define parameters for creating a new DevOps group
+$params = @{
+    ApiUri = "{0}/{1}/_apis/git/repositories?api-version={2}" -f $ApiUri, $Project.name, $ApiVersion
+    Method = 'POST'
+    ContentType = 'application/json'
+    Body = @{
+        name = $RepositoryName
+        project = @{
+            id = $Project.id
+        }
+    } | ConvertTo-Json
+}
+
+# Try to invoke the REST method to create the group and return the result
+try {
+    $repo = Invoke-AzDevOpsApiRestMethod @params
+    Write-Verbose "[New-GitRepository] Repository Created: '$($repo.name)'"
+    return $repo
+}
+# Catch any exceptions and write an error message
+catch {
+    Write-Error "[New-GitRepository] Failed to Create Repository: $_"
+}
+```
+
+When writing API calls, utilize `Invoke-AzDevOpsApiRestMethod` to execute the call.
+This function will automatically inject authentication headers, manage pagination, and handle rate-limiting.
+
+# Adding Additional Authentication Mechanisms
+
+
 
 ## Running the Tests
 
