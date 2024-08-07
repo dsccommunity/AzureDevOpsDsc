@@ -33,12 +33,20 @@ DSC resources available:
 Get-DscResource -Module AzureDevOpsDsc
 ```
 
+## DSC Resource Documentation
+
+* [xAzDoGitPermission](\Resources\xAzDoGitPermission.md)
+* [xAzDoGitRepository](\Resources\xAzDoGitRepository.md)
+* [xAzDoGroupMember](\Resources\xAzDoGroupMember.md)
+* [xAzDoGroupPermission](\Resources\xAzDoGroupPermission.md)
+* [xAzDoOrganizationGroup](\Resources\xAzDoOrganizationGroup.md)
+* [xAzDoProject](\Resources\xAzDoProject.md)
+* [xAzDoProjectGroup](\Resources\xAzDoProjectGroup.md)
+* [xAzDoProjectServices](\Resources\xAzDoProjectServices.md)
+
 ## Prerequisites
 
-The minimum Windows Management Framework (PowerShell) version required is 5.0
-or higher, which ships with Windows 10 or Windows Server 2016,
-but can also be installed on Windows 7 SP1, Windows 8.1, Windows Server 2012,
-and Windows Server 2012 R2.
+The minimum requirement for this module is PowerShell 7.0.
 
 ## Change log
 
