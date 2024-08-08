@@ -29,25 +29,21 @@ Function New-AuthProvider {
     #
     # If the parameterset is PersonalAccessToken
     if ($PSCmdlet.ParameterSetName -eq 'PersonalAccessToken') {
-
         Write-Verbose "[New-AuthProvider] Creating a new Personal Access Token with OrganizationName $OrganizationName."
-
-        # if the NoVerify switch is not set, verify the Token.
-        if ($NoVerify) {
-            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken
-        } else {
-            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken -Verify
+        $Global:DSCAZDO_AuthenticationToken = @{
+            'token' = ":{0}" -f ConvertTo-Base64String $PersonalAccessToken
+            'type' = 'PAT'
         }
-
     }
     #
     # If the parameterset is ManagedIdentity
     elseif ($PSCmdlet.ParameterSetName -eq 'ManagedIdentity') {
-
         Write-Verbose "[New-AuthProvider] Creating a new Azure Managed Identity with OrganizationName $OrganizationName."
         # If the Token is not Valid. Get a new Token.
-        $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName
-
+        $Global:DSCAZDO_AuthenticationToken = @{
+            'token' = Get-MIToken -OrganizationName $OrganizationName
+            'type' = 'ManagedIdentity'
+        }
     }
 
 
