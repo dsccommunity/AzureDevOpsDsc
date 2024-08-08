@@ -1,44 +1,46 @@
 powershell
 Describe 'Remove-GitRepository' {
-    Mock Get-AzDevOpsApiVersion { return '6.0' }
-    Mock Invoke-AzDevOpsApiRestMethod
+    Mock -ModuleName 'Az.DevOps' -CommandName 'Get-AzDevOpsApiVersion' -MockWith { '5.1-preview' }
+    Mock -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith { }
 
-    BeforeAll {
-        # Test data
-        $ApiUri = "https://dev.azure.com/organization"
-        $Project = [PSCustomObject]@{ name = "SampleProject"; id = "123-456" }
-        $Repository = [PSCustomObject]@{ name = "SampleRepo"; id = "789-012" }
-        $ApiVersion = "6.0"
+    $ApiUri = "https://dev.azure.com/example"
+    $Project = [PSCustomObject]@{ name = "ExampleProject" }
+    $Repository = [PSCustomObject]@{ id = "repo123"; Name = "ExampleRepo" }
+
+    Context 'When all parameters are valid' {
+        It 'Successfully removes a Git repository' {
+            Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository
+
+            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Get-AzDevOpsApiVersion' -Exactly 1
+            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -ParameterFilter { 
+                $PSCmdlet.MyInvocation.BoundParameters['ApiUri'] -eq "https://dev.azure.com/example/ExampleProject/_apis/git/repositories/repo123?api-version=5.1-preview" -and
+                $PSCmdlet.MyInvocation.BoundParameters['Method'] -eq 'Delete'
+            }
+        }
     }
 
-    It 'Removes the repository successfully' {
-        Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository -ApiVersion $ApiVersion
+    Context 'When API version is provided' {
+        It 'Uses the provided API version for removal' {
+            $ApiVersion = "6.0"
+            Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository -ApiVersion $ApiVersion
 
-        # Verify the function called the Invoked method correctly
-        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It
-        Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Times 0 -Scope It
+            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Get-AzDevOpsApiVersion' -Exactly 0
+            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -ParameterFilter { 
+                $PSCmdlet.MyInvocation.BoundParameters['ApiUri'] -eq "https://dev.azure.com/example/ExampleProject/_apis/git/repositories/repo123?api-version=6.0" -and
+                $PSCmdlet.MyInvocation.BoundParameters['Method'] -eq 'Delete'
+            }
+        }
     }
 
-    It 'Uses default API version if not supplied' {
-        Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository
+    Context 'When there is an error during API call' {
+        Mock -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith { throw "API call failed" }
 
-        # Verify the function calls Get-AzDevOpsApiVersion to get the default API version
-        Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Exactly 1 -Scope It
-    }
+        It 'Catches the error and writes an error message' {
+            { Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository } | Should -Throw
 
-    It 'Writes an error when it fails to remove the repository' {
-        Mock Invoke-AzDevOpsApiRestMethod { throw "Failed to call API" }
-
-        { Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository } |
-        Should -Throw
-
-        # Assert error
-        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It
-    }
-
-    AfterEach {
-        Remove-Mock -CommandName Invoke-AzDevOpsApiRestMethod
-        Remove-Mock -CommandName Get-AzDevOpsApiVersion
+            $errorMessage = "[Remove-GitRepository] Failed to Create Repository: API call failed"
+            $Error[0].ToString() | Should -Contain $errorMessage
+        }
     }
 }
 

@@ -1,67 +1,60 @@
 powershell
-Describe "Set-xAzDoPermission Unit Tests" {
+# Requires Pester 5.0 or later
 
-    Mock -ModuleName YourModule -FunctionName Get-AzDevOpsApiVersion {
-        "5.1-preview.1"
+# Mocking the Invoke-AzDevOpsApiRestMethod function
+Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' {
+    param (
+        [Parameter(Mandatory)]
+        [string]$Uri,
+
+        [Parameter(Mandatory)]
+        [string]$Method,
+
+        [Parameter(Mandatory)]
+        [Object]$Body
+    )
+    # Mock behavior here, can return a specific result if needed
+    return $null
+}
+
+Describe 'Set-xAzDoPermission' {
+    BeforeAll {
+        Import-Module -Name 'Path\To\Your\Module.psm1'
     }
+    Context 'When called with valid parameters' {
+        It 'Should invoke Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            $organizationName = 'YourOrganization'
+            $securityNamespaceID = 'SomeSecurityNamespaceID'
+            $serializedACLs = @{ Property = 'Value' }
+            $apiVersion = '6.0'
 
-    Mock -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod
+            Set-xAzDoPermission -OrganizationName $organizationName -SecurityNamespaceID $securityNamespaceID -SerializedACLs $serializedACLs -ApiVersion $apiVersion
 
-    $fakeOrgName = "FakeOrg"
-    $fakeSecurityNamespaceID = "FakeID"
-    $fakeSerializedACLs = [pscustomobject]@{ a = "b" }
-    $fakeApiVersion = "5.1-preview.1"
-
-    BeforeEach {
-        Clear-Host
-    }
-
-    Context "When parameters are correctly passed" {
-        It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
-            Set-xAzDoPermission -OrganizationName $fakeOrgName -SecurityNamespaceID $fakeSecurityNamespaceID -SerializedACLs $fakeSerializedACLs -ApiVersion $fakeApiVersion
-
-            Mock -Assert -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod { Param ([string]$Uri, [string]$Method, [string]$Body)}
-
-            $actualUri = "https://dev.azure.com/$fakeOrgName/_apis/accesscontrollists/$fakeSecurityNamespaceID?api-version=$fakeApiVersion"
-            $actualBody = $fakeSerializedACLs | ConvertTo-Json -Depth 4
-
-            # Assert the Invoke-AzDevOpsApiRestMethod was called with the expected parameters
-            Assert-MockCalled -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It
-            $lastCommand = (Get-MockCalled -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod).ParameterSet
-            $lastCommand.Uri | Should -Be $actualUri
-            $lastCommand.Method | Should -Be "POST"
-            $lastCommand.Body | Should -Be $actualBody
-        }
-
-        It "Should default ApiVersion if not provided" {
-            Set-xAzDoPermission -OrganizationName $fakeOrgName -SecurityNamespaceID $fakeSecurityNamespaceID -SerializedACLs $fakeSerializedACLs
-
-            Mock -Assert -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod { Param ([string]$Uri, [string]$Method, [string]$Body)}
-
-            $defaultApiVersion = "5.1-preview.1"
-            $actualUri = "https://dev.azure.com/$fakeOrgName/_apis/accesscontrollists/$fakeSecurityNamespaceID?api-version=$defaultApiVersion"
-            $actualBody = $fakeSerializedACLs | ConvertTo-Json -Depth 4
-
-            # Assert the Invoke-AzDevOpsApiRestMethod was called with the expected parameters
-            Assert-MockCalled -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It
-            $lastCommand = (Get-MockCalled -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod).ParameterSet
-            $lastCommand.Uri | Should -Be $actualUri
-            $lastCommand.Method | Should -Be "POST"
-            $lastCommand.Body | Should -Be $actualBody
-        }
-    }
-
-    Context "When an error occurs" {
-        It "Should write an error message" {
-
-            Mock -ModuleName YourModule -FunctionName Invoke-AzDevOpsApiRestMethod {
-                throw "Test Exception"
+            # Assert that the Invoke-AzDevOpsApiRestMethod was called with the correct parameters
+            Assert-MockCalled -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -Scope It -ParameterFilter {
+                $PSCommandPath -eq "https://dev.azure.com/$organizationName/_apis/accesscontrollists/$securityNamespaceID?api-version=$apiVersion" -and
+                $Method -eq 'POST' -and
+                $Body -eq ($serializedACLs | ConvertTo-Json -Depth 4)
             }
+        }
+    }
 
-            { Set-xAzDoPermission -OrganizationName $fakeOrgName -SecurityNamespaceID $fakeSecurityNamespaceID -SerializedACLs $fakeSerializedACLs -ApiVersion $fakeApiVersion } | Should -Throw
+    Context 'When Invoke-AzDevOpsApiRestMethod throws an exception' {
+        BeforeEach {
+            Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith {
+                throw "API call failed"
+            }
+        }
+        It 'Should catch the exception and write an error message' {
+            $organizationName = 'YourOrganization'
+            $securityNamespaceID = 'SomeSecurityNamespaceID'
+            $serializedACLs = @{ Property = 'Value' }
+            $apiVersion = '6.0'
 
-            # Check error was written to the output
-            $error[0].Exception.Message | Should -Be "Test Exception"
+            { Set-xAzDoPermission -OrganizationName $organizationName -SecurityNamespaceID $securityNamespaceID -SerializedACLs $serializedACLs -ApiVersion $apiVersion } | Should -Throw
+
+            # Assert that the error message was written
+            Assert-VerifiableMocks
         }
     }
 }

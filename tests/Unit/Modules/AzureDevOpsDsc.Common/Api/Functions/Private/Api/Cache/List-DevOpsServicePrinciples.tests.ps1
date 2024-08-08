@@ -1,52 +1,50 @@
 powershell
 Describe "List-DevOpsServicePrinciples" {
-    Mock Get-AzDevOpsApiVersion {
-        return "6.0-preview.1"
-    }
-    
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{ value = @("serviceprincipal1", "serviceprincipal2") }
-    }
+    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "6.0-preview.1" }
+    Mock -CommandName Invoke-AzDevOpsApiRestMethod
 
-    Context "When called with valid OrganizationName" {
-        It "Should call Get-AzDevOpsApiVersion once" {
-            List-DevOpsServicePrinciples -OrganizationName 'MyOrg'
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
+    Context "when OrganizationName is provided" {
+        $orgName = "testOrg"
+        $apiVersion = "6.0-preview.1"
+        $mockServicePrincipalsResult = @{
+            value = @(
+                @{
+                    id = "0001"
+                    displayName = "ServicePrincipal1"
+                },
+                @{
+                    id = "0002"
+                    displayName = "ServicePrincipal2"
+                }
+            )
         }
 
-        It "Should call Invoke-AzDevOpsApiRestMethod" {
-            List-DevOpsServicePrinciples -OrganizationName 'MyOrg'
-            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1
-        }
-
-        It "Should return a list of service principals" {
-            $result = List-DevOpsServicePrinciples -OrganizationName 'MyOrg'
-            $result | Should -Be @("serviceprincipal1", "serviceprincipal2")
-        }
-    }
-
-    Context "When no service principals are found" {
-        Mock Invoke-AzDevOpsApiRestMethod {
-            return @{ value = $null }
-        }
-
-        It "Should return $null" {
-            $result = List-DevOpsServicePrinciples -OrganizationName 'MyOrg'
-            $result | Should -Be $null
-        }
-    }
-
-    Context "When called with specific ApiVersion" {
-        It "Should use the provided ApiVersion" {
+        BeforeEach {
             Mock Invoke-AzDevOpsApiRestMethod -ParameterFilter {
-                $Uri -eq "https://vssps.dev.azure.com/MyOrg/_apis/graph/serviceprincipals" -and
-                $Method -eq "Get"
+                $PSCmdlet.MyInvocation.BoundParameters.Uri -eq "https://vssps.dev.azure.com/$orgName/_apis/graph/serviceprincipals"
             } -MockWith {
-                return @{ value = @("serviceprincipal3") }
+                return $mockServicePrincipalsResult
             }
+        }
 
-            $result = List-DevOpsServicePrinciples -OrganizationName 'MyOrg' -ApiVersion '5.0'
-            $result | Should -Be @("serviceprincipal3")
+        It "Returns service principals if available" {
+            $result = List-DevOpsServicePrinciples -OrganizationName $orgName -ApiVersion $apiVersion
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -HaveCount 2
+            $result[0].displayName | Should -Be "ServicePrincipal1"
+            $result[1].displayName | Should -Be "ServicePrincipal2"
+        }
+
+        It "Returns null if service principals result is null" {
+            Mock Invoke-AzDevOpsApiRestMethod -MockWith { return @{ value = $null } }
+            $result = List-DevOpsServicePrinciples -OrganizationName $orgName -ApiVersion $apiVersion
+            $result | Should -BeNull
+        }
+    }
+
+    Context "when OrganizationName is not provided" {
+        It "Throws a validation error" {
+            { List-DevOpsServicePrinciples -OrganizationName $null } | Should -Throw
         }
     }
 }

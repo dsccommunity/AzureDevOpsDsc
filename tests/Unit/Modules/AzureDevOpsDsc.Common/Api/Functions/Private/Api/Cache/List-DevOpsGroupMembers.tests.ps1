@@ -1,54 +1,53 @@
 powershell
-Describe "List-DevOpsGroupMembers Tests" {
+Describe "List-DevOpsGroupMembers" {
+    Mock -CommandName Get-AzDevOpsApiVersion {
+        return "6.0-preview.1"
+    }
 
-    Mock -ModuleName Az.DevOps -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-        @{
+    Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+        return @{
             value = @(
-                @{ displayName = "User1"; principalName = "user1@domain.com" }
-                @{ displayName = "User2"; principalName = "user2@domain.com" }
+                @{principalName = "user1@domain.com"},
+                @{principalName = "user2@domain.com"}
             )
         }
     }
 
-    It "should return group members when valid parameters are passed" {
-        $Organization = "myOrganization"
-        $GroupDescriptor = "someGroupDescriptor"
-        
+    It "Should return the correct group members when correct params are passed" {
+        $Organization = "testOrg"
+        $GroupDescriptor = "testGroup"
+
         $result = List-DevOpsGroupMembers -Organization $Organization -GroupDescriptor $GroupDescriptor
 
         $result | Should -Not -BeNullOrEmpty
         $result | Should -HaveCount 2
-        $result[0].displayName | Should -Be "User1"
-        $result[1].displayName | Should -Be "User2"
+        $result[0].principalName | Should -Be "user1@domain.com"
+        $result[1].principalName | Should -Be "user2@domain.com"
     }
 
-    It "should return null when no members are found" {
-        Mock -ModuleName Az.DevOps -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            @{ value = $null }
-        }
-        
-        $Organization = "myOrganization"
-        $GroupDescriptor = "someOtherGroupDescriptor"
+    It "Should use the default API version if none is specified" {
+        $Organization = "testOrg"
+        $GroupDescriptor = "testGroup"
 
         $result = List-DevOpsGroupMembers -Organization $Organization -GroupDescriptor $GroupDescriptor
 
-        $result | Should -BeNull
+        Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+            $Uri -eq "https://vssps.dev.azure.com/testOrg/_apis/graph/Memberships/testGroup?direction=down"
+        } -Exactly 1
     }
 
-    It "should call the API with the correct parameters" {
-        $Organization = "myOrganization"
-        $GroupDescriptor = "someGroupDescriptor"
-        $expectedUri = "https://vssps.dev.azure.com/{0}/_apis/graph/Memberships/{1}?direction=down" -f $Organization, $GroupDescriptor
-
-        List-DevOpsGroupMembers -Organization $Organization -GroupDescriptor $GroupDescriptor
-
-        Assert-MockCalled -ModuleName Az.DevOps -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It -Exactly {
-            Param (
-                $params
-            )
-            $params.Uri | Should -Be $expectedUri
-            $params.Method | Should -Be "Get"
+    It "Should return null when the membership value is null" {
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+            return @{ value = $null }
         }
+
+        $Organization = "testOrg"
+        $GroupDescriptor = "testGroup"
+
+        $result = List-DevOpsGroupMembers -Organization $Organization -GroupDescriptor $GroupDescriptor
+
+        $result | Should -Be $null
     }
 }
 

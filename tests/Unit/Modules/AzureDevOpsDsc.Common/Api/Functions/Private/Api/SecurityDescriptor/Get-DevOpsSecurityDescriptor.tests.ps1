@@ -1,46 +1,36 @@
 powershell
 Describe 'Get-DevOpsSecurityDescriptor' {
     Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' {
-        return @{
-            value = @{
-                securityDescriptor = 'sample-descriptor'
-            }
-        }
+        return @{ value = 'Mocked response' }
     }
 
-    Context 'When called with valid parameters' {
-        It 'Should return the security descriptor' {
-            $ProjectId = 'sample-project-id'
-            $Organization = 'sample-org'
-            $ApiVersion = '6.0-preview.1'
-
-            $result = Get-DevOpsSecurityDescriptor -ProjectId $ProjectId -Organization $Organization -ApiVersion $ApiVersion
-
-            $result.securityDescriptor | Should -Be 'sample-descriptor'
-        }
+    It 'Should return security descriptor when called with valid parameters' {
+        $result = Get-DevOpsSecurityDescriptor -ProjectId 'ProjectID' -Organization 'MyOrganization'
+        $result | Should -Be 'Mocked response'
     }
 
-    Context 'When called with missing mandatory parameters' {
-        It 'Should throw an error if ProjectId is missing' {
-            { Get-DevOpsSecurityDescriptor -Organization 'sample-org' -ApiVersion '6.0-preview.1' } | Should -Throw
-        }
-
-        It 'Should throw an error if Organization is missing' {
-            { Get-DevOpsSecurityDescriptor -ProjectId 'sample-project-id' -ApiVersion '6.0-preview.1' } | Should -Throw
-        }
+    It 'Should throw an error when ProjectId is missing' {
+        { Get-DevOpsSecurityDescriptor -Organization 'MyOrganization' } | Should -Throw
     }
-    
-    Context 'When Invoke-AzDevOpsApiRestMethod throws an exception' {
-        Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith {
-            throw "API failure"
-        }
 
-        It 'Should catch the exception and write an error' {
-            $ProjectId = 'sample-project-id'
-            $Organization = 'sample-org'
-            
-            { Get-DevOpsSecurityDescriptor -ProjectId $ProjectId -Organization $Organization } | Should -Throw
-        }
+    It 'Should throw an error when Organization is missing' {
+        { Get-DevOpsSecurityDescriptor -ProjectId 'ProjectID' } | Should -Throw
+    }
+
+    It 'Should use default ApiVersion when not specified' {
+        Mock -CommandName 'Get-AzDevOpsApiVersion' -MockWith { '6.0' }
+        Get-DevOpsSecurityDescriptor -ProjectId 'ProjectID' -Organization 'MyOrganization'
+        Assert-MockCalled 'Get-AzDevOpsApiVersion' -Exactly 1 -Scope It
+    }
+
+    It 'Should use specified ApiVersion' {
+        Get-DevOpsSecurityDescriptor -ProjectId 'ProjectID' -Organization 'MyOrganization' -ApiVersion '5.1'
+        Assert-MockCalled 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -Scope It -ParameterFilter { $params.ApiVersion -eq '5.1' }
+    }
+
+    It 'Should handle API errors gracefully' {
+        Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith { throw "API Error" }
+        { Get-DevOpsSecurityDescriptor -ProjectId 'ProjectID' -Organization 'MyOrganization' } | Should -Throw
     }
 }
 

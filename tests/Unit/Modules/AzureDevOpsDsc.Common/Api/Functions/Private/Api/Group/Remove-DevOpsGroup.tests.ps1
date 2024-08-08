@@ -1,63 +1,57 @@
 powershell
-# Remove-DevOpsGroup.Tests.ps1
-
-Import-Module Pester
-
 Describe 'Remove-DevOpsGroup' {
+    Mock Get-AzDevOpsApiVersion { "7.1-preview.1" }
+    Mock Invoke-AzDevOpsApiRestMethod { 
+        $null 
+    }
 
-    Mock Get-AzDevOpsApiVersion { return "6.0-preview.1" }
-    Mock Invoke-AzDevOpsApiRestMethod { return @{ success = $true } }
+    Context 'When all parameters are provided' {
+        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            $apiUri = "https://dev.azure.com/myorganization"
+            $apiVersion = "7.1-preview.1"
+            $groupDescriptor = "MyGroup"
+
+            Remove-DevOpsGroup -ApiUri $apiUri -ApiVersion $apiVersion -GroupDescriptor $groupDescriptor
+
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -Parameters @{
+                Uri = "$apiUri/_apis/graph/groups/$groupDescriptor?api-version=$apiVersion"
+                Method = 'Delete'
+                ContentType = 'application/json'
+            }
+        }
         
-    Context 'When called with mandatory parameters' {
-        It 'should call the invoke method with correct parameters' {
-            # Arrange
+        It 'Should use default ApiVersion if not provided' {
             $apiUri = "https://dev.azure.com/myorganization"
             $groupDescriptor = "MyGroup"
-            $expectedUri = "$apiUri/_apis/graph/groups/$groupDescriptor?api-version=6.0-preview.1"
-            $expectedMethod = 'Delete'
 
-            # Act
             Remove-DevOpsGroup -ApiUri $apiUri -GroupDescriptor $groupDescriptor
 
-            # Assert
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It -ParameterFilter {
-                $PSBoundParameters['Uri'] -eq $expectedUri -and
-                $PSBoundParameters['Method'] -eq $expectedMethod
+            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Times 1 -Exactly -Scope It -Parameters @{
+                Default = $true
+            }
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -Parameters @{
+                Uri = "$apiUri/_apis/graph/groups/$groupDescriptor?api-version=7.1-preview.1"
+                Method = 'Delete'
+                ContentType = 'application/json'
             }
         }
     }
+    
+    Context 'Error Handling' {
+        Mock Invoke-AzDevOpsApiRestMethod { throw 'API failure' }
 
-    Context 'When called without optional ApiVersion parameter' {
-        It 'should call Get-AzDevOpsApiVersion to get default ApiVersion' {
-            # Arrange
+        It 'Should handle errors and write an error message' {
             $apiUri = "https://dev.azure.com/myorganization"
             $groupDescriptor = "MyGroup"
 
-            # Act
-            Remove-DevOpsGroup -ApiUri $apiUri -GroupDescriptor $groupDescriptor
+            { Remove-DevOpsGroup -ApiUri $apiUri -GroupDescriptor $groupDescriptor } | Should -Throw
 
-            # Assert
-            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Exactly -Times 1
-        }
-    }
-
-    Context 'When an error occurs during the API call' {
-        It 'should write an error message' {
-            # Arrange
-            Mock Invoke-AzDevOpsApiRestMethod { 
-                throw "API call failed"
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -Parameters @{
+                Uri = "$apiUri/_apis/graph/groups/$groupDescriptor?api-version=7.1-preview.1"
+                Method = 'Delete'
+                ContentType = 'application/json'
             }
-            $apiUri = "https://dev.azure.com/myorganization"
-            $groupDescriptor = "MyGroup"
-            $errorMessage = "Failed to remove group: API call failed"
-
-            # Act
-            $result = { Remove-DevOpsGroup -ApiUri $apiUri -GroupDescriptor $groupDescriptor } | Should -Throw
-
-            # Assert
-            $result.Message | Should -Contain $errorMessage
         }
     }
-
 }
 

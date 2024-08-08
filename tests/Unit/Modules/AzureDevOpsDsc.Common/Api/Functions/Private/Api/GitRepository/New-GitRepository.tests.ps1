@@ -1,50 +1,59 @@
 powershell
-Describe "New-GitRepository" {
-    Mock Get-AzDevOpsApiVersion { "6.0-preview.1" }
-    Mock Invoke-AzDevOpsApiRestMethod { 
-        return @{
-            name = $using:RepositoryName
+Describe 'New-GitRepository' {
+    $ApiUri = "https://dev.azure.com/organization"
+    $Project = [PSCustomObject]@{ id = "project123"; name = "TestProject" }
+    $RepositoryName = "NewRepo"
+    $SourceRepository = "ExistingRepo"
+    $ApiVersion = "6.0"
+
+    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { "6.0" }
+
+    Context 'When mandatory parameters are provided' {
+        It 'should create a new repository' {
+            $params = @{
+                ApiUri = "$ApiUri/$($Project.name)/_apis/git/repositories?api-version=$ApiVersion"
+                Method = 'POST'
+                ContentType = 'application/json'
+                Body = @{
+                    name = $RepositoryName
+                    project = @{
+                        id = $Project.id
+                    }
+                } | ConvertTo-Json
+            }
+
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+                [PSCustomObject]@{ name = $RepositoryName }
+            }
+
+            $result = New-GitRepository -ApiUri $ApiUri -Project $Project -RepositoryName $RepositoryName
+            $result.name | Should -Be $RepositoryName
+        }
+
+        It 'should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -Verifiable
+
+            $result = New-GitRepository -ApiUri $ApiUri -Project $Project -RepositoryName $RepositoryName
+
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Parameters @{
+                ApiUri = "$ApiUri/$($Project.name)/_apis/git/repositories?api-version=$ApiVersion"
+                Method = 'POST'
+                ContentType = 'application/json'
+                Body = @{
+                    name = $RepositoryName
+                    project = @{
+                        id = $Project.id
+                    }
+                } | ConvertTo-Json
+            }
         }
     }
 
-    $params = @{
-        ApiUri = "https://dev.azure.com/fakeorg"
-        Project = [PSCustomObject]@{ name = "TestProject"; id = "12345" }
-        RepositoryName = "TestRepo"
-    }
+    Context 'When an error occurs during repository creation' {
+        It 'should catch the exception and write an error' {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API call failed" }
 
-    It "Creates a new repository successfully" {
-        $result = New-GitRepository @params
-        $result | Should -Not -BeNullOrEmpty
-        $result.name | Should -Be $params.RepositoryName
-    }
-
-    It "Calls Get-AzDevOpsApiVersion if ApiVersion is not supplied" {
-        $result = New-GitRepository @params
-        Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
-    }
-
-    It "Does not call Get-AzDevOpsApiVersion if ApiVersion is supplied" {
-        $params.ApiVersion = "5.0"
-        $result = New-GitRepository @params
-        Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0
-    }
-
-    It "Returns error if Invoke-AzDevOpsApiRestMethod throws an exception" {
-        Mock Invoke-AzDevOpsApiRestMethod { throw "API error" }
-        { New-GitRepository @params } | Should -Throw
-    }
-
-    Context "with SourceRepository" {
-        $params.SourceRepository = "sourceRepo"
-        It "Creates a new repository with source repository" {
-            Mock Invoke-AzDevOpsApiRestMethod {
-                $body = (ConvertFrom-Json $using:params.Body)
-                $body | Add-Member -MemberType NoteProperty -Name 'sourceRepository' -Value $using:params.SourceRepository -Force
-                return $body
-            }
-            $result = New-GitRepository @params
-            $result.sourceRepository | Should -Be $params.SourceRepository
+            { New-GitRepository -ApiUri $ApiUri -Project $Project -RepositoryName $RepositoryName } | Should -Throw
         }
     }
 }

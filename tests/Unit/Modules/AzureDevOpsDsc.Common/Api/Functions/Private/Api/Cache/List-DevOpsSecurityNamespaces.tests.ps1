@@ -1,43 +1,39 @@
 powershell
-# Unit Tests using Pester v5
-Describe 'List-DevOpsSecurityNamespaces' {
-    BeforeAll {
-        # Mock the function Invoke-AzDevOpsApiRestMethod
-        function Invoke-AzDevOpsApiRestMethod {
-            param (
-                $Uri,
-                $Method
+Describe "List-DevOpsSecurityNamespaces" {
+    Mock -ModuleName ModuleName -FunctionName Invoke-AzDevOpsApiRestMethod {
+        return @{
+            value = @(
+                @{ id = 'namespace1'; name = 'Namespace 1' }, 
+                @{ id = 'namespace2'; name = 'Namespace 2' }
             )
-            return @{ value = @( @{ id = 1; name = "Namespace1" }, @{ id = 2; name = "Namespace2" }) }
         }
     }
 
-    It 'Should return namespaces for valid OrganizationName' {
-        param (
-            [string]$OrganizationName = 'ValidOrg'
-        )
-
-        $result = List-DevOpsSecurityNamespaces -OrganizationName $OrganizationName
-
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -HaveLength 2
-        $result[0].name | Should -Be 'Namespace1'
+    Context "With valid OrganizationName" {
+        It "Returns the security namespaces" {
+            $result = List-DevOpsSecurityNamespaces -OrganizationName 'testOrg'
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -HaveCount 2
+            $result[0].name | Should -Be 'Namespace 1'
+            $result[1].name | Should -Be 'Namespace 2'
+        }
     }
 
-    It 'Should return null for invalid OrganizationName' {
-        # Mock the function for invalid organization name
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            return @{ value = $null }
+    Context "With no OrganizationName" {
+        It "Throws a parameter binding exception" {
+            { List-DevOpsSecurityNamespaces } | Should -Throw -ErrorId 'ParameterBindingValidationException'
+        }
+    }
+
+    Context "With no namespaces returned" {
+        Mock -ModuleName ModuleName -FunctionName Invoke-AzDevOpsApiRestMethod {
+            return @{ value = @() }
         }
 
-        $result = List-DevOpsSecurityNamespaces -OrganizationName 'InvalidOrg'
-
-        $result | Should -BeNullOrEmpty
-    }
-
-    AfterAll {
-        # Remove the mock
-        Remove-Mock -CommandName Invoke-AzDevOpsApiRestMethod
+        It "Returns $null" {
+            $result = List-DevOpsSecurityNamespaces -OrganizationName 'testOrg'
+            $result | Should -BeNull
+        }
     }
 }
 

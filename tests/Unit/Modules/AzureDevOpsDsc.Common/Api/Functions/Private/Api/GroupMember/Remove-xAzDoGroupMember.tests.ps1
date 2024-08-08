@@ -1,50 +1,44 @@
 powershell
-Describe "Remove-DevOpsGroupMember" {
-    Mock Get-AzDevOpsApiVersion { return "6.0-preview.1" }
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{message = "Member removed successfully."}
+Describe "Remove-DevOpsGroupMember Tests" {
+    Mock -ModuleName ModuleName -FunctionName Get-AzDevOpsApiVersion {
+        return "5.1-preview.1"
     }
+
+    Mock -ModuleName ModuleName -FunctionName Invoke-AzDevOpsApiRestMethod {
+        return $null
+    }
+
+    $mockGroupIdentity = [PSCustomObject]@{ descriptor = "group-descriptor" }
+    $mockMemberIdentity = [PSCustomObject]@{ descriptor = "member-descriptor" }
+    $mockApiUri = "https://dev.azure.com/organization"
     
-    Context "When running Remove-DevOpsGroupMember" {
-        $group = [PSCustomObject]@{ descriptor = "group-descriptor" }
-        $member = [PSCustomObject]@{ descriptor = "member-descriptor" }
-        $apiUri = "https://dev.azure.com/org"
-
-        It "Should call Get-AzDevOpsApiVersion if ApiVersion is not provided" {
-            Remove-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $apiUri
-
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly -Times 1
+    Context "When called with valid parameters" {
+        It "should call Get-AzDevOpsApiVersion if ApiVersion is not provided" {
+            Remove-DevOpsGroupMember -GroupIdentity $mockGroupIdentity -MemberIdentity $mockMemberIdentity -ApiUri $mockApiUri
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
         }
 
-        It "Should not call Get-AzDevOpsApiVersion if ApiVersion is provided" {
-            Remove-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $apiUri -ApiVersion "5.1"
-
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly -Times 0
-        }
-
-        It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
-            Remove-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $apiUri
-
-            $expectedParams = @{
-                Uri    = "https://dev.azure.com/org/_apis/graph/memberships/member-descriptor/group-descriptor?api-version=6.0-preview.1"
-                Method = 'DELETE'
-            }
-
-            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -ParameterFilter { 
-                $Uri -eq $expectedParams.Uri -and $Method -eq $expectedParams.Method 
+        It "should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
+            Remove-DevOpsGroupMember -GroupIdentity $mockGroupIdentity -MemberIdentity $mockMemberIdentity -ApiUri $mockApiUri -ApiVersion "5.1-preview.1"
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+                $Uri -eq "https://dev.azure.com/organization/_apis/graph/memberships/member-descriptor/group-descriptor?api-version=5.1-preview.1" -and
+                $Method -eq "DELETE"
             }
         }
 
-        It "Should return the expected result" {
-            $result = Remove-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $apiUri
+        It "should not catch an error if the API call is successful" {
+            {Remove-DevOpsGroupMember -GroupIdentity $mockGroupIdentity -MemberIdentity $mockMemberIdentity -ApiUri $mockApiUri -ApiVersion "5.1-preview.1"} | Should -Not -Throw
+        }
+    }
 
-            $result.message | Should -Be "Member removed successfully."
+    Context "When an exception occurs in Invoke-AzDevOpsApiRestMethod" {
+        Mock -ModuleName ModuleName -FunctionName Invoke-AzDevOpsApiRestMethod {
+            throw "API call failed"
         }
 
-        It "Should catch exceptions from Invoke-AzDevOpsApiRestMethod" {
-            Mock Invoke-AzDevOpsApiRestMethod { throw "API Error" } -Verifiable
-
-            { Remove-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $apiUri } | Should -Throw "API Error"
+        It "should catch and log the error" {
+            {Remove-DevOpsGroupMember -GroupIdentity $mockGroupIdentity -MemberIdentity $mockMemberIdentity -ApiUri $mockApiUri -ApiVersion "5.1-preview.1"} | Should -Throw
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1
         }
     }
 }

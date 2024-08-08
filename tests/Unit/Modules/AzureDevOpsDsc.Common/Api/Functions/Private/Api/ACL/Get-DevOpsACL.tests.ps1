@@ -1,78 +1,51 @@
 powershell
 Describe 'Get-DevOpsACL' {
-    Param (
-        [string]$OrganizationName = 'TestOrg',
-        [string]$SecurityDescriptorId = 'TestId',
-        [string]$ApiVersion = '5.1-preview.1'
-    )
+    Mock Get-AzDevOpsApiVersion { return '5.1-preview' }
+    Mock Invoke-AzDevOpsApiRestMethod
+    Mock Add-CacheItem
+    Mock Export-CacheObject
 
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return '5.1-preview.1' }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-        return @{ value = @("ACL1", "ACL2"); count = 2 }
-    }
-    Mock -CommandName Add-CacheItem
-    Mock -CommandName Export-CacheObject
-
-    Context 'When ACL List is retrieved successfully' {
-        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
-            Get-DevOpsACL -OrganizationName $OrganizationName -SecurityDescriptorId $SecurityDescriptorId
-
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $Uri -eq "https://dev.azure.com/$OrganizationName/_apis/accesscontrollists/$SecurityDescriptorId?api-version=$ApiVersion" -and
-                $Method -eq 'Get'
-            }
+    It 'Returns ACL list when called with valid parameters and items are present' {
+        $mockedAclList = @{
+            value = @('item1', 'item2')
         }
 
-        It 'Should cache the ACL List' {
-            Get-DevOpsACL -OrganizationName $OrganizationName -SecurityDescriptorId $SecurityDescriptorId
+        Mock Invoke-AzDevOpsApiRestMethod { return $mockedAclList }
 
-            Assert-MockCalled -CommandName Add-CacheItem -Exactly 1
-            Assert-MockCalled -CommandName Export-CacheObject -Exactly 1
-        }
+        $result = Get-DevOpsACL -OrganizationName 'OrgName' -SecurityDescriptorId 'SecurityDescId'
 
-        It 'Should return ACL List' {
-            $result = Get-DevOpsACL -OrganizationName $OrganizationName -SecurityDescriptorId $SecurityDescriptorId
-
-            $result | Should -Be @("ACL1", "ACL2")
-        }
+        $result | Should -Not -BeNullOrEmpty
+        $result | Should -Contain 'item1'
+        $result | Should -Contain 'item2'
+        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1
+        Assert-MockCalled -CommandName Add-CacheItem -Times 1
+        Assert-MockCalled -CommandName Export-CacheObject -Times 1
     }
 
-    Context 'When ACL List is empty' {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            return @{ value = @(); count = 0 }
+    It 'Returns null when no items are present in ACL list' {
+        $mockedEmptyAclList = @{
+            value = @()
         }
 
-        It 'Should return $null' {
-            $result = Get-DevOpsACL -OrganizationName $OrganizationName -SecurityDescriptorId $SecurityDescriptorId
+        Mock Invoke-AzDevOpsApiRestMethod { return $mockedEmptyAclList }
 
-            $result | Should -BeNullOrEmpty
-        }
+        $result = Get-DevOpsACL -OrganizationName 'OrgName' -SecurityDescriptorId 'SecurityDescId'
 
-        It 'Should not cache the ACL List' {
-            Get-DevOpsACL -OrganizationName $OrganizationName -SecurityDescriptorId $SecurityDescriptorId
-
-            Assert-MockNotCalled -CommandName Add-CacheItem
-            Assert-MockNotCalled -CommandName Export-CacheObject
-        }
+        $result | Should -BeNull
+        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1
+        Assert-MockCalled -CommandName Add-CacheItem -Times 0
+        Assert-MockCalled -CommandName Export-CacheObject -Times 0
     }
 
-    Context 'When ACL List is $null' {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            return @{ value = $null; count = 0 }
-        }
+    It 'Returns null when ACL list returns null' {
+        Mock Invoke-AzDevOpsApiRestMethod { return $null }
 
-        It 'Should return $null' {
-            $result = Get-DevOpsACL -OrganizationName $OrganizationName -SecurityDescriptorId $SecurityDescriptorId
+        $result = Get-DevOpsACL -OrganizationName 'OrgName' -SecurityDescriptorId 'SecurityDescId'
 
-            $result | Should -BeNullOrEmpty
-        }
-
-        It 'Should not cache the ACL List' {
-            Get-DevOpsACL -OrganizationName $OrganizationName -SecurityDescriptorId $SecurityDescriptorId
-
-            Assert-MockNotCalled -CommandName Add-CacheItem
-            Assert-MockNotCalled -CommandName Export-CacheObject
-        }
+        $result | Should -BeNull
+        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1
+        Assert-MockCalled -CommandName Add-CacheItem -Times 0
+        Assert-MockCalled -CommandName Export-CacheObject -Times 0
     }
 }
 

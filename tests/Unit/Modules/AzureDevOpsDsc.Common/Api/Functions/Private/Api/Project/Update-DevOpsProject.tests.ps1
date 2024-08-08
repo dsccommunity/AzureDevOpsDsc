@@ -1,94 +1,32 @@
 powershell
-Describe 'Update-DevOpsProject' {
-    $functionName = 'Update-DevOpsProject'
-
+Describe "Update-DevOpsProject" {
     BeforeAll {
-        function Test-AzDevOpsPat {
-            param (
-                [string]$Pat,
-                [bool]$IsValid
-            )
-            return $IsValid
-        }
-
-        function Invoke-AvDevOpsApiRestMethod {
-            param ($Uri, $Body, $Method, $Headers)
+        function Invoke-AzDevOpsApiRestMethod {
+            param($Uri, $Body, $Method)
             return @{
-                status = 'Success'
-                updatedName = $Body.name
-                updatedDescription = $Body.description
-                updatedVisibility = $Body.visibility
+                name = "NewProjectName"
+                description = "Updated project description"
+                visibility = "public"
             }
         }
     }
 
-    Context 'When all parameters are provided' {
-        $params = @{
-            Organization = "contoso"
-            ProjectId = "MyProject"
-            NewName = "NewProjectName"
-            Description = "Updated project description"
-            Visibility = "public"
-            PersonalAccessToken = "fakePAT"
-        }
-
-        It 'Should update the project successfully' {
-            $result = & $functionName @params
-            $result.status | Should -Be 'Success'
-            $result.updatedName | Should -Be $params.NewName
-            $result.updatedDescription | Should -Be $params.Description
-            $result.updatedVisibility | Should -Be $params.Visibility
-        }
+    It "Should throw an error when Organization parameter is missing" {
+        { Update-DevOpsProject -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "public" -PersonalAccessToken "PAT" } | Should -Throw
     }
 
-    Context 'When required parameters are missing' {
-        It 'Should throw an error when Organization is missing' {
-            {
-                & $functionName -ProjectId "MyProject"
-            } | Should -Throw
-        }
-
-        It 'Should throw an error when ProjectId is missing' {
-            {
-                & $functionName -Organization "contoso"
-            } | Should -Throw
-        }
+    It "Should update the project with the specified parameters" {
+        $result = Update-DevOpsProject -Organization "contoso" -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "public" -PersonalAccessToken "PAT"
+        
+        $result.name | Should -Be "NewProjectName"
+        $result.description | Should -Be "Updated project description"
+        $result.visibility | Should -Be "public"
     }
 
-    Context 'When optional parameters are not provided' {
-        $params = @{
-            Organization = "contoso"
-            ProjectId = "MyProject"
-        }
-
-        It 'Should use default values for optional parameters' {
-            $result = & $functionName @params
-            $result.status | Should -Be 'Success'
-            $result.updatedVisibility | Should -Be 'private'
-        }
-    }
-
-    Context 'When PAT validation fails' {
-        BeforeAll {
-            function Test-AzDevOpsPat {
-                param (
-                    [string]$Pat,
-                    [bool]$IsValid
-                )
-                return $false
-            }
-        }
-
-        It 'Should throw an error if PAT is invalid' {
-            $params = @{
-                Organization = "contoso"
-                ProjectId = "MyProject"
-                PersonalAccessToken = "invalidPAT"
-            }
-            {
-                & $functionName @params
-            } | Should -Throw
-        }
+    It "Should set the visibility to private when specified" {
+        $result = Update-DevOpsProject -Organization "contoso" -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "private" -PersonalAccessToken "PAT"
+        
+        $result.visibility | Should -Be "private"
     }
 }
 

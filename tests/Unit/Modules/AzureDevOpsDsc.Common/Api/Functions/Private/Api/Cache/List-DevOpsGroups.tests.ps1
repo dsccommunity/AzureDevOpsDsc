@@ -1,44 +1,54 @@
 powershell
 Describe "List-DevOpsGroups" {
-    Mock -CommandName Get-AzDevOpsApiVersion {
-        return "5.1-preview.1"
-    }
-
+    Param (
+        [string]$Organization = "testOrg",
+        [string]$ApiVersion = "6.0-preview.1"
+    )
+    
+    Mock -CommandName Get-AzDevOpsApiVersion { return "6.0-preview.1" }
     Mock -CommandName Invoke-AzDevOpsApiRestMethod {
         return @{
             value = @(
                 @{
-                    id = "group1"
-                    displayName = "Group 1"
+                    displayName = "Project Administrators"
+                    originId = "abc123"
                 },
                 @{
-                    id = "group2"
-                    displayName = "Group 2"
+                    displayName = "Contributors"
+                    originId = "def456"
                 }
             )
         }
     }
 
-    Context "When called with mandatory parameter" {
+    Context "Valid Parameters" {
         It "Should return groups" {
-            $Organization = "sampleOrg"
             $result = List-DevOpsGroups -Organization $Organization
+
             $result | Should -Not -BeNullOrEmpty
-            $result.count | Should -Be 2
-            $result[0].displayName | Should -Be "Group 1"
-            $result[1].displayName | Should -Be "Group 2"
+            $result | Should -BeOfType Array
+            $result.Count | Should -Be 2
+
+            $result[0].displayName | Should -Be "Project Administrators"
+            $result[0].originId | Should -Be "abc123"
+            $result[1].displayName | Should -Be "Contributors"
+            $result[1].originId | Should -Be "def456"
         }
     }
 
-    Context "When API call returns null value" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod {
-            return @{ value = $null }
-        }
+    Context "No Groups Returned" {
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod { return @{ value = $null } }
 
-        It "Should return null" {
-            $Organization = "sampleOrg"
+        It "Should return null if no groups" {
             $result = List-DevOpsGroups -Organization $Organization
+
             $result | Should -BeNull
+        }
+    }
+
+    Context "Mandatory Parameter -Organization" {
+        It "Should throw an error if missing -Organization" {
+            { List-DevOpsGroups } | Should -Throw -ErrorId "ParameterArgumentTransformationError"
         }
     }
 }

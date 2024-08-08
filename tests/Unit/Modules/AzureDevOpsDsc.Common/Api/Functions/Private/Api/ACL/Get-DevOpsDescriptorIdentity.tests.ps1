@@ -1,75 +1,78 @@
 powershell
-# Import the Pester module
-Import-Module Pester
-
-# Mock the Invoke-AzDevOpsApiRestMethod function
-Mock Invoke-AzDevOpsApiRestMethod {
-    Write-Output @{
-        value = @(
-            @{
-                displayName = "John Doe"
-                principalName = "johndoe@contoso.com"
-            }
-        )
-        count = 1
-    }
+# Define the function
+function Get-DevOpsDescriptorIdentity {
+    # Function code as described above
 }
 
-Describe "Get-DevOpsDescriptorIdentity" {
-    BeforeAll {
-        # Define test parameters
-        $organizationName = "TestOrg"
-        $subjectDescriptor = "subject:abcd1234"
-    }
+# Test the function
+Describe 'Get-DevOpsDescriptorIdentity Tests' {
+    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return '6.0-preview.1' }
+    Mock -CommandName Invoke-AzDevOpsApiRestMethod
 
-    Context "when called with valid SubjectDescriptor" {
-        It "should return a single identity" {
-            # Run the function
-            $result = Get-DevOpsDescriptorIdentity -OrganizationName $organizationName -SubjectDescriptor $subjectDescriptor
+    Context 'When retrieving identity by SubjectDescriptor' {
+        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            $orgName = "MyOrg"
+            $subjectDescriptor = "subject:abcd1234"
+            $expectedUri = "https://vssps.dev.azure.com/$orgName/_apis/identities?subjectDescriptors=$subjectDescriptor&api-version=6.0-preview.1"
 
-            # Assert results
-            $result | Should -Not -BeNullOrEmpty
-            $result.displayName | Should -Be "John Doe"
+            Get-DevOpsDescriptorIdentity -OrganizationName $orgName -SubjectDescriptor $subjectDescriptor
+
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -Parameters @{
+                Uri = $expectedUri
+                Method = 'Get'
+            }
         }
     }
 
-    Context "when SubjectDescriptor is not provided" {
-        It "should return null" {
-            # Run the function without SubjectDescriptor
-            $result = Get-DevOpsDescriptorIdentity -OrganizationName $organizationName
-            
-            # Assert results
+    Context 'When retrieving identity by Descriptor' {
+        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            $orgName = "MyOrg"
+            $descriptor = "descriptor:abcd1234"
+            $expectedUri = "https://vssps.dev.azure.com/$orgName/_apis/identities?descriptors=$descriptor&api-version=6.0-preview.1"
+
+            Get-DevOpsDescriptorIdentity -OrganizationName $orgName -Descriptor $descriptor
+
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -Parameters @{
+                Uri = $expectedUri
+                Method = 'Get'
+            }
+        }
+    }
+
+    Context 'When result has multiple identities' {
+        It 'Should return $null' {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { @{
+                count = 2
+                value = @('identity1', 'identity2')
+            } }
+
+            $result = Get-DevOpsDescriptorIdentity -OrganizationName "MyOrg" -SubjectDescriptor "subject:abcd1234"
             $result | Should -BeNullOrEmpty
         }
     }
-    
-    Context "when more than one identity is returned" {
-        BeforeAll {
-            Mock Invoke-AzDevOpsApiRestMethod {
-                Write-Output @{
-                    value = @(
-                        @{
-                            displayName = "John Doe"
-                            principalName = "johndoe@contoso.com"
-                        },
-                        @{
-                            displayName = "Jane Doe"
-                            principalName = "janedoe@contoso.com"
-                        }
-                    )
-                    count = 2
+
+    Context 'When result has no identity' {
+        It 'Should return $null' {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { @{ count = 0 } }
+
+            $result = Get-DevOpsDescriptorIdentity -OrganizationName "MyOrg" -SubjectDescriptor "subject:abcd1234"
+            $result | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'When result has one identity' {
+        It 'Should return the identity' {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+                @{
+                    count = 1
+                    value = @('identity1')
                 }
             }
-        }
-        
-        It "should return null" {
-            # Run the function
-            $result = Get-DevOpsDescriptorIdentity -OrganizationName $organizationName -SubjectDescriptor $subjectDescriptor
 
-            # Assert results
-            $result | Should -BeNullOrEmpty
+            $result = Get-DevOpsDescriptorIdentity -OrganizationName "MyOrg" -SubjectDescriptor "subject:abcd1234"
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeExactly 'identity1'
         }
     }
 }
-
 

@@ -1,60 +1,44 @@
 powershell
-Describe "List-DevOpsGitRepository" {
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "6.0" }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod
+Describe 'List-DevOpsGitRepository' {
+    Mock Get-AzDevOpsApiVersion { return "6.0" }
+    Mock Invoke-AzDevOpsApiRestMethod
 
-    $orgName = "TestOrganization"
-    $projName = "TestProject"
-    $apiVersionDefault = "6.0"
-    $apiResponse = [PSCustomObject]@{
-        Value = @(
-            [PSCustomObject]@{ name = "Repo1" },
-            [PSCustomObject]@{ name = "Repo2" }
-        )
-    }
+    Context 'When called with valid parameters' {
+        $orgName = "testOrg"
+        $projName = "testProj"
 
-    Context "When API returns repositories" {
-        Mock Invoke-AzDevOpsApiRestMethod {
-            param (
-                [Parameter(Mandatory = $true)][string]$Uri,
-                [Parameter(Mandatory = $true)][string]$Method
-            )
-            return $apiResponse
-        }
-
-        It "should return the repository list" {
-            $result = List-DevOpsGitRepository -OrganizationName $orgName -ProjectName $projName
-            $result | Should -BeExactly $apiResponse.Value
-        }
-    }
-
-    Context "When API returns null value" {
-        Mock Invoke-AzDevOpsApiRestMethod {
-            param (
-                [Parameter(Mandatory = $true)][string]$Uri,
-                [Parameter(Mandatory = $true)][string]$Method
-            )
-            return [PSCustomObject]@{ value = $null }
-        }
-
-        It "should return null" {
-            $result = List-DevOpsGitRepository -OrganizationName $orgName -ProjectName $projName
-            $result | Should -BeNull
-        }
-    }
-
-    Context "With Default API Version" {
-        It "should use default API version from Get-AzDevOpsApiVersion" {
+        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
             List-DevOpsGitRepository -OrganizationName $orgName -ProjectName $projName
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
+            $params = @{
+                Uri = "https://dev.azure.com/$orgName/$projName/_apis/git/repositories"
+                Method = 'Get'
+            }
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Parameters $params
+        }
+
+        It 'Should return repositories values' {
+            $expectedResult = @(
+                @{ name = 'Repo1'; id = '1' },
+                @{ name = 'Repo2'; id = '2' }
+            )
+            Mock Invoke-AzDevOpsApiRestMethod { @{ value = $expectedResult } }
+
+            $result = List-DevOpsGitRepository -OrganizationName $orgName -ProjectName $projName
+            
+            $result | Should -Be $expectedResult
         }
     }
 
-    Context "Including API Version Parameter" {
-        It "should use provided API version" {
-            $apiVersion = "5.1"
-            List-DevOpsGitRepository -OrganizationName $orgName -ProjectName $projName -ApiVersion $apiVersion
-            Assert-MockCalled Get-AzDevOpsApiVersion -Times 0
+    Context 'When no repositories found' {
+        $orgName = "testOrg"
+        $projName = "testProj"
+
+        It 'Should return $null' {
+            Mock Invoke-AzDevOpsApiRestMethod { @{ value = $null } }
+
+            $result = List-DevOpsGitRepository -OrganizationName $orgName -ProjectName $projName
+
+            $result | Should -Be $null
         }
     }
 }

@@ -1,56 +1,67 @@
 powershell
 Describe 'List-UserCache' {
-    Param (
-        [string]$OrganizationName = 'dummyOrg',
-        [string]$ApiVersion = '6.0-preview.1'
-    )
-
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return '6.0-preview.1' }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+    Mock Invoke-AzDevOpsApiRestMethod {
         return @{
             value = @(
-                @{id = 1; displayName = 'User One'},
-                @{id = 2; displayName = 'User Two'}
+                @{ id = 1; displayName = 'User One' }
+                @{ id = 2; displayName = 'User Two' }
             )
         }
     }
 
-    Context 'When mandatory parameter is missing' {
-        It 'Should throw an error if OrganizationName is not provided' {
-            { List-UserCache } | Should -Throw
-        }
+    Mock Get-AzDevOpsApiVersion {
+        return '6.0'
     }
 
-    Context 'When OrganizationName is provided' {
-        It 'Should call Get-AzDevOpsApiVersion if ApiVersion is not provided' {
-            List-UserCache -OrganizationName $OrganizationName
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly -Times 1
-        }
-
-        It 'Should not call Get-AzDevOpsApiVersion if ApiVersion is provided' {
-            List-UserCache -OrganizationName $OrganizationName -ApiVersion $ApiVersion
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly -Times 0
+    Context 'When called with a mandatory OrganizationName' {
+        It 'Should return users from the cache' {
+            $result = List-UserCache -OrganizationName 'TestOrg'
+            $result | Should -BeOfType 'System.Object[]'
+            $result.Count | Should -Be 2
+            $result[0].displayName | Should -Be 'User One'
+            $result[1].displayName | Should -Be 'User Two'
         }
 
         It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
-            List-UserCache -OrganizationName $OrganizationName -ApiVersion $ApiVersion
-            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope Context -ParameterFilter {
-                $params.Uri -eq "https://vssps.dev.azure.com/$OrganizationName/_apis/graph/users" -and
-                $params.Method -eq 'Get'
+            List-UserCache -OrganizationName 'TestOrg'
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
+                $Uri -eq 'https://vssps.dev.azure.com/TestOrg/_apis/graph/users' -and $Method -eq 'Get'
             }
         }
 
-        It 'Should return the users if response contains value' {
-            $result = List-UserCache -OrganizationName $OrganizationName -ApiVersion $ApiVersion
-            $result | Should -Not -BeNullOrEmpty
-            $result | Should -BeOfType 'System.Object[]'
-            $result.Count | Should -Be 2
+        It 'Should call Get-AzDevOpsApiVersion once' {
+            List-UserCache -OrganizationName 'TestOrg'
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1 -Scope It
         }
+    }
 
-        It 'Should return $null if there are no users' {
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { return @{} }
-            $result = List-UserCache -OrganizationName $OrganizationName -ApiVersion $ApiVersion
-            $result | Should -BeNull
+    Context 'When no users are returned' {
+        Mock Invoke-AzDevOpsApiRestMethod {
+            return @{
+                value = $null
+            }
+        }
+        
+        It 'Should return $null when no users are returned' {
+            $result = List-UserCache -OrganizationName 'TestOrg'
+            $result | Should -Be $null
+        }
+    }
+
+    Context 'When ApiVersion is provided' {
+        Mock Invoke-AzDevOpsApiRestMethod {
+            return @{
+                value = @(
+                    @{ id = 3; displayName = 'User Three' }
+                )
+            }
+        }
+        
+        It 'Should use the provided ApiVersion' {
+            $result = List-UserCache -OrganizationName 'TestOrg' -ApiVersion '5.0'
+            $result | Should -BeOfType 'System.Object[]'
+            $result.Count | Should -Be 1
+            $result[0].displayName | Should -Be 'User Three'
         }
     }
 }

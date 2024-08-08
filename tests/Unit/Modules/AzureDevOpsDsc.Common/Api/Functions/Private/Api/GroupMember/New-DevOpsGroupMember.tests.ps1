@@ -1,73 +1,53 @@
 powershell
-Describe 'New-DevOpsGroupMember' {
-    # Mock function to simulate Get-AzDevOpsApiVersion
-    function Get-AzDevOpsApiVersion {
-        param()
-        return '6.0-preview.1'
-    }
+Describe "New-DevOpsGroupMember Tests" {
+    Mock Get-AzDevOpsApiVersion { return "6.0-preview.1" }
+    Mock Invoke-AzDevOpsApiRestMethod
 
-    # Mock function to simulate Invoke-AzDevOpsApiRestMethod
-    function Invoke-AzDevOpsApiRestMethod {
-        param (
-            [string]$Uri,
-            [string]$Method
-        )
-        return @{ result = 'success' }
-    }
+    $GroupIdentity = [pscustomobject]@{ descriptor = "vssgp.Uy8yNTarDUI1LTE4N" }
+    $MemberIdentity = [pscustomobject]@{ descriptor = "aad.MjU2ZDQtNzQtNDAwOA" }
+    $ApiUri = "https://dev.azure.com/myorg"
 
-    Context 'With valid parameters' {
-        It 'Should call Invoke-AzDevOpsApiRestMethod and return result from REST method' {
-            # Arrange
-            $group = [PSCustomObject]@{ descriptor = 'group-descriptor' }
-            $member = [PSCustomObject]@{ descriptor = 'member-descriptor' }
-            $apiUri = 'https://dev.azure.com/organization'
+    Context "When all mandatory parameters are provided" {
+        It "Calls Invoke-AzDevOpsApiRestMethod with constructed URI and method" {
+            $result = New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
 
-            # Act
-            $result = New-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $apiUri
+            $expectedUri = "{0}/_apis/graph/memberships/{1}/{2}?api-version={3}" -f $ApiUri, $MemberIdentity.descriptor, $GroupIdentity.descriptor, "6.0-preview.1"
 
-            # Assert
-            $result.result | Should -Be 'success'
-            (Get-Command Invoke-AzDevOpsApiRestMethod).Parameters.Keys | Should -Contain 'Uri'
-            (Get-Command Invoke-AzDevOpsApiRestMethod).Parameters.Keys | Should -Contain 'Method'
+            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter { 
+                $params.Uri -eq $expectedUri -and
+                $params.Method -eq "PUT"
+            }
         }
     }
 
-    Context 'When REST method fails' {
-        It 'Should catch the exception and write an error' {
-            # Arrange
-            $group = [PSCustomObject]@{ descriptor = 'group-descriptor' }
-            $member = [PSCustomObject]@{ descriptor = 'member-descriptor' }
-            $apiUri = 'https://dev.azure.com/organization'
-            
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-                throw [System.Exception]::new('REST call failed.')
-            }
+    Context "When ApiVersion parameter is provided" {
+        It "Uses the provided ApiVersion in the URI" {
+            $ApiVersion = "5.1"
+            $result = New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri -ApiVersion $ApiVersion
 
-            # Act & Assert
-            { New-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $apiUri } | Should -Throw -ExceptionMessage 'REST call failed.'
+            $expectedUri = "{0}/_apis/graph/memberships/{1}/{2}?api-version={3}" -f $ApiUri, $MemberIdentity.descriptor, $GroupIdentity.descriptor, $ApiVersion
+
+            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter { 
+                $params.Uri -eq $expectedUri -and
+                $params.Method -eq "PUT"
+            }
         }
     }
 
-    Context 'With default API version' {
-        It 'Should use the default API version if not provided' {
-            # Arrange
-            $group = [PSCustomObject]@{ descriptor = 'group-descriptor' }
-            $member = [PSCustomObject]@{ descriptor = 'member-descriptor' }
+    Context "When Invoke-AzDevOpsApiRestMethod throws an error" {
+        Mock Invoke-AzDevOpsApiRestMethod { throw "REST call failed" } -Verifiable -Scope It
+        It "Catches and writes an error" {
+            { New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri } | Should -Throw
 
-            $global:ApiUri = 'https://dev.azure.com/organization'
-            $global:ApiVersion = '6.0-preview.1'
+            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It
+        }
+    }
 
-            Mock -CommandName Get-AzDevOpsApiVersion -MockWith {
-                $global:ApiVersion
-            }
+    Context "When Get-AzDevOpsApiVersion is called" {
+        It "Calls Get-AzDevOpsApiVersion to get the default ApiVersion" {
+            New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
 
-            # Act
-            $result = New-DevOpsGroupMember -GroupIdentity $group -MemberIdentity $member -ApiUri $global:ApiUri
-
-            # Assert
-            $result.result | Should -Be 'success'
-            $params = Get-MockCalledInvoke -ModuleName Pester -Mock Invoke-AzDevOpsApiRestMethod
-            $params.Parameters.ApiVersion | Should -Be $global:ApiVersion
+            Assert-MockCalled -MockName Get-AzDevOpsApiVersion -Times 1 -Exactly -Scope It
         }
     }
 }

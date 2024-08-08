@@ -1,40 +1,53 @@
 powershell
-Describe "List-DevOpsProjects Tests" {
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { "6.0-preview.1" }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod
+Describe 'List-DevOpsProjects' {
+    Mock Get-AzDevOpsApiVersion {
+        return "6.0"
+    }
 
-    Context "When OrganizationName is specified" {
-        It "should call Invoke-AzDevOpsApiRestMethod with correct parameters and return project list" {
-            $mockResult = [PSCustomObject]@{ value = @("Project1", "Project2") }
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { $mockResult }
-
-            $result = List-DevOpsProjects -OrganizationName "MyOrg"
-
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It
-            $result | Should -Be @("Project1", "Project2")
-        }
-
-        It "should call Get-AzDevOpsApiVersion if ApiVersion is not specified" {
-            List-DevOpsProjects -OrganizationName "MyOrg"
-            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Exactly -Times 1 -Scope It
-        }
-
-        It "should not call Get-AzDevOpsApiVersion if ApiVersion is specified" {
-            List-DevOpsProjects -OrganizationName "MyOrg" -ApiVersion "5.1"
-            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Exactly -Times 0 -Scope It
-        }
-
-        It "should return null if Invoke-AzDevOpsApiRestMethod returns no value" {
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { [PSCustomObject]@{ value = $null } }
-
-            $result = List-DevOpsProjects -OrganizationName "MyOrg"
-            $result | Should -Be $null
+    Mock Invoke-AzDevOpsApiRestMethod {
+        return @{
+            value = @(
+                @{ id = '1'; name = 'ProjectOne' }, 
+                @{ id = '2'; name = 'ProjectTwo' }
+            )
         }
     }
 
-    Context "When OrganizationName is not specified" {
-        It "should throw an error" {
-            { List-DevOpsProjects -ApiVersion "5.1" } | Should -Throw
+    It 'Returns DevOps projects for a valid organization name' {
+        $result = List-DevOpsProjects -OrganizationName 'TestOrg'
+
+        $result | Should -Not -BeNullOrEmpty
+        $result | Should -HaveCount 2
+        $result[0].name | Should -Be 'ProjectOne'
+        $result[1].name | Should -Be 'ProjectTwo'
+    }
+
+    It 'Returns null when no projects are found' {
+        Mock Invoke-AzDevOpsApiRestMethod {
+            return @{
+                value = $null
+            }
+        }
+
+        $result = List-DevOpsProjects -OrganizationName 'EmptyOrg'
+        $result | Should -BeNull
+    }
+
+    It 'Calls Get-AzDevOpsApiVersion when ApiVersion is not supplied' {
+        List-DevOpsProjects -OrganizationName 'TestOrg'
+        Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
+    }
+
+    It 'Uses the supplied ApiVersion when provided' {
+        $apiVersion = '5.1'
+        List-DevOpsProjects -OrganizationName 'TestOrg' -ApiVersion $apiVersion
+        Assert-MockCalled Get-AzDevOpsApiVersion -Times 0
+    }
+
+    It 'Calls Invoke-AzDevOpsApiRestMethod with correct URI' {
+        List-DevOpsProjects -OrganizationName 'TestOrg'
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
+            $params.Uri -eq "https://dev.azure.com/TestOrg/_apis/projects"
         }
     }
 }
