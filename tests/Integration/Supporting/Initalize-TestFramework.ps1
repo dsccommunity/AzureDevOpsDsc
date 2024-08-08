@@ -17,25 +17,22 @@ if (-not (Test-Path $TestFrameworkConfigurationPath))
 # Attempt to load the configuration
 $TestFrameworkConfiguration = Get-Content $TestFrameworkConfigurationPath | ConvertFrom-Json
 
+# Confirm the Organization
+if (-not $TestFrameworkConfiguration.Organization)
+{
+    throw "[Initialize-TestFramework] Organization not specified in the Test Framework Configuration"
+}
+
 # Confirm the Authentication Type
 if ($TestFrameworkConfiguration.AuthenticationType -eq 'PAT')
 {
-
-} elseif ($TestFrameworkConfiguration.AuthenticationType -eq 'ManagedIdentity')
-{
-
+    # Authenticate with a Personal Access Token
+    New-AzDoAuthenticationProvider -OrganizationName $AzureDevopsOrganizationName -PersonalAccessToken $TestFrameworkConfiguration.PATToken
+} elseif ($TestFrameworkConfiguration.AuthenticationType -eq 'ManagedIdentity') {
+    # Authenticate with a Managed Identity
+    New-AzDoAuthenticationProvider -OrganizationName $AzureDevopsOrganizationName -useManagedIdentity
 } else {
     throw "[Initialize-TestFramework] Invalid Authentication Type: $($TestFrameworkConfiguration.AuthenticationType)"
 }
 
 
-
-#
-# Depending on the Type, validate the configuration
-
-if ($Type -eq 'BeforeAll')
-{
-
-
-
-}
