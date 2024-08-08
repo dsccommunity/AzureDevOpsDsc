@@ -1,4 +1,3 @@
-powershell
 Describe 'List-DevOpsGitRepository' {
     Mock Get-AzDevOpsApiVersion { return "6.0" }
     Mock Invoke-AzDevOpsApiRestMethod
@@ -24,7 +23,7 @@ Describe 'List-DevOpsGitRepository' {
             Mock Invoke-AzDevOpsApiRestMethod { @{ value = $expectedResult } }
 
             $result = List-DevOpsGitRepository -OrganizationName $orgName -ProjectName $projName
-            
+
             $result | Should -Be $expectedResult
         }
     }

@@ -1,4 +1,3 @@
-powershell
 Describe 'Get-DevOpsProject' {
     Mock -CommandName Convert::ToBase64String -MockWith { return 'dGVzdAo=' }
     Mock -CommandName Invoke-RestMethod -MockWith { return @{ name = 'ProjectName'; id = 'ProjectId' } }

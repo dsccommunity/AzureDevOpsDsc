@@ -1,19 +1,18 @@
-Describe "AzDoAPI_7_IdentitySubjectDescriptors Tests" {
-    
-    Mock -CommandName Get-CacheObject {
-        switch ($args[1]) {
-            'LiveGroups' { return @{} }
-            'LiveUsers' { return @{} }
-            'LiveServicePrinciples' { return @{} }
+Describe "AzDoAPI_7_IdentitySubjectDescriptors" {
+    Mock -CommandName Get-CacheObject -MockWith {
+        switch ($args[0]) {
+            'LiveGroups' { @{} }
+            'LiveUsers' { @{} }
+            'LiveServicePrinciples' { @{} }
         }
     }
 
-    Mock -CommandName Get-DevOpsDescriptorIdentity {
-        return [PSCustomObject]@{
-            id = 'test-id'
-            descriptor = 'test-descriptor'
-            subjectDescriptor = 'test-subjectDescriptor'
-            providerDisplayName = 'test-providerDisplayName'
+    Mock -CommandName Get-DevOpsDescriptorIdentity -MockWith {
+        @{
+            id = 'mockId'
+            descriptor = 'mockDescriptor'
+            subjectDescriptor = 'mockSubjectDescriptor'
+            providerDisplayName = 'mockProvider'
             isActive = $true
             isContainer = $false
         }
@@ -21,40 +20,61 @@ Describe "AzDoAPI_7_IdentitySubjectDescriptors Tests" {
 
     Mock -CommandName Add-CacheItem
     Mock -CommandName Export-CacheObject
-    Mock -CommandName Write-Verbose
 
-    Context "When OrganizationName is provided" {
-        It "Should call Get-CacheObject and other dependent commands" {
-            $OrganizationName = "TestOrganization"
-            AzDoAPI_7_IdentitySubjectDescriptors -OrganizationName $OrganizationName
-
-            # Verifying Get-CacheObject calls
-            (Get-CommandMock -CommandName Get-CacheObject).CallCount | Should -Be 3
-
-            # Verifying Get-DevOpsDescriptorIdentity calls
-            (Get-CommandMock -CommandName Get-DevOpsDescriptorIdentity).CallCount | Should -BeGreaterThan 0
-
-            # Verifying Add-CacheItem calls
-            (Get-CommandMock -CommandName Add-CacheItem).CallCount | Should -BeGreaterThan 0
-
-            # Verifying Export-CacheObject calls
-            (Get-CommandMock -CommandName Export-CacheObject -ParameterFilter { $CacheType -eq 'LiveGroups' }).CallCount | Should -Be 1
-            (Get-CommandMock -CommandName Export-CacheObject -ParameterFilter { $CacheType -eq 'LiveUsers' }).CallCount | Should -Be 1
-            (Get-CommandMock -CommandName Export-CacheObject -ParameterFilter { $CacheType -eq 'LiveServicePrinciples' }).CallCount | Should -Be 1
-
-            # Verifying Write-Verbose calls
-            (Get-CommandMock -CommandName Write-Verbose).CallCount | Should -BeGreaterThan 1
-        }
+    BeforeEach {
+        $Global:DSCAZDO_OrganizationName = 'mockOrg'
     }
 
-    Context "When OrganizationName is not provided" {
-        It "Should use global variable for OrganizationName" {
-            $Global:DSCAZDO_OrganizationName = "GlobalTestOrganization"
+    It "should use a global variable if OrganizationName parameter is not provided" {
+        $result = AzDoAPI_7_IdentitySubjectDescriptors
+        Should -InvokeCommand -CommandName Get-CacheObject
+        Should -InvokeCommand -CommandName Get-DevOpsDescriptorIdentity
+        Should -InvokeCommand -CommandName Add-CacheItem
+        Should -InvokeCommand -CommandName Export-CacheObject
+    }
 
-            AzDoAPI_7_IdentitySubjectDescriptors
+    It "should use OrganizationName parameter if provided" {
+        $result = AzDoAPI_7_IdentitySubjectDescriptors -OrganizationName 'testOrg'
+        Should -InvokeCommand -CommandName Get-CacheObject
+        Should -InvokeCommand -CommandName Get-DevOpsDescriptorIdentity
+        Should -InvokeCommand -CommandName Add-CacheItem
+        Should -InvokeCommand -CommandName Export-CacheObject
+    }
 
-            # Verifying Get-CacheObject calls
-            (Get-CommandMock -CommandName Get-CacheObject).CallCount | Should -Be 3
+    It "should call Get-CacheObject for each cache type" {
+        $result = AzDoAPI_7_IdentitySubjectDescriptors -OrganizationName 'testOrg'
+        Should -InvokeCommand -CommandName Get-CacheObject -Times 3
+    }
+
+    It "should add members to each cache object" {
+        $mockGroup = @{
+            Key = 'mockKey'
+            Value = [PSCustomObject]@{
+                descriptor = 'mockDescriptorGroup'
+            }
+        }
+
+        Mock -CommandName Get-CacheObject -MockWith { @{'mockGroup' = $mockGroup} }
+
+        $result = AzDoAPI_7_IdentitySubjectDescriptors -OrganizationName 'testOrg'
+
+        Should -InvokeCommand -CommandName Get-DevOpsDescriptorIdentity -ParameterFilter {
+            $_.SubjectDescriptor -eq 'mockDescriptorGroup'
+        }
+
+        $cacheItemArgs = @{
+            Key = 'mockKey'
+            Value = $mockGroup
+            Type = 'LiveGroups'
+            SuppressWarning = $true
+        }
+
+        Should -InvokeCommand -CommandName Add-CacheItem -ParameterFilter {
+            $_.Key -eq $cacheItemArgs.Key -and
+            $_.Value -eq $cacheItemArgs.Value -and
+            $_.Type -eq $cacheItemArgs.Type -and
+            $_.SuppressWarning -eq $cacheItemArgs.SuppressWarning
         }
     }
 }
+

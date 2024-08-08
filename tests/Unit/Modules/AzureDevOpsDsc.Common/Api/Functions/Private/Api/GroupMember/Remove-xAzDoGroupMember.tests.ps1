@@ -1,4 +1,3 @@
-powershell
 Describe "Remove-DevOpsGroupMember Tests" {
     Mock -ModuleName ModuleName -FunctionName Get-AzDevOpsApiVersion {
         return "5.1-preview.1"
@@ -11,7 +10,7 @@ Describe "Remove-DevOpsGroupMember Tests" {
     $mockGroupIdentity = [PSCustomObject]@{ descriptor = "group-descriptor" }
     $mockMemberIdentity = [PSCustomObject]@{ descriptor = "member-descriptor" }
     $mockApiUri = "https://dev.azure.com/organization"
-    
+
     Context "When called with valid parameters" {
         It "should call Get-AzDevOpsApiVersion if ApiVersion is not provided" {
             Remove-DevOpsGroupMember -GroupIdentity $mockGroupIdentity -MemberIdentity $mockMemberIdentity -ApiUri $mockApiUri

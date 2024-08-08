@@ -1,6 +1,5 @@
-powershell
 Describe "Get-AzManagedIdentityToken Tests" {
-    
+
     Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith {
         return @{
             access_token = "fake-access-token"
@@ -30,7 +29,7 @@ Describe "Get-AzManagedIdentityToken Tests" {
             $result = Get-AzManagedIdentityToken -OrganizationName "Contoso" -Verify
             $result.AccessToken | Should -Be "fake-access-token"
         }
-        
+
         It "should throw error if Token verification fails" {
             Mock -CommandName 'Test-AzToken' -MockWith { return $false }
             {

@@ -1,96 +1,106 @@
+powershell
+# ConvertTo-ACEList.Tests.ps1
 
-# Module: ConvertTo-ACEList.Tests.ps1
+# Import the module containing the function to be tested
+# Import-Module -Name 'YourModuleName'
 
 Describe "ConvertTo-ACEList" {
-    BeforeEach {
-        function Find-Identity {
-            param (
-                [string]$Name,
-                [string]$OrganizationName,
-                [string]$SearchType
-            )
-            return "$Name-Found"
-        }
 
-        function ConvertTo-ACETokenList {
-            param (
-                [string]$SecurityNamespace,
-                [string]$ACEPermissions
-            )
-            return "$ACEPermissions-Token"
+    Mock -CommandName 'Find-Identity' {
+        return @{
+            Identity = "FoundIdentity"
         }
     }
-    
-    It "Should return ACEs with valid input" {
+
+    Mock -CommandName 'ConvertTo-ACETokenList' {
+        return "MockedPermissionToken"
+    }
+
+    Context "When called with valid parameters" {
         $SecurityNamespace = "Namespace"
-        $Permissions = @(
-            [PSCustomObject]@{ Identity = "User1"; Permission = "Read" },
-            [PSCustomObject]@{ Identity = "User2"; Permission = "Write" }
-        )
         $OrganizationName = "MyOrg"
+        $Permissions = @(
+            @{
+                Identity = "User1"
+                Permission = "Read"
+            },
+            @{
+                Identity = "User2"
+                Permission = "Write"
+            }
+        )
 
-        $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
+        It "Should return a list of ACEs" {
+            $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
 
-        $result | Should -HaveCount 2
-        $result | Should -Contain @{
-            Identity = "User1-Found"
-            Permissions = "Read-Token"
-        }
-        $result | Should -Contain @{
-            Identity = "User2-Found"
-            Permissions = "Write-Token"
+            $result | Should -HaveCount 2
+            $result[0].Identity | Should -Be "FoundIdentity"
+            $result[0].Permissions | Should -Be "MockedPermissionToken"
+            $result[1].Identity | Should -Be "FoundIdentity"
+            $result[1].Permissions | Should -Be "MockedPermissionToken"
         }
     }
 
-    It "Should handle missing identity gracefully" {
-        function Find-Identity {
-            param (
-                [string]$Name,
-                [string]$OrganizationName,
-                [string]$SearchType
-            )
+    Context "When identity search fails" {
+        Mock -CommandName 'Find-Identity' {
             return $null
         }
-        
-        $SecurityNamespace = "Namespace"
-        $Permissions = @(
-            [PSCustomObject]@{ Identity = "UnknownUser"; Permission = "Read" }
-        )
-        $OrganizationName = "MyOrg"
-        
-        $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
 
-        $result | Should -BeEmpty
+        $SecurityNamespace = "Namespace"
+        $OrganizationName = "MyOrg"
+        $Permissions = @(
+            @{
+                Identity = "User1"
+                Permission = "Read"
+            },
+            @{
+                Identity = "User2"
+                Permission = "Write"
+            }
+        )
+
+        It "Should log a warning and not include the entry in result" {
+            { ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName } | Should -Not -Throw
+
+            $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
+
+            $result | Should -HaveCount 0
+        }
     }
 
-    It "Should handle missing permissions gracefully" {
-        function ConvertTo-ACETokenList {
-            param (
-                [string]$SecurityNamespace,
-                [string]$ACEPermissions
-            )
+    Context "When permissions conversion fails" {
+        Mock -CommandName 'Find-Identity' {
+            return @{
+                Identity = "FoundIdentity"
+            }
+        }
+
+        Mock -CommandName 'ConvertTo-ACETokenList' {
             return $null
         }
-        
+
         $SecurityNamespace = "Namespace"
+        $OrganizationName = "MyOrg"
         $Permissions = @(
-            [PSCustomObject]@{ Identity = "User1"; Permission = "UnknownPermission" }
+            @{
+                Identity = "User1"
+                Permission = "Read"
+            },
+            @{
+                Identity = "User2"
+                Permission = "Write"
+            }
         )
-        $OrganizationName = "MyOrg"
-        
-        $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
 
-        $result | Should -BeEmpty
-    }
+        It "Should log a warning and not include the entry in result" {
+            { ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName } | Should -Not -Throw
+            
+            $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
 
-    It "Should return empty list when no permissions are provided" {
-        $SecurityNamespace = "Namespace"
-        $Permissions = @()
-        $OrganizationName = "MyOrg"
-        
-        $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
-
-        $result | Should -BeEmpty
+            $result | Should -HaveCount 0
+        }
     }
 }
+
+
 

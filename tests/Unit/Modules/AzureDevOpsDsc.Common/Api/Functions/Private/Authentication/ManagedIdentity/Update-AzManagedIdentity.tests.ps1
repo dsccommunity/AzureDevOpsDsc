@@ -1,11 +1,10 @@
-powershell
 Describe "Update-AzManagedIdentity" {
     Mock -CommandName Get-AzManagedIdentityToken
 
     Context "When the Global Organization Name is not set" {
         It "Throws an error" {
             $Global:DSCAZDO_OrganizationName = $null
-            
+
             { Update-AzManagedIdentity } | Should -Throw "[Update-AzManagedIdentity] Organization Name is not set. Please run 'New-AzManagedIdentity -OrganizationName <OrganizationName>'"
         }
     }

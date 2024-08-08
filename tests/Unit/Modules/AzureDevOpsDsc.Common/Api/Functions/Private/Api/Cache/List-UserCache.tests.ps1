@@ -1,4 +1,3 @@
-powershell
 Describe 'List-UserCache' {
     Mock Invoke-AzDevOpsApiRestMethod {
         return @{
@@ -41,7 +40,7 @@ Describe 'List-UserCache' {
                 value = $null
             }
         }
-        
+
         It 'Should return $null when no users are returned' {
             $result = List-UserCache -OrganizationName 'TestOrg'
             $result | Should -Be $null
@@ -56,7 +55,7 @@ Describe 'List-UserCache' {
                 )
             }
         }
-        
+
         It 'Should use the provided ApiVersion' {
             $result = List-UserCache -OrganizationName 'TestOrg' -ApiVersion '5.0'
             $result | Should -BeOfType 'System.Object[]'

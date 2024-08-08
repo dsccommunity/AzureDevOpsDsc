@@ -1,8 +1,7 @@
-powershell
 Describe 'Remove-DevOpsGroup' {
     Mock Get-AzDevOpsApiVersion { "7.1-preview.1" }
-    Mock Invoke-AzDevOpsApiRestMethod { 
-        $null 
+    Mock Invoke-AzDevOpsApiRestMethod {
+        $null
     }
 
     Context 'When all parameters are provided' {
@@ -19,7 +18,7 @@ Describe 'Remove-DevOpsGroup' {
                 ContentType = 'application/json'
             }
         }
-        
+
         It 'Should use default ApiVersion if not provided' {
             $apiUri = "https://dev.azure.com/myorganization"
             $groupDescriptor = "MyGroup"
@@ -36,7 +35,7 @@ Describe 'Remove-DevOpsGroup' {
             }
         }
     }
-    
+
     Context 'Error Handling' {
         Mock Invoke-AzDevOpsApiRestMethod { throw 'API failure' }
 

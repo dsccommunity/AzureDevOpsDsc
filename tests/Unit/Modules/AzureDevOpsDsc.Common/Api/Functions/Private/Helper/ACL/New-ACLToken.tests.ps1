@@ -1,39 +1,63 @@
-
 Describe 'New-ACLToken Function Tests' {
-    $LocalizedDataAzResourceTokenPatten = @{
-        OrganizationGit = 'Contoso'
-        GitProject = 'Org/Project'
-        GitRepository = 'Org/Project/Repo'
+
+    BeforeAll {
+        Import-Module -Name 'AzureDevOpsDsc.Common' -Force
     }
 
-    Mock -CommandName 'Get-CacheItem' -MockWith { return @{ id = "123" } }
-
-    It 'Should return GitOrganization type for OrganizationGit pattern' {
-        $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Contoso'
-        $result.type | Should -Be 'GitOrganization'
+    Mock -CommandName Get-CacheItem {
+        return [PSCustomObject]@{id = "1234"}
     }
 
-    It 'Should return GitProject type for GitProject pattern' {
-        $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Org/Project'
-        $result.type | Should -Be 'GitProject'
-        $result.projectId | Should -Be '123'
+    Context 'Git Repositories Namespace' {
+
+        It 'Should return GitOrganization type for valid Git organization token' {
+            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]'
+            $result.type | Should -Be 'GitOrganization'
+        }
+
+        It 'Should return GitProject type for valid Git project token' {
+            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]/[ProjectName]'
+            $result.type | Should -Be 'GitProject'
+            $result.projectId | Should -Be '1234'
+        }
+
+        It 'Should return GitRepository type for valid Git repository token' {
+            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]/[ProjectName]/[RepoName]'
+            $result.type | Should -Be 'GitRepository'
+            $result.projectId | Should -Be '1234'
+            $result.RepoId | Should -Be '1234'
+        }
+
+        It 'Should return GitUnknown type for unknown Git token' {
+            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Unknown/Token'
+            $result.type | Should -Be 'GitUnknown'
+        }
+
     }
 
-    It 'Should return GitRepository type for GitRepository pattern' {
-        $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Org/Project/Repo'
-        $result.type | Should -Be 'GitRepository'
-        $result.projectId | Should -Be '123'
-        $result.RepoId | Should -Be '123'
+    Context 'Identity Namespace' {
+
+        It 'Should return GitGroupPermission type for valid identity group token' {
+            $result = New-ACLToken -SecurityNamespace 'Identity' -TokenName '[ProjectId]/[GroupId]'
+            $result.type | Should -Be 'GitGroupPermission'
+            $result.projectId | Should -Be 'ProjectId'
+            $result.groupId | Should -Be 'GroupId'
+        }
+
+        It 'Should return GroupUnknown type for unknown identity token' {
+            $result = New-ACLToken -SecurityNamespace 'Identity' -TokenName 'Unknown/Token'
+            $result.type | Should -Be 'GroupUnknown'
+        }
     }
 
-    It 'Should return GitUnknown type for unknown pattern' {
-        $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Unknown/Token'
-        $result.type | Should -Be 'GitUnknown'
+    Context 'Unknown SecurityNamespace' {
+
+        It 'Should return UnknownSecurityNamespace type for unrecognized security namespace' {
+            $result = New-ACLToken -SecurityNamespace 'Unknown' -TokenName 'Any/Token'
+            $result.type | Should -Be 'UnknownSecurityNamespace'
+        }
+
     }
 
-    It 'Should return UnknownSecurityNamespace for unrecognized namespace' {
-        $result = New-ACLToken -SecurityNamespace 'Unknown Namespace' -TokenName 'Org/Project'
-        $result.type | Should -Be 'UnknownSecurityNamespace'
-    }
 }
 

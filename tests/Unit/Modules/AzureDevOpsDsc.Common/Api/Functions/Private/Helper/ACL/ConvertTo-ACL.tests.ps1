@@ -1,63 +1,32 @@
+Describe "ConvertTo-ACL" {
+    Mock -CommandName New-ACLToken -MockWith { return @{ Token = "mockToken" } }
+    Mock -CommandName ConvertTo-ACEList -MockWith { return @( @{ Identity = "User1"; Permissions = "Read" }, @{ Identity = "User2"; Permissions = "Read, Write" } ) }
+    Mock -CommandName Group-ACEs -MockWith { param($ACEs) return $ACEs }
 
-# ConvertTo-ACL.Tests.ps1
-
-# Import the module containing the ConvertTo-ACL function
-# Import-Module '<module-path>'
-
-Describe 'ConvertTo-ACL' {
-    BeforeEach {
-        # Mock dependencies
-        Mock New-ACLToken {
-            return @{
-                SecurityNamespace  = $SecurityNamespace
-                TokenName          = $TokenName
-            }
+    $permissions = @(
+        @{
+            Identity    = 'User1'
+            Permissions = 'Read'
+        },
+        @{
+            Identity    = 'User2'
+            Permissions = 'Read', 'Write'
         }
+    )
 
-        Mock ConvertTo-ACEList {
-            return @(
-                @{
-                    Identity    = 'User1'
-                    Permissions = 'Read'
-                },
-                @{
-                    Identity    = 'User2'
-                    Permissions = 'Read', 'Write'
-                }
-            )
-        }
-
-        Mock Group-ACEs {
-            param (
-                [Parameter(Mandatory = $true)]
-                [hashtable[]]$ACEs
-            )
-
-            return $ACEs | Sort-Object -Property Identity -Unique
-        }
-    }
-
-    It 'should create ACL with correct parameters' {
-        $permissions = @(
-            @{
-                Identity    = 'User1'
-                Permissions = 'Read'
-            },
-            @{
-                Identity    = 'User2'
-                Permissions = 'Read', 'Write'
-            }
-        )
-
+    It "should return an ACL with correct properties" {
         $result = ConvertTo-ACL -Permissions $permissions -SecurityNamespace 'Namespace1' -isInherited $true -OrganizationName 'Org1' -TokenName 'Token1'
 
         $result | Should -Not -BeNullOrEmpty
-        $result.token.SecurityNamespace | Should -Be 'Namespace1'
-        $result.token.TokenName | Should -Be 'Token1'
-        $result.inherited | Should -Be $true
+        $result.token.Token | Should -Be "mockToken"
         $result.aces | Should -HaveCount 2
-        $result.aces[0].Identity | Should -Be 'User1'
-        $result.aces[1].Identity | Should -Be 'User2'
+        $result.inherited | Should -Be $true
+    }
+
+    It "should return a warning if no ACEs are created" {
+        Mock -CommandName ConvertTo-ACEList -MockWith { return @() }
+        $result = ConvertTo-ACL -Permissions $permissions -SecurityNamespace 'Namespace1' -isInherited $true -OrganizationName 'Org1' -TokenName 'Token1'
+        $result.aces | Should -HaveCount 0
     }
 }
 

@@ -1,54 +1,38 @@
-
-Describe 'AzDoAPI_5_PermissionsCache' {
-    Mock -CommandName 'List-DevOpsSecurityNamespaces' {
+Describe 'AzDoAPI_5_PermissionsCache Tests' {
+    Mock -CommandName List-DevOpsSecurityNamespaces {
         return @(
-            [PSCustomObject]@{
-                namespaceId = '12345'
-                name = 'Namespace1'
-                displayName = 'Namespace 1'
-                writePermission = $true
-                readPermision = $false
-                dataspaceCategory = 'Category1'
-                actions = @('Read', 'Write')
-            }
-            [PSCustomObject]@{
-                namespaceId = '67890'
-                name = 'Namespace2'
-                displayName = 'Namespace 2'
-                writePermission = $false
-                readPermision = $true
-                dataspaceCategory = 'Category2'
-                actions = @('Delete', 'Create')
-            }
+            [PSCustomObject]@{ name = 'Namespace1'; namespaceId = 1; writePermission = $true; readPermission = $true; dataspaceCategory = 'category1'; actions = @('Action1','Action2') },
+            [PSCustomObject]@{ name = 'Namespace2'; namespaceId = 2; writePermission = $false; readPermission = $true; dataspaceCategory = 'category2'; actions = @('Action3','Action4') }
         )
     }
 
-    Mock -CommandName 'Add-CacheItem'
-    Mock -CommandName 'Export-CacheObject'
+    Mock -CommandName Add-CacheItem
+    Mock -CommandName Export-CacheObject
 
-    Context 'When organization name is provided' {
-        It 'should list security namespaces and add them to cache' {
-            AzDoAPI_5_PermissionsCache -OrganizationName 'TestOrg'
+    $global:DSCAZDO_OrganizationName = "DefaultOrg"
 
-            Should -InvokeCommand 'List-DevOpsSecurityNamespaces' -Times 1 -Exactly -Scope It
-            Should -InvokeCommand 'Add-CacheItem' -Times 2 -Exactly -Scope It
-            Should -InvokeCommand 'Export-CacheObject' -Times 1 -Exactly -Scope It
-        }
+    It 'Uses provided OrganizationName parameter' {
+        AzDoAPI_5_PermissionsCache -OrganizationName 'TestOrg'
+        Assert-VerifiableMocks
     }
 
-    Context 'When organization name is not provided' {
-        BeforeAll {
-            # Set the global variable for organization name
-            $Global:DSCAZDO_OrganizationName = 'GlobalTestOrg'
-        }
+    It 'Uses global OrganizationName when parameter is not provided' {
+        AzDoAPI_5_PermissionsCache
+        Assert-MockCalled -CommandName List-DevOpsSecurityNamespaces -ParameterFilter { $OrganizationName -eq $global:DSCAZDO_OrganizationName }
+    }
 
-        It 'should use the global variable for organization name' {
-            AzDoAPI_5_PermissionsCache
+    It 'Adds each security namespace to cache correctly' {
+        AzDoAPI_5_PermissionsCache -OrganizationName 'TestOrg'
 
-            Should -InvokeCommand 'List-DevOpsSecurityNamespaces' -Times 1 -Exactly -Scope It
-            Should -InvokeCommand 'Add-CacheItem' -Times 2 -Exactly -Scope It
-            Should -InvokeCommand 'Export-CacheObject' -Times 1 -Exactly -Scope It
-        }
+        Assert-MockCalled -CommandName Add-CacheItem -Times 2
+        Assert-MockCalled -CommandName Add-CacheItem -ParameterFilter { $Key -eq 'Namespace1' -and $Type -eq 'SecurityNamespaces' }
+        Assert-MockCalled -CommandName Add-CacheItem -ParameterFilter { $Key -eq 'Namespace2' -and $Type -eq 'SecurityNamespaces' }
+    }
+
+    It 'Exports cache correctly' {
+        AzDoAPI_5_PermissionsCache -OrganizationName 'TestOrg'
+
+        Assert-MockCalled -CommandName Export-CacheObject -ParameterFilter { $CacheType -eq 'SecurityNameSpaces' -and $Depth -eq 5 }
     }
 }
 

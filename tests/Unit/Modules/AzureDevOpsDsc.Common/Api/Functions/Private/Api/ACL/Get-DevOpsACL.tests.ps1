@@ -1,4 +1,3 @@
-powershell
 Describe 'Get-DevOpsACL' {
     Mock Get-AzDevOpsApiVersion { return '5.1-preview' }
     Mock Invoke-AzDevOpsApiRestMethod

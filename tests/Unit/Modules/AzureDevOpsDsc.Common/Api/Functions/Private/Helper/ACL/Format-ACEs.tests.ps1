@@ -1,57 +1,43 @@
-
-Describe 'Format-ACEs Tests' {
-    BeforeAll {
-        Function Get-CacheItem {
-            param($Key, $Type)
-            return @{
-                actions = @(
-                    @{ bit = 1; Action = 'Read' }
-                    @{ bit = 2; Action = 'Write' }
-                    @{ bit = 4; Action = 'Delete' }
-                )
-            }
+Describe 'Format-ACEs' {
+    Mock -ModuleName AzureDevOpsDsc.Common -CommandName Get-CacheItem -MockWith {
+        @{
+            Key = 'SecurityNamespace'
+            Type = 'SecurityNamespaces'
+            Actions = @(
+                [PSCustomObject]@{ bit = 1; Name = 'Read' },
+                [PSCustomObject]@{ bit = 2; Name = 'Write' }
+            )
         }
     }
 
-    Describe 'Valid ACE formatting' {
-        It 'Should return ACE with Allow action' {
-            $result = Format-ACEs -Allow 1 -Deny 0 -SecurityNamespace 'MySecurityNamespace'
-            $result.Allow.Action | Should -Contain 'Read'
-            $result.Deny | Should -BeNullOrEmpty
-            $result.DescriptorType | Should -Be 'MySecurityNamespace'
-        }
+    It 'Returns Allow actions from the specified security namespace' {
+        $result = Format-ACEs -Allow 1 -Deny 0 -SecurityNamespace "SecurityNamespace"
 
-        It 'Should return ACE with Deny action' {
-            $result = Format-ACEs -Allow 0 -Deny 2 -SecurityNamespace 'MySecurityNamespace'
-            $result.Allow | Should -BeNullOrEmpty
-            $result.Deny.Action | Should -Contain 'Write'
-            $result.DescriptorType | Should -Be 'MySecurityNamespace'
-        }
-
-        It 'Should return ACE with both Allow and Deny actions' {
-            $result = Format-ACEs -Allow 1 -Deny 2 -SecurityNamespace 'MySecurityNamespace'
-            $result.Allow.Action | Should -Contain 'Read'
-            $result.Deny.Action | Should -Contain 'Write'
-            $result.DescriptorType | Should -Be 'MySecurityNamespace'
-        }
-
-        It 'Should return empty ACE if neither Allow nor Deny actions are specified' {
-            $result = Format-ACEs -Allow 0 -Deny 0 -SecurityNamespace 'MySecurityNamespace'
-            $result.Allow | Should -BeNullOrEmpty
-            $result.Deny | Should -BeNullOrEmpty
-            $result.DescriptorType | Should -Be 'MySecurityNamespace'
-        }
+        $result.Allow | Should -Contain [PSCustomObject]@{ bit = 1; Name = 'Read' }
+        $result.Allow | Should -Not -Contain [PSCustomObject]@{ bit = 2; Name = 'Write' }
+        $result.Deny | Should -BeNullOrEmpty
+        $result.DescriptorType | Should -Be "SecurityNamespace"
     }
 
-    Describe 'Parameter Validation' {
-        It 'Should throw an error if SecurityNamespace is not provided' {
-            { Format-ACEs -Allow 1 -Deny 0 } | Should -Throw
-        }
+    It 'Returns Deny actions from the specified security namespace' {
+        $result = Format-ACEs -Allow 0 -Deny 2 -SecurityNamespace "SecurityNamespace"
 
-        It 'Should allow only integer values for Allow and Deny parameters' {
-            { Format-ACEs -Allow 'string' -Deny 0 -SecurityNamespace 'MySecurityNamespace' } | Should -Throw
-            { Format-ACEs -Allow 1 -Deny 'string' -SecurityNamespace 'MySecurityNamespace' } | Should -Throw
-        }
+        $result.Allow | Should -BeNullOrEmpty
+        $result.Deny | Should -Contain [PSCustomObject]@{ bit = 2; Name = 'Write' }
+        $result.Deny | Should -Not -Contain [PSCustomObject]@{ bit = 1; Name = 'Read' }
+        $result.DescriptorType | Should -Be "SecurityNamespace"
+    }
+
+    It 'Returns both Allow and Deny actions from the specified security namespace' {
+        $result = Format-ACEs -Allow 1 -Deny 2 -SecurityNamespace "SecurityNamespace"
+
+        $result.Allow | Should -Contain [PSCustomObject]@{ bit = 1; Name = 'Read' }
+        $result.Deny | Should -Contain [PSCustomObject]@{ bit = 2; Name = 'Write' }
+        $result.DescriptorType | Should -Be "SecurityNamespace"
+    }
+
+    It 'Handles missing SecurityNamespace parameter as mandatory' {
+        { Format-ACEs -Allow 1 -Deny 0 } | Should -Throw -ErrorId ParameterBindingValidationException
     }
 }
 

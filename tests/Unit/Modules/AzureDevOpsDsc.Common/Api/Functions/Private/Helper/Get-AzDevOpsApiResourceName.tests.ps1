@@ -1,19 +1,18 @@
-
 Describe 'Get-AzDevOpsApiResourceName' {
-    It 'Returns an array of strings' {
+    It 'Should return an array of strings' {
         $result = Get-AzDevOpsApiResourceName
         $result | Should -BeOfType [System.String[]]
     }
 
-    It 'Returns the expected resource names' {
+    It 'Should return expected resource names' {
         $expected = @('Operation', 'Project')
         $result = Get-AzDevOpsApiResourceName
         $result | Should -Be $expected
     }
 
-    It 'Does not return empty or null' {
+    It 'Should not return an empty array' {
         $result = Get-AzDevOpsApiResourceName
-        $result | Should -Not -BeNullOrEmpty
+        $result.Length | Should -BeGreaterThan 0
     }
 }
 

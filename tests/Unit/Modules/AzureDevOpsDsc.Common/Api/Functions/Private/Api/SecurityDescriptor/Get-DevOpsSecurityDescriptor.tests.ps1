@@ -1,4 +1,3 @@
-powershell
 Describe 'Get-DevOpsSecurityDescriptor' {
     Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' {
         return @{ value = 'Mocked response' }

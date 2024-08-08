@@ -1,4 +1,3 @@
-powershell
 Describe "List-DevOpsServicePrinciples" {
     Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "6.0-preview.1" }
     Mock -CommandName Invoke-AzDevOpsApiRestMethod

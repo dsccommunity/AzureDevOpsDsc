@@ -1,57 +1,61 @@
+powershell
+# ConvertTo-FormattedToken.Tests.ps1
 
 Describe "ConvertTo-FormattedToken" {
     BeforeAll {
-        Import-Module "$PSScriptRoot\path_to_your_module.psm1"
+        # Load the function into the session
+        . "$PSScriptRoot\ConvertTo-FormattedToken.ps1"
     }
 
-    It "should return formatted string for GitProject token" {
+    It "should format GitOrganization token correctly" {
+        $token = @{
+            type = 'GitOrganization'
+        }
+
+        $result = ConvertTo-FormattedToken -Token $token
+        
+        $result | Should -Be 'repoV2'
+    }
+
+    It "should format GitProject token correctly" {
         $token = @{
             type = 'GitProject'
             projectId = 'myProject'
-            repositoryId = 'myRepo'
         }
-        $expected = 'repoV2/myProject'
+
         $result = ConvertTo-FormattedToken -Token $token
-        $result | Should -Be $expected
+        
+        $result | Should -Be 'repoV2/myProject'
     }
 
-    It "should return formatted string for GitRepository token" {
+    It "should format GitRepository token correctly" {
         $token = @{
             type = 'GitRepository'
             projectId = 'myProject'
             RepoId = 'myRepo'
         }
-        $expected = 'repoV2/myProject/myRepo'
+
         $result = ConvertTo-FormattedToken -Token $token
-        $result | Should -Be $expected
+        
+        $result | Should -Be 'repoV2/myProject/myRepo'
     }
 
-    It "should return formatted string for GitOrganization token" {
-        $token = @{
-            type = 'GitOrganization'
-        }
-        $expected = 'repoV2'
-        $result = ConvertTo-FormattedToken -Token $token
-        $result | Should -Be $expected
-    }
-
-    It "should return empty string for unrecognized token type" {
+    It "should return an empty string for unrecognized token type" {
         $token = @{
             type = 'UnknownType'
         }
-        $expected = ''
+
         $result = ConvertTo-FormattedToken -Token $token
-        $result | Should -Be $expected
+        
+        $result | Should -Be ''
     }
 
-    It "should return empty string when no type is provided" {
-        $token = @{
-            projectId = 'myProject'
-            RepoId = 'myRepo'
-        }
-        $expected = ''
+    It "should return an empty string for an empty token" {
+        $token = @{}
+
         $result = ConvertTo-FormattedToken -Token $token
-        $result | Should -Be $expected
+        
+        $result | Should -Be ''
     }
 }
 

@@ -1,4 +1,3 @@
-powershell
 Describe 'Get-DevOpsProjects' {
     Mock -CommandName 'Invoke-RestMethod' {
         return @{
@@ -11,7 +10,7 @@ Describe 'Get-DevOpsProjects' {
 
     $Organization = 'TestOrg'
     $PersonalAccessToken = 'TestToken'
-    
+
     Context 'When StateFilter is not provided' {
         It 'Should call Invoke-RestMethod with correct URI' {
             Get-DevOpsProjects -Organization $Organization -PersonalAccessToken $PersonalAccessToken

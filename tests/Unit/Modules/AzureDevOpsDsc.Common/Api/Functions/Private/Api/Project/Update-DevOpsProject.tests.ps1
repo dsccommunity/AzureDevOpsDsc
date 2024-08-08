@@ -1,4 +1,3 @@
-powershell
 Describe "Update-DevOpsProject" {
     BeforeAll {
         function Invoke-AzDevOpsApiRestMethod {
@@ -17,7 +16,7 @@ Describe "Update-DevOpsProject" {
 
     It "Should update the project with the specified parameters" {
         $result = Update-DevOpsProject -Organization "contoso" -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "public" -PersonalAccessToken "PAT"
-        
+
         $result.name | Should -Be "NewProjectName"
         $result.description | Should -Be "Updated project description"
         $result.visibility | Should -Be "public"
@@ -25,7 +24,7 @@ Describe "Update-DevOpsProject" {
 
     It "Should set the visibility to private when specified" {
         $result = Update-DevOpsProject -Organization "contoso" -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "private" -PersonalAccessToken "PAT"
-        
+
         $result.visibility | Should -Be "private"
     }
 }

@@ -1,4 +1,3 @@
-powershell
 Describe 'New-GitRepository' {
     $ApiUri = "https://dev.azure.com/organization"
     $Project = [PSCustomObject]@{ id = "project123"; name = "TestProject" }

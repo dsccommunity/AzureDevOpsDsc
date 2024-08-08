@@ -1,4 +1,3 @@
-powershell
 Describe 'Remove-GitRepository' {
     Mock -ModuleName 'Az.DevOps' -CommandName 'Get-AzDevOpsApiVersion' -MockWith { '5.1-preview' }
     Mock -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith { }
@@ -12,7 +11,7 @@ Describe 'Remove-GitRepository' {
             Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository
 
             Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Get-AzDevOpsApiVersion' -Exactly 1
-            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -ParameterFilter { 
+            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -ParameterFilter {
                 $PSCmdlet.MyInvocation.BoundParameters['ApiUri'] -eq "https://dev.azure.com/example/ExampleProject/_apis/git/repositories/repo123?api-version=5.1-preview" -and
                 $PSCmdlet.MyInvocation.BoundParameters['Method'] -eq 'Delete'
             }
@@ -25,7 +24,7 @@ Describe 'Remove-GitRepository' {
             Remove-GitRepository -ApiUri $ApiUri -Project $Project -Repository $Repository -ApiVersion $ApiVersion
 
             Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Get-AzDevOpsApiVersion' -Exactly 0
-            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -ParameterFilter { 
+            Assert-MockCalled -ModuleName 'Az.DevOps' -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -ParameterFilter {
                 $PSCmdlet.MyInvocation.BoundParameters['ApiUri'] -eq "https://dev.azure.com/example/ExampleProject/_apis/git/repositories/repo123?api-version=6.0" -and
                 $PSCmdlet.MyInvocation.BoundParameters['Method'] -eq 'Delete'
             }

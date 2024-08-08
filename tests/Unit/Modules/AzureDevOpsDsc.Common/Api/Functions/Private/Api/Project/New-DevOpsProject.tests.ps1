@@ -1,6 +1,5 @@
-powershell
 Describe "New-DevOpsProject" {
-    
+
     Mock -CommandName 'Test-AzDevOpsProjectName' -MockWith {
         return $true
     }
@@ -41,7 +40,7 @@ Describe "New-DevOpsProject" {
 
     It "Calls Get-AzDevOpsApiVersion" {
         $result = New-DevOpsProject @params
-    
+
         Assert-MockCalled -CommandName 'Get-AzDevOpsApiVersion' -Exactly -Times 1 -Scope It
     }
 
@@ -66,7 +65,7 @@ Describe "New-DevOpsProject" {
             } | ConvertTo-Json)
         }
     }
-    
+
     It "Throws an error if the response is null" {
         Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith {
             return $null

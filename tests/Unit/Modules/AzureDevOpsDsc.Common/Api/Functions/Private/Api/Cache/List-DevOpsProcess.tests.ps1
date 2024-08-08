@@ -1,4 +1,3 @@
-powershell
 Describe 'List-DevOpsProcess' {
     Param (
         [string]$Organization = "TestOrg",
@@ -6,7 +5,7 @@ Describe 'List-DevOpsProcess' {
     )
 
     Mock Get-AzDevOpsApiVersion { "6.0-preview.1" }
-    Mock Invoke-AzDevOpsApiRestMethod { 
+    Mock Invoke-AzDevOpsApiRestMethod {
         return @{
             value = @(
                 @{ name = "Agile" },

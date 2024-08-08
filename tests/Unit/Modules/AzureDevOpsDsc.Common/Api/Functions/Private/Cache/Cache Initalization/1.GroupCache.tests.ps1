@@ -1,55 +1,108 @@
+powershell
+# Mock List-DevOpsGroups function
+Function Mock-List-DevOpsGroups {
+    param(
+        [string]$Organization
+    )
 
-Describe 'AzDoAPI_1_GroupCache' {
-    Mock List-DevOpsGroups { return @(
-        @{ PrincipalName = 'Group1'; OtherProperty = 'Value1' },
-        @{ PrincipalName = 'Group2'; OtherProperty = 'Value2' }
-    ) }
-
-    Mock Add-CacheItem
-    Mock Export-CacheObject
-
-    Context 'When organization name is provided as parameter' {
-        It 'should call List-DevOpsGroups with provided organization name' {
-            $Global:DSCAZDO_OrganizationName = $null
-            $organizationName = 'MyOrganization'
-            AzDoAPI_1_GroupCache -OrganizationName $organizationName
-
-            Assert-MockCalled List-DevOpsGroups -Exactly 1 -Scope It -ParameterFilter {
-                $Organization -eq $organizationName
-            }
+    return @(
+        @{
+            PrincipalName = "Group1"
+            OtherProperty = "Value1"
+        },
+        @{
+            PrincipalName = "Group2"
+            OtherProperty = "Value2"
         }
+    )
+}
 
-        It 'should add groups to cache and export cache' {
-            AzDoAPI_1_GroupCache -OrganizationName "MyOrganization"
+# Mock Add-CacheItem function
+Function Mock-Add-CacheItem {
+    param(
+        [string]$Key,
+        $Value,
+        [string]$Type
+    )
+    # Simulate adding item to cache
+    Write-Output "Cached $Key with type $Type"
+}
 
-            Assert-MockCalled Add-CacheItem -Exactly 2 -Scope It
-            Assert-MockCalled Export-CacheObject -Exactly 1 -Scope It
+# Mock Export-CacheObject function
+Function Mock-Export-CacheObject {
+    param(
+        [string]$CacheType,
+        $Content
+    )
+    # Simulate export cache to file
+    Write-Output "Cache exported with type $CacheType"
+}
+
+# Import the Pester module
+Import-Module Pester
+
+Describe "AzDoAPI_1_GroupCache Tests" {
+    BeforeAll {
+        # Mock functions
+        Mock List-DevOpsGroups { Mock-List-DevOpsGroups -Organization $Organization }
+        Mock Add-CacheItem { Mock-Add-CacheItem -Key $Key -Value $Value -Type $Type }
+        Mock Export-CacheObject { Mock-Export-CacheObject -CacheType $CacheType -Content $Content }
+
+        # Function to test
+        . $PSScriptRoot\AzDoAPI_1_GroupCache.ps1
+    }
+
+    It "should use global organization name if none is provided" {
+        $Global:DSCAZDO_OrganizationName = "DefaultOrg"
+        AzDoAPI_1_GroupCache
+
+        # Assertions
+        Should -Invoke List-DevOpsGroups -Exactly -ArgumentList @{ Organization = 'DefaultOrg' }
+        Should -Invoke Add-CacheItem -Times 2
+        Should -Invoke Export-CacheObject -Once
+    }
+
+    It "should use provided organization name" {
+        AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
+
+        # Assertions
+        Should -Invoke List-DevOpsGroups -Exactly -ArgumentList @{ Organization = 'MyOrg' }
+        Should -Invoke Add-CacheItem -Times 2
+        Should -Invoke Export-CacheObject -Once
+    }
+    
+    It "should call Add-CacheItem for each group" {
+        AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
+        
+        # Assertions
+        Should -Invoke Add-CacheItem -Times 2 -Exactly -ArgumentList @{
+            Key = 'Group1'
+            Value = @{
+                PrincipalName = 'Group1'
+                OtherProperty = 'Value1'
+            }
+            Type = 'LiveGroups'
+        }
+        Should -Invoke Add-CacheItem -Times 2 -Exactly -ArgumentList @{
+            Key = 'Group2'
+            Value = @{
+                PrincipalName = 'Group2'
+                OtherProperty = 'Value2'
+            }
+            Type = 'LiveGroups'
         }
     }
 
-    Context 'When organization name is not provided as parameter' {
-        It 'should use global variable for organization name' {
-            $Global:DSCAZDO_OrganizationName = 'GlobalOrganization'
-            AzDoAPI_1_GroupCache
-
-            Assert-MockCalled List-DevOpsGroups -Exactly 1 -Scope It -ParameterFilter {
-                $Organization -eq $Global:DSCAZDO_OrganizationName
-            }
-        }
-    }
-
-    Context 'When there is an error during execution' {
-        Mock List-DevOpsGroups { throw 'List-DevOpsGroups error' }
-
-        It 'should catch and log the error using Write-Error' {
-            $errorActionPreference = 'Stop'
-            { AzDoAPI_1_GroupCache -OrganizationName "MyOrganization" } | Should -Throw
-
-            $result = Get-Variable error -Scope 0
-            $lastError = $result.value[0]
-
-            $lastError.Exception.Message | Should -Match 'List-DevOpsGroups error'
+    It "should export cache after adding groups" {
+        AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
+        
+        # Assertions
+        Should -Invoke Export-CacheObject -Exactly -ArgumentList @{
+            CacheType = 'LiveGroups'
+            Content = $null  # Assuming `$AzDoLiveGroups` can be $null in this context
         }
     }
 }
+
+
 

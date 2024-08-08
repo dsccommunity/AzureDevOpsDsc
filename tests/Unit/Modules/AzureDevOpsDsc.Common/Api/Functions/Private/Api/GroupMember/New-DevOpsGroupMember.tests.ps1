@@ -1,4 +1,3 @@
-powershell
 Describe "New-DevOpsGroupMember Tests" {
     Mock Get-AzDevOpsApiVersion { return "6.0-preview.1" }
     Mock Invoke-AzDevOpsApiRestMethod
@@ -13,7 +12,7 @@ Describe "New-DevOpsGroupMember Tests" {
 
             $expectedUri = "{0}/_apis/graph/memberships/{1}/{2}?api-version={3}" -f $ApiUri, $MemberIdentity.descriptor, $GroupIdentity.descriptor, "6.0-preview.1"
 
-            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter { 
+            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter {
                 $params.Uri -eq $expectedUri -and
                 $params.Method -eq "PUT"
             }
@@ -27,7 +26,7 @@ Describe "New-DevOpsGroupMember Tests" {
 
             $expectedUri = "{0}/_apis/graph/memberships/{1}/{2}?api-version={3}" -f $ApiUri, $MemberIdentity.descriptor, $GroupIdentity.descriptor, $ApiVersion
 
-            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter { 
+            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter {
                 $params.Uri -eq $expectedUri -and
                 $params.Method -eq "PUT"
             }

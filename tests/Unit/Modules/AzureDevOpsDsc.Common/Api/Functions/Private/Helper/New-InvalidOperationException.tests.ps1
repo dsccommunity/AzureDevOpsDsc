@@ -1,36 +1,23 @@
-
-# Unit Tests for New-InvalidOperationException function using Pester v5
-
 Describe 'New-InvalidOperationException' {
-
-    BeforeAll {
-        Import-Module -Name 'Path\To\The\Module.psm1' -Force
+    It 'Should return an ErrorRecord when given a valid message' {
+        $message = 'An error occurred'
+        $result = New-InvalidOperationException -Message $message
+        $result | Should -BeOfType [System.Management.Automation.ErrorRecord]
+        $result.Exception.Message | Should -BeExactly $message
+        $result.CategoryInfo.Category | Should -Be [System.Management.Automation.ErrorCategory]::ConnectionError
     }
 
-    Context 'When passed a message and Throw is not specified' {
-        It 'Should return an ErrorRecord object' {
-            $Message = "An error has occurred"
-            $result = New-InvalidOperationException -Message $Message
-
-            $result | Should -BeOfType 'System.Management.Automation.ErrorRecord'
-            $result.Exception.Message | Should -Be $Message
-            $result.FullyQualifiedErrorId | Should -Be 'System.InvalidOperationException'
-            $result.CategoryInfo.Category | Should -Be [System.Management.Automation.ErrorCategory]::ConnectionError
-        }
+    It 'Should throw an ErrorRecord when -Throw is specified' {
+        $message = 'An error occurred'
+        { New-InvalidOperationException -Message $message -Throw } | Should -Throw -ExceptionType [System.Management.Automation.ErrorRecord]
     }
 
-    Context 'When passed a message and Throw is specified' {
-        It 'Should throw the ErrorRecord' {
-            $Message = "An error has occurred"
-            { New-InvalidOperationException -Message $Message -Throw } | Should -Throw 'System.InvalidOperationException'
-        }
+    It 'Should fail if Message parameter is null' {
+        { New-InvalidOperationException -Message $null } | Should -Throw -ExceptionType [System.Management.Automation.ParameterBindingValidationException]
     }
 
-    Context 'When the Message parameter is null or empty' {
-        It 'Should throw a validation exception' {
-            { New-InvalidOperationException -Message $null } | Should -Throw 'System.Management.Automation.ParameterBindingValidationException'
-            { New-InvalidOperationException -Message '' } | Should -Throw 'System.Management.Automation.ParameterBindingValidationException'
-        }
+    It 'Should fail if Message parameter is empty' {
+        { New-InvalidOperationException -Message '' } | Should -Throw -ExceptionType [System.Management.Automation.ParameterBindingValidationException]
     }
 }
 

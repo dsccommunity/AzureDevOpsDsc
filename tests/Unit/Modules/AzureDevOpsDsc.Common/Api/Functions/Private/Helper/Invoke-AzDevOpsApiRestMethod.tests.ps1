@@ -1,104 +1,83 @@
+Describe 'Invoke-AzDevOpsApiRestMethod' {
+    Mock -CommandName Invoke-RestMethod
 
-Describe "Invoke-AzDevOpsApiRestMethod Tests" {
-
-    Mock Invoke-RestMethod {
-        return @{ SomeProperty = "SomeValue" }
+    $defaultParameters = @{
+        ApiUri = 'https://dev.azure.com/someOrganizationName/_apis/'
+        HttpMethod = 'Get'
+        HttpHeaders = @{}
+        RetryAttempts = 1
+        RetryIntervalMs = 250
     }
 
-    BeforeAll {
-        Import-Module .\path\to\your\module.psm1
-    }
-
-    Context "When API call is successful" {
-        It "Should return API response" {
-            $params = @{
-                ApiUri = "https://dev.azure.com/someOrganizationName/_apis/"
-                HttpMethod = "Get"
-                HttpHeaders = @{}
-                HttpBody = ""
-                RetryAttempts = 3
-                RetryIntervalMs = 250
-            }
-
-            $result = Invoke-AzDevOpsApiRestMethod @params
-            $result.SomeProperty | Should -Be "SomeValue"
-        }
-    }
-
-    Context "When retry logic is tested" {
-        Mock Invoke-RestMethod {
-            if ($Global:retryCount -lt 2) {
-                $Global:retryCount++
-                throw "API failure"
-            } else {
-                return @{ SomeProperty = "SomeValue" }
-            }
+    Context 'Basic functionality' {
+        It 'should call Invoke-RestMethod with correct parameters' {
+            Invoke-AzDevOpsApiRestMethod @defaultParameters
+            Assert-MockCalled -CommandName Invoke-RestMethod -Exactly -Times 1
         }
 
-        BeforeAll {
-            $Global:retryCount = 0
-        }
-
-        It "Should retry specified number of times and return API response" {
-            $params = @{
-                ApiUri = "https://dev.azure.com/someOrganizationName/_apis/"
-                HttpMethod = "Get"
-                HttpHeaders = @{}
-                HttpBody = ""
-                RetryAttempts = 3
-                RetryIntervalMs = 250
-            }
-
-            $result = Invoke-AzDevOpsApiRestMethod @params
-            $result.SomeProperty | Should -Be "SomeValue"
+        It 'should return results from Invoke-RestMethod' {
+            Mock -CommandName Invoke-RestMethod -MockWith { return @{ success = $true } }
+            $result = Invoke-AzDevOpsApiRestMethod @defaultParameters
+            $result | Should -BeOfType [System.Collections.ArrayList]
+            $result[0].success | Should -Be $true
         }
     }
 
-    Context "When max retries are reached" {
-        Mock Invoke-RestMethod {
-            throw "API failure"
+    Context 'Retry mechanism' {
+        It 'should retry if Invoke-RestMethod throws' {
+            Mock -CommandName Invoke-RestMethod -MockWith { throw "Error" }
+            $parameters = @defaultParameters
+            $parameters.RetryAttempts = 2
+
+            { Invoke-AzDevOpsApiRestMethod @parameters } | Should -Throw
+            Assert-MockCalled -CommandName Invoke-RestMethod -Exactly -Times 3
         }
 
-        It "Should throw an error after max retries" {
-            $params = @{
-                ApiUri = "https://dev.azure.com/someOrganizationName/_apis/"
-                HttpMethod = "Get"
-                HttpHeaders = @{}
-                HttpBody = ""
-                RetryAttempts = 3
-                RetryIntervalMs = 250
-            }
+        It 'should wait between retries' {
+            Mock -CommandName Start-Sleep
+            Mock -CommandName Invoke-RestMethod -MockWith { throw "Error" }
+            $parameters = @defaultParameters
+            $parameters.RetryAttempts = 2
 
-            { Invoke-AzDevOpsApiRestMethod @params } | Should -Throw
+            { Invoke-AzDevOpsApiRestMethod @parameters } | Should -Throw
+            Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 2
         }
     }
 
-    Context "When continuation token is present" {
-        Mock Invoke-RestMethod {
-            if ($Global:continuationCount -lt 1) {
-                $Global:continuationCount++
-                return @{ SomeProperty = "SomeValue" }, @{ $responseHeaders = @{ "x-ms-continuationtoken" = "token" } }
-            } else {
-                return @{ SomeProperty = "SomeValue" }
+    Context 'Continuation token handling' {
+        It 'should handle continuation tokens and loop until no token is found' {
+            $responseHeaders = @{
+                'x-ms-continuationtoken' = 'token'
             }
-        }
+            Mock -CommandName Invoke-RestMethod -MockWith {
+                param ($ResponseHeadersVariable)
+                Set-Variable -Name $ResponseHeadersVariable -Value $responseHeaders -Scope Global
+                return @{ success = $true }
+            } -Verifiable
+            Mock -CommandName Invoke-RestMethod -MockWith { return @{} }
+            $parameters = @defaultParameters
 
-        BeforeAll {
-            $Global:continuationCount = 0
-        }
+            $result = Invoke-AzDevOpsApiRestMethod @parameters
 
-        It "Should handle continuation tokens" {
-            $params = @{
-                ApiUri = "https://dev.azure.com/someOrganizationName/_apis/"
-                HttpMethod = "Get"
-                HttpHeaders = @{}
-                HttpBody = ""
-                RetryAttempts = 3
-                RetryIntervalMs = 250
+            Assert-MockCalled -CommandName Invoke-RestMethod -AtLeast -Times 2
+            $result | Should -BeOfType [System.Collections.ArrayList]
+        }
+    }
+
+    Context 'HTTP 429 Handling' {
+        It 'should handle HTTP 429 and retry with appropriate delay' {
+            Mock -CommandName Invoke-RestMethod -MockWith {
+                throw [System.Net.WebException]::new("Too Many Requests", [System.Net.WebExceptionStatus]::ProtocolError, ([System.Net.HttpWebResponse]@{
+                    StatusCode = [System.Net.HttpStatusCode]::TooManyRequests
+                    Headers = [Ordered]@{ "Retry-After" = 1 }
+                }))
             }
+            Mock -CommandName Start-Sleep -MockWith { param($Milliseconds); return $null }
+            $parameters = @defaultParameters
+            $parameters.RetryAttempts = 2
 
-            $result = Invoke-AzDevOpsApiRestMethod @params
-            $result.Count | Should -Be 2
+            { Invoke-AzDevOpsApiRestMethod @parameters } | Should -Throw
+            Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 2
         }
     }
 }

@@ -1,8 +1,7 @@
-
 Describe "Get-AzDevOpsApiWaitIntervalMs" {
     It "Should return an integer" {
         $result = Get-AzDevOpsApiWaitIntervalMs
-        $result | Should -BeOfType [Int32]
+        $result | Should -BeOfType 'System.Int32'
     }
 
     It "Should return 500" {

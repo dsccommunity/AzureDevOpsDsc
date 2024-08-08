@@ -1,4 +1,3 @@
-powershell
 Describe 'Remove-DevOpsProject' {
 
     Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return '6.0' }

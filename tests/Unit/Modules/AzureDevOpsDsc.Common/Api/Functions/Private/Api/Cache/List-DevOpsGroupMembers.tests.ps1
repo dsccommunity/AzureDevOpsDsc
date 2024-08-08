@@ -1,4 +1,3 @@
-powershell
 Describe "List-DevOpsGroupMembers" {
     Mock -CommandName Get-AzDevOpsApiVersion {
         return "6.0-preview.1"

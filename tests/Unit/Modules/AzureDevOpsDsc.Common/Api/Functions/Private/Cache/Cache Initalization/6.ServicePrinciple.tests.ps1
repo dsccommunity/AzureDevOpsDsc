@@ -1,89 +1,46 @@
-
 Describe 'AzDoAPI_6_ServicePrinciple' {
-    BeforeAll {
-        function List-DevOpsServicePrinciples {
-            param(
-                [Parameter()]
-                [string]$Organization
-            )
-            return @( [pscustomobject]@{ DisplayName = 'ServicePrincipal1' }, [pscustomobject]@{ DisplayName = 'ServicePrincipal2' } )
-        }
-
-        function Add-CacheItem {
-            param(
-                [Parameter()]
-                [string]$Key,
-                [Parameter()]
-                [object]$Value,
-                [Parameter()]
-                [string]$Type
-            )
-        }
-
-        function Export-CacheObject {
-            param(
-                [Parameter()]
-                [string]$CacheType,
-                [Parameter()]
-                [object]$Content
-            )
-        }
-
-        $Global:DSCAZDO_OrganizationName = 'DefaultOrg'
-    }
-
     BeforeEach {
         Mock List-DevOpsServicePrinciples {
-            param($params)
-            return @( [pscustomobject]@{ DisplayName = 'ServicePrincipal1' }, [pscustomobject]@{ DisplayName = 'ServicePrincipal2' } )
+            return @({'displayName' = 'SP1'}, {'displayName' = 'SP2'})
         }
-
         Mock Add-CacheItem
         Mock Export-CacheObject
+
+        $Global:DSCAZDO_OrganizationName = 'MyOrganization'
     }
 
-    It 'Should use the OrganizationName parameter if provided' {
-        $OrganizationName = 'TestOrg'
-        AzDoAPI_6_ServicePrinciple -OrganizationName $OrganizationName
+    It 'should call List-DevOpsServicePrinciples with provided organization name' {
+        AzDoAPI_6_ServicePrinciple -OrganizationName 'TestOrgName'
 
-        Assert-MockCalled List-DevOpsServicePrinciples -ParameterFilter {
-            $Organization -eq 'TestOrg'
-        } -Times 1
+        Assert-MockCalled List-DevOpsServicePrinciples -Exactly 1 -Scope It -ParameterFilter { $Organization -eq 'TestOrgName' }
     }
 
-    It 'Should use the global variable DSCAZDO_OrganizationName if no parameter is provided' {
+    It 'should call List-DevOpsServicePrinciples with global organization name if none provided' {
         AzDoAPI_6_ServicePrinciple
 
-        Assert-MockCalled List-DevOpsServicePrinciples -ParameterFilter {
-            $Organization -eq 'DefaultOrg'
-        } -Times 1
+        Assert-MockCalled List-DevOpsServicePrinciples -Exactly 1 -Scope It -ParameterFilter { $Organization -eq $Global:DSCAZDO_OrganizationName }
     }
 
-    It 'Should add returned service principals to the cache' {
-        $servicePrincipals = @( [pscustomobject]@{ DisplayName = 'ServicePrincipal1' }, [pscustomobject]@{ DisplayName = 'ServicePrincipal2' } )
-        Mock List-DevOpsServicePrinciples { return $servicePrincipals }
+    It 'should add returned service principals to cache' {
+        AzDoAPI_6_ServicePrinciple -OrganizationName 'TestOrgName'
 
-        AzDoAPI_6_ServicePrinciple -OrganizationName 'TestOrg'
-
-        Assert-MockCalled Add-CacheItem -ParameterFilter {
-            $Key -eq 'ServicePrincipal1' -or $Key -eq 'ServicePrincipal2'
-        } -Times 2
+        Assert-MockCalled Add-CacheItem -Exactly 2 -Scope It
+        Assert-MockCalled Add-CacheItem -ParameterFilter { $Key -eq 'SP1' -and $Value.displayName -eq 'SP1' -and $Type -eq 'LiveServicePrinciples' }
+        Assert-MockCalled Add-CacheItem -ParameterFilter { $Key -eq 'SP2' -and $Value.displayName -eq 'SP2' -and $Type -eq 'LiveServicePrinciples' }
     }
 
-    It 'Should call Export-CacheObject with the right CacheType' {
-        AzDoAPI_6_ServicePrinciple -OrganizationName 'TestOrg'
+    It 'should export cache object after adding service principals' {
+        AzDoAPI_6_ServicePrinciple -OrganizationName 'TestOrgName'
 
-        Assert-MockCalled Export-CacheObject -ParameterFilter {
-            $CacheType -eq 'LiveServicePrinciples'
-        } -Times 1
+        Assert-MockCalled Export-CacheObject -Exactly 1 -Scope It -ParameterFilter { $CacheType -eq 'LiveServicePrinciples' }
     }
 
-    It 'Should catch and write an error when an exception occurs' {
-        Mock List-DevOpsServicePrinciples { throw "An error occurred" }
+    It 'should write an error message if an exception occurs' {
+        Mock List-DevOpsServicePrinciples { throw 'API Error' }
 
-        { AzDoAPI_6_ServicePrinciple -OrganizationName 'TestOrg' } | Should -Throw
+        { AzDoAPI_6_ServicePrinciple -OrganizationName 'TestOrgName' } | Should -Throw
 
-        Assert-MockCalled -ModuleName Microsoft.PowerShell.Utility -CommandName Write-Error
+        Assert-MockCalled -CommandName Write-Error -Exactly 1 -Scope It
     }
 }
 

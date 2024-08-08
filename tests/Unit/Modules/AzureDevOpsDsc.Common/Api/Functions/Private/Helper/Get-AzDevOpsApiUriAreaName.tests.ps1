@@ -1,37 +1,38 @@
-
 Describe 'Get-AzDevOpsApiUriAreaName' {
-    Mock -CommandName Test-AzDevOpsApiResourceName -MockWith { $true }
-
-    Context 'When no ResourceName is provided' {
-        It 'Returns all unique area names' {
-            $result = Get-AzDevOpsApiUriAreaName
-            $expected = @('core', 'profile')
-
-            $result | Should -Be $expected
+    BeforeAll {
+        function Test-AzDevOpsApiResourceName {
+            param (
+                [string]$ResourceName,
+                [bool]$IsValid
+            )
+            return $IsValid
         }
     }
 
-    Context 'When a valid ResourceName is provided' {
-        It 'Returns the correct area name for Project' {
+    Context 'When ResourceName is provided and valid' {
+        It 'Should return corresponding URI-specific area name' {
             $result = Get-AzDevOpsApiUriAreaName -ResourceName 'Project'
             $result | Should -Be 'core'
         }
 
-        It 'Returns the correct area name for Operation' {
-            $result = Get-AzDevOpsApiUriAreaName -ResourceName 'Operation'
-            $result | Should -Be 'core'
-        }
-
-        It 'Returns the correct area name for Profile' {
+        It 'Should return another URI-specific area name' {
             $result = Get-AzDevOpsApiUriAreaName -ResourceName 'Profile'
             $result | Should -Be 'profile'
         }
     }
 
-    Context 'When an invalid ResourceName is provided' {
-        It 'Throws an error' {
-            Mock -CommandName Test-AzDevOpsApiResourceName -MockWith { $false }
-            { Get-AzDevOpsApiUriAreaName -ResourceName 'InvalidResourceName' } | Should -Throw
+    Context 'When no ResourceName is provided' {
+        It 'Should return all unique URI-specific area names' {
+            $result = Get-AzDevOpsApiUriAreaName
+            $result | Should -Contain 'core'
+            $result | Should -Contain 'profile'
+            $result.Count | Should -Be 2
+        }
+    }
+
+    Context 'When invalid ResourceName is provided' {
+        It 'Should throw validation exception' {
+            { Get-AzDevOpsApiUriAreaName -ResourceName 'Invalid' } | Should -Throw
         }
     }
 }

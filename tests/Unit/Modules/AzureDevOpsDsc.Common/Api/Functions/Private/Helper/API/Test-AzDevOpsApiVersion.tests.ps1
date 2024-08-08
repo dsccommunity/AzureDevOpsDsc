@@ -1,31 +1,41 @@
-# Save this script as Test-TestAzDevOpsApiVersion.Tests.ps1
+Describe 'Test-AzDevOpsApiVersion' {
+    BeforeAll {
+        function Test-AzDevOpsApiVersion {
+            param (
+                [Parameter(Mandatory = $true)]
+                [System.String]
+                $ApiVersion,
 
-# Import the module or script containing the function
-. .\Path\To\Your\Script.ps1
+                [Parameter(Mandatory = $true)]
+                [ValidateSet($true)]
+                [System.Management.Automation.SwitchParameter]
+                $IsValid
+            )
 
-Describe "Test-AzDevOpsApiVersion" {
+            $supportedApiVersions = @(
+                '6.0'
+            )
 
-    Context "When validating API version with -IsValid switch" {
-
-        It "should return $true for a supported API version" {
-            $apiVersion = '6.0'
-            $result = Test-AzDevOpsApiVersion -ApiVersion $apiVersion -IsValid
-            $result | Should -Be $true
-        }
-
-        It "should return $false for an unsupported API version" {
-            $apiVersion = '5.0'
-            $result = Test-AzDevOpsApiVersion -ApiVersion $apiVersion -IsValid
-            $result | Should -Be $false
-        }
-
-        It "should throw an error if -IsValid switch is not used" {
-            $apiVersion = '6.0'
-            { Test-AzDevOpsApiVersion -ApiVersion $apiVersion } | Should -Throw
-        }
-
-        It "should throw an error if ApiVersion parameter is missing" {
-            { Test-AzDevOpsApiVersion -IsValid } | Should -Throw
+            return !(!$supportedApiVersions.Contains($ApiVersion))
         }
     }
+
+    It 'Should return $true for supported API version' {
+        $result = Test-AzDevOpsApiVersion -ApiVersion '6.0' -IsValid
+        $result | Should -Be $true
+    }
+
+    It 'Should return $false for unsupported API version' {
+        $result = Test-AzDevOpsApiVersion -ApiVersion '5.0' -IsValid
+        $result | Should -Be $false
+    }
+
+    It 'Should throw an error if -IsValid switch is missing' {
+        { Test-AzDevOpsApiVersion -ApiVersion '6.0' } | Should -Throw
+    }
+
+    It 'Should throw an error if ApiVersion is not provided' {
+        { Test-AzDevOpsApiVersion -IsValid } | Should -Throw
+    }
 }
+

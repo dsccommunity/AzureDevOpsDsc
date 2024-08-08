@@ -1,4 +1,3 @@
-powershell
 Describe 'Get-ProjectServiceStatus' {
     Mock Get-AzDevOpsApiVersion { return '5.0-preview.1' }
     Mock Invoke-AzDevOpsApiRestMethod

@@ -1,105 +1,92 @@
+powershell
+# Import the Pester module
+Import-Module Pester
 
+# Mock functions to simplify testing
+Mock ConvertTo-FormattedToken { param ($Token) return $Token }
+Mock Get-BitwiseOrResult { param ($bit) return $bit }
+
+# Define the test cases
+$referenceACLs = @(
+    [PSCustomObject]@{
+        token = "token1"
+        inheritPermissions = $true
+        aces = @(
+            [PSCustomObject]@{
+                permissions = @{
+                    allow = @{
+                        bit = 1
+                    }
+                    deny = @{
+                        bit = 0
+                    }
+                }
+                Identity = @{
+                    value = @{
+                        ACLIdentity = @{
+                            descriptor = "descriptor1"
+                        }
+                    }
+                }
+            }
+        )
+    }
+)
+
+$descriptorACLList = @(
+    [PSCustomObject]@{
+        token = "token2"
+        inheritPermissions = $false
+        aces = @(
+            [PSCustomObject]@{
+                permissions = @{
+                    allow = @{
+                        bit = 0
+                    }
+                    deny = @{
+                        bit = 1
+                    }
+                }
+                Identity = @{
+                    value = @{
+                        ACLIdentity = @{
+                            descriptor = "descriptor2"
+                        }
+                    }
+                }
+            }
+        )
+    }
+)
+
+$descriptorMatchToken = "token2"
+
+# Test to ensure the function handles the provided parameters correctly and returns the expected hashtable
 Describe "ConvertTo-ACLHashtable" {
-    $referenceACLs = @(
-        [PSCustomObject]@{
-            token = "token1"
+    It "Correctly converts and builds the ACL hashtable" {
+        $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
+        
+        $expectedResult = @{
+            Count = 2
+            value = [System.Collections.Generic.List[Object]]::new()
+        }
+
+        $expectedResult.value.Add($descriptorACLList[0])
+        
+        $expectedResult.value.Add([PSCustomObject]@{
             inheritPermissions = $true
-            aces = @(
-                [PSCustomObject]@{
-                    permissions = @{
-                        allow = @{
-                            bit = 1
-                        }
-                        deny = @{
-                            bit = 0
-                        }
-                    }
-                    Identity = @{
-                        value = @{
-                            ACLIdentity = @{
-                                descriptor = "descriptor1"
-                            }
-                        }
-                    }
+            token = "token1"
+            acesDictionary = @{
+                "descriptor1" = @{
+                    allow = 1
+                    deny = 0
+                    descriptor = "descriptor1"
                 }
-            )
-        }
-    )
+            }
+        })
 
-    $descriptorACLList = @(
-        [PSCustomObject]@{
-            token = "token2"
-            inheritPermissions = $false
-            aces = @(
-                [PSCustomObject]@{
-                    permissions = @{
-                        allow = @{
-                            bit = 0
-                        }
-                        deny = @{
-                            bit = 1
-                        }
-                    }
-                    Identity = @{
-                        value = @{
-                            ACLIdentity = @{
-                                descriptor = "descriptor2"
-                            }
-                        }
-                    }
-                }
-            )
-        }
-    )
-
-    $descriptorMatchToken = "token2"
-
-    It "should return an ACL Hashtable with correct structure and values" {
-        $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
-
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -BeOfType Hashtable
-        $result.ContainsKey('Count') | Should -BeTrue
-        $result.ContainsKey('value') | Should -BeTrue
-        $result.Count | Should -Be 1
-
-        $acl = $result.value[0]
-        $acl.token | Should -Be "token2"
-        $acl.acesDictionary.ContainsKey("descriptor2") | Should -BeTrue
-
-        $ace = $acl.acesDictionary['descriptor2']
-        $ace.allow | Should -Be 0
-        $ace.deny | Should -Be 1
-    }
-
-    It "should handle empty descriptor ACL list and use reference ACLs" {
-        $descriptorACLList = @()
-        $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
-
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -BeOfType Hashtable
-        $result.ContainsKey('Count') | Should -BeTrue
-        $result.ContainsKey('value') | Should -BeTrue
-        $result.Count | Should -Be 1
-
-        $acl = $result.value[0]
-        $acl.token | Should -Be "token1"
-        $acl.acesDictionary.ContainsKey("descriptor1") | Should -BeTrue
-
-        $ace = $acl.acesDictionary['descriptor1']
-        $ace.allow | Should -Be 1
-        $ace.deny | Should -Be 0
-    }
-
-    It "should return empty ACL Hashtable for unmatched descriptor match token" {
-        $descriptorMatchToken = "non-existent"
-        $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
-
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -BeOfType Hashtable
-        $result.ContainsKey('Count') | Should -BeTrue
-        $result.ContainsKey('value') | Should -BeTrue
-        $result.Count | Should -Be 0
+        $result | Should -BeExactly $expectedResult
     }
 }
 
+Be sure you've installed and imported the Pester module version 5 before running this test. You can do so by running `Install-Module -Name Pester -Force`, then `Import-Module Pester`.

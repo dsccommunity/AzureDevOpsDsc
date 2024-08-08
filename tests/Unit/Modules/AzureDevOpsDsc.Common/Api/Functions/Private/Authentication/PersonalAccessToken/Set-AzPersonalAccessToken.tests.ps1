@@ -1,4 +1,3 @@
-powershell
 Describe "Set-AzPersonalAccessToken" {
     Mock New-PersonalAccessToken
     Mock Test-AzToken -MockWith { return $true }

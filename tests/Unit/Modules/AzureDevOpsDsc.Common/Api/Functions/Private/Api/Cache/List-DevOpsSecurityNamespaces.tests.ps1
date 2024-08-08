@@ -1,9 +1,8 @@
-powershell
 Describe "List-DevOpsSecurityNamespaces" {
     Mock -ModuleName ModuleName -FunctionName Invoke-AzDevOpsApiRestMethod {
         return @{
             value = @(
-                @{ id = 'namespace1'; name = 'Namespace 1' }, 
+                @{ id = 'namespace1'; name = 'Namespace 1' },
                 @{ id = 'namespace2'; name = 'Namespace 2' }
             )
         }

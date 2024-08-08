@@ -1,4 +1,3 @@
-powershell
 Describe 'List-DevOpsProjects' {
     Mock Get-AzDevOpsApiVersion {
         return "6.0"
@@ -7,7 +6,7 @@ Describe 'List-DevOpsProjects' {
     Mock Invoke-AzDevOpsApiRestMethod {
         return @{
             value = @(
-                @{ id = '1'; name = 'ProjectOne' }, 
+                @{ id = '1'; name = 'ProjectOne' },
                 @{ id = '2'; name = 'ProjectTwo' }
             )
         }

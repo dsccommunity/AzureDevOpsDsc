@@ -1,52 +1,61 @@
+powershell
+# Unit tests for ConvertTo-ACETokenList function
+
+# Load the function script
+. .\ConvertTo-ACETokenList.ps1
 
 Describe "ConvertTo-ACETokenList Tests" {
 
-    Mock Get-CacheItem
-
-    Context "When Security Descriptor is not found" {
-        It "Should return an error message" {
-            Get-CacheItem -Key "SecurityNamespace" -Type 'SecurityNamespaces' | Mock -MockWith { $null }
-
-            { ConvertTo-ACETokenList -SecurityNamespace "SecurityNamespace" -ACEPermissions @(@{}) } | Should -Throw -ErrorId "Security Descriptor not found for namespace: SecurityNamespace"
+    BeforeEach {
+        # Mock Get-CacheItem to return a mock SecurityDescriptor
+        Mock Get-CacheItem {
+            return @{
+                actions = @(
+                    @{ displayName = "Read"; name = "read" },
+                    @{ displayName = "Write"; name = "write" },
+                    @{ displayName = "Execute"; name = "execute" }
+                )
+            }
         }
     }
 
-    Context "When Security Descriptor is found" {
-        $mockedDescriptor = @{
-            'actions' = @(
-                @{
-                    'displayName' = 'read'
-                    'name'        = 'read'
-                },
-                @{
-                    'displayName' = 'write'
-                    'name'        = 'write'
-                }
-            )
-        }
+    It "should return an empty list when SecurityDescriptor is not found" {
+        # Mock to return $null for not found SecurityDescriptor
+        Mock Get-CacheItem { return $null }
 
-        Mock Get-CacheItem -MockWith { return $mockedDescriptor }
+        $result = ConvertTo-ACETokenList -SecurityNamespace "TestNamespace" -ACEPermissions @(
+            @{ "Read" = "Allow"; "Write" = "Deny" }
+        )
 
-        It "Should process ACE Permissions correctly" {
-            $ACEPermissions = @(
-                @{ 'read' = 'Allow'; 'write' = 'Deny' }
-            )
+        $result | Should -BeNullOrEmpty
+    }
 
-            $result = ConvertTo-ACETokenList -SecurityNamespace "SecurityNamespace" -ACEPermissions $ACEPermissions
+    It "should correctly process Allow and Deny permissions" {
+        $acePermissions = @(
+            @{ "Read" = "Allow"; "Write" = "Deny" },
+            @{ "Execute" = "Allow"; "Read" = "Deny" }
+        )
+        $result = ConvertTo-ACETokenList -SecurityNamespace "TestNamespace" -ACEPermissions $acePermissions
 
-            $result | Should -Not -BeNullOrEmpty
-            $result[0].DescriptorType | Should -Be "SecurityNamespace"
-            $result[0].Allow.displayName | Should -Contain "read"
-            $result[0].Deny.displayName  | Should -Contain "write"
-        }
+        $result | Should -HaveCount 2
+        $result[0].DescriptorType | Should -Be "TestNamespace"
+        $result[0].Allow.displayName | Should -Contain "Read"
+        $result[0].Deny.displayName | Should -Contain "Write"
+        $result[1].Allow.displayName | Should -Contain "Execute"
+        $result[1].Deny.displayName | Should -Contain "Read"
+    }
 
-        It "Should handle missing permissions correctly" {
-            $ACEPermissions = @(
-                @{ 'execute' = 'Allow' }
-            )
+    It "should filter out permissions not found in the SecurityDescriptor" {
+        $acePermissions = @(
+            @{ "UnknownPermission" = "Allow"; "Read" = "Deny" }
+        )
+        $result = ConvertTo-ACETokenList -SecurityNamespace "TestNamespace" -ACEPermissions $acePermissions
 
-            { ConvertTo-ACETokenList -SecurityNamespace "SecurityNamespace" -ACEPermissions $ACEPermissions } | Should -Not -Throw
-        }
+        $result | Should -HaveCount 1
+        $result[0].Allow | Should -BeNullOrEmpty
+        $result[0].Deny.displayName | Should -Contain "Read"
     }
 }
+
+# End of Pester tests for ConvertTo-ACETokenList
 

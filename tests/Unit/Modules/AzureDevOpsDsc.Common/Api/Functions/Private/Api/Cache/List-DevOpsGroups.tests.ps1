@@ -1,10 +1,9 @@
-powershell
 Describe "List-DevOpsGroups" {
     Param (
         [string]$Organization = "testOrg",
         [string]$ApiVersion = "6.0-preview.1"
     )
-    
+
     Mock -CommandName Get-AzDevOpsApiVersion { return "6.0-preview.1" }
     Mock -CommandName Invoke-AzDevOpsApiRestMethod {
         return @{

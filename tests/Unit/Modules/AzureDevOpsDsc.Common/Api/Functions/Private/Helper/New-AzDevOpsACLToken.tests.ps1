@@ -1,40 +1,37 @@
-
+powershell
+# Unit Tests for New-AzDevOpsACLToken function
 Describe 'New-AzDevOpsACLToken' {
-    BeforeAll {
-        Import-Module -Name "Path\To\Your\Module" # Adjust path to the module containing the function
-    }
-
     Context 'When TeamId is provided' {
-        It 'should create a token for team-level access' {
+        It 'Should create a team-level access token' {
             $OrganizationName = "Contoso"
             $ProjectId = "MyProject"
             $TeamId = "MyTeam"
-
-            $expectedToken = "vstfs:///Classification/TeamProject/MyProject/MyTeam"
-
+            $expectedToken = "vstfs:///Classification/TeamProject/$ProjectId/$TeamId"
+            
             $result = New-AzDevOpsACLToken -OrganizationName $OrganizationName -ProjectId $ProjectId -TeamId $TeamId
+            
             $result | Should -Be $expectedToken
         }
     }
 
     Context 'When TeamId is not provided' {
-        It 'should create a token for project-level access' {
+        It 'Should create a project-level access token' {
             $OrganizationName = "Contoso"
             $ProjectId = "MyProject"
-
-            $expectedToken = "vstfs:///Classification/TeamProject/MyProject"
-
+            $expectedToken = "vstfs:///Classification/TeamProject/$ProjectId"
+            
             $result = New-AzDevOpsACLToken -OrganizationName $OrganizationName -ProjectId $ProjectId
+            
             $result | Should -Be $expectedToken
         }
     }
 
-    Context 'When mandatory parameters are not provided' {
-        It 'should throw an error when OrganizationName is missing' {
+    Context 'When required parameters are missing' {
+        It 'Should throw an error if OrganizationName is missing' {
             { New-AzDevOpsACLToken -ProjectId "MyProject" } | Should -Throw
         }
-
-        It 'should throw an error when ProjectId is missing' {
+        
+        It 'Should throw an error if ProjectId is missing' {
             { New-AzDevOpsACLToken -OrganizationName "Contoso" } | Should -Throw
         }
     }

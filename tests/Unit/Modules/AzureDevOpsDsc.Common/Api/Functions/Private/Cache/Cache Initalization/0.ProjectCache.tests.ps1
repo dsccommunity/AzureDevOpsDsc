@@ -1,52 +1,87 @@
+powershell
+# Mock functions
+Function List-DevOpsProjects {
+    param (
+        [string]$Organization
+    )
+    return @(
+        @{Id = '1'; Name = 'Project1'},
+        @{Id = '2'; Name = 'Project2'}
+    )
+}
 
+Function Get-DevOpsSecurityDescriptor {
+    param (
+        [string]$ProjectId,
+        [string]$Organization
+    )
+    return "SecurityDescriptor_$ProjectId"
+}
+
+Function Add-CacheItem {
+    param (
+        [string]$Key,
+        [object]$Value,
+        [string]$Type
+    )
+}
+
+Function Export-CacheObject {
+    param (
+        [string]$CacheType,
+        [object]$Content
+    )
+}
+
+# Actual tests
 Describe 'AzDoAPI_0_ProjectCache' {
-    Mock List-DevOpsProjects {
-        return @( @{ Id = 1; Name = 'Project1' }, @{ Id = 2; Name = 'Project2' } )
+    
+    BeforeEach {
+        $Global:DSCAZDO_OrganizationName = "GlobalOrganization"
     }
 
-    Mock Get-DevOpsSecurityDescriptor {
-        return 'SecurityDescriptor'
+    It 'Should use organization name from parameter' {
+        $script:paramsUsed = $null
+        Mock List-DevOpsProjects { param($Organization) $script:paramsUsed = $Organization; return @(@{}); }
+
+        AzDoAPI_0_ProjectCache -OrganizationName "TestOrg"
+        $paramsUsed | Should -Be "TestOrg"
     }
 
-    Mock Add-CacheItem
-    Mock Export-CacheObject
+    It 'Should use global organization name if parameter is not provided' {
+        $script:paramsUsed = $null
+        Mock List-DevOpsProjects { param($Organization) $script:paramsUsed = $Organization; return @(@{}); }
 
-    Context 'When OrganizationName is provided' {
-        It 'should call List-DevOpsProjects with provided OrganizationName' {
-            AzDoAPI_0_ProjectCache -OrganizationName 'MyOrg'
-
-            Assert-MockCalled List-DevOpsProjects -ParameterFilter { $params.Organization -eq 'MyOrg' } -Exactly 1
-        }
-
-        It 'should add projects to cache' {
-            AzDoAPI_0_ProjectCache -OrganizationName 'MyOrg'
-
-            Assert-MockCalled Add-CacheItem -Exactly 2
-        }
-
-        It 'should call Export-CacheObject' {
-            AzDoAPI_0_ProjectCache -OrganizationName 'MyOrg'
-
-            Assert-MockCalled Export-CacheObject -Exactly 1
-        }
+        AzDoAPI_0_ProjectCache
+        $paramsUsed | Should -Be "GlobalOrganization"
     }
 
-    Context 'When OrganizationName is not provided' {
-        $Global:DSCAZDO_OrganizationName = 'GlobalOrg'
+    It 'Should add projects to the cache' {
+        $projectsAdded = @()
+        Mock List-DevOpsProjects { return @(
+            @{ Id = '1'; Name = 'Project1' },
+            @{ Id = '2'; Name = 'Project2' }
+        )}
+        Mock Get-DevOpsSecurityDescriptor { param($ProjectId) return "SD_$ProjectId" }
+        Mock Add-CacheItem { param($Key, $Value, $Type) $projectsAdded += $Key }
 
-        It 'should use global variable for OrganizationName' {
-            AzDoAPI_0_ProjectCache
-
-            Assert-MockCalled List-DevOpsProjects -ParameterFilter { $params.Organization -eq 'GlobalOrg' } -Exactly 1
-        }
+        AzDoAPI_0_ProjectCache -OrganizationName "TestOrg"
+        $projectsAdded | Should -Contain "Project1", "Project2"
     }
 
-    Context 'Error handling' {
-        Mock List-DevOpsProjects { throw 'API Error' }
+    It 'Should export cache object' {
+        $exportCalled = $false
+        Mock Export-CacheObject { param($CacheType, $Content) $exportCalled = $true }
 
-        It 'should handle API errors' {
-            { AzDoAPI_0_ProjectCache -OrganizationName 'MyOrg' } | Should -Throw 'API Error'
-        }
+        AzDoAPI_0_ProjectCache -OrganizationName "TestOrg"
+        $exportCalled | Should -Be $true
+    }
+
+    It 'Should handle errors gracefully' {
+        Mock List-DevOpsProjects { throw "API Error" }
+        Mock Write-Error {}
+
+        { AzDoAPI_0_ProjectCache -OrganizationName "TestOrg" } | Should -Not -Throw
     }
 }
 

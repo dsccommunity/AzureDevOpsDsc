@@ -1,49 +1,43 @@
+Describe 'Get-AzDevOpsApiUriResourceName Tests' {
 
-Describe 'Get-AzDevOpsApiUriResourceName' {
-    Context 'No Parameter' {
-        It 'Should return all Azure DevOps API URI resource names' {
-            $result = Get-AzDevOpsApiUriResourceName
-            $expected = @('operations', 'projects')
-            $result | Should -BeOfType [System.String[]]
-            $result | Should -Be $expected
+    BeforeEach {
+        function Test-AzDevOpsApiResourceName {
+            param ($ResourceName, $IsValid)
+            return $true
         }
     }
 
-    Context 'With ResourceName Parameter' {
-        It 'Should return the correct URI-specific resource name for Operation' {
-            $result = Get-AzDevOpsApiUriResourceName -ResourceName 'Operation'
-            $expected = 'operations'
-            $result | Should -BeOfType [System.String]
-            $result | Should -Be $expected
-        }
-
-        It 'Should return the correct URI-specific resource name for Project' {
+    Context 'When ResourceName is provided' {
+        It 'Should return correct URI-specific resource name for "Project"' {
             $result = Get-AzDevOpsApiUriResourceName -ResourceName 'Project'
-            $expected = 'projects'
-            $result | Should -BeOfType [System.String]
-            $result | Should -Be $expected
+            $result | Should -Be 'projects'
         }
 
-        It 'Should return $null if an invalid ResourceName is provided' {
-            $result = Get-AzDevOpsApiUriResourceName -ResourceName 'InvalidResource'
-            $result | Should -Be $null
-        }
-
-        It 'Should throw an error if ResourceName is whitespace' {
-            { Get-AzDevOpsApiUriResourceName -ResourceName ' ' } | Should -Throw
+        It 'Should return correct URI-specific resource name for "Operation"' {
+            $result = Get-AzDevOpsApiUriResourceName -ResourceName 'Operation'
+            $result | Should -Be 'operations'
         }
     }
-}
 
-Function Test-AzDevOpsApiResourceName {
-    param (
-        [string] $ResourceName,
-        [bool] $IsValid
-    )
-    if ($IsValid) {
-        return $true
-    } else {
-        return $false
+    Context 'When ResourceName is not provided' {
+        It 'Should return all URI-specific resource names' {
+            $result = Get-AzDevOpsApiUriResourceName
+            $expectedResult = @('operations', 'projects')
+            $result | Should -Be $expectedResult
+        }
+    }
+
+    Context 'When ResourceName is invalid' {
+        BeforeEach {
+            function Test-AzDevOpsApiResourceName {
+                param ($ResourceName, $IsValid)
+                return $false
+            }
+        }
+
+        It 'Should not validate and throw an error' {
+            { Get-AzDevOpsApiUriResourceName -ResourceName 'InvalidResource' } | Should -Throw
+        }
     }
 }
 

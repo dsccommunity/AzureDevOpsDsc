@@ -1,53 +1,68 @@
-
 Describe 'AzDoAPI_2_UserCache' {
-    Mock List-UserCache {
+
+    Mock -ModuleName <ModuleName> -CommandName List-UserCache {
         return @(
-            [pscustomobject]@{ PrincipalName = 'user1@domain.com'; }
-            [pscustomobject]@{ PrincipalName = 'user2@domain.com'; }
+            [PSCustomObject]@{ PrincipalName = 'user1@example.com' },
+            [PSCustomObject]@{ PrincipalName = 'user2@example.com' }
         )
     }
 
-    Mock Add-CacheItem { }
+    Mock -ModuleName <ModuleName> -CommandName Add-CacheItem
+    Mock -ModuleName <ModuleName> -CommandName Export-CacheObject
 
-    Mock Export-CacheObject { }
+    Context 'when organization name parameter is provided' {
 
-    BeforeEach {
-        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+        It 'should call List-UserCache with correct parameters' {
+            AzDoAPI_2_UserCache -OrganizationName 'TestOrg'
+
+            Assert-MockCalled -ModuleName <ModuleName> -CommandName List-UserCache -Exactly -Times 1 -Scope It -ParameterFilter {
+                $Organization -eq 'TestOrg'
+            }
+        }
+
+        It 'should add users to cache' {
+            AzDoAPI_2_UserCache -OrganizationName 'TestOrg'
+
+            Assert-MockCalled -ModuleName <ModuleName> -CommandName Add-CacheItem -Exactly -Times 2
+            Assert-MockCalled -ModuleName <ModuleName> -CommandName Add-CacheItem -ParameterFilter {
+                $Key -eq 'user1@example.com'
+            }
+            Assert-MockCalled -ModuleName <ModuleName> -CommandName Add-CacheItem -ParameterFilter {
+                $Key -eq 'user2@example.com'
+            }
+        }
+
+        It 'should export the cache' {
+            AzDoAPI_2_UserCache -OrganizationName 'TestOrg'
+
+            Assert-MockCalled -ModuleName <ModuleName> -CommandName Export-CacheObject -Exactly -Times 1
+        }
     }
 
-    It 'Should call List-UserCache with correct parameters' {
-        AzDoAPI_2_UserCache -OrganizationName 'TestOrg'
+    Context 'when organization name parameter is not provided' {
 
-        Assert-MockCalled List-UserCache -Exactly -Scope It -ParameterFilter { $Organization -eq 'TestOrg' }
+        BeforeEach {
+            $Global:DSCAZDO_OrganizationName = 'GlobalTestOrg'
+        }
+
+        It 'should use the global organization name' {
+            AzDoAPI_2_UserCache
+
+            Assert-MockCalled -ModuleName <ModuleName> -CommandName List-UserCache -Exactly -Times 1 -ParameterFilter {
+                $Organization -eq 'GlobalTestOrg'
+            }
+        }
     }
 
-    It 'Should use global variable if OrganizationName is not provided' {
-        AzDoAPI_2_UserCache
+    Context 'when an error occurs' {
 
-        Assert-MockCalled List-UserCache -Exactly -Scope It -ParameterFilter { $Organization -eq 'TestOrganization' }
-    }
+        Mock -ModuleName <ModuleName> -CommandName List-UserCache { throw "API Error" }
 
-    It 'Should add returned users to cache' {
-        AzDoAPI_2_UserCache -OrganizationName 'TestOrg'
+        It 'should catch and handle the error' {
+            { AzDoAPI_2_UserCache -OrganizationName 'TestOrg' } | Should -Throw
 
-        Assert-MockCalled Add-CacheItem -Exactly 2 -Scope It
-        Assert-MockCalled Add-CacheItem -Scope It -ParameterFilter { $Key -eq 'user1@domain.com' }
-        Assert-MockCalled Add-CacheItem -Scope It -ParameterFilter { $Key -eq 'user2@domain.com' }
-    }
-
-    It 'Should export cache to file' {
-        AzDoAPI_2_UserCache -OrganizationName 'TestOrg'
-
-        Assert-MockCalled Export-CacheObject -Exactly -Scope It -ParameterFilter { $CacheType -eq 'LiveUsers' -and $Content -eq $Global:AzDoLiveUsers }
-    }
-
-    It 'Should log error if an exception occurs' {
-        Mock List-UserCache { throw 'Error' }
-
-        { AzDoAPI_2_UserCache -OrganizationName 'TestOrg' } | Should -Throw
-
-        # Check if Write-Error was called
-        Assert-MockCalled Write-Error -Exactly 1 -Scope It
+            Get-Variable -Name Error -Scope Global | Should -Not -BeNullOrEmpty
+        }
     }
 }
 

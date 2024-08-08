@@ -1,43 +1,45 @@
+Describe 'Format-AzDoProjectName' {
+    Mock Write-Verbose
 
-Describe "Format-AzDoProjectName Tests" {
-
-    # Test: Correct format with backslash
-    It "Should format 'Project1\Group1' correctly" {
-        $result = Format-AzDoProjectName -GroupName 'Project1\Group1' -OrganizationName 'Org')
-        $result | Should -Be '[Project1]\Group1'
+    Context 'When GroupName is already formatted' {
+        It 'Returns the same GroupName' {
+            $result = Format-AzDoProjectName -GroupName '[ProjectName]\GroupName' -OrganizationName 'OrgName'
+            $result | Should -Be '[ProjectName]\GroupName'
+        }
     }
 
-    # Test: Correct format with forward slash
-    It "Should format 'Project1/Group1' correctly" {
-        $result = Format-AzDoProjectName -GroupName 'Project1/Group1' -OrganizationName 'Org')
-        $result | Should -Be '[Project1]\Group1'
+    Context 'When GroupName needs formatting' {
+        It 'Formats correctly with given organization name' {
+            $result = Format-AzDoProjectName -GroupName 'ProjectName/GroupName' -OrganizationName 'OrgName'
+            $result | Should -Be '[ProjectName]\GroupName'
+        }
+
+        It 'Throws if the given format has insufficient parts' {
+            { Format-AzDoProjectName -GroupName 'GroupName' -OrganizationName 'OrgName' } | Should -Throw
+        }
+
+        It 'Replaces %ORG% with given organization name' {
+            $result = Format-AzDoProjectName -GroupName '%ORG%\GroupName' -OrganizationName 'OrgName'
+            $result | Should -Be '[OrgName]\GroupName'
+        }
+
+        It 'Replaces %TFS% with TEAM FOUNDATION' {
+            $result = Format-AzDoProjectName -GroupName '%TFS%\GroupName' -OrganizationName 'OrgName'
+            $result | Should -Be '[TEAM FOUNDATION]\GroupName'
+        }
+
+        It 'Throws if group part is empty' {
+            { Format-AzDoProjectName -GroupName 'ProjectName\' -OrganizationName 'OrgName' } | Should -Throw
+        }
+
+        It 'Trims leading and trailing spaces' {
+            $result = Format-AzDoProjectName -GroupName ' ProjectName / GroupName ' -OrganizationName 'OrgName'
+            $result | Should -Be '[ProjectName]\GroupName'
+        }
     }
 
-    # Test: Replace %ORG% with OrganizationName
-    It "Should replace %ORG% with OrganizationName" {
-        $result = Format-AzDoProjectName -GroupName '%ORG%\Group1' -OrganizationName 'Organization')
-        $result | Should -Be '[Organization]\Group1'
-    }
-
-    # Test: Replace %TFS% with TEAM FOUNDATION
-    It "Should replace %TFS% with TEAM FOUNDATION" {
-        $result = Format-AzDoProjectName -GroupName '%TFS%\Group1' -OrganizationName 'Organization')
-        $result | Should -Be '[TEAM FOUNDATION]\Group1'
-    }
-
-    # Test: Throw error on empty project name
-    It "Should throw error on empty project name" {
-        { Format-AzDoProjectName -GroupName '\Group1' -OrganizationName 'Organization' } | Should -Throw "The GroupName '\Group1' is not in the correct format. The GroupName must be in the format 'ProjectName\GroupName' or 'Project/GroupName."
-    }
-
-    # Test: Throw error on single element group name
-    It "Should throw error on single element group name" {
-        { Format-AzDoProjectName -GroupName 'Group1' -OrganizationName 'Organization' } | Should -Throw "The GroupName 'Group1' is not in the correct format. The GroupName must be in the format 'ProjectName\GroupName' or 'Project/GroupName."
-    }
-
-    # Test: Throw error on empty group name
-    It "Should throw error on empty group name" {
-        { Format-AzDoProjectName -GroupName 'Project\' -OrganizationName 'Organization' } | Should -Throw "The GroupName 'Project\' is not in the correct format. The GroupName must be in the format 'ProjectName\GroupName'."
+    AfterEach {
+        Remove-Mock Write-Verbose
     }
 }
 

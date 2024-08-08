@@ -1,61 +1,105 @@
-
 Describe "Find-AzDoIdentity" {
-
     BeforeAll {
-        $Global:AZDOLiveUsers = @(
-            [PSCustomObject]@{ value = [PSCustomObject]@{ displayName = "John Doe"; UPN = "johndoe@example.com" } },
-            [PSCustomObject]@{ value = [PSCustomObject]@{ displayName = "Jane Doe"; UPN = "janedoe@example.com" } }
-        )
-        $Global:AZDOLiveGroups = @(
-            [PSCustomObject]@{ value = [PSCustomObject]@{ displayName = "Project Team"; GroupName = "[Project]\Team" } }
-        )
-
         function Get-CacheItem {
             param (
+                [Parameter(Mandatory)]
                 [string]$Key,
+                [Parameter(Mandatory)]
                 [string]$Type
             )
-            switch ($Type) {
-                'LiveUsers' {
-                    return $Global:AZDOLiveUsers | Where-Object { $_.value.UPN -eq $Key }
+            if ($Type -eq 'LiveUsers') {
+                return @{
+                    displayName = "test.user"
+                    emailAddress = "test@domain.com"
                 }
-                'LiveGroups' {
-                    return $Global:AZDOLiveGroups | Where-Object { $_.value.GroupName -eq $Key }
+            } elseif ($Type -eq 'LiveGroups') {
+                return @{
+                    displayName = "test.group"
                 }
             }
         }
+
+        $Global:AZDOLiveUsers = @(
+            @{
+                key = "testuser"
+                value = @{
+                    displayName = "Test User"
+                    emailAddress = "test.user@domain.com"
+                }
+            }
+        )
+
+        $Global:AZDOLiveGroups = @(
+            @{
+                key = "testgroup"
+                value = @{
+                    displayName = "Test Group"
+                }
+            }
+        )
     }
 
-    It "Should return user details if identity is an email address" {
-        $result = Find-AzDoIdentity -Identity "johndoe@example.com"
-        $result.value.displayName | Should -Be "John Doe"
+    It "Should return user for email input" {
+        $result = Find-AzDoIdentity -Identity 'test.user@domain.com' -Verbose
+        $result.emailAddress | Should -Be 'test@domain.com'
     }
 
-    It "Should return group details if identity is a group name with backslash" {
-        $result = Find-AzDoIdentity -Identity "Project\Team"
-        $result.value.displayName | Should -Be "Project Team"
+    It "Should return group for name with slashes" {
+        $result = Find-AzDoIdentity -Identity 'Project/TestGroup' -Verbose
+        $result.displayName | Should -Be 'test.group'
     }
 
-    It "Should return group details if identity is a group name with forward slash" {
-        $result = Find-AzDoIdentity -Identity "Project/Team"
-        $result.value.displayName | Should -Be "Project Team"
+    It "Should return user for display name" {
+        $result = Find-AzDoIdentity -Identity 'Test User' -Verbose
+        $result.displayName | Should -Be 'Test User'
     }
 
-    It "Should return user details using display name" {
-        $result = Find-AzDoIdentity -Identity "Jane Doe"
-        $result.displayName | Should -Be "Jane Doe"
+    It "Should return group for display name" {
+        $result = Find-AzDoIdentity -Identity 'Test Group' -Verbose
+        $result.displayName | Should -Be 'Test Group'
     }
 
-    It "Should return warning if multiple users with same display name" {
-        $Global:AZDOLiveUsers += [PSCustomObject]@{ value = [PSCustomObject]@{ displayName = "Duplicate Name"; UPN = "dup1@example.com" } }
-        $Global:AZDOLiveUsers += [PSCustomObject]@{ value = [PSCustomObject]@{ displayName = "Duplicate Name"; UPN = "dup2@example.com" } }
+    It "Should return warning for multiple users" {
+        $Global:AZDOLiveUsers = @(
+            @{
+                key = "testuser1"
+                value = @{
+                    displayName = "Duplicate User"
+                    emailAddress = "test1@domain.com"
+                }
+            },
+            @{
+                key = "testuser2"
+                value = @{
+                    displayName = "Duplicate User"
+                    emailAddress = "test2@domain.com"
+                }
+            }
+        )
+        $result = { Find-AzDoIdentity -Identity 'Duplicate User' -Verbose } | Should -Throw
+    }
 
-        { Find-AzDoIdentity -Identity "Duplicate Name" } | Should -Throw
+    It "Should return warning for multiple groups" {
+        $Global:AZDOLiveGroups = @(
+            @{
+                key = "testgroup1"
+                value = @{
+                    displayName = "Duplicate Group"
+                }
+            },
+            @{
+                key = "testgroup2"
+                value = @{
+                    displayName = "Duplicate Group"
+                }
+            }
+        )
+        $result = { Find-AzDoIdentity -Identity 'Duplicate Group' -Verbose } | Should -Throw
     }
 
     AfterAll {
-        Remove-Variable -Name AZDOLiveUsers -Scope Global
-        Remove-Variable -Name AZDOLiveGroups -Scope Global
+        Remove-Variable -Name Global:AZDOLiveUsers
+        Remove-Variable -Name Global:AZDOLiveGroups
     }
 }
 

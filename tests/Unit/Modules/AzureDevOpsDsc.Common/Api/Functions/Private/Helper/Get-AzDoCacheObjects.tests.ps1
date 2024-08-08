@@ -1,30 +1,16 @@
-
 Describe 'Get-AzDoCacheObjects' {
-    It 'Should return an array of cache objects' {
-        $expectedObjects = @(
-            'Project',
-            'Team',
-            'Group',
-            'SecurityDescriptor',
-            'LiveGroups',
-            'LiveProjects',
-            'LiveUsers',
-            'LiveGroupMembers',
-            'LiveRepositories',
-            'LiveServicePrinciples',
-            'LiveACLList',
-            'SecurityNamespaces'
-        )
-
+    It 'Returns an array' {
         $result = Get-AzDoCacheObjects
-
-        $result | Should -BeOfType 'System.Object[]'
-        $result | Should -Be $expectedObjects
-        $result.Count | Should -Be $expectedObjects.Count
+        $result | Should -BeOfType 'System.Array'
     }
 
-    It 'Should return the correct cache object names' {
-        $expectedObjects = @(
+    It 'Returns an array with 13 elements' {
+        $result = Get-AzDoCacheObjects
+        $result.Length | Should -Be 13
+    }
+
+    It 'Contains expected elements' {
+        $expectedElements = @(
             'Project',
             'Team',
             'Group',
@@ -36,14 +22,11 @@ Describe 'Get-AzDoCacheObjects' {
             'LiveRepositories',
             'LiveServicePrinciples',
             'LiveACLList',
+            'LiveProcesses',
             'SecurityNamespaces'
         )
-
         $result = Get-AzDoCacheObjects
-
-        foreach ($object in $expectedObjects) {
-            $result | Should -Contain $object
-        }
+        $result | Should -Be $expectedElements
     }
 }
 

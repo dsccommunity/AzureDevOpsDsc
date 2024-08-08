@@ -1,4 +1,3 @@
-powershell
 Describe 'Set-ProjectServiceStatus' {
     Mock Get-AzDevOpsApiVersion { '6.0-preview.1' }
     Mock Invoke-AzDevOpsApiRestMethod {
@@ -18,8 +17,8 @@ Describe 'Set-ProjectServiceStatus' {
 
             Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1 -Scope It
             Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $_.Uri -eq $expectedUri -and 
-                $_.Method -eq 'PATCH' -and 
+                $_.Uri -eq $expectedUri -and
+                $_.Method -eq 'PATCH' -and
                 $_.Body -eq ($body | ConvertTo-Json)
             }
 
@@ -40,8 +39,8 @@ Describe 'Set-ProjectServiceStatus' {
             $expectedUri = 'https://dev.azure.com/TestOrg/_apis/FeatureManagement/FeatureStates/host/project/TestProj/TestService?api-version=5.1'
 
             Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $_.Uri -eq $expectedUri -and 
-                $_.Method -eq 'PATCH' -and 
+                $_.Uri -eq $expectedUri -and
+                $_.Method -eq 'PATCH' -and
                 $_.Body -eq ($body | ConvertTo-Json)
             }
         }
