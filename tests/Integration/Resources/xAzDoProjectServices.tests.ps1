@@ -14,18 +14,11 @@ Describe "xAzDoProjectServices Integration Tests" {
             ModuleName = 'AzureDevOpsDsc'
         }
 
+        #
         # Create a new project
-        $projectParams = @{
-            Name = 'xAzDoProject'
-            ModuleName = 'AzureDevOpsDsc'
-            Method = 'Set'
-            properties = @{
-                ProjectName = $PROJECTNAME
-            }
-        }
 
-        # Invoke the DSC resource to create a new project.
-        $null = Invoke-DscResource @projectParams
+        New-Project $PROJECTNAME
+
     }
 
     # This context is used to test if a project services exist.

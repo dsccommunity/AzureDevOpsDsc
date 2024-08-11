@@ -11,18 +11,10 @@ Describe "xAzDoGitRepository Integration Tests" {
             ModuleName = 'AzureDevOpsDsc'
         }
 
+        #
         # Create a new project
-        $projectParams = @{
-            Name = 'xAzDoProject'
-            ModuleName = 'AzureDevOpsDsc'
-            Method = 'Set'
-            properties = @{
-                ProjectName = $PROJECTNAME
-            }
-        }
 
-        # Invoke the DSC resource to create a new project.
-        $null = Invoke-DscResource @projectParams
+        New-Project $PROJECTNAME
 
     }
 
@@ -60,7 +52,7 @@ Describe "xAzDoGitRepository Integration Tests" {
     }
 
     # This context is used to test the creation of a new git repository.
-    Context "Creating a new Git Repository" {
+    Context "Creating a new Git Repository Permissions" {
 
         BeforeAll {
             # Set up the parameters for the DSC resource invocation.

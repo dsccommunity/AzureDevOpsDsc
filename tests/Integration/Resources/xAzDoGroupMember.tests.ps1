@@ -11,37 +11,16 @@ Describe "xAzDoGroupMember Integration Tests" {
             ModuleName = 'AzureDevOpsDsc'
         }
 
+        #
         # Create a new project
-        $projectParams = @{
-            Name = 'xAzDoProject'
-            ModuleName = 'AzureDevOpsDsc'
-            Method = 'Set'
-            properties = @{
-                ProjectName = $PROJECTNAME
-            }
-        }
 
-        # Invoke the DSC resource to create a new project.
-        $null = Invoke-DscResource @projectParams
+        New-Project $PROJECTNAME
 
-        # Create a new group
-        $groupParams = @{
-            Name = 'xAzDoProjectGroup'
-            ModuleName = 'AzureDevOpsDsc'
-            Method = 'Set'
-            properties = @{
-                ProjectName = $PROJECTNAME
-                GroupName = 'TESTGROUP'
-            }
-        }
+        #
+        # Create some new groups
 
-        # Invoke the DSC resource to create a new group.
-        $null = Invoke-DscResource @groupParams
-
-        # Create some additional group that will be used for the members
         'Group1', 'Group2' | ForEach-Object {
-            $groupParams.properties.GroupName = "$PROJECTNAME\$_"
-            $null = Invoke-DscResource @groupParams
+            New-Group -ProjectName $PROJECTNAME -GroupName $_
         }
 
     }
