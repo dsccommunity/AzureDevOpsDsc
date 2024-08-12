@@ -47,7 +47,7 @@ Describe "xAzDoGitRepository Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Absent',
             # indicating that the git repository 'TESTREPOSITORY' does not exist.
             $result.InDesiredState | Should -BeFalse
-        } -because "The git repository does not exist"
+        }
 
     }
 
@@ -80,7 +80,7 @@ Describe "xAzDoGitRepository Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the git repository 'TESTREPOSITORY' exists.
             $result.InDesiredState | Should -BeTrue
-        } -because "The git repository exists"
+        }
 
     }
 
@@ -116,7 +116,7 @@ Describe "xAzDoGitRepository Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Absent',
             # indicating that the git repository 'TESTREPOSITORY' was deleted.
             $result.InDesiredState | Should -BeTrue
-        } -because "The git repository was deleted"
+        }
 
     }
 

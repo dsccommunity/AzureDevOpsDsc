@@ -41,7 +41,7 @@ Describe "xAzDoProject Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Absent',
             # indicating that the project 'TESTPROJECT' does not exist.
             $result.InDesiredState | Should -BeFalse
-        } -because "The project does not exist"
+        }
 
     }
 
@@ -75,7 +75,7 @@ Describe "xAzDoProject Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the project specified by '$PROJECTNAME' was successfully created.
             $result.InDesiredState | Should -BeTrue
-        } -because "The project was successfully created"
+        }
 
     }
 
@@ -110,7 +110,7 @@ Describe "xAzDoProject Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Absent',
             # indicating that the project specified by '$PROJECTNAME' was successfully deleted.
             $result.InDesiredState | Should -BeFalse
-        } -because "The project was successfully deleted"
+        }
 
     }
 

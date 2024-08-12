@@ -1,0 +1,41 @@
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [Switch]
+    $ClearAll,
+
+    [Parameter()]
+    [Switch]
+    $ClearOrganizationGroups,
+
+    [Parameter()]
+    [Switch]
+    $ClearProjects,
+
+    [Parameter()]
+    [String]
+    $OrganizationName
+
+)
+
+#
+# Remove Projects
+if ($ClearAll -or $ClearProjects)
+{
+    # List all projects and remove them
+    List-DevOpsProjects -OrganizationName $OrganizationName | ForEach-Object {
+        Remove-DevOpsProject -ProjectId $_.id
+    }
+}
+
+#
+# Remove Organization Groups
+
+if ($ClearAll -or $ClearOrganizationGroups)
+{
+    # List all groups and remove them
+    List-DevOpsGroups -OrganizationName $OrganizationName | ForEach-Object {
+        Remove-DevOpsGroup -GroupDescriptor $_.GroupDescriptor
+    }
+}
+

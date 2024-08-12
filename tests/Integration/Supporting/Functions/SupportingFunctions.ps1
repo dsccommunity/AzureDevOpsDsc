@@ -12,7 +12,7 @@ Function New-Project {
         Name = 'xAzDoProject'
         ModuleName = 'AzureDevOpsDsc'
         Method = 'Set'
-        properties = @{
+        property = @{
             ProjectName = $PROJECTNAME
         }
     }
@@ -35,7 +35,7 @@ Function New-Repository {
         Name = 'xAzDoGitRepository'
         ModuleName = 'AzureDevOpsDsc'
         Method = 'Set'
-        properties = @{
+        property = @{
             ProjectName = $PROJECTNAME
             RepositoryName = $RepositoryName
         }
@@ -61,7 +61,7 @@ Function New-Group {
         Name = 'xAzDoProjectGroup'
         ModuleName = 'AzureDevOpsDsc'
         Method = 'Set'
-        properties = @{
+        property = @{
             ProjectName = $PROJECTNAME
             GroupName = $GroupName
         }

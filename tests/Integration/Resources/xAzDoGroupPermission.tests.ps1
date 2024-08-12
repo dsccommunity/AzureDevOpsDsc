@@ -44,7 +44,7 @@ Describe "xAzDoGroupPermission intergration tests" {
         It "Should return False" {
             $result = Invoke-DscResource @parameters
             $result.InDesiredState | Should -BeFalse
-        } -because "The permissions do not exist"
+        }
 
     }
 
@@ -74,7 +74,7 @@ Describe "xAzDoGroupPermission intergration tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the git repository 'TESTREPOSITORY' exists.
             $result.InDesiredState | Should -BeTrue
-        } -because "The git repository exists"
+        }
 
     }
 

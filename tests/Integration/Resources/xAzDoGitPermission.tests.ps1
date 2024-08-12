@@ -35,7 +35,6 @@ Describe "xAzDoGitPermission Integration Tests" {
 
         #
         # Create a new project
-
         New-Project $PROJECTNAME
 
         #
@@ -64,7 +63,7 @@ Describe "xAzDoGitPermission Integration Tests" {
         It "Should return False" {
             $result = Invoke-DscResource @parameters
             $result.InDesiredState | Should -BeFalse
-        } -because "The permissions do not exist"
+        }
 
     }
 
@@ -85,7 +84,7 @@ Describe "xAzDoGitPermission Integration Tests" {
 
             $result = Invoke-DscResource @parameters
             $result.InDesiredState | Should -BeTrue
-        } -because "The permissions were created"
+        }
 
     }
 
@@ -107,7 +106,7 @@ Describe "xAzDoGitPermission Integration Tests" {
 
             $result = Invoke-DscResource @parameters
             $result.InDesiredState | Should -BeFalse
-        } -because "The permissions were cleared"
+        }
     }
 
 }

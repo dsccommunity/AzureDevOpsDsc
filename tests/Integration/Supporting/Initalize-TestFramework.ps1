@@ -1,10 +1,11 @@
 param(
     [Parameter(Mandatory)]
-    [String]$TestFrameworkConfigurationPath,
-    [Parameter(Mandatory)]
-    [ValidateSet('BeforeAll', 'BeforeEach', 'AfterEach', 'AfterAll')]
-    [String]$Type
+    [String]$TestFrameworkConfigurationPath
 )
+
+Import-Module DscResource.Common.psd1
+Import-Module AzureDevOpsDsc.Common.psd1
+Import-Module AzureDevOpsDsc.psd1
 
 #
 # Test Framework Configuration
@@ -27,10 +28,12 @@ if (-not $TestFrameworkConfiguration.Organization)
 if ($TestFrameworkConfiguration.AuthenticationType -eq 'PAT')
 {
     # Authenticate with a Personal Access Token
-    New-AzDoAuthenticationProvider -OrganizationName $AzureDevopsOrganizationName -PersonalAccessToken $TestFrameworkConfiguration.PATToken
+    #New-AuthProvider -OrganizationName $TestFrameworkConfiguration.Organization -PersonalAccessToken $TestFrameworkConfiguration.PATToken
+    New-AzDoAuthenticationProvider -OrganizationName $TestFrameworkConfiguration.Organization -PersonalAccessToken $TestFrameworkConfiguration.PATToken
 } elseif ($TestFrameworkConfiguration.AuthenticationType -eq 'ManagedIdentity') {
     # Authenticate with a Managed Identity
-    New-AzDoAuthenticationProvider -OrganizationName $AzureDevopsOrganizationName -useManagedIdentity
+    #New-AuthProvider -OrganizationName $TestFrameworkConfiguration.Organization -useManagedIdentity
+    New-AzDoAuthenticationProvider -OrganizationName $TestFrameworkConfiguration.Organization -useManagedIdentity
 } else {
     throw "[Initialize-TestFramework] Invalid Authentication Type: $($TestFrameworkConfiguration.AuthenticationType)"
 }

@@ -50,7 +50,7 @@ Describe "xAzDoProjectGroup Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the project 'TESTPROJECT_PROJECTGROUP' exists.
             $result.InDesiredState | Should -BeTrue
-        } -because "The project group exists"
+        }
 
     }
 
@@ -86,7 +86,7 @@ Describe "xAzDoProjectGroup Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the project group 'TESTPROJECTGROUP' was created.
             $result.InDesiredState | Should -BeTrue
-        } -because "The project group was created"
+        }
 
     }
 
@@ -120,7 +120,7 @@ Describe "xAzDoProjectGroup Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Absent',
             # indicating that the project group 'TESTPROJECTGROUP' was removed.
             $result.InDesiredState | Should -BeTrue
-        } -because "The project group was removed"
+        }
 
     }
 

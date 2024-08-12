@@ -54,7 +54,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Absent',
             # indicating that the group member 'TESTMEMBER' does not exist.
             $result.InDesiredState | Should -BeFalse
-        } -because "The group member does not exist"
+        }
 
     }
 
@@ -86,7 +86,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the group member 'TESTMEMBER' exists.
             $result.InDesiredState | Should -BeTrue
-        } -because "The group member exists"
+        }
 
     }
 
@@ -122,7 +122,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Absent',
             # indicating that the group member 'TESTMEMBER' does not exist.
             $result.InDesiredState | Should -BeTrue
-        } -because "The group member was removed"
+        }
 
     }
 

@@ -55,7 +55,7 @@ Describe "xAzDoProjectServices Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the project 'TEST_PROJECTSERVICES' exists.
             $result.InDesiredState | Should -BeTrue
-        } -because "The project services exists"
+        }
     }
 
     # This context is used to test the creation of a new project services.
@@ -123,7 +123,7 @@ Describe "xAzDoProjectServices Integration Tests" {
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the project services were successfully disabled.
             $result.InDesiredState | Should -BeTrue
-        } -because "The project services were successfully disabled"
+        }
 
     }
 
