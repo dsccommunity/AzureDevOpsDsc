@@ -31,7 +31,7 @@ Describe "xAzDoProjectGroup Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT_PROJECTGROUP'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
                 GroupName = $GROUPNAME
             }
@@ -64,7 +64,7 @@ Describe "xAzDoProjectGroup Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT_PROJECTGROUP' and a group name 'TESTPROJECTGROUP'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
                 GroupName = $GROUPNAME
                 GroupDescription = 'This is a test project group.'
@@ -100,7 +100,7 @@ Describe "xAzDoProjectGroup Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT_PROJECTGROUP' and a group name 'TESTPROJECTGROUP'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
                 GroupName = $GROUPNAME
                 Ensure = 'Absent'

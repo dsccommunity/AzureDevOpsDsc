@@ -29,7 +29,7 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 OrganizationName = $PROJECTNAME
                 GroupName = 'TESTORGANIZATIONGROUP'
                 GroupDescription = 'This is a test organization group.'
@@ -64,7 +64,7 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 OrganizationName = $PROJECTNAME
                 GroupName = 'TESTORGANIZATIONGROUP'
                 GroupDescription = 'This is a test organization group.'
@@ -99,7 +99,7 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 OrganizationName = $PROJECTNAME
                 GroupName = 'TESTORGANIZATIONGROUP'
                 GroupDescription = 'This is a test organization group.'
@@ -114,7 +114,7 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 OrganizationName = $PROJECTNAME
                 GroupName = 'TESTORGANIZATIONGROUP'
                 GroupDescription = 'This is a test organization group.'

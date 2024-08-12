@@ -7,7 +7,7 @@ Describe "xAzDoGitPermission Integration Tests" {
         $parameters = @{
             Name = 'xAzDoGitPermission'
             ModuleName = 'AzureDevOpsDsc'
-            properties = @{
+            property = @{
                 ProjectName = $PROJECTNAME
                 RepositoryName = 'TESTREPOSITORY'
                 isInherited = $false
@@ -92,7 +92,7 @@ Describe "xAzDoGitPermission Integration Tests" {
 
         BeforeAll {
             $parameters.Method = 'Set'
-            $parameters.properties.Permissions = @()
+            $parameters.property.Permissions = @()
         }
 
         It "Should not throw any exceptions" {

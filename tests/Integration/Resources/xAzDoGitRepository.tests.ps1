@@ -28,7 +28,7 @@ Describe "xAzDoGitRepository Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
                 RepositoryName = 'TESTREPOSITORY'
             }
@@ -61,7 +61,7 @@ Describe "xAzDoGitRepository Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name using the variable '$PROJECTNAME'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
                 RepositoryName = 'TESTREPOSITORY'
                 Ensure = 'Present'
@@ -94,7 +94,7 @@ Describe "xAzDoGitRepository Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name using the variable '$PROJECTNAME'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
                 RepositoryName = 'TESTREPOSITORY'
                 Ensure = 'Absent'

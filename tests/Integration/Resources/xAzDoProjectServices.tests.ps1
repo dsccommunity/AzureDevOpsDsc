@@ -40,7 +40,7 @@ Describe "xAzDoProjectServices Integration Tests" {
                 AzureArtifact = 'Enabled'
             }
 
-            $parameters.properties = $properties
+            $parameters.property = $properties
         }
 
         It "Should not throw any exceptions" {
@@ -77,7 +77,7 @@ Describe "xAzDoProjectServices Integration Tests" {
                 AzureArtifact = 'Enabled'
             }
 
-            $parameters.properties = $properties
+            $parameters.property = $properties
         }
 
         It "Should not throw any exceptions" {
@@ -105,7 +105,7 @@ Describe "xAzDoProjectServices Integration Tests" {
                 AzureArtifact = 'Disabled'
             }
 
-            $parameters.properties = $properties
+            $parameters.property = $properties
         }
 
         It "Should not throw any exceptions" {

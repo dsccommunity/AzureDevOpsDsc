@@ -9,7 +9,7 @@ Describe "xAzDoGroupPermission intergration tests" {
         $parameters = @{
             Name = 'xAzDoGroupPermission'
             ModuleName = 'AzureDevOpsDsc'
-            properties = @{
+            property = @{
                 GroupName = "[$PROJECTNAME]\$GroupName"
                 isInherited = $false
                 Permissions = @(

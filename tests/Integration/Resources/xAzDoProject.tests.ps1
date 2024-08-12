@@ -24,7 +24,7 @@ Describe "xAzDoProject Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
             }
         }
@@ -55,7 +55,7 @@ Describe "xAzDoProject Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name using the variable '$PROJECTNAME'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
             }
         }
@@ -89,7 +89,7 @@ Describe "xAzDoProject Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name using the variable '$PROJECTNAME'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 ProjectName = $PROJECTNAME
                 Ensure = 'Absent'
             }

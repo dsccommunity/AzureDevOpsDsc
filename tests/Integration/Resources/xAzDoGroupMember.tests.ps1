@@ -35,7 +35,7 @@ Describe "xAzDoGroupMember Integration Tests" {
 
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT_GROUPMEMBER'.
-            $parameters.properties = @{
+            $parameters.property = @{
                 GroupName = "$PROJECTNAME\TESTGROUP"
                 GroupMembers = "[$PROJECTNAME]\Group1", "[$PROJECTNAME]\Group2"
             }
@@ -67,7 +67,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             $parameters.Method = 'Set'
 
             # Define properties for the DSC resource.
-            $parameters.properties = @{
+            $parameters.property = @{
                 GroupName = "$PROJECTNAME\TESTGROUP"
                 GroupMembers = "[$PROJECTNAME]\Group1", "[$PROJECTNAME]\Group2"
             }
@@ -99,7 +99,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             $parameters.Method = 'Set'
 
             # Define properties for the DSC resource.
-            $parameters.properties = @{
+            $parameters.property = @{
                 GroupName = "$PROJECTNAME\TESTGROUP"
                 GroupMembers = @("[$PROJECTNAME]\Group1")
                 Ensure = 'Absent'
