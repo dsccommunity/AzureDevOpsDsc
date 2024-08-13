@@ -1,6 +1,6 @@
 
 
-Describe "xAzDoGitPermission Integration Tests" -skip {
+Describe "xAzDoGitPermission Integration Tests" {
 
     BeforeAll {
 
@@ -86,6 +86,42 @@ Describe "xAzDoGitPermission Integration Tests" -skip {
             $result.InDesiredState | Should -BeTrue
         }
 
+    }
+
+    Context "Changing permissions" {
+
+            BeforeAll {
+                $parameters.Method = 'Set'
+                $parameters.property.Permissions = @(
+                    @{
+                        Identity = '[$PROJECTNAME]\Group1'
+                        Permission = @{
+                            Read = 'Allow'
+                            Write = 'Deny'
+                        }
+                    }
+                    @{
+                        Identity = '[$PROJECTNAME]\Group2'
+                        Permission = @{
+                            Read = 'Deny'
+                            Write = 'Allow'
+                        }
+                    }
+                )
+            }
+
+            It "Should not throw any exceptions" {
+                { Invoke-DscResource @parameters } | Should -Not -Throw
+            }
+
+            It "Should return True" {
+
+                # Set up the parameters for the DSC resource invocation.
+                $parameters.Method = 'Test'
+
+                $result = Invoke-DscResource @parameters
+                $result.InDesiredState | Should -BeTrue
+            }
     }
 
     Context "Clearing permissions" {
