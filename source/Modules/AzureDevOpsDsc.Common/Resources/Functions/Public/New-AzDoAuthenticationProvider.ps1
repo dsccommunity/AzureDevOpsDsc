@@ -122,7 +122,7 @@ Function New-AzDoAuthenticationProvider {
 
     # Iterate through Each of the Caching Commands and initalize the Cache.
     Get-Command "AzDoAPI_*" | Where-Object Source -eq 'AzureDevOpsDsc.Common' | ForEach-Object {
-        . $_.Name -OrganizationName $AzureDevopsOrganizationName -Verbose
+        . $_.Name -OrganizationName $AzureDevopsOrganizationName
     }
 
     #
