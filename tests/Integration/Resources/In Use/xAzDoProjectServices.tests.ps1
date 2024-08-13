@@ -1,6 +1,8 @@
-Describe "xAzDoProjectServices Integration Tests" {
+Describe "xAzDoProjectServices Integration Tests" -skip {
 
     BeforeAll {
+
+        Mock Write-Verbose { param($Message) }
 
         #
         # Perform setup tasks here

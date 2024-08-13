@@ -1,11 +1,11 @@
-Describe "xAzDoProjectGroup Integration Tests" {
+Describe "xAzDoProjectGroup Integration Tests - Description" {
 
     BeforeAll {
 
         #
         # Perform setup tasks here
 
-        $PROJECTNAME = 'TESTPROJECT_PROJECTGROUP'
+        $PROJECTNAME = 'TESTPROJECT_PROJECTGROUP_DESC'
         $GROUPNAME = 'TESTPROJECTGROUP'
 
         # Define common parameters
@@ -33,6 +33,7 @@ Describe "xAzDoProjectGroup Integration Tests" {
             # In this case, we specify a project name 'TESTPROJECT_PROJECTGROUP'.
             $parameters.property = @{
                 ProjectName = $PROJECTNAME
+                GroupDescription = 'This is a test project group.'
                 GroupName = $GROUPNAME
             }
 
@@ -43,13 +44,13 @@ Describe "xAzDoProjectGroup Integration Tests" {
             { Invoke-DscResource @parameters } | Should -Not -Throw
         }
 
-        It "Should return True" {
+        # It shouldn't be in the desired state because the project group doesn't exist.
+        It "Should return False" {
             # Invoke the DSC resource with the specified parameters and store the result.
             $result = Invoke-DscResource @parameters
 
-            # Verify that the 'Ensure' property in the result is 'Present',
-            # indicating that the project 'TESTPROJECT_PROJECTGROUP' exists.
-            $result.InDesiredState | Should -BeTrue
+            # Verify that the 'Ensure' property in the result is 'false'
+            $result.InDesiredState | Should -BeFalse
         }
 
     }
@@ -85,6 +86,43 @@ Describe "xAzDoProjectGroup Integration Tests" {
 
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the project group 'TESTPROJECTGROUP' was created.
+            $result.InDesiredState | Should -BeTrue
+        }
+
+    }
+
+    # Test if the project description can be updated.
+    Context "Updating the Project Group Description" {
+
+        BeforeAll {
+            # Set up the parameters for the DSC resource invocation.
+            # 'Method' is set to 'Set', which means we are updating a resource.
+            $parameters.Method = 'Set'
+
+            # Define properties for the DSC resource.
+            # In this case, we specify a project name 'TESTPROJECT_PROJECTGROUP' and a group name 'TESTPROJECTGROUP'.
+            # We also specify a new description for the project group.
+            $parameters.property = @{
+                ProjectName = $PROJECTNAME
+                GroupName = $GROUPNAME
+                GroupDescription = 'This is an updated test project group.'
+            }
+
+        }
+
+        It "Should not throw any exceptions" {
+            # Test that invoking the DSC resource with the specified parameters does not throw any exceptions.
+            { Invoke-DscResource @parameters } | Should -Not -Throw
+        }
+
+        It "Should return True" {
+            $parameters.Method = 'Test'
+
+            # Invoke the DSC resource with the specified parameters and store the result.
+            $result = Invoke-DscResource @parameters
+
+            # Verify that the 'Ensure' property in the result is 'Present',
+            # indicating that the project group 'TESTPROJECTGROUP' was updated.
             $result.InDesiredState | Should -BeTrue
         }
 

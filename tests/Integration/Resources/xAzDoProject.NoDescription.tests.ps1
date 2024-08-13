@@ -1,4 +1,4 @@
-Describe "xAzDoProject Integration Tests" {
+Describe "xAzDoProject Integration Tests - No Description" {
 
     BeforeAll {
 
@@ -100,16 +100,15 @@ Describe "xAzDoProject Integration Tests" {
             { Invoke-DscResource @parameters } | Should -Not -Throw
         }
 
-        It "Should be successful" {
+        It "Should return True (since ensure is set to Absent)" {
             # Set the 'Method' to 'Test' to verify that the project was successfully deleted.
             $parameters.Method = 'Test'
 
             # Invoke the DSC resource with the specified parameters and store the result.
             $result = Invoke-DscResource @parameters
 
-            # Verify that the 'Ensure' property in the result is 'Absent',
-            # indicating that the project specified by '$PROJECTNAME' was successfully deleted.
-            $result.InDesiredState | Should -BeFalse
+            # Verify that the it has been deleted successfully.
+            $result.InDesiredState | Should -BeTrue
         }
 
     }

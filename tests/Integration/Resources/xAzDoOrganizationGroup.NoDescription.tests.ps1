@@ -1,4 +1,4 @@
-Describe "xAzDoOrganizationGroup Integration Tests" {
+Describe "xAzDoOrganizationGroup Integration Tests - No Description" {
 
     BeforeAll {
 
@@ -30,7 +30,6 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
             $parameters.property = @{
-                OrganizationName = $PROJECTNAME
                 GroupName = 'TESTORGANIZATIONGROUP'
                 GroupDescription = 'This is a test organization group.'
             }
@@ -65,9 +64,42 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
             $parameters.property = @{
-                OrganizationName = $PROJECTNAME
                 GroupName = 'TESTORGANIZATIONGROUP'
                 GroupDescription = 'This is a test organization group.'
+            }
+
+        }
+
+        It "Should not throw any exceptions" {
+            # Test that invoking the DSC resource with the specified parameters does not throw any exceptions.
+            { Invoke-DscResource @parameters } | Should -Not -Throw
+        }
+
+        It "Should return True" {
+
+            $parameters.Method = 'Test'
+
+            # Invoke the DSC resource with the specified parameters and store the result.
+            $result = Invoke-DscResource @parameters
+
+            # Verify that it is in the desired state
+            $result.InDesiredState | Should -BeTrue
+        }
+    }
+
+    # This context is used to test if a organization group can be updated.
+    Context "Testing if a Organization Group Can Be Updated" {
+
+        BeforeAll {
+            # Set up the parameters for the DSC resource invocation.
+            # 'Method' is set to 'Set', which means we are creating a new resource.
+            $parameters.Method = 'Set'
+
+            # Define properties for the DSC resource.
+            # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
+            $parameters.property = @{
+                GroupName = 'TESTORGANIZATIONGROUP'
+                GroupDescription = 'This is an updated test organization group.'
             }
 
         }
@@ -100,24 +132,8 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
             $parameters.property = @{
-                OrganizationName = $PROJECTNAME
+                Ensure = 'Absent'
                 GroupName = 'TESTORGANIZATIONGROUP'
-                GroupDescription = 'This is a test organization group.'
-            }
-
-            # Invoke the DSC resource to create a new organization group.
-            $null = Invoke-DscResource @parameters
-
-            # Set up the parameters for the DSC resource invocation.
-            # 'Method' is set to 'Set', which means we are removing a resource.
-            $parameters.Method = 'Set'
-
-            # Define properties for the DSC resource.
-            # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
-            $parameters.property = @{
-                OrganizationName = $PROJECTNAME
-                GroupName = 'TESTORGANIZATIONGROUP'
-                GroupDescription = 'This is a test organization group.'
             }
 
         }
@@ -127,7 +143,7 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
             { Invoke-DscResource @parameters } | Should -Not -Throw
         }
 
-        It "Should return False" {
+        It "Should return True (since ensure is set to Absent)" {
 
             $parameters.Method = 'Test'
 
@@ -135,7 +151,7 @@ Describe "xAzDoOrganizationGroup Integration Tests" {
             $result = Invoke-DscResource @parameters
 
             # Verify that it is not in the desired state
-            $result.InDesiredState | Should -BeFalse
+            $result.InDesiredState | Should -BeTrue
         }
     }
 

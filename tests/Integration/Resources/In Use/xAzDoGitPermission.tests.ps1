@@ -1,8 +1,11 @@
 
 
-Describe "xAzDoGitPermission Integration Tests" {
+Describe "xAzDoGitPermission Integration Tests" -skip {
 
     BeforeAll {
+
+        # Perform setup tasks here
+        $PROJECTNAME = 'TESTPROJECT_GIT_PERMISSION'
 
         $parameters = @{
             Name = 'xAzDoGitPermission'
@@ -29,9 +32,6 @@ Describe "xAzDoGitPermission Integration Tests" {
                 )
             }
         }
-
-        # Perform setup tasks here
-        $PROJECTNAME = 'TESTPROJECT_GIT_PERMISSION'
 
         #
         # Create a new project

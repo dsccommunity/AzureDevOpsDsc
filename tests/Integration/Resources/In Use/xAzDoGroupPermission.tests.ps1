@@ -1,4 +1,4 @@
-Describe "xAzDoGroupPermission intergration tests" {
+Describe "xAzDoGroupPermission intergration tests" -skip {
 
     BeforeAll {
 

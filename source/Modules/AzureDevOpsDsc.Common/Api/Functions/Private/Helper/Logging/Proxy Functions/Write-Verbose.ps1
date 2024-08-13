@@ -16,5 +16,5 @@ Function Write-Verbose {
 
     # Append the message to the log file
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    #Add-Content -Path $LogFilePath -Value "[$timestamp] $Message"
+    Add-Content -Path $LogFilePath -Value "[$timestamp] $Message"
 }

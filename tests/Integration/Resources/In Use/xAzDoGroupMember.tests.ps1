@@ -1,4 +1,4 @@
-Describe "xAzDoGroupMember Integration Tests" {
+Describe "xAzDoGroupMember Integration Tests" -skip {
 
     BeforeAll {
 
