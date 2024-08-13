@@ -782,6 +782,68 @@ Ensure that the necessary authentication protocols are properly implemented to f
 Next, apply the changes to the `Add-AuthenticationHTTPHeader` function.
 This involves updating the function to include the new authentication headers, ensuring that each HTTP request is authenticated correctly.
 
+# Enable Verbose Logging
+
+> **IMPORTANT**: Enabling verbose logging will impact performance.
+
+To enable `Write-Verbose` logging, follow these steps:
+
+1. **Create a System Environment Variable**:
+    * Name the variable `AZDO_VERBOSELOGGING_FILEPATH`.
+    * Set the value of this variable to the desired file path where you want the verbose logs to be stored.
+
+1. **Steps to Create the Environment Variable**:
+    * **Windows**:
+        1. Open the Start Menu and search for "Environment Variables".
+        1. Select "Edit the system environment variables".
+        1. In the System Properties window, click on the "Environment Variables" button.
+        1. In the Environment Variables window, under the "System variables" section, click "New".
+        1. Enter `AZDO_VERBOSELOGGING_FILEPATH` as the variable name.
+        1. Enter the full path of the file where you want the logs to be saved as the variable value (e.g., `C:\Logs\AzDoVerbose.log`).
+        1. Click "OK" to save the new variable.
+        1. Click "OK" again to close the Environment Variables window, and then "OK" to close the System Properties window.
+
+    * **Linux/macOS**:
+        1. Open a terminal window.
+        1. Edit your shell profile file (e.g., `~/.bashrc`, `~/.zshrc`) using a text editor.
+        1. Add the following line to set the environment variable:
+            ```sh
+            export AZDO_VERBOSELOGGING_FILEPATH="/path/to/your/logfile.log"
+            ```
+        1. Save the file and close the text editor.
+        1. Source the profile file to apply the changes:
+            ```sh
+            source ~/.bashrc   # or source ~/.zshrc depending on your shell
+            ```
+
+1. **Verify the Environment Variable**:
+    * To ensure that the environment variable is set correctly, you can use the following command:
+        * **Windows** (Command Prompt):
+            ```cmd
+            echo %AZDO_VERBOSELOGGING_FILEPATH%
+            ```
+        * ***Windows** (PowerShell):
+            ```powershell
+            $env:AZDO_VERBOSELOGGING_FILEPATH
+            ```
+        * **Linux/macOS**:
+            ```sh
+            echo $AZDO_VERBOSELOGGING_FILEPATH
+            ```
+
+By setting the `AZDO_VERBOSELOGGING_FILEPATH` environment variable, you direct the `Write-Verbose` output to the specified file, enabling detailed logging for troubleshooting and monitoring purposes.
+
+Below is an example of the `Write-Verbose` logfile:
+
+``` Text
+[2024-08-13 14:10:45] [Invoke-AzDevOpsApiRestMethod] Invoking the Azure DevOps API REST method 'Get'.
+[2024-08-13 14:10:45] [Invoke-AzDevOpsApiRestMethod] API URI: https://vssps.dev.azure.com/sample/_apis/graph/Memberships/vssgp.string?direction=down
+[2024-08-13 14:10:45] [Add-AuthenticationHTTPHeader] Adding Managed Identity Token to the HTTP Headers.
+[2024-08-13 14:10:45] [Add-AuthenticationHTTPHeader] Adding Header
+[2024-08-13 14:10:45] [Invoke-AzDevOpsApiRestMethod] No continuation token found. Breaking loop.
+[2024-08-13 14:10:45] No members found for group '[TEAM FOUNDATION]\Enterprise Service Accounts'; skipping.
+```
+
 # Tests
 
 ## Running the Tests
