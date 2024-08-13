@@ -129,19 +129,20 @@ Describe "xAzDoGitPermission Integration Tests" {
         BeforeAll {
             $parameters.Method = 'Set'
             $parameters.property.Permissions = @()
+            $parameters.property.isInherited = $false
         }
 
         It "Should not throw any exceptions" {
             { Invoke-DscResource @parameters } | Should -Not -Throw
         }
 
-        It "Should return False" {
+        It "Should return True" {
 
             # Set up the parameters for the DSC resource invocation.
             $parameters.Method = 'Test'
 
             $result = Invoke-DscResource @parameters
-            $result.InDesiredState | Should -BeFalse
+            $result.InDesiredState | Should -BeTrue
         }
     }
 
