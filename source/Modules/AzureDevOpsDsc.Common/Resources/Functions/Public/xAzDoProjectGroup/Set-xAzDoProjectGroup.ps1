@@ -65,7 +65,7 @@ Function Set-xAzDoProjectGroup {
         Remove-CacheItem -Key $LookupResult.localCache.principalName -Type 'Group'
     }
     Add-CacheItem -Key $group.principalName -Value $group -Type 'Group'
-    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Groups'
+    Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Group'
 
     #
     # Return the group from the cache
