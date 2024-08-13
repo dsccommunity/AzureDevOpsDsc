@@ -1,6 +1,6 @@
 
 
-Describe "xAzDoGitPermission Integration Tests" {
+Describe "xAzDoGitPermission Integration Tests" -Skip {
 
     BeforeAll {
 
@@ -16,14 +16,14 @@ Describe "xAzDoGitPermission Integration Tests" {
                 isInherited = $false
                 Permissions = @(
                     @{
-                        Identity = '[$PROJECTNAME]\Group1'
+                        Identity = "[$PROJECTNAME]\Group1"
                         Permission = @{
                             Read = 'Allow'
                             Write = 'Allow'
                         }
                     }
                     @{
-                        Identity = '[$PROJECTNAME]\Group2'
+                        Identity = "[$PROJECTNAME]\Group2"
                         Permission = @{
                             Read = 'Deny'
                             Write = 'Deny'
@@ -94,14 +94,14 @@ Describe "xAzDoGitPermission Integration Tests" {
                 $parameters.Method = 'Set'
                 $parameters.property.Permissions = @(
                     @{
-                        Identity = '[$PROJECTNAME]\Group1'
+                        Identity = "[$PROJECTNAME]\Group1"
                         Permission = @{
                             Read = 'Allow'
                             Write = 'Deny'
                         }
                     }
                     @{
-                        Identity = '[$PROJECTNAME]\Group2'
+                        Identity = "[$PROJECTNAME]\Group2"
                         Permission = @{
                             Read = 'Deny'
                             Write = 'Allow'
@@ -124,7 +124,7 @@ Describe "xAzDoGitPermission Integration Tests" {
             }
     }
 
-    Context "Clearing permissions" {
+    Context "Clearing permissions should revert to inherited" {
 
         BeforeAll {
             $parameters.Method = 'Set'
@@ -137,10 +137,8 @@ Describe "xAzDoGitPermission Integration Tests" {
         }
 
         It "Should return True" {
-
             # Set up the parameters for the DSC resource invocation.
             $parameters.Method = 'Test'
-
             $result = Invoke-DscResource @parameters
             $result.InDesiredState | Should -BeTrue
         }

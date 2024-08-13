@@ -1,9 +1,9 @@
-Describe "xAzDoGroupMember Integration Tests" -skip {
+Describe "xAzDoGitRepository Integration Tests" -skip {
 
     BeforeAll {
 
         # Perform setup tasks here
-        $PROJECTNAME = 'TESTPROJECT_GROUPMEMBER'
+        $PROJECTNAME = 'TESTPROJECT_GITREPOSITORY'
 
         # Define common parameters
         $parameters = @{
@@ -16,17 +16,10 @@ Describe "xAzDoGroupMember Integration Tests" -skip {
 
         New-Project $PROJECTNAME
 
-        #
-        # Create some new groups
-
-        'Group1', 'Group2' | ForEach-Object {
-            New-Group -ProjectName $PROJECTNAME -GroupName $_
-        }
-
     }
 
-    # This context is used to test if a group member exists.
-    Context "Testing if a Group Member Exists" {
+    # This context is used to test if a git repository exists.
+    Context "Testing if a Git Repository Exists" {
 
         BeforeAll {
             # Set up the parameters for the DSC resource invocation.
@@ -34,10 +27,10 @@ Describe "xAzDoGroupMember Integration Tests" -skip {
             $parameters.Method = 'Test'
 
             # Define properties for the DSC resource.
-            # In this case, we specify a project name 'TESTPROJECT_GROUPMEMBER'.
+            # In this case, we specify a project name 'TESTPROJECT'.
             $parameters.property = @{
-                GroupName = "$PROJECTNAME\TESTGROUP"
-                GroupMembers = "[$PROJECTNAME]\Group1", "[$PROJECTNAME]\Group2"
+                ProjectName = $PROJECTNAME
+                RepositoryName = 'TESTREPOSITORY'
             }
 
         }
@@ -52,14 +45,14 @@ Describe "xAzDoGroupMember Integration Tests" -skip {
             $result = Invoke-DscResource @parameters
 
             # Verify that the 'Ensure' property in the result is 'Absent',
-            # indicating that the group member 'TESTMEMBER' does not exist.
+            # indicating that the git repository 'TESTREPOSITORY' does not exist.
             $result.InDesiredState | Should -BeFalse
         }
 
     }
 
-    # This context is used to test the creation of a new group member.
-    Context "Creating a new Group Member" {
+    # This context is used to test the creation of a new git repository.
+    Context "Creating a new Git Repository Permissions" {
 
         BeforeAll {
             # Set up the parameters for the DSC resource invocation.
@@ -67,11 +60,12 @@ Describe "xAzDoGroupMember Integration Tests" -skip {
             $parameters.Method = 'Set'
 
             # Define properties for the DSC resource.
+            # In this case, we specify a project name using the variable '$PROJECTNAME'.
             $parameters.property = @{
-                GroupName = "$PROJECTNAME\TESTGROUP"
-                GroupMembers = "[$PROJECTNAME]\Group1", "[$PROJECTNAME]\Group2"
+                ProjectName = $PROJECTNAME
+                RepositoryName = 'TESTREPOSITORY'
+                Ensure = 'Present'
             }
-
         }
 
         It "Should not throw any exceptions" {
@@ -80,31 +74,35 @@ Describe "xAzDoGroupMember Integration Tests" -skip {
         }
 
         It "Should return True" {
+
+            # Update the 'Method' property to 'Test' to test the presence of the git repository.
+            $parameters.Method = 'Test'
+
             # Invoke the DSC resource with the specified parameters and store the result.
             $result = Invoke-DscResource @parameters
 
             # Verify that the 'Ensure' property in the result is 'Present',
-            # indicating that the group member 'TESTMEMBER' exists.
+            # indicating that the git repository 'TESTREPOSITORY' exists.
             $result.InDesiredState | Should -BeTrue
         }
 
     }
 
-    # This context is used to test the removal of a group member.
-    Context "Removing a Group Member" {
+    # This context is used to test the deletion of a git repository.
+    Context "Deleting an Existing Git Repository" {
 
         BeforeAll {
             # Set up the parameters for the DSC resource invocation.
-            # 'Method' is set to 'Set', which means we are removing a resource.
+            # 'Method' is set to 'Set', which means we are deleting an existing resource.
             $parameters.Method = 'Set'
 
             # Define properties for the DSC resource.
+            # In this case, we specify a project name using the variable '$PROJECTNAME'.
             $parameters.property = @{
-                GroupName = "$PROJECTNAME\TESTGROUP"
-                GroupMembers = @("[$PROJECTNAME]\Group1")
+                ProjectName = $PROJECTNAME
+                RepositoryName = 'TESTREPOSITORY'
                 Ensure = 'Absent'
             }
-
         }
 
         It "Should not throw any exceptions" {
@@ -120,7 +118,7 @@ Describe "xAzDoGroupMember Integration Tests" -skip {
             $result = Invoke-DscResource @parameters
 
             # Verify that the 'Ensure' property in the result is 'Absent',
-            # indicating that the group member 'TESTMEMBER' does not exist.
+            # indicating that the git repository 'TESTREPOSITORY' was deleted.
             $result.InDesiredState | Should -BeTrue
         }
 

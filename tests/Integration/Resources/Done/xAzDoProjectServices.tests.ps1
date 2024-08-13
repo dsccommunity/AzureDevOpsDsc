@@ -37,8 +37,8 @@ Describe "xAzDoProjectServices Integration Tests" -skip {
                 ProjectName = $PROJECTNAME
                 GitRepositories = 'Enabled'
                 WorkBoards = 'Enabled'
-                BuildPipelines = 'Disabled'
-                TestPlans = 'Disabled'
+                BuildPipelines = 'Enabled'
+                TestPlans = 'Enabled'
                 AzureArtifact = 'Enabled'
             }
 
