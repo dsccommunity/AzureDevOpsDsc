@@ -10,12 +10,7 @@ Describe "xAzDoOrganizationGroup Integration Tests - With Description" {
             ModuleName = 'AzureDevOpsDsc'
         }
 
-        $PROJECTNAME = 'TESTORGANIZATIONGROUP_DESC'
-
-        #
-        # Create a new project
-
-        New-Project $PROJECTNAME
+        $GROUPNAME = 'TESTORGANIZATIONGROUP'
 
     }
 
@@ -30,7 +25,7 @@ Describe "xAzDoOrganizationGroup Integration Tests - With Description" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
             $parameters.property = @{
-                GroupName = 'TESTORGANIZATIONGROUP'
+                GroupName = $GROUPNAME
                 GroupDescription = 'This is a test organization group.'
             }
 
@@ -64,7 +59,7 @@ Describe "xAzDoOrganizationGroup Integration Tests - With Description" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
             $parameters.property = @{
-                GroupName = 'TESTORGANIZATIONGROUP'
+                GroupName = $GROUPNAME
                 GroupDescription = 'This is a test organization group.'
             }
 
@@ -98,7 +93,7 @@ Describe "xAzDoOrganizationGroup Integration Tests - With Description" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
             $parameters.property = @{
-                GroupName = 'TESTORGANIZATIONGROUP'
+                GroupName = $GROUPNAME
                 GroupDescription = 'This is an updated test organization group.'
             }
 
@@ -133,7 +128,7 @@ Describe "xAzDoOrganizationGroup Integration Tests - With Description" {
             # In this case, we specify a project name 'TESTORGANIZATIONGROUP'.
             $parameters.property = @{
                 Ensure = 'Absent'
-                GroupName = 'TESTORGANIZATIONGROUP'
+                GroupName = $GROUPNAME
             }
 
         }

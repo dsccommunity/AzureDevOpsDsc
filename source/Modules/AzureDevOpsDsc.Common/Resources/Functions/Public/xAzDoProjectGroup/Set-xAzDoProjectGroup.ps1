@@ -62,9 +62,9 @@ Function Set-xAzDoProjectGroup {
     #
     # Secondarily Replace the local cache with the new group
     if ($null -ne $LookupResult.localCache) {
-        Remove-CacheItem -Key $LookupResult.localCache.principalName -Type 'Groups'
+        Remove-CacheItem -Key $LookupResult.localCache.principalName -Type 'Group'
     }
-    Add-CacheItem -Key $group.principalName -Value $group -Type 'Groups'
+    Add-CacheItem -Key $group.principalName -Value $group -Type 'Group'
     Set-CacheObject -Content $Global:AzDoGroup -CacheType 'Groups'
 
     #
