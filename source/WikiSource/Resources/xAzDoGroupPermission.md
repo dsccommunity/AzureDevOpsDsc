@@ -28,6 +28,7 @@ xAzDoGroupPermission/Permissions
 {
     Identity = [String]$Identity
     #   SYNTAX:     '[ProjectName | OrganizationName]\ServicePrincipalName, UserPrincipalName, UserDisplayName, GroupDisplayName'
+    #   ALTERNATIVE SYNTAX: 'this' Referring to the group.
     #   EXAMPLE:    '[TestProject]\UserName@email.com'
     #   EXAMPLE:    '[SampleOrganizationName]\Project Collection Administrators'
     Permission = [Hashtable[]]$Permissions

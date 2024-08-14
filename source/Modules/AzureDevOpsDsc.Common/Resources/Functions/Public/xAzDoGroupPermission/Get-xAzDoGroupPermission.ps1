@@ -22,7 +22,7 @@ Function Get-xAzDoGroupPermission {
         $Force
     )
 
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Started."
+    Write-Verbose "[Get-xAzDoGroupPermission] Started."
 
     # Define the Descriptor Type and Organization Name
     $SecurityNamespace = 'Identity'
@@ -32,19 +32,19 @@ Function Get-xAzDoGroupPermission {
 
     # Test if the Group Name is valid
     if ($split.Count -ne 2) {
-        Write-Warning "[Get-xAzDoProjectGroupPermission] Invalid Group Name: $GroupName"
+        Write-Warning "[Get-xAzDoGroupPermission] Invalid Group Name: $GroupName"
         return
     }
 
     # Define the Project and Group Name
-    $ProjectName = $split[0]
+    $ProjectName = $split[0].Replace('[', '').Replace(']', '')
     $GroupName = $split[1]
 
     # If the Project Name contains 'organization'. Update the Project Name
 
 
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Security Namespace: $SecurityNamespace"
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Organization Name: $OrganizationName"
+    Write-Verbose "[Get-xAzDoGroupPermission] Security Namespace: $SecurityNamespace"
+    Write-Verbose "[Get-xAzDoGroupPermission] Organization Name: $OrganizationName"
 
     #
     # Construct a hashtable detailing the group
@@ -58,8 +58,8 @@ Function Get-xAzDoGroupPermission {
         reason = $null
     }
 
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Group result hashtable constructed."
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Performing lookup of permissions for the group."
+    Write-Verbose "[Get-xAzDoGroupPermission] Group result hashtable constructed."
+    Write-Verbose "[Get-xAzDoGroupPermission] Performing lookup of permissions for the group."
 
     # Define the ACL List
     $ACLList = [System.Collections.Generic.List[Hashtable]]::new()
@@ -71,7 +71,7 @@ Function Get-xAzDoGroupPermission {
 
     # Test if the Group was found
     if (-not $group) {
-        Throw "[Get-xAzDoProjectGroupPermission] Group not found: $group"
+        Throw "[Get-xAzDoGroupPermission] Group not found: $('[{0}]\{1}' -f $ProjectName, $GroupName)"
         return
     }
 
@@ -79,7 +79,7 @@ Function Get-xAzDoGroupPermission {
     # Perform Lookup of the Permissions for the Group
 
     $namespace = Get-CacheItem -Key $SecurityNamespace -Type 'SecurityNamespaces'
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Retrieved namespace: $($namespace.namespaceId)"
+    Write-Verbose "[Get-xAzDoGroupPermission] Retrieved namespace: $($namespace.namespaceId)"
 
     # Add to the ACL Lookup Params
     $getGroupResult.namespace = $namespace
@@ -90,7 +90,7 @@ Function Get-xAzDoGroupPermission {
     }
 
     # Get the ACL List and format the ACLS
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
+    Write-Verbose "[Get-xAzDoGroupPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
 
     $DifferenceACLs = Get-DevOpsACL @ACLLookupParams | ConvertTo-FormattedACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
     $DifferenceACLs = $DifferenceACLs | Where-Object {
@@ -107,7 +107,7 @@ Function Get-xAzDoGroupPermission {
         }
     }
 
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] ACL List retrieved and formatted."
+    Write-Verbose "[Get-xAzDoGroupPermission] ACL List retrieved and formatted."
 
     #
     # Convert the Permissions into an ACL Token
@@ -125,7 +125,7 @@ Function Get-xAzDoGroupPermission {
 
     # if the ACEs are empty, skip
     if ($ReferenceACLs.aces.Count -eq 0) {
-        Write-Verbose "[Get-xAzDoProjectGroupPermission] No ACEs found for the group."
+        Write-Verbose "[Get-xAzDoGroupPermission] No ACEs found for the group."
         return
     }
 
@@ -140,8 +140,8 @@ Function Get-xAzDoGroupPermission {
     $getGroupResult.DifferenceACLs = $DifferenceACLs
 
     # Write
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Result Status: $($getGroupResult.status)"
-    Write-Verbose "[Get-xAzDoProjectGroupPermission] Returning Group Result."
+    Write-Verbose "[Get-xAzDoGroupPermission] Result Status: $($getGroupResult.status)"
+    Write-Verbose "[Get-xAzDoGroupPermission] Returning Group Result."
 
     # Return the Group Result
     return $getGroupResult
