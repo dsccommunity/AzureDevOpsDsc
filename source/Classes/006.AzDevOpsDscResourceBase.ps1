@@ -219,10 +219,12 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                         ([DSCGetSummaryState]::NotFound) {
                             $dscRequiredAction = [RequiredAction]::New
                             Write-Verbose "Resource not found. Setting action to New."
-                        }
-                        ([DSCGetSummaryState]::Changed, [DSCGetSummaryState]::Renamed) {
+                        }([DSCGetSummaryState]::Changed) {
                             $dscRequiredAction = [RequiredAction]::Set
-                            Write-Verbose "Resource changed or renamed. Setting action to Set."
+                            Write-Verbose "Resource Changed. Setting action to Set."
+                        }([DSCGetSummaryState]::Renamed) {
+                            $dscRequiredAction = [RequiredAction]::Set
+                            Write-Verbose "Resource Renamed. Setting action to Set."
                         }
                         ([DSCGetSummaryState]::Missing) {
                             $dscRequiredAction = [RequiredAction]::Remove
