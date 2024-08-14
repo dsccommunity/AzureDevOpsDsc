@@ -50,10 +50,6 @@ Describe "xAzDoGroupPermission intergration tests" {
             $parameters.Method = 'Test'
         }
 
-        It "Should not throw any exceptions" {
-            { Invoke-DscResource @parameters } | Should -Not -Throw
-        }
-
         It "Should return False" {
             $result = Invoke-DscResource @parameters
             $result.InDesiredState | Should -BeFalse
@@ -72,7 +68,6 @@ Describe "xAzDoGroupPermission intergration tests" {
         }
 
         It "Should not throw any exceptions" {
-            Wait-Debugger
             # Test that invoking the DSC resource with the specified parameters does not throw any exceptions.
             { Invoke-DscResource @parameters } | Should -Not -Throw
         }
