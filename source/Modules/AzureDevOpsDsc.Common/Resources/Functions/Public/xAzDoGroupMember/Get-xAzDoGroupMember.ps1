@@ -29,11 +29,12 @@ Function Get-xAzDoGroupMember {
     # Logging
     Write-Verbose "[Get-xAzDoGroupMember] Retriving the GroupName from the Live and Local Cache."
 
+
     # Format the  According to the Group Name
-    $Key = Format-AzDoProjectName -GroupName $GroupName -OrganizationName $Global:DSCAZDO_OrganizationName
+    $Key = Format-AzDoGroupMember -GroupName $GroupName
 
     # Check the cache for the group
-    $livegroupMembers = Get-CacheItem -Key $GroupName -Type 'LiveGroupMembers'
+    $livegroupMembers = Get-CacheItem -Key $Key -Type 'LiveGroupMembers'
 
     Write-Verbose "[Get-xAzDoGroupMember] GroupName: '$GroupName'"
 

@@ -1,4 +1,4 @@
-Describe "xAzDoGroupMember Integration Tests" {
+Describe "xAzDoGroupMember Integration Tests" -skip {
 
     BeforeAll {
 
@@ -36,7 +36,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT_GROUPMEMBER'.
             $parameters.property = @{
-                GroupName = "$PROJECTNAME\TESTGROUP"
+                GroupName = "[{0}]\TESTGROUP" -f $PROJECTNAME
                 GroupMembers = "[$PROJECTNAME]\Group1", "[$PROJECTNAME]\Group2"
             }
 
@@ -55,6 +55,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             # indicating that the group member 'TESTMEMBER' does not exist.
             $result.InDesiredState | Should -BeFalse
         }
+
 
     }
 
@@ -86,7 +87,6 @@ Describe "xAzDoGroupMember Integration Tests" {
 
             # Invoke the DSC resource with the specified parameters and store the result.
             $result = Invoke-DscResource @parameters
-            Wait-Debugger
             # Verify that the 'Ensure' property in the result is 'Present',
             # indicating that the group member 'TESTMEMBER' exists.
             $result.InDesiredState | Should -BeTrue

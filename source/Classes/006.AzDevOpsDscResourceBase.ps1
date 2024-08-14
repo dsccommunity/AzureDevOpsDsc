@@ -193,13 +193,14 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
     hidden [RequiredAction]GetDscRequiredAction()
     {
-        # Perform logic with 'Ensure' (to determine whether resource should be created or dropped (or updated, if already [Ensure]::Present but property values differ)
+        # Initialize required action as None
         $dscRequiredAction = [RequiredAction]::None
-        #$cacheProperties = $false
 
+        # Retrieve current and desired properties
         [Hashtable]$currentProperties = $this.GetDscCurrentStateProperties()
         [Hashtable]$desiredProperties = $this.GetDscDesiredStateProperties()
 
+        # Retrieve property names
         [System.String[]]$dscPropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
         [System.String[]]$dscPropertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
@@ -207,50 +208,49 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         {
             ([Ensure]::Present) {
 
-                # If the desired state is to add the resource, however the current resource is absent. It is not in state.
+                Write-Verbose "Desired state is Present."
+
                 if ($currentProperties.Ensure -eq [Ensure]::Absent)
                 {
-                    # The resource is not in the desired state and is not present.
-                    if ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::NotFound)
+                    Write-Verbose "Current state is Absent."
+
+                    switch ($currentProperties.LookupResult.Status)
                     {
-                        $dscRequiredAction = [RequiredAction]::New
-                    }
-                    # If the resource has been renamed or changed, it is not in state. The resource needs to be updated.
-                    if ($currentProperties.LookupResult.Status -in ([DSCGetSummaryState]::Changed, [DSCGetSummaryState]::Renamed))
-                    {
-                        $dscRequiredAction = [RequiredAction]::Set
-                    }
-                    # If the resource has been removed, it is not in state. The resource needs to be added.
-                    if ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::Missing)
-                    {
-                        $dscRequiredAction = [RequiredAction]::Remove
+                        ([DSCGetSummaryState]::NotFound) {
+                            $dscRequiredAction = [RequiredAction]::New
+                            Write-Verbose "Resource not found. Setting action to New."
+                        }
+                        ([DSCGetSummaryState]::Changed, [DSCGetSummaryState]::Renamed) {
+                            $dscRequiredAction = [RequiredAction]::Set
+                            Write-Verbose "Resource changed or renamed. Setting action to Set."
+                        }
+                        ([DSCGetSummaryState]::Missing) {
+                            $dscRequiredAction = [RequiredAction]::Remove
+                            Write-Verbose "Resource missing. Setting action to Remove."
+                        }
                     }
 
                     Write-Verbose "DscActionRequired='$dscRequiredAction'"
                     return $dscRequiredAction
-                    break
-
                 }
 
-                # Otherwise, no changes to make (i.e. The desired state is already achieved)
+                Write-Verbose "No changes required. Desired state already achieved."
                 return $dscRequiredAction
-                break
-
             }
 
             ([Ensure]::Absent) {
 
-                # If the desired state is to remove the resource, however the current resource is present. It is not in state.
+                Write-Verbose "Desired state is Absent."
+
                 $dscRequiredAction = ($currentProperties.LookupResult.Status -eq [DSCGetSummaryState]::NotFound) ? [RequiredAction]::None : [RequiredAction]::Remove
 
-                # Otherwise, no changes to make (i.e. The desired state is already achieved)
                 Write-Verbose "DscActionRequired='$dscRequiredAction'"
                 return $dscRequiredAction
-                break
-
             }
+
             default {
                 $errorMessage = "Could not obtain a valid 'Ensure' value within '$($this.GetResourceName())' Test() function. Value was '$($desiredProperties.Ensure)'."
+                Write-Verbose $errorMessage
                 New-InvalidOperationException -Message $errorMessage
             }
         }
