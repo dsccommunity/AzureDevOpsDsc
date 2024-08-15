@@ -1,4 +1,4 @@
-# xAzDoGroupPermission Resource Documentation
+# xAzDoGroupPermission Resource Documentation (Currently Disabled)
 
 ## Overview
 

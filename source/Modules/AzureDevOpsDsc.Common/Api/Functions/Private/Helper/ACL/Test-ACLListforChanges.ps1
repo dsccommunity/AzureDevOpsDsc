@@ -24,7 +24,10 @@ Function Test-ACLListforChanges
     $result = @{
         status = "Unchanged"
         reason = @(
-            @{ Value = "No changes detected."; Reason = "No changes detected." }
+            @{
+                Value = "No changes detected."
+                Reason = "No changes detected."
+            }
         )
         propertiesChanged = @()
     }
@@ -77,7 +80,7 @@ Function Test-ACLListforChanges
     {
         Write-Verbose "[Test-ACLListforChanges] ACLs count is not equal."
         $result.status = "Changed"
-        $result.reason + @{
+        $result.reason += @{
             Value = $ReferenceACLs
             Reason = "ACLs count is not equal."
         }
