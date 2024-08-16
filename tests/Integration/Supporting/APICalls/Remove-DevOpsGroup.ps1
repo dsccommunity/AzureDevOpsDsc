@@ -29,13 +29,13 @@ Function Remove-DevOpsGroup {
     [OutputType([System.Management.Automation.PSObject])]
     param
     (
-        [Parameter(Mandatory)]
-        [string]
-        $ApiUri,
-
         [Parameter()]
         [String]
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
+
+        [Parameter(Mandatory)]
+        [String]
+        $OrganizationName,
 
         [Parameter()]
         [String]
@@ -43,7 +43,7 @@ Function Remove-DevOpsGroup {
     )
 
     $params = @{
-        Uri = "{0}/_apis/graph/groups/{1}?api-version={2}" -f $ApiUri, $GroupDescriptor, $ApiVersion
+        Uri = "https://vssps.dev.azure.com/{0}/_apis/graph/groups/{1}?api-version={2}" -f $OrganizationName, $GroupDescriptor, $ApiVersion
         Method = 'Delete'
         ContentType = 'application/json'
     }
@@ -54,4 +54,5 @@ Function Remove-DevOpsGroup {
     catch {
         Write-Error "Failed to remove group: $_"
     }
+
 }

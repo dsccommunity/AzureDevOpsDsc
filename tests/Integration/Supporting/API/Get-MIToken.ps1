@@ -27,6 +27,9 @@ Function Get-MIToken {
     if ($null -eq $response.access_token) { throw "Error. Access token not returned from Azure Instance Metadata Service. Please ensure that the Azure Instance Metadata Service is available." }
 
     # Return the token if the verify switch is not set
-    return $response.access_token
+    return @{
+        tokenType = 'ManagedIdentity'
+        token = $response.access_token
+    }
 
 }

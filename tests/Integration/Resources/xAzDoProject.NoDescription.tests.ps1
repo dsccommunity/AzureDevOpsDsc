@@ -1,4 +1,4 @@
-Describe "xAzDoProject Integration Tests - No Description" -skip {
+Describe "xAzDoProject Integration Tests - No Description" {
 
     BeforeAll {
 

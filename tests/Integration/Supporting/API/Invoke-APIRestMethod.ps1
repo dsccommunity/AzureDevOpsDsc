@@ -61,9 +61,6 @@ function Invoke-APIRestMethod
         ResponseHeadersVariable     = 'responseHeaders'
     }
 
-    Write-Verbose -Message ("[Invoke-APIRestMethod] Invoking the Azure DevOps API REST method '{0}'." -f $HttpMethod)
-    Write-Verbose -Message ("[Invoke-APIRestMethod] API URI: {0}" -f $ApiUri)
-
     # Remove the 'Body' and 'ContentType' if not relevant to request
     if ($HttpMethod -in $('Get','Delete'))
     {
@@ -81,29 +78,6 @@ function Invoke-APIRestMethod
     {
 
         #
-        # Slow down the retry attempts if the API resource is close to being overwelmed
-
-        # If there are any retry attempts, wait for the specified number of seconds before retrying
-        if (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.retryAfter -ge 0))
-        {
-            Write-Verbose -Message ("[Invoke-APIRestMethod] Waiting for {0} seconds before retrying." -f $Global:DSCAZDO_APIRateLimit.retryAfter)
-            Start-Sleep -Seconds $Global:DSCAZDO_APIRateLimit.retryAfter
-        }
-
-        # If the API resouce is close to beig overwelmed, wait for the specified number of seconds before sending the request
-        if (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -le 50) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -ge 5))
-        {
-            Write-Verbose -Message "[Invoke-APIRestMethod] Resource is close to being overwelmed. Waiting for $RetryIntervalMs seconds before sending the request."
-            Start-Sleep -Milliseconds $RetryIntervalMs
-        }
-        # If the API resouce is overwelmed, wait for the specified number of seconds before sending the request
-        elseif (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5))
-        {
-            Write-Verbose -Message ("[Invoke-APIRestMethod] Resource is overwelmed. Waiting for {0} seconds to reset the TSTUs." -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
-            Start-Sleep -Milliseconds $RetryIntervalMs
-        }
-
-        #
         # Invoke the REST method. Loop until the Continuation Token is False.
 
         Do {
@@ -114,7 +88,7 @@ function Invoke-APIRestMethod
             # If the 'NoAuthentication' switch is NOT PRESENT and the 'Authentication' header is empty, add the authentication header
             if (([String]::IsNullOrEmpty($invokeRestMethodParameters.Headers.Authentication)) -and (-not $NoAuthentication.IsPresent))
             {
-                $invokeRestMethodParameters.Headers.Authorization = Add-AuthenticationHTTPHeader
+                $invokeRestMethodParameters.Headers.Authorization = Add-Header
             }
 
             #

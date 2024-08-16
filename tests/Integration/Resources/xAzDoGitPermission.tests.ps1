@@ -1,6 +1,6 @@
 
 
-Describe "xAzDoGitPermission Integration Tests" -Skip {
+Describe "xAzDoGitPermission Integration Tests" {
 
     BeforeAll {
 

@@ -1,4 +1,4 @@
-Describe "xAzDoProjectGroup Integration Tests - Description" -skip {
+Describe "xAzDoProjectGroup Integration Tests - With Description" {
 
     BeforeAll {
 
@@ -18,7 +18,6 @@ Describe "xAzDoProjectGroup Integration Tests - Description" -skip {
         # Create a new project
 
         New-Project $PROJECTNAME
-
     }
 
     # This context is used to test if a project group exists.
@@ -152,6 +151,9 @@ Describe "xAzDoProjectGroup Integration Tests - Description" -skip {
         }
 
         It "Should return True" {
+            # Set the Method
+            $parameters.Method = 'Test'
+
             # Invoke the DSC resource with the specified parameters and store the result.
             $result = Invoke-DscResource @parameters
 
