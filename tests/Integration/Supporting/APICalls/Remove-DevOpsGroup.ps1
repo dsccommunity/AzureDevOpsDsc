@@ -51,8 +51,6 @@ Function Remove-DevOpsGroup {
     try {
         return (Invoke-APIRestMethod @params)
     }
-    catch {
-        Write-Error "Failed to remove group: $_"
-    }
+    catch {}
 
 }
