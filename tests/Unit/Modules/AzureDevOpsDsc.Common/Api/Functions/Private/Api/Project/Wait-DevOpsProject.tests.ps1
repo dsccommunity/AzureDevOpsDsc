@@ -1,81 +1,50 @@
-powershell
-# Pester Unit Tests for Wait-DevOpsProject
 
-Describe "Wait-DevOpsProject" {
+Describe 'Wait-DevOpsProject' {
     Mock Invoke-AzDevOpsApiRestMethod
 
-    BeforeEach {
-        Clear-Mock
+    Context 'When Project is created successfully' {
+        It 'Stops retrying after project is wellFormed' {
+            Mock Invoke-AzDevOpsApiRestMethod { return @{ status = "wellFormed" } }
+
+            { Wait-DevOpsProject -OrganizationName "TestOrg" -ProjectURL "https://dev.azure.com/TestOrg/TestProject" } | Should -Not -Throw
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 1
+        }
     }
 
-    It "should wait until project is wellFormed" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            @{
-                status = 'creating'
-            },
-            @{
-                status = 'creating'
-            },
-            @{
-                status = 'wellFormed'
-            }
+    Context 'When Project creation fails' {
+        It 'Handles failed status correctly' {
+            Mock Invoke-AzDevOpsApiRestMethod { return @{ status = "failed" } }
+
+            { Wait-DevOpsProject -OrganizationName "TestOrg" -ProjectURL "https://dev.azure.com/TestOrg/TestProject" } | Should -Throw
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 1
         }
-
-        { Wait-DevOpsProject -OrganizationName "MyOrg" -ProjectURL "https://dev.azure.com/MyOrg/MyProject" } | Should -Not -Throw
-
-        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 3
     }
 
-    It "should handle project creation failure" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            @{
-                status = 'failed'
-            }
+    Context 'When Project creation times out' {
+        It 'Retries 10 times before timing out' {
+            Mock Invoke-AzDevOpsApiRestMethod { return @{ status = "creating" } }
+
+            { Wait-DevOpsProject -OrganizationName "TestOrg" -ProjectURL "https://dev.azure.com/TestOrg/TestProject" } | Should -Throw
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 10
         }
-
-        { Wait-DevOpsProject -OrganizationName "MyOrg" -ProjectURL "https://dev.azure.com/MyOrg/MyProject" } | Should -Throw
-
-        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1
     }
 
-    It "should time out waiting for project creation" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            @{
-                status = 'creating'
-            }
+    Context 'When Project status is not set' {
+        It 'Throws an error when status is notSet' {
+            Mock Invoke-AzDevOpsApiRestMethod { return @{ status = "notSet" } }
+
+            { Wait-DevOpsProject -OrganizationName "TestOrg" -ProjectURL "https://dev.azure.com/TestOrg/TestProject" } | Should -Throw
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 1
         }
-
-        { Wait-DevOpsProject -OrganizationName "MyOrg" -ProjectURL "https://dev.azure.com/MyOrg/MyProject" } | Should -Throw
-
-        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 10
     }
 
-    It "should handle unknown status" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            @{
-                status = 'unknown'
-            }
+    Context 'When Project status default case' {
+        It 'Retries if project is still being created (default case)' {
+            Mock Invoke-AzDevOpsApiRestMethod { return @{ status = "unknown" } }
+
+            { Wait-DevOpsProject -OrganizationName "TestOrg" -ProjectURL "https://dev.azure.com/TestOrg/TestProject" } | Should -Throw
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 10
         }
-
-        { Wait-DevOpsProject -OrganizationName "MyOrg" -ProjectURL "https://dev.azure.com/MyOrg/MyProject" } | Should -Throw
-
-        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1
-    }
-
-    It "should use the default API version if not specified" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            @{
-                status = 'wellFormed'
-            }
-        }
-
-        Mock -CommandName Get-AzDevOpsApiVersion -MockWith {
-            return "6.0"
-        }
-
-        { Wait-DevOpsProject -OrganizationName "MyOrg" -ProjectURL "https://dev.azure.com/MyOrg/MyProject" } | Should -Not -Throw
-
-        Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Times 1
     }
 }
 

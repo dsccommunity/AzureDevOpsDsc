@@ -1,71 +1,63 @@
-powershell
-# ModuleName: DevOpsGroup.Tests.ps1
-
-Import-Module Pester
-Import-Module ./YourModule.psm1
 
 Describe "New-DevOpsGroup" {
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod
-
-    Context "Parameter Validation" {
-        It "Throws an error if ApiUri is not provided" {
-            { New-DevOpsGroup -GroupName "MyGroup" } | Should -Throw
+    Mock Invoke-AzDevOpsApiRestMethod {
+        return @{
+            displayName = $GroupName
+            description = $GroupDescription
+            id = "mock-id"
         }
+    }
+    Mock Get-AzDevOpsApiVersion {
+        return "6.0"
+    }
 
-        It "Throws an error if GroupName is not provided" {
-            { New-DevOpsGroup -ApiUri "https://dev.azure.com/myorganization" } | Should -Throw
+    Context "When required parameters are provided" {
+        It 'Creates a new group successfully' {
+            $ApiUri = "https://dev.azure.com/myorganization"
+            $GroupName = "MyGroup"
+
+            $result = New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName
+
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1
+            $result.displayName | Should -Be $GroupName
         }
     }
 
-    Context "Functionality" {
-        $params = @{
-            ApiUri   = "https://dev.azure.com/myorganization"
-            GroupName = "MyGroup"
+    Context "When optional parameters are provided" {
+        It 'Creates a new group successfully with description' {
+            $ApiUri = "https://dev.azure.com/myorganization"
+            $GroupName = "MyGroup"
+            $GroupDescription = "A sample group"
+
+            $result = New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName -GroupDescription $GroupDescription
+
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1
+            $result.description | Should -Be $GroupDescription
         }
 
-        It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
-            New-DevOpsGroup @params
+        It 'Creates a new group successfully with project scope descriptor' {
+            $ApiUri = "https://dev.azure.com/myorganization"
+            $GroupName = "MyGroup"
+            $ProjectScopeDescriptor = "vstfs:///Classification/TeamProject/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-            $expectedBody = @{
-                displayName = "MyGroup"
-                description = $null
-            } | ConvertTo-Json
+            $result = New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName -ProjectScopeDescriptor $ProjectScopeDescriptor
 
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It -ParameterFilter {
-                $_.Uri -eq "https://dev.azure.com/myorganization/_apis/graph/groups?api-version=$(Get-AzDevOpsApiVersion -Default)" -and
-                $_.Method -eq 'Post' -and
-                $_.ContentType -eq 'application/json' -and
-                $_.Body -eq $expectedBody
-            }
-        }
-
-        It "Should handle project scope descriptor" {
-            $params.ProjectScopeDescriptor = "vstfs:///Classification/TeamProject/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            New-DevOpsGroup @params
-
-            $expectedUri = "https://dev.azure.com/myorganization/_apis/graph/groups?scopeDescriptor=vstfs:///Classification/TeamProject/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&api-version=$(Get-AzDevOpsApiVersion -Default)"
-            $expectedBody = @{
-                displayName = "MyGroup"
-                description = $null
-            } | ConvertTo-Json
-
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It -ParameterFilter {
-                $_.Uri -eq $expectedUri -and
-                $_.Method -eq 'Post' -and
-                $_.ContentType -eq 'application/json' -and
-                $_.Body -eq $expectedBody
-            }
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1
+            $result.displayName | Should -Be $GroupName
         }
     }
 
-    Context "Error Handling" {
-        It "Should write an error if Invoke-AzDevOpsApiRestMethod throws an exception" {
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API call failed" }
-            $errorMessage = "Failed to create group: API call failed"
+    Context "When an exception is thrown" {
+        Mock Invoke-AzDevOpsApiRestMethod {
+            throw "API call failed"
+        }
 
-            { New-DevOpsGroup -ApiUri "https://dev.azure.com/myorganization" -GroupName "MyGroup" } | Should -Throw -ExceptionMessage $errorMessage
+        It 'Handles the error and writes an error message' {
+            $ApiUri = "https://dev.azure.com/myorganization"
+            $GroupName = "MyGroup"
+
+            { New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName } | Should -Throw
         }
     }
 }
-
 

@@ -1,76 +1,51 @@
-Describe "New-DevOpsProject" {
 
-    Mock -CommandName 'Test-AzDevOpsProjectName' -MockWith {
-        return $true
-    }
-
-    Mock -CommandName 'Get-AzDevOpsApiVersion' -MockWith {
-        return "6.0-preview.4"
-    }
-
+Describe 'New-DevOpsProject' {
     Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith {
-        return @{ id = "1"; name = "MyProject"; description = "This is a new project"; visibility = "private" }
-    }
-
-    $params = @{
-        Organization       = "myorg"
-        ProjectName        = "MyProject"
-        ProjectDescription = "This is a new project"
-        SourceControlType  = "Git"
-        ProcessTemplateId  = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
-        Visibility         = "private"
-    }
-
-    It "Creates a new Azure DevOps project" {
-        $result = New-DevOpsProject @params
-
-        $result.id | Should -Not -BeNullOrEmpty
-        $result.name | Should -Be $params.ProjectName
-        $result.description | Should -Be $params.ProjectDescription
-        $result.visibility | Should -Be $params.Visibility
-    }
-
-    It "Calls Test-AzDevOpsProjectName with the correct parameters" {
-        $result = New-DevOpsProject @params
-
-        Assert-MockCalled -CommandName 'Test-AzDevOpsProjectName' -Exactly -Times 1 -Scope It -ParameterFilter {
-            $ProjectName -eq $params.ProjectName -and $_.IsValid
+        @{
+            id = "1234"
+            name = "MyProject"
+            description = "This is a new project"
+            visibility = "private"
         }
     }
 
-    It "Calls Get-AzDevOpsApiVersion" {
-        $result = New-DevOpsProject @params
+    Context 'Creates a new Azure DevOps project with valid parameters' {
+        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters and return the project details' {
+            $organization = "myorg"
+            $projectName = "MyProject"
+            $projectDescription = "This is a new project"
+            $sourceControlType = "Git"
+            $processTemplateId = "6b724908-ef14-45cf-84f8-768b5384da45"
+            $visibility = "private"
+            $apiVersion = "6.0"
 
-        Assert-MockCalled -CommandName 'Get-AzDevOpsApiVersion' -Exactly -Times 1 -Scope It
-    }
+            $result = New-DevOpsProject -Organization $organization -ProjectName $projectName -Description $projectDescription -SourceControlType $sourceControlType -ProcessTemplateId $processTemplateId -Visibility $visibility -ApiVersion $apiVersion
 
-    It "Calls Invoke-AzDevOpsApiRestMethod with the correct parameters" {
-        $result = New-DevOpsProject @params
+            $result | Should -Not -BeNullOrEmpty
+            $result.name | Should -Be $projectName
+            $result.description | Should -Be $projectDescription
 
-        Assert-MockCalled -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly -Times 1 -Scope It -ParameterFilter {
-            $Uri -eq "https://dev.azure.com/myorg/_apis/projects?api-version=6.0-preview.4" -and
-            $Method -eq "POST" -and
-            $Body -eq (@{
-                name         = "MyProject"
-                description  = "This is a new project"
-                visibility   = "private"
-                capabilities = @{
-                    versioncontrol = @{
-                        sourceControlType = "Git"
-                    }
-                    processTemplate = @{
-                        templateTypeId = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
-                    }
-                }
-            } | ConvertTo-Json)
+            Assert-MockCalled -CommandName 'Invoke-AzDevOpsApiRestMethod' -Times 1 -Exactly -Scope It -ParameterFilter {
+                $params = $_
+                $params.Uri -eq "https://dev.azure.com/$organization/_apis/projects?api-version=$apiVersion" -and
+                $params.Method -eq "POST" -and
+                $params.Body.name -eq $projectName -and
+                $params.Body.description -eq $projectDescription -and
+                $params.Body.visibility -eq $visibility
+            }
         }
     }
 
-    It "Throws an error if the response is null" {
+    Context 'Handles errors gracefully' {
         Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith {
-            return $null
+            throw "API call failed"
         }
-        { New-DevOpsProject @params } | Should -Throw -ErrorId "New-DevOpsProject"
+
+        It 'Should return an error message if API call fails' {
+            {
+                New-DevOpsProject -Organization "myorg" -ProjectName "MyProject" -Description "This is a new project" -SourceControlType "Git" -ProcessTemplateId "6b724908-ef14-45cf-84f8-768b5384da45" -Visibility "private" -ApiVersion "6.0"
+            } | Should -Throw -ErrorMessage "\[New-DevOpsProject\] Failed to create the Azure DevOps project: API call failed"
+        }
     }
 }
 

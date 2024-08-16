@@ -1,4 +1,4 @@
-powershell
+
 # ConvertTo-ACEList.Tests.ps1
 
 # Import the module containing the function to be tested
@@ -94,7 +94,7 @@ Describe "ConvertTo-ACEList" {
 
         It "Should log a warning and not include the entry in result" {
             { ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName } | Should -Not -Throw
-            
+
             $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
 
             $result | Should -HaveCount 0

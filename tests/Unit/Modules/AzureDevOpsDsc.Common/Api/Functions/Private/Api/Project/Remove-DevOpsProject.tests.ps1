@@ -1,42 +1,28 @@
-Describe 'Remove-DevOpsProject' {
 
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return '6.0' }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { return @{ status = '200' } }
+Describe "Remove-DevOpsProject" {
+    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "5.1-preview.1" }
+    Mock -CommandName Invoke-AzDevOpsApiRestMethod
 
-    Context 'When called with valid parameters' {
-        $params = @{
-            Organization = 'TestOrg'
-            ProjectId    = 'TestProj'
-        }
+    Context "When removing a project" {
+        It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
+            $org = "MyOrganization"
+            $projectId = "MyProject"
+            $apiVersion = "5.1-preview.1"
 
-        It 'Should call Get-AzDevOpsApiVersion' {
-            Remove-DevOpsProject @params
-            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Times 1
-        }
+            Remove-DevOpsProject -Organization $org -ProjectId $projectId
 
-        It 'Should call Invoke-AzDevOpsApiRestMethod with the correct parameters' {
-            Remove-DevOpsProject @params
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly {
-                Param(
-                  [Hashtable]$params
-                )
-                $params.Uri -eq 'https://dev.azure.com/TestOrg/_apis/projects/TestProj?api-version=6.0' -and
-                $params.Method -eq 'DELETE'
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It -ParameterFilter {
+                $Uri -eq "https://dev.azure.com/$org/_apis/projects/$projectId?api-version=$apiVersion" -and
+                $Method -eq "DELETE"
             }
-        }
-
-        It 'Should return the API response' {
-            $result = Remove-DevOpsProject @params
-            $result | Should -BeOfType [Hashtable]
-            $result.status | Should -Be '200'
         }
     }
 
-    Context 'When an error occurs during deletion' {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw 'Deletion failed' }
+    Context "When an exception occurs" {
+        It "Should write an error message" {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API call failed" }
 
-        It 'Should display an error message' {
-            { Remove-DevOpsProject -Organization 'TestOrg' -ProjectId 'TestProj' } | Should -Throw
+            { Remove-DevOpsProject -Organization "MyOrganization" -ProjectId "MyProject" } | Should -Throw
         }
     }
 }

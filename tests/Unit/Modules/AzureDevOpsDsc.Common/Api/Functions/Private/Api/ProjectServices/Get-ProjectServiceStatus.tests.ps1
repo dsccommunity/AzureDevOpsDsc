@@ -1,77 +1,61 @@
+
 Describe 'Get-ProjectServiceStatus' {
-    Mock Get-AzDevOpsApiVersion { return '5.0-preview.1' }
-    Mock Invoke-AzDevOpsApiRestMethod
+    Mock -ModuleName 'Az.DevOps' Get-AzDevOpsApiVersion { '6.0-preview.1' }
+    Mock -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod {
+        [pscustomobject]@{
+            state = 'enabled'
+        }
+    }
 
-    Context 'When all parameters are provided' {
-        It 'retrieves the project service status' {
-            # Arrange
-            $Organization = 'MyOrg'
-            $ProjectId = '123456'
-            $ServiceName = 'MyService'
-            $ApiVersion = '6.0'
-            $response = [PSCustomObject]@{ state = 'enabled' }
+    Context 'When all parameters are valid' {
+        It 'Should return the state of the service as enabled' {
+            $organization = 'TestOrg'
+            $projectId = 'TestProjectId'
+            $serviceName = 'TestServiceName'
 
-            Mock Invoke-AzDevOpsApiRestMethod { return $response }
+            $result = Get-ProjectServiceStatus -Organization $organization -ProjectId $projectId -ServiceName $serviceName
 
-            # Act
-            $result = Get-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -ApiVersion $ApiVersion
-
-            # Assert
-            $result | Should -Be $response
+            $result.state | Should -Be 'enabled'
         }
 
-        It 'defaults state to enabled if undefined' {
-            # Arrange
-            $Organization = 'MyOrg'
-            $ProjectId = '123456'
-            $ServiceName = 'MyService'
-            $ApiVersion = '6.0'
-            $response = [PSCustomObject]@{ state = 'undefined' }
+        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            $organization = 'TestOrg'
+            $projectId = 'TestProjectId'
+            $serviceName = 'TestServiceName'
 
-            Mock Invoke-AzDevOpsApiRestMethod { return $response }
+            $result = Get-ProjectServiceStatus -Organization $organization -ProjectId $projectId -ServiceName $serviceName
 
-            # Act
-            $result = Get-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -ApiVersion $ApiVersion
+            Assert-MockCalled -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod -Exactly -Exactly 1
+        }
+    }
 
-            # Assert
+    Context 'When service state is undefined' {
+        Mock -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod {
+            [pscustomobject]@{
+                state = 'undefined'
+            }
+        }
+
+        It 'Should treat undefined state as enabled' {
+            $organization = 'TestOrg'
+            $projectId = 'TestProjectId'
+            $serviceName = 'TestServiceName'
+
+            $result = Get-ProjectServiceStatus -Organization $organization -ProjectId $projectId -ServiceName $serviceName
+
             $result.state | Should -Be 'enabled'
         }
     }
 
-    Context 'When ApiVersion is not provided' {
-        It 'uses the default API version' {
-            # Arrange
-            $Organization = 'MyOrg'
-            $ProjectId = '123456'
-            $ServiceName = 'MyService'
-            $response = [PSCustomObject]@{ state = 'enabled' }
+    Context 'When an error occurs during API call' {
+        Mock -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod { throw "API Error" }
 
-            Mock Invoke-AzDevOpsApiRestMethod { return $response }
+        It 'Should write an error message' {
+            $organization = 'TestOrg'
+            $projectId = 'TestProjectId'
+            $serviceName = 'TestServiceName'
 
-            # Act
-            $result = Get-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName
-
-            # Assert
-            $result | Should -Be $response
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
-        }
-    }
-
-    Context 'When an exception occurs' {
-        It 'writes an error message' {
-            # Arrange
-            $Organization = 'MyOrg'
-            $ProjectId = '123456'
-            $ServiceName = 'MyService'
-            $ApiVersion = '6.0'
-
-            Mock Invoke-AzDevOpsApiRestMethod { throw 'Error' }
-
-            # Act
-            { Get-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -ApiVersion $ApiVersion } | Should -Throw
-
-            # Assert
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
+            { Get-ProjectServiceStatus -Organization $organization -ProjectId $projectId -ServiceName $serviceName } | Should -Throw
         }
     }
 }

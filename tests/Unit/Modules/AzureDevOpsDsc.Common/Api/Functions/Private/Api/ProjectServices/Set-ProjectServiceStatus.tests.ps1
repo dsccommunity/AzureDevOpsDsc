@@ -1,64 +1,61 @@
+
 Describe 'Set-ProjectServiceStatus' {
-    Mock Get-AzDevOpsApiVersion { '6.0-preview.1' }
+    Mock Get-AzDevOpsApiVersion {
+        return '6.0'
+    }
+
     Mock Invoke-AzDevOpsApiRestMethod {
-        [PSCustomObject]@{ state = 'enabled' }
-    }
-
-    Context 'When all required parameters are provided' {
-        It 'should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
-            $org = 'TestOrg'
-            $projId = 'TestProj'
-            $srvName = 'TestService'
-            $body = [PSCustomObject]@{ status = 'enable' }
-
-            $result = Set-ProjectServiceStatus -Organization $org -ProjectId $projId -ServiceName $srvName -Body $body
-
-            $expectedUri = 'https://dev.azure.com/TestOrg/_apis/FeatureManagement/FeatureStates/host/project/TestProj/TestService?api-version=6.0-preview.1'
-
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1 -Scope It
-            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $_.Uri -eq $expectedUri -and
-                $_.Method -eq 'PATCH' -and
-                $_.Body -eq ($body | ConvertTo-Json)
-            }
-
-            $result | Should -Be 'enabled'
+        return @{
+            state = 'Enabled'
         }
     }
 
-    Context 'When ApiVersion parameter is provided' {
-        It 'should use the provided ApiVersion' {
-            $org = 'TestOrg'
-            $projId = 'TestProj'
-            $srvName = 'TestService'
-            $body = [PSCustomObject]@{ status = 'enable' }
-            $apiVersion = '5.1'
+    It 'should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+        Param (
+            [string]$Organization = 'TestOrg',
+            [string]$ProjectId = 'TestProjId',
+            [string]$ServiceName = 'Git',
+            [Object]$Body = @{
+                state = 'Enabled'
+            },
+            [string]$ApiVersion
+        )
 
-            $result = Set-ProjectServiceStatus -Organization $org -ProjectId $projId -ServiceName $srvName -Body $body -ApiVersion $apiVersion
+        $expectedUri = 'https://dev.azure.com/TestOrg/_apis/FeatureManagement/FeatureStates/host/project/TestProjId/Git?api-version=6.0'
 
-            $expectedUri = 'https://dev.azure.com/TestOrg/_apis/FeatureManagement/FeatureStates/host/project/TestProj/TestService?api-version=5.1'
+        Set-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -Body $Body -ApiVersion $ApiVersion
 
-            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $_.Uri -eq $expectedUri -and
-                $_.Method -eq 'PATCH' -and
-                $_.Body -eq ($body | ConvertTo-Json)
-            }
-        }
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+            $Uri -eq $expectedUri -and $Method -eq 'PATCH' -and $Body -eq ($Body | ConvertTo-Json)
+        } -Exactly -Times 1
     }
 
-    Context 'When an error occurs' {
-        Mock Invoke-AzDevOpsApiRestMethod { throw 'Error' }
-
-        It 'should catch the error and write an error message' {
-            $org = 'TestOrg'
-            $projId = 'TestProj'
-            $srvName = 'TestService'
-            $body = [PSCustomObject]@{ status = 'enable' }
-
-            { Set-ProjectServiceStatus -Organization $org -ProjectId $projId -ServiceName $srvName -Body $body } | Should -Throw
-
-            Get-Content -Path $Error[0] | Should -Match 'Failed to set Security Descriptor:'
+    It 'should return the state of the service if the API call is successful' {
+        $Organization = 'TestOrg'
+        $ProjectId = 'TestProjId'
+        $ServiceName = 'Git'
+        $Body = @{
+            state = 'Enabled'
         }
+
+        $result = Set-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -Body $Body
+
+        $result | Should -Be 'Enabled'
+    }
+
+    It 'should return error message when API call fails' {
+        Mock Invoke-AzDevOpsApiRestMethod {
+            throw "API call failed"
+        }
+
+        $Organization = 'TestOrg'
+        $ProjectId = 'TestProjId'
+        $ServiceName = 'Git'
+        $Body = @{
+            state = 'Enabled'
+        }
+
+        { Set-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -Body $Body } | Should -Throw -ErrorMessage "Failed to set Security Descriptor: API call failed"
     }
 }
 

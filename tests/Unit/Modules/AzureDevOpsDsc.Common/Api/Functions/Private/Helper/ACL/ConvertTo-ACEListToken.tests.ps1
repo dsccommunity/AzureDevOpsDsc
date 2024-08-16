@@ -1,4 +1,4 @@
-powershell
+
 # Unit tests for ConvertTo-ACETokenList function
 
 # Load the function script

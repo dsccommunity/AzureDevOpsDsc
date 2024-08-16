@@ -1,31 +1,56 @@
-Describe "Update-DevOpsProject" {
-    BeforeAll {
-        function Invoke-AzDevOpsApiRestMethod {
-            param($Uri, $Body, $Method)
-            return @{
-                name = "NewProjectName"
-                description = "Updated project description"
-                visibility = "public"
-            }
+
+Describe 'Update-DevOpsProject' {
+
+    Mock Invoke-AzDevOpsApiRestMethod {
+        return @{
+            name = $params.Body.name
+            description = $params.Body.description
+            visibility = $params.Body.visibility
         }
     }
 
-    It "Should throw an error when Organization parameter is missing" {
-        { Update-DevOpsProject -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "public" -PersonalAccessToken "PAT" } | Should -Throw
+    $commonParams = @{
+        Organization        = 'contoso'
+        ProjectId           = 'MyProject'
+        ApiVersion          = '6.0'
     }
 
-    It "Should update the project with the specified parameters" {
-        $result = Update-DevOpsProject -Organization "contoso" -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "public" -PersonalAccessToken "PAT"
+    It 'Should update project with new name and description' {
+        $params = $commonParams + @{
+            NewName             = 'NewProjectName'
+            Description         = 'Updated project description'
+        }
 
-        $result.name | Should -Be "NewProjectName"
-        $result.description | Should -Be "Updated project description"
-        $result.visibility | Should -Be "public"
+        $result = Update-DevOpsProject @params
+
+        $result.name | Should -Be 'NewProjectName'
+        $result.description | Should -Be 'Updated project description'
     }
 
-    It "Should set the visibility to private when specified" {
-        $result = Update-DevOpsProject -Organization "contoso" -ProjectId "MyProject" -NewName "NewProjectName" -Description "Updated project description" -Visibility "private" -PersonalAccessToken "PAT"
+    It 'Should update project visibility to public' {
+        $params = $commonParams + @{
+            Visibility          = 'public'
+        }
 
-        $result.visibility | Should -Be "private"
+        $result = Update-DevOpsProject @params
+
+        $result.visibility | Should -Be 'public'
+    }
+
+    It 'Should not include description if not provided' {
+        $params = $commonParams + @{
+            Visibility          = 'private'
+        }
+
+        $result = Update-DevOpsProject @params
+
+        $result.PSObject.Properties.Match('description') | Should -Be $null
+    }
+
+    It 'Should handle failure gracefully' {
+        Mock Invoke-AzDevOpsApiRestMethod { throw 'API error' }
+
+        { Update-DevOpsProject @commonParams } | Should -Throw 'API error'
     }
 }
 

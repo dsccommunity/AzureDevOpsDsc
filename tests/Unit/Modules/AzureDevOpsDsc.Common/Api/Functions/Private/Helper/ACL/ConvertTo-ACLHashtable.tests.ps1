@@ -1,4 +1,4 @@
-powershell
+
 # Import the Pester module
 Import-Module Pester
 
@@ -65,14 +65,14 @@ $descriptorMatchToken = "token2"
 Describe "ConvertTo-ACLHashtable" {
     It "Correctly converts and builds the ACL hashtable" {
         $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken $descriptorMatchToken
-        
+
         $expectedResult = @{
             Count = 2
             value = [System.Collections.Generic.List[Object]]::new()
         }
 
         $expectedResult.value.Add($descriptorACLList[0])
-        
+
         $expectedResult.value.Add([PSCustomObject]@{
             inheritPermissions = $true
             token = "token1"

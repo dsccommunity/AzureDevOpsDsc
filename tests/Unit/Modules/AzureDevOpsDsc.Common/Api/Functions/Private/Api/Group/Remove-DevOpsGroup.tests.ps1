@@ -1,55 +1,51 @@
+
 Describe 'Remove-DevOpsGroup' {
-    Mock Get-AzDevOpsApiVersion { "7.1-preview.1" }
+    Param (
+        [string]$ApiUri = "https://dev.azure.com/myorganization",
+        [string]$ApiVersion = "6.0",
+        [string]$GroupDescriptor = "MyGroup"
+    )
+
+    Mock Get-AzDevOpsApiVersion -MockWith { "6.0" }
     Mock Invoke-AzDevOpsApiRestMethod {
-        $null
+        [PSCustomObject]@{ success = $true }
     }
 
-    Context 'When all parameters are provided' {
-        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
-            $apiUri = "https://dev.azure.com/myorganization"
-            $apiVersion = "7.1-preview.1"
-            $groupDescriptor = "MyGroup"
+    Context 'When all mandatory parameters are provided' {
+        It 'should make a DELETE request to Azure DevOps API' {
+            $result = Remove-DevOpsGroup -ApiUri $ApiUri -GroupDescriptor $GroupDescriptor
 
-            Remove-DevOpsGroup -ApiUri $apiUri -ApiVersion $apiVersion -GroupDescriptor $groupDescriptor
-
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -Parameters @{
-                Uri = "$apiUri/_apis/graph/groups/$groupDescriptor?api-version=$apiVersion"
+            $params = @{
+                Uri = "$ApiUri/_apis/graph/groups/$GroupDescriptor?api-version=$ApiVersion"
                 Method = 'Delete'
                 ContentType = 'application/json'
             }
-        }
 
-        It 'Should use default ApiVersion if not provided' {
-            $apiUri = "https://dev.azure.com/myorganization"
-            $groupDescriptor = "MyGroup"
-
-            Remove-DevOpsGroup -ApiUri $apiUri -GroupDescriptor $groupDescriptor
-
-            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Times 1 -Exactly -Scope It -Parameters @{
-                Default = $true
-            }
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -Parameters @{
-                Uri = "$apiUri/_apis/graph/groups/$groupDescriptor?api-version=7.1-preview.1"
-                Method = 'Delete'
-                ContentType = 'application/json'
-            }
+            Should -InvokeCommand 'Invoke-AzDevOpsApiRestMethod' -Exactly -WithArguments $params
+            $result.success | Should -Be $true
         }
     }
 
-    Context 'Error Handling' {
-        Mock Invoke-AzDevOpsApiRestMethod { throw 'API failure' }
+    Context 'When ApiVersion parameter is not provided' {
+        It 'should use the default ApiVersion' {
+            Mock Get-AzDevOpsApiVersion -MockWith { "6.0" }
 
-        It 'Should handle errors and write an error message' {
-            $apiUri = "https://dev.azure.com/myorganization"
-            $groupDescriptor = "MyGroup"
+            $result = Remove-DevOpsGroup -ApiUri $ApiUri -GroupDescriptor $GroupDescriptor
 
-            { Remove-DevOpsGroup -ApiUri $apiUri -GroupDescriptor $groupDescriptor } | Should -Throw
+            Should -InvokeCommand 'Get-AzDevOpsApiVersion' -Times 1
+            $result.success | Should -Be $true
+        }
+    }
 
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -Parameters @{
-                Uri = "$apiUri/_apis/graph/groups/$groupDescriptor?api-version=7.1-preview.1"
-                Method = 'Delete'
-                ContentType = 'application/json'
-            }
+    Context 'When an error occurs during the API call' {
+        Mock Invoke-AzDevOpsApiRestMethod -MockWith {
+            throw "API call failed"
+        }
+
+        It 'should catch and log the error' {
+            { Remove-DevOpsGroup -ApiUri $ApiUri -GroupDescriptor $GroupDescriptor } | Should -Throw
+
+            $error[0].Exception.Message | Should -Be "Failed to remove group: API call failed"
         }
     }
 }

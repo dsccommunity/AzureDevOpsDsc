@@ -1,52 +1,79 @@
+
 Describe "New-DevOpsGroupMember Tests" {
-    Mock Get-AzDevOpsApiVersion { return "6.0-preview.1" }
-    Mock Invoke-AzDevOpsApiRestMethod
 
-    $GroupIdentity = [pscustomobject]@{ descriptor = "vssgp.Uy8yNTarDUI1LTE4N" }
-    $MemberIdentity = [pscustomobject]@{ descriptor = "aad.MjU2ZDQtNzQtNDAwOA" }
-    $ApiUri = "https://dev.azure.com/myorg"
+    Mock Get-AzDevOpsApiVersion {
+        return "3.0-preview"
+    }
 
-    Context "When all mandatory parameters are provided" {
-        It "Calls Invoke-AzDevOpsApiRestMethod with constructed URI and method" {
-            $result = New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
-
-            $expectedUri = "{0}/_apis/graph/memberships/{1}/{2}?api-version={3}" -f $ApiUri, $MemberIdentity.descriptor, $GroupIdentity.descriptor, "6.0-preview.1"
-
-            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter {
-                $params.Uri -eq $expectedUri -and
-                $params.Method -eq "PUT"
-            }
+    Mock Invoke-AzDevOpsApiRestMethod {
+        return @{
+            success = $true
+            message = "Member added successfully"
         }
     }
 
-    Context "When ApiVersion parameter is provided" {
-        It "Uses the provided ApiVersion in the URI" {
-            $ApiVersion = "5.1"
-            $result = New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri -ApiVersion $ApiVersion
+    Mock Write-Verbose
+    Mock Write-Error
 
-            $expectedUri = "{0}/_apis/graph/memberships/{1}/{2}?api-version={3}" -f $ApiUri, $MemberIdentity.descriptor, $GroupIdentity.descriptor, $ApiVersion
+    Context "When adding a new member to a DevOps group" {
 
-            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter {
-                $params.Uri -eq $expectedUri -and
-                $params.Method -eq "PUT"
-            }
-        }
-    }
+        It "should call Get-AzDevOpsApiVersion if ApiVersion is not provided" {
+            $GroupIdentity = [PSCustomObject]@{ descriptor = "group-descriptor" }
+            $MemberIdentity = [PSCustomObject]@{ descriptor = "member-descriptor" }
+            $ApiUri = "https://dev.azure.com/organization"
 
-    Context "When Invoke-AzDevOpsApiRestMethod throws an error" {
-        Mock Invoke-AzDevOpsApiRestMethod { throw "REST call failed" } -Verifiable -Scope It
-        It "Catches and writes an error" {
-            { New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri } | Should -Throw
-
-            Assert-MockCalled -MockName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It
-        }
-    }
-
-    Context "When Get-AzDevOpsApiVersion is called" {
-        It "Calls Get-AzDevOpsApiVersion to get the default ApiVersion" {
             New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
 
-            Assert-MockCalled -MockName Get-AzDevOpsApiVersion -Times 1 -Exactly -Scope It
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1 -Scope It
+        }
+
+        It "should not call Get-AzDevOpsApiVersion if ApiVersion is provided" {
+            $GroupIdentity = [PSCustomObject]@{ descriptor = "group-descriptor" }
+            $MemberIdentity = [PSCustomObject]@{ descriptor = "member-descriptor" }
+            $ApiVersion = "6.0"
+            $ApiUri = "https://dev.azure.com/organization"
+
+            New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri -ApiVersion $ApiVersion
+
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0 -Scope It
+        }
+
+        It "should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
+            $GroupIdentity = [PSCustomObject]@{ descriptor = "group-descriptor" }
+            $MemberIdentity = [PSCustomObject]@{ descriptor = "member-descriptor" }
+            $ApiVersion = "6.0"
+            $ApiUri = "https://dev.azure.com/organization"
+            $expectedUri = "$ApiUri/_apis/graph/memberships/$($MemberIdentity.descriptor)/$($GroupIdentity.descriptor)?api-version=$ApiVersion"
+
+            New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri -ApiVersion $ApiVersion
+
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
+                $Uri -eq $expectedUri -and $Method -eq "PUT"
+            }
+        }
+
+        It "should write a verbose message if member is added successfully" {
+            $GroupIdentity = [PSCustomObject]@{ descriptor = "group-descriptor" }
+            $MemberIdentity = [PSCustomObject]@{ descriptor = "member-descriptor" }
+            $ApiUri = "https://dev.azure.com/organization"
+
+            New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
+
+            Assert-MockCalled Write-Verbose -Exactly 3
+        }
+
+        It "should write an error message if adding a member to the group fails" {
+            Mock Invoke-AzDevOpsApiRestMethod {
+                throw "API call failed"
+            }
+
+            $GroupIdentity = [PSCustomObject]@{ descriptor = "group-descriptor" }
+            $MemberIdentity = [PSCustomObject]@{ descriptor = "member-descriptor" }
+            $ApiUri = "https://dev.azure.com/organization"
+
+            New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
+
+            Assert-MockCalled Write-Error -Exactly 1 -Scope It
         }
     }
 }

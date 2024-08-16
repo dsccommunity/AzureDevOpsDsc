@@ -1,4 +1,4 @@
-powershell
+
 # ConvertTo-FormattedACL.Tests.ps1
 
 Describe "ConvertTo-FormattedACL" {

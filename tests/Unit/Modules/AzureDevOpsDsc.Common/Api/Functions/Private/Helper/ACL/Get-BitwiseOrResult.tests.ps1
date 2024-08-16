@@ -1,4 +1,4 @@
-powershell
+
 # Unit Tests for Get-BitwiseOrResult function using Pester v5
 
 # Import Pester module if not already imported

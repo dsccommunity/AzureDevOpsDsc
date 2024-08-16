@@ -1,54 +1,38 @@
-Describe "List-DevOpsGroups" {
-    Param (
-        [string]$Organization = "testOrg",
-        [string]$ApiVersion = "6.0-preview.1"
-    )
 
-    Mock -CommandName Get-AzDevOpsApiVersion { return "6.0-preview.1" }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod {
-        return @{
-            value = @(
-                @{
-                    displayName = "Project Administrators"
-                    originId = "abc123"
-                },
-                @{
-                    displayName = "Contributors"
-                    originId = "def456"
-                }
-            )
-        }
+# Unit Test Code for List-DevOpsGroups function using Pester v5
+
+Describe 'List-DevOpsGroups' {
+    Mock Get-AzDevOpsApiVersion { return '6.0-preview' }
+    Mock Invoke-AzDevOpsApiRestMethod { return @{ value = @( @{ id = '1'; displayName = 'Group1' }, @{ id = '2'; displayName = 'Group2' } ) } }
+
+    It 'should call Get-AzDevOpsApiVersion if no ApiVersion is specified' {
+        List-DevOpsGroups -Organization 'myOrg'
+        Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
     }
 
-    Context "Valid Parameters" {
-        It "Should return groups" {
-            $result = List-DevOpsGroups -Organization $Organization
-
-            $result | Should -Not -BeNullOrEmpty
-            $result | Should -BeOfType Array
-            $result.Count | Should -Be 2
-
-            $result[0].displayName | Should -Be "Project Administrators"
-            $result[0].originId | Should -Be "abc123"
-            $result[1].displayName | Should -Be "Contributors"
-            $result[1].originId | Should -Be "def456"
-        }
+    It 'should not call Get-AzDevOpsApiVersion if ApiVersion is specified' {
+        List-DevOpsGroups -Organization 'myOrg' -ApiVersion '5.1'
+        Assert-MockNotCalled Get-AzDevOpsApiVersion
     }
 
-    Context "No Groups Returned" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod { return @{ value = $null } }
-
-        It "Should return null if no groups" {
-            $result = List-DevOpsGroups -Organization $Organization
-
-            $result | Should -BeNull
-        }
+    It 'should use the supplied ApiVersion' {
+        List-DevOpsGroups -Organization 'myOrg' -ApiVersion '5.1'
+        # Ensure the ApiVersion parameter wasn't used but mocked instead
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter { $params.Uri -eq 'https://vssps.dev.azure.com/myOrg/_apis/graph/groups' -and $params.ApiVersion -eq '5.1'}
     }
 
-    Context "Mandatory Parameter -Organization" {
-        It "Should throw an error if missing -Organization" {
-            { List-DevOpsGroups } | Should -Throw -ErrorId "ParameterArgumentTransformationError"
-        }
+    It 'should return group data' {
+        $result = List-DevOpsGroups -Organization 'myOrg'
+        $result | Should -BeOfType 'System.Object[]'
+        $result.Count | Should -Be 2
+        $result[0].displayName | Should -Be 'Group1'
+    }
+
+    It 'should return null if no groups are found' {
+        Mock Invoke-AzDevOpsApiRestMethod { return @{ value = $null } }
+        $result = List-DevOpsGroups -Organization 'myOrg'
+        $result | Should -Be $null
     }
 }
+
 

@@ -1,66 +1,57 @@
+
 Describe 'List-UserCache' {
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{
-            value = @(
-                @{ id = 1; displayName = 'User One' }
-                @{ id = 2; displayName = 'User Two' }
-            )
-        }
-    }
+    Mock Get-AzDevOpsApiVersion { return "5.0-preview.1" }
+    Mock Invoke-AzDevOpsApiRestMethod
 
-    Mock Get-AzDevOpsApiVersion {
-        return '6.0'
-    }
-
-    Context 'When called with a mandatory OrganizationName' {
-        It 'Should return users from the cache' {
-            $result = List-UserCache -OrganizationName 'TestOrg'
-            $result | Should -BeOfType 'System.Object[]'
-            $result.Count | Should -Be 2
-            $result[0].displayName | Should -Be 'User One'
-            $result[1].displayName | Should -Be 'User Two'
-        }
-
-        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
-            List-UserCache -OrganizationName 'TestOrg'
-            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $Uri -eq 'https://vssps.dev.azure.com/TestOrg/_apis/graph/users' -and $Method -eq 'Get'
-            }
-        }
-
-        It 'Should call Get-AzDevOpsApiVersion once' {
-            List-UserCache -OrganizationName 'TestOrg'
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1 -Scope It
-        }
-    }
-
-    Context 'When no users are returned' {
-        Mock Invoke-AzDevOpsApiRestMethod {
-            return @{
-                value = $null
-            }
-        }
-
-        It 'Should return $null when no users are returned' {
-            $result = List-UserCache -OrganizationName 'TestOrg'
-            $result | Should -Be $null
-        }
-    }
-
-    Context 'When ApiVersion is provided' {
-        Mock Invoke-AzDevOpsApiRestMethod {
-            return @{
+    Context 'when called with valid OrganizationName' {
+        It 'should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            $OrganizationName = 'TestOrg'
+            $ApiVersion = '5.0-preview.1'
+            $response = @{
                 value = @(
-                    @{ id = 3; displayName = 'User Three' }
+                    @{ displayName = 'User1' }
+                    @{ displayName = 'User2' }
                 )
             }
-        }
 
-        It 'Should use the provided ApiVersion' {
-            $result = List-UserCache -OrganizationName 'TestOrg' -ApiVersion '5.0'
+            Mock Invoke-AzDevOpsApiRestMethod { return $response }
+
+            $result = List-UserCache -OrganizationName $OrganizationName -ApiVersion $ApiVersion
+
+            $expectedUri = "https://vssps.dev.azure.com/$OrganizationName/_apis/graph/users"
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter {
+                $params.Uri -eq $expectedUri -and $params.Method -eq 'Get'
+            }
+
             $result | Should -BeOfType 'System.Object[]'
-            $result.Count | Should -Be 1
-            $result[0].displayName | Should -Be 'User Three'
+            $result.Count | Should -Be 2
+            $result[0].displayName | Should -Be 'User1'
+            $result[1].displayName | Should -Be 'User2'
+        }
+    }
+
+    Context 'when API returns null' {
+        It 'should return null' {
+            $OrganizationName = 'TestOrg'
+            $ApiVersion = '5.0-preview.1'
+
+            Mock Invoke-AzDevOpsApiRestMethod { return @{ value = $null } }
+
+            $result = List-UserCache -OrganizationName $OrganizationName -ApiVersion $ApiVersion
+
+            $result | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'when ApiVersion is not provided' {
+        It 'should call Get-AzDevOpsApiVersion' {
+            $OrganizationName = 'TestOrg'
+
+            Mock Get-AzDevOpsApiVersion { return "5.0-preview.1" -Verifiable }
+
+            $result = List-UserCache -OrganizationName $OrganizationName
+
+            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Times 1 -Exactly -Scope It
         }
     }
 }

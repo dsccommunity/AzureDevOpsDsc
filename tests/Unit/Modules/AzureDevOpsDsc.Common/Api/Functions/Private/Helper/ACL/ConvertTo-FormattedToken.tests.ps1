@@ -1,4 +1,4 @@
-powershell
+
 # ConvertTo-FormattedToken.Tests.ps1
 
 Describe "ConvertTo-FormattedToken" {
@@ -13,7 +13,7 @@ Describe "ConvertTo-FormattedToken" {
         }
 
         $result = ConvertTo-FormattedToken -Token $token
-        
+
         $result | Should -Be 'repoV2'
     }
 
@@ -24,7 +24,7 @@ Describe "ConvertTo-FormattedToken" {
         }
 
         $result = ConvertTo-FormattedToken -Token $token
-        
+
         $result | Should -Be 'repoV2/myProject'
     }
 
@@ -36,7 +36,7 @@ Describe "ConvertTo-FormattedToken" {
         }
 
         $result = ConvertTo-FormattedToken -Token $token
-        
+
         $result | Should -Be 'repoV2/myProject/myRepo'
     }
 
@@ -46,7 +46,7 @@ Describe "ConvertTo-FormattedToken" {
         }
 
         $result = ConvertTo-FormattedToken -Token $token
-        
+
         $result | Should -Be ''
     }
 
@@ -54,7 +54,7 @@ Describe "ConvertTo-FormattedToken" {
         $token = @{}
 
         $result = ConvertTo-FormattedToken -Token $token
-        
+
         $result | Should -Be ''
     }
 }

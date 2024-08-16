@@ -1,4 +1,4 @@
-powershell
+
 # Mock functions
 Function List-DevOpsProjects {
     param (
@@ -35,7 +35,7 @@ Function Export-CacheObject {
 
 # Actual tests
 Describe 'AzDoAPI_0_ProjectCache' {
-    
+
     BeforeEach {
         $Global:DSCAZDO_OrganizationName = "GlobalOrganization"
     }

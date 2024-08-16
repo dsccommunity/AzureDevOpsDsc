@@ -1,4 +1,4 @@
-powershell
+
 # Unit Tests for Find-Identity function
 Describe 'Find-Identity Function Tests' {
     # Mock Get-CacheObject to return test data
@@ -6,12 +6,12 @@ Describe 'Find-Identity Function Tests' {
         Param(
             [string]$CacheType
         )
-        
+
         switch ($CacheType) {
-            'LiveGroups' { 
+            'LiveGroups' {
                 @{ value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'groupDescriptor'; id = 'groupId'; originId = 'groupOrigin'; principalName = 'groupPrincipal'; displayName = 'groupDisplay' } } }
             }
-            'LiveUsers' { 
+            'LiveUsers' {
                 @{ value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'userDescriptor'; id = 'userId'; originId = 'userOrigin'; principalName = 'userPrincipal'; displayName = 'userDisplay' } } }
             }
             'LiveServicePrinciples' {
@@ -26,25 +26,25 @@ Describe 'Find-Identity Function Tests' {
             [string]$OrganizationName,
             [string]$Descriptor
         )
-        
+
         return [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'apiDescriptor'; id = 'apiId'; originId = 'apiOrigin'; principalName = 'apiPrincipal'; displayName = 'apiDisplay' } }
     }
 
     It 'Should return group identity for valid group descriptor' {
         $result = Find-Identity -Name 'groupDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-        
+
         $result.value.ACLIdentity.descriptor | Should -Be 'groupDescriptor'
     }
 
     It 'Should return user identity for valid user descriptor' {
         $result = Find-Identity -Name 'userDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-        
+
         $result.value.ACLIdentity.descriptor | Should -Be 'userDescriptor'
     }
 
     It 'Should return null for non-existent descriptor' {
         $result = Find-Identity -Name 'nonExistentDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-        
+
         $result | Should -BeNullOrEmpty
     }
 
@@ -53,9 +53,9 @@ Describe 'Find-Identity Function Tests' {
         Mock Get-CacheObject {
             @{}
         }
-        
+
         $result = Find-Identity -Name 'apiDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-        
+
         $result.ACLIdentity.descriptor | Should -Be 'apiDescriptor'
     }
 
@@ -69,7 +69,7 @@ Describe 'Find-Identity Function Tests' {
         }
 
         $result = Find-Identity -Name 'duplicateDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-        
+
         $result | Should -BeNullOrEmpty
     }
 }

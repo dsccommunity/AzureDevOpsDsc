@@ -1,38 +1,54 @@
+
 Describe "List-DevOpsSecurityNamespaces" {
-    Mock -ModuleName ModuleName -FunctionName Invoke-AzDevOpsApiRestMethod {
+    Mock Invoke-AzDevOpsApiRestMethod {
         return @{
             value = @(
-                @{ id = 'namespace1'; name = 'Namespace 1' },
-                @{ id = 'namespace2'; name = 'Namespace 2' }
+                @{
+                    namespaceId = "testNamespace1"
+                    description = "Test Namespace 1"
+                },
+                @{
+                    namespaceId = "testNamespace2"
+                    description = "Test Namespace 2"
+                }
             )
         }
     }
 
-    Context "With valid OrganizationName" {
-        It "Returns the security namespaces" {
-            $result = List-DevOpsSecurityNamespaces -OrganizationName 'testOrg'
-            $result | Should -Not -BeNullOrEmpty
-            $result | Should -HaveCount 2
-            $result[0].name | Should -Be 'Namespace 1'
-            $result[1].name | Should -Be 'Namespace 2'
-        }
+    It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
+        $organizationName = "TestOrganization"
+
+        List-DevOpsSecurityNamespaces -OrganizationName $organizationName
+
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+            $params['Uri'] -eq "https://dev.azure.com/$organizationName/_apis/securitynamespaces/" -and
+            $params['Method'] -eq 'Get'
+        } -Times 1
     }
 
-    Context "With no OrganizationName" {
-        It "Throws a parameter binding exception" {
-            { List-DevOpsSecurityNamespaces } | Should -Throw -ErrorId 'ParameterBindingValidationException'
-        }
+    It "Should return the namespaces value when present" {
+        $organizationName = "TestOrganization"
+
+        $result = List-DevOpsSecurityNamespaces -OrganizationName $organizationName
+
+        $result | Should -BeOfType @()
+        $result | Should -HaveCount 2
+        $result[0].namespaceId | Should -Be "testNamespace1"
+        $result[1].namespaceId | Should -Be "testNamespace2"
     }
 
-    Context "With no namespaces returned" {
-        Mock -ModuleName ModuleName -FunctionName Invoke-AzDevOpsApiRestMethod {
-            return @{ value = @() }
+    It "Should return $null when there are no namespaces" {
+        Mock Invoke-AzDevOpsApiRestMethod {
+            return @{
+                value = $null
+            }
         }
 
-        It "Returns $null" {
-            $result = List-DevOpsSecurityNamespaces -OrganizationName 'testOrg'
-            $result | Should -BeNull
-        }
+        $organizationName = "TestOrganization"
+
+        $result = List-DevOpsSecurityNamespaces -OrganizationName $organizationName
+
+        $result | Should -Be $null
     }
 }
 

@@ -1,4 +1,4 @@
-powershell
+
 # Mock List-DevOpsGroups function
 Function Mock-List-DevOpsGroups {
     param(
@@ -70,10 +70,10 @@ Describe "AzDoAPI_1_GroupCache Tests" {
         Should -Invoke Add-CacheItem -Times 2
         Should -Invoke Export-CacheObject -Once
     }
-    
+
     It "should call Add-CacheItem for each group" {
         AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
-        
+
         # Assertions
         Should -Invoke Add-CacheItem -Times 2 -Exactly -ArgumentList @{
             Key = 'Group1'
@@ -95,7 +95,7 @@ Describe "AzDoAPI_1_GroupCache Tests" {
 
     It "should export cache after adding groups" {
         AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
-        
+
         # Assertions
         Should -Invoke Export-CacheObject -Exactly -ArgumentList @{
             CacheType = 'LiveGroups'

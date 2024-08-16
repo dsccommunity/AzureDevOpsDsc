@@ -1,4 +1,4 @@
-powershell
+
 $hereScript = @"
 Function Test-Initialize-CacheObject {
 
@@ -23,11 +23,11 @@ Function Test-Initialize-CacheObject {
             $mockPath = "C:\CacheDir\Cache"
             $null = New-Item -Path $($mockPath) -ItemType Directory -Force
         }
-        
+
         AfterAll {
             Remove-Item -Path "C:\CacheDir" -Recurse -Force
         }
-        
+
         Context "When Cache File Does Not Exist" {
 
             It "Should Create Cache Directory If Not Exists" {

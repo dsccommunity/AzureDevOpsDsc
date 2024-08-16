@@ -1,4 +1,4 @@
-powershell
+
 # Unit Tests for New-AzDevOpsACLToken function
 Describe 'New-AzDevOpsACLToken' {
     Context 'When TeamId is provided' {
@@ -7,9 +7,9 @@ Describe 'New-AzDevOpsACLToken' {
             $ProjectId = "MyProject"
             $TeamId = "MyTeam"
             $expectedToken = "vstfs:///Classification/TeamProject/$ProjectId/$TeamId"
-            
+
             $result = New-AzDevOpsACLToken -OrganizationName $OrganizationName -ProjectId $ProjectId -TeamId $TeamId
-            
+
             $result | Should -Be $expectedToken
         }
     }
@@ -19,9 +19,9 @@ Describe 'New-AzDevOpsACLToken' {
             $OrganizationName = "Contoso"
             $ProjectId = "MyProject"
             $expectedToken = "vstfs:///Classification/TeamProject/$ProjectId"
-            
+
             $result = New-AzDevOpsACLToken -OrganizationName $OrganizationName -ProjectId $ProjectId
-            
+
             $result | Should -Be $expectedToken
         }
     }
@@ -30,7 +30,7 @@ Describe 'New-AzDevOpsACLToken' {
         It 'Should throw an error if OrganizationName is missing' {
             { New-AzDevOpsACLToken -ProjectId "MyProject" } | Should -Throw
         }
-        
+
         It 'Should throw an error if ProjectId is missing' {
             { New-AzDevOpsACLToken -OrganizationName "Contoso" } | Should -Throw
         }

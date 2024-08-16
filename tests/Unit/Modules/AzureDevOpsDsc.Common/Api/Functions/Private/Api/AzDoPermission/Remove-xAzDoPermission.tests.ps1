@@ -1,34 +1,45 @@
-Describe "Remove-xAzDoPermission Unit Tests" {
 
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { "6.0-preview.1" }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod
+Describe 'Remove-xAzDoPermission' {
+    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { '5.1' }
 
-    Context "When called with mandatory parameters" {
-        It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
-            $orgName = "testOrg"
-            $secNamespaceID = "testNamespaceID"
-            $token = "testToken"
+    Context 'When invoked' {
+        It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+            # Arrange
+            $OrganizationName = 'ExampleOrg'
+            $SecurityNamespaceID = '00000000-0000-0000-0000-000000000000'
+            $TokenName = 'ExampleToken'
+            $ApiVersion = '5.1'
 
-            Remove-xAzDoPermission -OrganizationName $orgName -SecurityNamespaceID $secNamespaceID -TokenName $token
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+                return $true
+            }
 
-            $expectedUri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?tokens={2}&recurse=False&api-version={3}" -f $orgName, $secNamespaceID, $token, "6.0-preview.1"
+            # Act
+            Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
 
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It -Parameters @{
-                Uri = $expectedUri
-                Method = 'DELETE'
+            # Assert
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
+                $Uri -eq "https://dev.azure.com/$OrganizationName/_apis/accesscontrollists/$SecurityNamespaceID?tokens=$TokenName&recurse=False&api-version=$ApiVersion" -and
+                $Method -eq 'DELETE'
             }
         }
-    }
 
-    Context "When an exception occurs" {
-        It "Should catch the exception and write an error message" {
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API error" }
+        It 'Should handle exceptions and write error message' {
+            # Arrange
+            $OrganizationName = 'ExampleOrg'
+            $SecurityNamespaceID = '00000000-0000-0000-0000-000000000000'
+            $TokenName = 'ExampleToken'
+            $ApiVersion = '5.1'
 
-            {
-                Remove-xAzDoPermission -OrganizationName "testOrg" -SecurityNamespaceID "testNamespaceID" -TokenName "testToken"
-            } | Should -Throw
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+                throw 'An error occurred'
+            }
 
-            Assert-MockCalled -CommandName Write-Error -Exactly -Times 1 -Scope It -Parameters @("[Remove-xAzDoPermission] Failed to add member to group: API error")
+            # Act
+            { Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion } | Should -Throw
+
+            # Assert
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It
         }
     }
 }

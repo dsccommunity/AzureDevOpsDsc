@@ -1,4 +1,4 @@
-powershell
+
 # Find-CacheItem.Tests.ps1
 
 # Import the module or the script containing the function

@@ -1,45 +1,39 @@
-Describe 'List-DevOpsProcess' {
-    Param (
-        [string]$Organization = "TestOrg",
-        [string]$ApiVersion = "6.0-preview.1"
-    )
 
-    Mock Get-AzDevOpsApiVersion { "6.0-preview.1" }
+Describe 'List-DevOpsProcess' {
+    Mock Get-AzDevOpsApiVersion { return "6.0" }
     Mock Invoke-AzDevOpsApiRestMethod {
         return @{
             value = @(
-                @{ name = "Agile" },
-                @{ name = "Scrum" }
+                @{ id = "1"; name = "Agile" }
+                @{ id = "2"; name = "Scrum" }
             )
         }
     }
 
-    It 'Returns processes when provided valid organization' {
-        $result = List-DevOpsProcess -Organization $Organization
-        $result | Should -Not -BeNullOrEmpty
-        $result | Should -Contain @{
-            name = "Agile"
-        }
-        $result | Should -Contain @{
-            name = "Scrum"
+    Context 'When called with mandatory parameters' {
+        It 'should return the process groups' {
+            $result = List-DevOpsProcess -Organization "MyOrganization"
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType 'System.Object[]'
+            $result.Count | Should -Be 2
         }
     }
 
-    It 'Uses default ApiVersion when not provided' {
-        List-DevOpsProcess -Organization $Organization
-        Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1 -Scope It
+    Context 'When no processes are returned' {
+        Mock Invoke-AzDevOpsApiRestMethod { return @{ value = $null } -MockScope It }
+
+        It 'should return $null' {
+            $result = List-DevOpsProcess -Organization "MyOrganization"
+            $result | Should -Be $null
+        }
     }
 
-    It 'Returns null when no processes are present' {
-        Mock Invoke-AzDevOpsApiRestMethod { return @{ value = @() } }
-        $result = List-DevOpsProcess -Organization $Organization
-        $result | Should -BeNull
-    }
-
-    It 'Calls Invoke-AzDevOpsApiRestMethod with correct parameters' {
-        List-DevOpsProcess -Organization $Organization -ApiVersion $ApiVersion
-        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
-            $params.Uri -eq "https://dev.azure.com/TestOrg/_apis/process/processes?api-version=6.0-preview.1"
+    Context 'When a specific API version is provided' {
+        It 'should call Invoke-AzDevOpsApiRestMethod with the specified version' {
+            $result = List-DevOpsProcess -Organization "MyOrganization" -ApiVersion "5.1"
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
+                $params['Uri'] -eq 'https://dev.azure.com/MyOrganization/_apis/process/processes?api-version=5.1'
+            }
         }
     }
 }
