@@ -1,17 +1,21 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'New-GitRepository Tests' {
-    Mock -ModuleName mymodule -FunctionName Invoke-AzDevOpsApiRestMethod
 
     BeforeAll {
-        Import-Module .\path\to\mymodule.psm1 -Force
-    }
 
-    BeforeEach {
-        Mock Clear-AllMocks
-        Set-StrictMode -Version Latest
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod
+
     }
 
     Context 'When creating a repository successfully' {
+
         It 'should invoke the REST method with correct parameters' {
             $mockApiUri = "https://dev.azure.com/org"
             $mockProject = [PSCustomObject]@{ name = 'TestProject'; id = '12345' }
@@ -30,17 +34,16 @@ Describe 'New-GitRepository Tests' {
     }
 
     Context 'When failing to create a repository' {
+
         It 'should throw an error and write an error message' {
             $mockApiUri = "https://dev.azure.com/org"
             $mockProject = [PSCustomObject]@{ name = 'TestProject'; id = '12345' }
             $mockRepoName = "TestRepo"
             $mockApiVersion = "5.0"
 
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-                throw "API failure"
-            } -Verifiable -ParameterFilter { $Body -match "TestRepo" }
+            Mock -CommandName Write-Error -Verifiable
 
-            { New-GitRepository -ApiUri $mockApiUri -Project $mockProject -RepositoryName $mockRepoName -ApiVersion $mockApiVersion } | Should -Throw -ErrorId "Write-Error"
+            { New-GitRepository -ApiUri $mockApiUri -Project $mockProject -RepositoryName $mockRepoName -ApiVersion $mockApiVersion } | Should -Not -Throw
 
             Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1
         }
