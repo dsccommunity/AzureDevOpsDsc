@@ -1,22 +1,34 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'List-DevOpsServicePrinciples' {
-    Mock Get-AzDevOpsApiVersion {
-        return '6.0-preview.1'
-    }
 
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{
-            value = @(
-                @{
-                    id = 'sp1'
-                    displayName = 'Service Principal 1'
-                },
-                @{
-                    id = 'sp2'
-                    displayName = 'Service Principal 2'
-                }
-            )
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
+
+        Mock -CommandName Get-AzDevOpsApiVersion {
+            return '6.0-preview.1'
+        }
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+            return @{
+                value = @(
+                    @{
+                        id = 'sp1'
+                        displayName = 'Service Principal 1'
+                    },
+                    @{
+                        id = 'sp2'
+                        displayName = 'Service Principal 2'
+                    }
+                )
+            }
+        }
+
     }
 
     Context 'When called with valid OrganizationName' {
@@ -52,14 +64,16 @@ Describe 'List-DevOpsServicePrinciples' {
     }
 
     Context 'When API returns null' {
-        Mock Invoke-AzDevOpsApiRestMethod {
-            return @{ value = $null }
-        }
 
         It 'Returns null' {
-            $result = List-DevOpsServicePrinciples -OrganizationName 'MyOrg'
 
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+                return @{ value = $null }
+            }
+
+            $result = List-DevOpsServicePrinciples -OrganizationName 'MyOrg'
             $result | Should -BeNull
+
         }
     }
 }
