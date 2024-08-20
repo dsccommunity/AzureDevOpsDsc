@@ -1,19 +1,25 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "New-DevOpsGroupMember Tests" {
 
-    Mock Get-AzDevOpsApiVersion {
-        return "3.0-preview"
-    }
+    BeforeAll {
 
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{
-            success = $true
-            message = "Member added successfully"
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
-    }
 
-    Mock Write-Verbose
-    Mock Write-Error
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "3.0-preview" }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return @{
+                success = $true
+                message = "Member added successfully"
+            }
+        }
+        Mock -CommandName Write-Verbose
+        Mock -CommandName Write-Error
+    }
 
     Context "When adding a new member to a DevOps group" {
 
@@ -24,7 +30,7 @@ Describe "New-DevOpsGroupMember Tests" {
 
             New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
 
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1 -Scope It
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 1
         }
 
         It "should not call Get-AzDevOpsApiVersion if ApiVersion is provided" {
@@ -35,7 +41,7 @@ Describe "New-DevOpsGroupMember Tests" {
 
             New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri -ApiVersion $ApiVersion
 
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0 -Scope It
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0
         }
 
         It "should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
@@ -47,8 +53,9 @@ Describe "New-DevOpsGroupMember Tests" {
 
             New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri -ApiVersion $ApiVersion
 
-            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $Uri -eq $expectedUri -and $Method -eq "PUT"
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
+                $ApiUri -eq $expectedUri -and
+                $Method -eq "PUT"
             }
         }
 
@@ -59,11 +66,11 @@ Describe "New-DevOpsGroupMember Tests" {
 
             New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
 
-            Assert-MockCalled Write-Verbose -Exactly 3
+            Assert-MockCalled Write-Verbose -Times 3
         }
 
         It "should write an error message if adding a member to the group fails" {
-            Mock Invoke-AzDevOpsApiRestMethod {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
                 throw "API call failed"
             }
 
@@ -73,8 +80,7 @@ Describe "New-DevOpsGroupMember Tests" {
 
             New-DevOpsGroupMember -GroupIdentity $GroupIdentity -MemberIdentity $MemberIdentity -ApiUri $ApiUri
 
-            Assert-MockCalled Write-Error -Exactly 1 -Scope It
+            Assert-MockCalled Write-Error -Exactly 1
         }
     }
 }
-

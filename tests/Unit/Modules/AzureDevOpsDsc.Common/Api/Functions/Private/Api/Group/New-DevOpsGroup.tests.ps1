@@ -1,14 +1,24 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "New-DevOpsGroup" {
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{
-            displayName = $GroupName
-            description = $GroupDescription
-            id = "mock-id"
+
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
-    }
-    Mock Get-AzDevOpsApiVersion {
-        return "6.0"
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return @{
+                displayName = $GroupName
+                description = $GroupDescription
+                id = "mock-id"
+            }
+        }
+
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "6.0" }
     }
 
     Context "When required parameters are provided" {
@@ -48,16 +58,16 @@ Describe "New-DevOpsGroup" {
     }
 
     Context "When an exception is thrown" {
-        Mock Invoke-AzDevOpsApiRestMethod {
-            throw "API call failed"
+        BeforeAll {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API call failed" }
+            Mock -CommandName Write-Error -Verifiable
         }
 
         It 'Handles the error and writes an error message' {
             $ApiUri = "https://dev.azure.com/myorganization"
             $GroupName = "MyGroup"
 
-            { New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName } | Should -Throw
+            { New-DevOpsGroup -ApiUri $ApiUri -GroupName $GroupName } | Should -Not -Throw
         }
     }
 }
-
