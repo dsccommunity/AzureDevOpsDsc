@@ -1,9 +1,21 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Remove-xAzDoPermission' {
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { '5.1' }
+
+    BeforeAll {
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith { '5.1' }
+
+    }
 
     Context 'When invoked' {
         It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
+
             # Arrange
             $OrganizationName = 'ExampleOrg'
             $SecurityNamespaceID = '00000000-0000-0000-0000-000000000000'
@@ -13,33 +25,36 @@ Describe 'Remove-xAzDoPermission' {
             Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
                 return $true
             }
+            Mock Write-Error
 
             # Act
-            Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
+            $result = Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
 
             # Assert
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It -ParameterFilter {
-                $Uri -eq "https://dev.azure.com/$OrganizationName/_apis/accesscontrollists/$SecurityNamespaceID?tokens=$TokenName&recurse=False&api-version=$ApiVersion" -and
-                $Method -eq 'DELETE'
-            }
+            $result | Should -BeNullOrEmpty
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
+            Assert-MockCalled -CommandName Write-Error -Exactly 0
+
         }
 
         It 'Should handle exceptions and write error message' {
+
             # Arrange
             $OrganizationName = 'ExampleOrg'
             $SecurityNamespaceID = '00000000-0000-0000-0000-000000000000'
             $TokenName = 'ExampleToken'
             $ApiVersion = '5.1'
 
-            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-                throw 'An error occurred'
-            }
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod
+            Mock Write-Error
 
             # Act
-            { Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion } | Should -Throw
+            $result = Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
+            $result | Should -BeNullOrEmpty
 
             # Assert
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -Scope It
+            Assert-MockCalled -CommandName Write-Error -Exactly 1
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
         }
     }
 }

@@ -1,0 +1,95 @@
+Function Split-RecurivePath {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $false)]
+        [int]$Times = 1
+    )
+
+    1 .. $Times | ForEach-Object {
+        $Path = Split-Path -Path $Path -Parent
+    }
+
+    $Path
+}
+
+Function Invoke-BeforeEachFunctions {
+    param(
+        [string[]]$FileNames
+    )
+
+    # Locate the scriptroot for the module
+    $ScriptRoot = $Global:RepositoryRoot
+
+
+    if ($null -eq $Global:TestPaths) {
+        $Global:TestPaths = Get-ChildItem -Path $ScriptRoot -Recurse -File -Include *.ps1 | Where-Object {
+            ($_.Name -notlike "*Tests.ps1") -or
+            ($_.DirectoryName -notlike "*/\output/\*") -or
+            ($_.DirectoryName -notlike "*\tests\*")
+        }
+    }
+
+    # Perform a lookup for all BeforeEach FileNames
+    $BeforeEachPath = @()
+    ForEach ($FileName in $FileNames) {
+        $BeforeEachPath += $Global:TestPaths | Where-Object { $_.Name -eq $FileName }
+    }
+
+    return $BeforeEachPath
+
+    # Load all BeforeEach scripts
+    ForEach ($Path in $BeforeEachPath) {
+        . $Path.FullName
+    }
+
+}
+
+Function Find-Functions {
+    param(
+        [String]$TestFilePath
+    )
+
+    $files = @()
+
+    #
+    # Using the File path of the test file, work out the function that is being tested
+    $FunctionName = (Get-Item -LiteralPath $TestFilePath).BaseName -replace '\.tests$', ''
+    $files += "$($FunctionName).ps1"
+
+    #
+    # Load the function into the AST and look for the mock commands.
+
+    # Parse the PowerShell script file
+    $AST = [System.Management.Automation.Language.Parser]::ParseFile($TestFilePath, [ref]$null, [ref]$null)
+
+    # Find all the Mock commands
+    $MockCommands = $AST.FindAll({
+        $args[0] -is [System.Management.Automation.Language.CommandAst] -and
+        $args[0].CommandElements[0].Value -eq 'Mock'
+    }, $true)
+
+    # Iterate over the Mock commands and find the CommandName parameter
+    foreach ($mockCommand in $MockCommands) {
+
+        # Iterate over the CommandElements
+        foreach ($element in $mockCommand.CommandElements) {
+
+            # Check if the element is a CommandParameterAst and the parameter name is CommandName
+            if ($element -is [System.Management.Automation.Language.CommandParameterAst] -and $element.ParameterName -eq 'CommandName') {
+                $null = $element.Parent.Extent.Text -match '(-CommandName\s+(?<Function>[^\s]+))|(^Mock (?<Function>[^\s]+$))'
+                $files += "$($matches.Function).ps1"
+            }
+        }
+    }
+
+    # Return the unique list of functions
+    $files = $files | Select-Object -Unique
+
+    $files
+
+}
+
+
+Export-ModuleMember -Function Split-RecurivePath, Invoke-BeforeEachFunctions, Find-Functions

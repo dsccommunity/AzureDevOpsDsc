@@ -1,14 +1,24 @@
-
-Import-Module Pester
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Get-DevOpsDescriptorIdentity' {
-    $OrganizationName = "MyOrg"
-    $SubjectDescriptor = "subject:abcd1234"
-    $Descriptor = "descriptor:abcd1234"
-    $ApiVersion = "5.0"
 
-    Mock Get-AzDevOpsApiVersion { return "5.0" }
-    Mock Invoke-AzDevOpsApiRestMethod
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        $OrganizationName = "MyOrg"
+        $SubjectDescriptor = "subject:abcd1234"
+        $Descriptor = "descriptor:abcd1234"
+        $ApiVersion = "5.0"
+
+        Mock -CommandName Get-AzDevOpsApiVersion { return "5.0" }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod
+
+    }
 
     Context 'With Default Parameter Set and SubjectDescriptor' {
         It 'Calls Invoke-AzDevOpsApiRestMethod with correct parameters' {
@@ -36,7 +46,7 @@ Describe 'Get-DevOpsDescriptorIdentity' {
 
     Context 'Handles empty response' {
         It 'Returns $null when identity value is $null' {
-            Mock Invoke-AzDevOpsApiRestMethod { return @{ value = $null; count = 0 } }
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod { return @{ value = $null; count = 0 } }
 
             $result = Get-DevOpsDescriptorIdentity -OrganizationName $OrganizationName -SubjectDescriptor $SubjectDescriptor
 
@@ -44,7 +54,7 @@ Describe 'Get-DevOpsDescriptorIdentity' {
         }
 
         It 'Returns $null when count is greater than 1' {
-            Mock Invoke-AzDevOpsApiRestMethod { return @{ value = @('identity1', 'identity2'); count = 2 } }
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod { return @{ value = @('identity1', 'identity2'); count = 2 } }
 
             $result = Get-DevOpsDescriptorIdentity -OrganizationName $OrganizationName -SubjectDescriptor $SubjectDescriptor
 
@@ -55,7 +65,7 @@ Describe 'Get-DevOpsDescriptorIdentity' {
     Context 'Handles valid response' {
         It 'Returns identity value when count is 1' {
             $expectedValue = @('identity1')
-            Mock Invoke-AzDevOpsApiRestMethod { return @{ value = $expectedValue; count = 1 } }
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod { return @{ value = $expectedValue; count = 1 } }
 
             $result = Get-DevOpsDescriptorIdentity -OrganizationName $OrganizationName -SubjectDescriptor $SubjectDescriptor
 

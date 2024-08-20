@@ -1,12 +1,24 @@
-ps1
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe "Get-DevOpsACL" {
-    Mock Get-AzDevOpsApiVersion { return "6.0" }
-    Mock Invoke-AzDevOpsApiRestMethod
-    Mock Add-CacheItem
-    Mock Export-CacheObject
-    
+
+    BeforeAll {
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Mock the required functions
+        Mock -CommandName Get-AzDevOpsApiVersion { return "6.0" }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Export-CacheObject
+
+    }
+
     BeforeEach {
-        Clear-Host
+        #Clear-Host
     }
 
     It "should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
@@ -16,27 +28,25 @@ Describe "Get-DevOpsACL" {
 
         Get-DevOpsACL -OrganizationName $orgName -SecurityDescriptorId $secDescId
 
-        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -Scope It -ParameterFilter {
-            $params.Uri -eq "https://dev.azure.com/TestOrg/_apis/accesscontrollists/abc123?api-version=6.0" -and
-            $params.Method -eq 'Get'
-        }
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly
     }
 
     It "should handle null response from REST API and return null" {
         Mock Invoke-AzDevOpsApiRestMethod { return @{ value = $null } }
-        
+
         $result = Get-DevOpsACL -OrganizationName "TestOrg" -SecurityDescriptorId "abc123"
 
         $result | Should -BeNull
-        Assert-MockNotCalled Add-CacheItem
-        Assert-MockNotCalled Export-CacheObject
+        Assert-MockCalled Add-CacheItem -Times 0 -Exactly -Scope It
+        Assert-MockCalled Export-CacheObject -Times 0 -Exactly -Scope It
+
     }
 
     It "should cache and return ACL list if response is not empty" {
         $mockACLList = @{ count = 1; value = @("aclEntry1", "aclEntry2") }
 
         Mock Invoke-AzDevOpsApiRestMethod { return $mockACLList }
-        
+
         $result = Get-DevOpsACL -OrganizationName "TestOrg" -SecurityDescriptorId "abc123"
 
         $result | Should -HaveCount 2

@@ -1,15 +1,24 @@
-
-# Load required module
-Import-Module Pester
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Set-xAzDoPermission Tests' {
-    Mock Get-AzDevOpsApiVersion { return '6.0-preview.1' }
-    Mock Invoke-AzDevOpsApiRestMethod { return $null }
 
-    $OrganizationName = "TestOrg"
-    $SecurityNamespaceID = "TestNamespace"
-    $SerializedACLs = @{some = "data"}
-    $ApiVersion = "5.0"
+    BeforeAll {
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-AzDevOpsApiVersion { return '6.0-preview.1' }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod { return $null }
+
+        $OrganizationName = "TestOrg"
+        $SecurityNamespaceID = "TestNamespace"
+        $SerializedACLs = @{some = "data"}
+        $ApiVersion = "5.0"
+
+    }
+
 
     Context 'When Mandatory Parameters are provided' {
         It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
@@ -42,7 +51,7 @@ Describe 'Set-xAzDoPermission Tests' {
     }
 
     Context 'When an exception occurs' {
-        Mock Invoke-AzDevOpsApiRestMethod { throw "API call failed" }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod { throw "API call failed" }
 
         It 'Should catch and log the error' {
             $ErrorActionPreference = 'Stop'
