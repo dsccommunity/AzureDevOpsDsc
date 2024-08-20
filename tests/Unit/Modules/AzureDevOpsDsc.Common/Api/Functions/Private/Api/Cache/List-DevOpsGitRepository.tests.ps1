@@ -1,7 +1,17 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'List-DevOpsGitRepository' {
-    Mock -ModuleName 'AzDevOps' -Name 'Get-AzDevOpsApiVersion' -MockWith { return '6.0' }
-    Mock -ModuleName 'AzDevOps' -Name 'Invoke-AzDevOpsApiRestMethod'
+
+    BeforeAll {
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return '6.0' }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod
+    }
 
     It 'Returns repositories when API provides data' {
         $mockResult = @{
@@ -11,7 +21,7 @@ Describe 'List-DevOpsGitRepository' {
             )
         }
 
-        Mock Invoke-AzDevOpsApiRestMethod { return $mockResult }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod { return $mockResult }
 
         $result = List-DevOpsGitRepository -OrganizationName 'org' -ProjectName 'proj'
 
@@ -21,15 +31,14 @@ Describe 'List-DevOpsGitRepository' {
     }
 
     It 'Returns null when API does not provide data' {
-        $mockResult = @{
-            value = $null
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+            return @{ value = $null }
         }
 
-        Mock Invoke-AzDevOpsApiRestMethod { return $mockResult }
-
         $result = List-DevOpsGitRepository -OrganizationName 'org' -ProjectName 'proj'
-
         $result | Should -Be $null
+
     }
 
     It 'Uses default API version if not provided' {

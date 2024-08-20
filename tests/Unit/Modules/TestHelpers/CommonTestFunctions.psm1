@@ -25,9 +25,9 @@ Function Invoke-BeforeEachFunctions {
 
     if ($null -eq $Global:TestPaths) {
         $Global:TestPaths = Get-ChildItem -Path $ScriptRoot -Recurse -File -Include *.ps1 | Where-Object {
-            ($_.Name -notlike "*Tests.ps1") -or
-            ($_.DirectoryName -notlike "*/\output/\*") -or
-            ($_.DirectoryName -notlike "*\tests\*")
+            ($_.Name -notlike "*Tests.ps1") -and
+            ($_.DirectoryName.FullName -notlike '*\output\*') -and
+            ($_.DirectoryName.FullName -notlike '*\tests\*')
         }
     }
 
@@ -84,6 +84,8 @@ Function Find-Functions {
         }
     }
 
+    # Ignore the following list of functions
+    $files = $files | Where-Object { $_ -notin @('Write-Error.ps1', 'Write-Output.ps1', 'Write-Verbose.ps1', 'Write-Warning.ps1') }
     # Return the unique list of functions
     $files = $files | Select-Object -Unique
 

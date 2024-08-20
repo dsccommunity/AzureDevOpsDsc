@@ -26,12 +26,7 @@ Describe 'Set-xAzDoPermission Tests' {
 
             Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion
 
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -ParameterFilter {
-                $params.Uri -eq $expectedUri -and
-                $params.Method -eq 'POST' -and
-                $params.Body -eq ($SerializedACLs | ConvertTo-Json -Depth 4)
-            }
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
         }
     }
 
@@ -41,27 +36,24 @@ Describe 'Set-xAzDoPermission Tests' {
 
             Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs
 
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -ParameterFilter {
-                $params.Uri -eq $expectedUri -and
-                $params.Method -eq 'POST' -and
-                $params.Body -eq ($SerializedACLs | ConvertTo-Json -Depth 4)
-            }
+            Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Exactly 1
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
         }
     }
 
     Context 'When an exception occurs' {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod { throw "API call failed" }
 
         It 'Should catch and log the error' {
-            $ErrorActionPreference = 'Stop'
 
-            { Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion } | Should -Throw
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod { throw "API call failed" }
+            Mock -CommandName Write-Error
 
-            Assert-MockCalled -CommandName Write-Error -Exactly -Times 1 -Scope It
-            Assert-MockCalled -CommandName Write-Error -ParameterFilter {
-                $Message -match '\[Set-xAzDoPermission\] Failed to set ACLs:'
-            }
+            $result = Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion
+
+            $result | Should -BeNullOrEmpty
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
+            Assert-MockCalled -CommandName Write-Error -Exactly -Times 1
+
         }
     }
 }

@@ -1,16 +1,27 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "List-DevOpsProjects" {
 
-    Mock -CommandName Get-AzDevOpsApiVersion {
-        return "6.0"
-    }
+    BeforeAll {
 
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod {
-        return @{
-            value = @(
-                @{ name = "Project1"; id = "123" },
-                @{ name = "Project2"; id = "456" }
-            )
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            Wait-Debugger
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith {
+            return "6.0"
+        }
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return @{
+                value = @(
+                    @{ name = "Project1"; id = "123" },
+                    @{ name = "Project2"; id = "456" }
+                )
+            }
         }
     }
 
@@ -23,9 +34,9 @@ Describe "List-DevOpsProjects" {
     }
 
     It "Returns null when no projects found" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
             return @{ value = @() }
-        }
+        } -MockScope It
 
         $result = List-DevOpsProjects -OrganizationName "TestOrg"
         $result | Should -BeNull
@@ -44,4 +55,3 @@ Describe "List-DevOpsProjects" {
     }
 
 }
-

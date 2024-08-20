@@ -25,7 +25,7 @@ Describe 'Remove-xAzDoPermission' {
             Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
                 return $true
             }
-            Mock Write-Error
+            Mock -CommandName Write-Error
 
             # Act
             $result = Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
@@ -46,7 +46,7 @@ Describe 'Remove-xAzDoPermission' {
             $ApiVersion = '5.1'
 
             Mock -CommandName Invoke-AzDevOpsApiRestMethod
-            Mock Write-Error
+            Mock -CommandName Write-Error
 
             # Act
             $result = Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
