@@ -18,6 +18,34 @@ Describe 'List-DevOpsProcess' {
     Context 'When called with mandatory parameters' {
 
         # Validate the call
+        It 'should call Invoke-AzDevOpsApiRestMethod' {
+
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+                return @{ value = @() }
+            }
+
+            List-DevOpsProcess -Organization "MyOrganization"
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+                $apiUri -eq "https://dev.azure.com/MyOrganization/_apis/process/processes?api-version=6.0" -and
+                $Method -eq 'Get'
+            } -Times 1
+        }
+
+        it "should change the url when the api-version changes" {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+                return @{ value = @() }
+            }
+
+            Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "6.1" }
+
+            List-DevOpsProcess -Organization "MyOrganization"
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+                $apiUri -eq "https://dev.azure.com/MyOrganization/_apis/process/processes?api-version=6.1" -and
+                $Method -eq 'Get'
+            } -Times 1
+        }
+
+        # Validate the call
         It 'should return the process groups' {
 
             Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {

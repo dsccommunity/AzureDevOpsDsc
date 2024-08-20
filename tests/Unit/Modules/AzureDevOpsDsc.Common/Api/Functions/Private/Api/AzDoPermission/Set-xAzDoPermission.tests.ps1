@@ -26,7 +26,11 @@ Describe 'Set-xAzDoPermission Tests' {
 
             Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion
 
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
+                $Uri -eq $expectedUri
+                $Method -eq 'POST'
+                $Body -eq $SerializedACLs
+            }
         }
     }
 
@@ -37,7 +41,11 @@ Describe 'Set-xAzDoPermission Tests' {
             Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs
 
             Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Exactly 1
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
+                $Uri -eq $expectedUri
+                $Method -eq 'POST'
+                $Body -eq $SerializedACLs
+            }
         }
     }
 

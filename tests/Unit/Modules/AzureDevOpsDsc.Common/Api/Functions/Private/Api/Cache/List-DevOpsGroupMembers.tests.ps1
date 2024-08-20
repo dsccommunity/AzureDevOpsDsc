@@ -64,7 +64,9 @@ Describe 'List-DevOpsGroupMembers' {
 
             # Inject expected ApiVersion
             $null = List-DevOpsGroupMembers -Organization 'MyOrg' -GroupDescriptor 'MyGroup' -ApiVersion '6.0-preview.1'
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0 -ParameterFilter {
+                $Uri -eq 'https://dev.azure.com/MyOrg/_apis/graph/groups/MyGroup/members?api-version=6.0-preview.1'
+            }
         }
 
     }

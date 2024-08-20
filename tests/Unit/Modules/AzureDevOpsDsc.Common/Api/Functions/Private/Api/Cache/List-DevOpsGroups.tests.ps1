@@ -17,7 +17,7 @@ Describe 'List-DevOpsGroups' {
     Context "When calling List-DevOpsGroups" {
 
         BeforeAll {
-            Mock -CommandName Invoke-APIRestMethod -MockWith {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
                 return @{
                     value = @(
                         @{
@@ -31,9 +31,9 @@ Describe 'List-DevOpsGroups' {
             }
         }
 
-        It 'should call Invoke-APIRestMethod' {
+        It 'should call Invoke-AzDevOpsApiRestMethod' {
             List-DevOpsGroups -Organization 'myOrg'
-            Assert-MockCalled Invoke-APIRestMethod -Exactly 1
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly 1
         }
 
         It 'should call Get-AzDevOpsApiVersion if no ApiVersion is specified' {
@@ -43,7 +43,9 @@ Describe 'List-DevOpsGroups' {
 
         It 'should not call Get-AzDevOpsApiVersion if ApiVersion is specified' {
             List-DevOpsGroups -Organization 'myOrg' -ApiVersion '5.1'
-            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0
+            Assert-MockCalled Get-AzDevOpsApiVersion -Exactly 0 -ParameterFilter {
+                $Uri -eq 'https://dev.azure.com/myOrg/_apis/graph/groups?api-version=5.1'
+            }
         }
 
         It 'should return group data' {
@@ -58,7 +60,7 @@ Describe 'List-DevOpsGroups' {
     Context "When no groups are found" {
 
         BeforeAll {
-            Mock -CommandName Invoke-APIRestMethod -MockWith { return @{ value = $null } }
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { return @{ value = $null } }
         }
 
         It 'should return null if no groups are found' {

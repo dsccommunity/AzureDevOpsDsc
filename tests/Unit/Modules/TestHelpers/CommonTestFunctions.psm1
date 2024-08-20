@@ -20,14 +20,17 @@ Function Invoke-BeforeEachFunctions {
     )
 
     # Locate the scriptroot for the module
+    if ($Global:RepositoryRoot -eq $null) {
+        $Global:RepositoryRoot = Split-RecurivePath $PSScriptRoot -Times 4
+    }
+
     $ScriptRoot = $Global:RepositoryRoot
 
-
     if ($null -eq $Global:TestPaths) {
-        $Global:TestPaths = Get-ChildItem -Path $ScriptRoot -Recurse -File -Include *.ps1 | Where-Object {
-            ($_.Name -notlike "*Tests.ps1") -and
-            ($_.DirectoryName.FullName -notlike '*\output\*') -and
-            ($_.DirectoryName.FullName -notlike '*\tests\*')
+        $Global:TestPaths = Get-ChildItem -LiteralPath $ScriptRoot -Recurse -File -Include *.ps1 | Where-Object {
+            ($_.FullName -notlike "*Tests.ps1") -and
+            ($_.FullName -notlike '*\output\*') -and
+            ($_.FullName -notlike '*\tests\*')
         }
     }
 
@@ -38,11 +41,6 @@ Function Invoke-BeforeEachFunctions {
     }
 
     return $BeforeEachPath
-
-    # Load all BeforeEach scripts
-    ForEach ($Path in $BeforeEachPath) {
-        . $Path.FullName
-    }
 
 }
 

@@ -32,7 +32,10 @@ Describe 'Remove-xAzDoPermission' {
 
             # Assert
             $result | Should -BeNullOrEmpty
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
+                $Uri -eq "https://dev.azure.com/$OrganizationName/_apis/securitynamespaces/$SecurityNamespaceID/descriptors/$TokenName?api-version=$ApiVersion"
+                $Method -eq 'DELETE'
+            }
             Assert-MockCalled -CommandName Write-Error -Exactly 0
 
         }

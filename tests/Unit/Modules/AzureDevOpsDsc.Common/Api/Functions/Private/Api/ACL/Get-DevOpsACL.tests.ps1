@@ -17,10 +17,6 @@ Describe "Get-DevOpsACL" {
 
     }
 
-    BeforeEach {
-        #Clear-Host
-    }
-
     It "should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
         $orgName = "TestOrg"
         $secDescId = "abc123"
@@ -28,7 +24,10 @@ Describe "Get-DevOpsACL" {
 
         Get-DevOpsACL -OrganizationName $orgName -SecurityDescriptorId $secDescId
 
-        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Times 1 -Exactly -ParameterFilter {
+            $Uri -eq "https://dev.azure.com/$orgName/_apis/accesscontrollists/$secDescId?api-version=$apiVersion"
+            $Method -eq "GET"
+        }
     }
 
     It "should handle null response from REST API and return null" {

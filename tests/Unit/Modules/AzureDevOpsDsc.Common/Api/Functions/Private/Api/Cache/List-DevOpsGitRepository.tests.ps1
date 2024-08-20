@@ -61,7 +61,10 @@ Describe 'List-DevOpsGitRepository' {
 
         List-DevOpsGitRepository -OrganizationName $dummyOrg -ProjectName $dummyProj
 
-        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter { $Uri -eq "https://dev.azure.com/$dummyOrg/$dummyProj/_apis/git/repositories" -and $Method -eq 'Get' }
+        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+            $Uri -eq "https://dev.azure.com/$dummyOrg/$dummyProj/_apis/git/repositories" -and
+            $Method -eq 'Get'
+        }
     }
 }
 

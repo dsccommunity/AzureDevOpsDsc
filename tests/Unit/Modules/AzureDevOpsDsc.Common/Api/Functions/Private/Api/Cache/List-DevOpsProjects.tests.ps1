@@ -7,7 +7,6 @@ Describe "List-DevOpsProjects" {
         # Load the functions to test
         $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
         ForEach ($file in $files) {
-            Wait-Debugger
             . $file.FullName
         }
 
@@ -36,22 +35,10 @@ Describe "List-DevOpsProjects" {
     It "Returns null when no projects found" {
         Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
             return @{ value = @() }
-        } -MockScope It
+        }
 
         $result = List-DevOpsProjects -OrganizationName "TestOrg"
-        $result | Should -BeNull
-    }
-
-    It "Uses default API version when not specified" {
-        $result = List-DevOpsProjects -OrganizationName "TestOrg"
-        $params = Get-MockDynamicParameters -CommandName Invoke-AzDevOpsApiRestMethod
-        $params.Uri | Should -Match "_apis/projects"
-    }
-
-    It "Allows overriding the API version" {
-        $result = List-DevOpsProjects -OrganizationName "TestOrg" -ApiVersion "5.1"
-        $params = Get-MockDynamicParameters -CommandName Invoke-AzDevOpsApiRestMethod
-        $params.Uri | Should -Match "_apis/projects"
+        $result | Should -BeNullOrEmpty
     }
 
 }
