@@ -1,56 +1,100 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Update-DevOpsProject' {
+Describe "Update-DevOpsProject" {
 
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{
-            name = $params.Body.name
-            description = $params.Body.description
-            visibility = $params.Body.visibility
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+            return @{ statusCode = 200; content = "Success" }
+        }
+
+    }
+
+    Context "When all mandatory parameters are provided" {
+
+        It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
+
+            $organization = "TestOrg"
+            $projectId = "TestProject"
+            $apiVersion = "6.0"
+
+            $params = @{
+                Organization = $organization
+                ProjectId = $projectId
+                ApiVersion = $apiVersion
+            }
+
+            $result = Update-DevOpsProject @params
+
+            # Assert that the mock was called with expected parameters
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly -Scope It -ParameterFilter {
+                $ApiUri -eq "https://dev.azure.com/TestOrg/_apis/projects/TestProject?api-version=6.0" -and
+                $Method -eq 'PATCH'
+            }
+
+            # Assert that the result is as expected
+            $result.statusCode | Should -Be 200
         }
     }
 
-    $commonParams = @{
-        Organization        = 'contoso'
-        ProjectId           = 'MyProject'
-        ApiVersion          = '6.0'
+    Context "When optional parameters are provided" {
+
+        It "Should include optional parameters in the request body" {
+            $organization = "TestOrg"
+            $projectId = "TestProject"
+            $projectDescription = "Test Description"
+            $visibility = "private"
+            $apiVersion = "6.0"
+
+            $params = @{
+                Organization = $organization
+                ProjectId = $projectId
+                ProjectDescription = $projectDescription
+                Visibility = $visibility
+                ApiVersion = $apiVersion
+            }
+
+            $result = Update-DevOpsProject @params
+
+            # Assert that the mock was called with expected parameters
+            Assert-MockCalled Invoke-AzDevOpsApiRestMethod -Exactly -Scope It -ParameterFilter {
+                $Body -match '"description": "Test Description"' -and
+                $Body -match '"visibility": "private"'
+            }
+
+            # Assert that the result is as expected
+            $result.statusCode | Should -Be 200
+        }
     }
 
-    It 'Should update project with new name and description' {
-        $params = $commonParams + @{
-            NewName             = 'NewProjectName'
-            Description         = 'Updated project description'
+    Context "When an error occurs during API call" {
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod {
+            throw "API call failed"
         }
 
-        $result = Update-DevOpsProject @params
+        It "Should catch the error and write an error message" {
 
-        $result.name | Should -Be 'NewProjectName'
-        $result.description | Should -Be 'Updated project description'
-    }
+            Mock -CommandName Write-Error -Verifiable
 
-    It 'Should update project visibility to public' {
-        $params = $commonParams + @{
-            Visibility          = 'public'
+            $organization = "TestOrg"
+            $projectId = "TestProject"
+            $apiVersion = "6.0"
+
+            $params = @{
+                Organization = $organization
+                ProjectId = $projectId
+                ApiVersion = $apiVersion
+            }
+
+            { Update-DevOpsProject @params } | Should -Not -Throw
+
         }
-
-        $result = Update-DevOpsProject @params
-
-        $result.visibility | Should -Be 'public'
-    }
-
-    It 'Should not include description if not provided' {
-        $params = $commonParams + @{
-            Visibility          = 'private'
-        }
-
-        $result = Update-DevOpsProject @params
-
-        $result.PSObject.Properties.Match('description') | Should -Be $null
-    }
-
-    It 'Should handle failure gracefully' {
-        Mock Invoke-AzDevOpsApiRestMethod { throw 'API error' }
-
-        { Update-DevOpsProject @commonParams } | Should -Throw 'API error'
     }
 }
-

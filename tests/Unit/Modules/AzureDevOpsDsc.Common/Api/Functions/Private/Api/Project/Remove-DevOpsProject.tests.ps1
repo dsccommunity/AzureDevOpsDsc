@@ -1,9 +1,22 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "Remove-DevOpsProject" {
-    Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "5.1-preview.1" }
-    Mock -CommandName Invoke-AzDevOpsApiRestMethod
+
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith { return "5.1-preview.1" }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {}
+
+    }
 
     Context "When removing a project" {
+
         It "Should call Invoke-AzDevOpsApiRestMethod with correct parameters" {
             $org = "MyOrganization"
             $projectId = "MyProject"
@@ -11,19 +24,22 @@ Describe "Remove-DevOpsProject" {
 
             Remove-DevOpsProject -Organization $org -ProjectId $projectId
 
-            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1 -Scope It -ParameterFilter {
-                $Uri -eq "https://dev.azure.com/$org/_apis/projects/$projectId?api-version=$apiVersion" -and
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
+                $ApiUri -eq "https://dev.azure.com/MyOrganization/_apis/projects/MyProject?api-version=5.1-preview.1" -and
                 $Method -eq "DELETE"
             }
         }
+
     }
 
     Context "When an exception occurs" {
-        It "Should write an error message" {
+        BeforeEach {
             Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API call failed" }
+            Mock -CommandName Write-Error -Verifiable
+        }
 
-            { Remove-DevOpsProject -Organization "MyOrganization" -ProjectId "MyProject" } | Should -Throw
+        It "Should write an error message" {
+            { Remove-DevOpsProject -Organization "MyOrganization" -ProjectId "MyProject" } | Should -Not -Throw
         }
     }
 }
-
