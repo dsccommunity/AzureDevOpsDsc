@@ -92,5 +92,18 @@ Function Find-Functions {
 
 }
 
+Function Get-ClassFilePath {
+    param(
+        [string]$FileName
+    )
 
-Export-ModuleMember -Function Split-RecurivePath, Invoke-BeforeEachFunctions, Find-Functions
+    $Class = $Global:TestPaths | Where-Object { ($_.Name -eq $FileName) -or ($_.Name -eq "$FileName.ps1") }
+    return $Class.FullName
+
+}
+
+Function Import-Enums {
+    return ($Global:TestPaths | Where-Object { $_.Directory.Name -eq 'Enum' })
+}
+
+Export-ModuleMember -Function Split-RecurivePath, Invoke-BeforeEachFunctions, Find-Functions, Get-ClassFilePath, Import-Enums
