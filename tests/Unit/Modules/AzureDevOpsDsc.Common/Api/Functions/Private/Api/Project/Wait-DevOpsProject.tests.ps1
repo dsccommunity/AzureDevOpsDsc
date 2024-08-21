@@ -5,6 +5,11 @@ Describe "Wait-DevOpsProject" {
     BeforeAll {
 
         # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Wait-DevOpsProject.tests.ps1'
+        }
+
+        # Load the functions to test
         $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
         ForEach ($file in $files) {
             . $file.FullName

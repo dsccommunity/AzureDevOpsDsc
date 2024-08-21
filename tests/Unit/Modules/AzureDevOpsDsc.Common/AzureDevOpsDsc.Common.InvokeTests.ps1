@@ -32,6 +32,7 @@ Import-Module -Name (Join-Path -Path $script:RepositoryRoot -ChildPath '/tests/U
 
 $script:TestFolders = Get-ChildItem -Path (Join-Path -Path $script:CurrentFolder -ChildPath '\AzureDevOpsDsc.Common') -Directory
 
+Wait-Debugger
 ForEach ($TestFolder in $script:TestFolders) {
     Invoke-Pester -Path $TestFolder.FullName -Output Detailed -PassThru
 }
