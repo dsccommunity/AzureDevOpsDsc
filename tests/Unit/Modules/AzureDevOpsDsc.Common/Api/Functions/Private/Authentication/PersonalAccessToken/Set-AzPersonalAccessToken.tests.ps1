@@ -6,7 +6,7 @@ Describe "Set-AzPersonalAccessToken" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzManagedIdentityToken.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzPersonalAccessToken.tests.ps1'
         }
 
         # Load the functions to test
