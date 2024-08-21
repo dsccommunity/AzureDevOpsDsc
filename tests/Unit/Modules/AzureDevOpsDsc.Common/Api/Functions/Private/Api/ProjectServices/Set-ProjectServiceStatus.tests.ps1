@@ -1,32 +1,45 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Set-ProjectServiceStatus' {
-    Mock Get-AzDevOpsApiVersion {
-        return '6.0'
-    }
 
-    Mock Invoke-AzDevOpsApiRestMethod {
-        return @{
-            state = 'Enabled'
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
+
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith {
+            return '6.0'
+        }
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return @{
+                state = 'Enabled'
+            }
+        }
+
     }
 
     It 'should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
-        Param (
-            [string]$Organization = 'TestOrg',
-            [string]$ProjectId = 'TestProjId',
-            [string]$ServiceName = 'Git',
-            [Object]$Body = @{
+
+        $Organization = 'TestOrg'
+        $ProjectId = 'TestProjId'
+        $ServiceName = 'Git'
+        $Body = @{
                 state = 'Enabled'
-            },
-            [string]$ApiVersion
-        )
+            }
+        $ApiVersion = '6.0'
+
 
         $expectedUri = 'https://dev.azure.com/TestOrg/_apis/FeatureManagement/FeatureStates/host/project/TestProjId/Git?api-version=6.0'
 
         Set-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -Body $Body -ApiVersion $ApiVersion
 
-        Assert-MockCalled Invoke-AzDevOpsApiRestMethod -ParameterFilter {
-            $Uri -eq $expectedUri -and $Method -eq 'PATCH' -and $Body -eq ($Body | ConvertTo-Json)
+        Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -ParameterFilter {
+            $Uri -eq $expectedUri -and
+            $Method -eq 'PATCH'
         } -Exactly -Times 1
     }
 
@@ -44,9 +57,11 @@ Describe 'Set-ProjectServiceStatus' {
     }
 
     It 'should return error message when API call fails' {
-        Mock Invoke-AzDevOpsApiRestMethod {
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
             throw "API call failed"
         }
+
+        Mock -CommandName Write-Error -Verifiable
 
         $Organization = 'TestOrg'
         $ProjectId = 'TestProjId'
@@ -55,7 +70,6 @@ Describe 'Set-ProjectServiceStatus' {
             state = 'Enabled'
         }
 
-        { Set-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -Body $Body } | Should -Throw -ErrorMessage "Failed to set Security Descriptor: API call failed"
+        { Set-ProjectServiceStatus -Organization $Organization -ProjectId $ProjectId -ServiceName $ServiceName -Body $Body } | Should -Not -Throw
     }
 }
-

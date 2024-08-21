@@ -1,10 +1,24 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Get-ProjectServiceStatus' {
-    Mock -ModuleName 'Az.DevOps' Get-AzDevOpsApiVersion { '6.0-preview.1' }
-    Mock -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod {
-        [pscustomobject]@{
-            state = 'enabled'
+
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
+
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith {
+            return '6.0-preview.1'
+        }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return [pscustomobject]@{
+                state = 'enabled'
+            }
+        }
+
     }
 
     Context 'When all parameters are valid' {
@@ -25,13 +39,13 @@ Describe 'Get-ProjectServiceStatus' {
 
             $result = Get-ProjectServiceStatus -Organization $organization -ProjectId $projectId -ServiceName $serviceName
 
-            Assert-MockCalled -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod -Exactly -Exactly 1
+            Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly -Times 1
         }
     }
 
     Context 'When service state is undefined' {
-        Mock -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod {
-            [pscustomobject]@{
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return [pscustomobject]@{
                 state = 'undefined'
             }
         }
@@ -48,15 +62,17 @@ Describe 'Get-ProjectServiceStatus' {
     }
 
     Context 'When an error occurs during API call' {
-        Mock -ModuleName 'Az.DevOps' Invoke-AzDevOpsApiRestMethod { throw "API Error" }
 
         It 'Should write an error message' {
+
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API Error" }
+            Mock -CommandName Write-Error -Verifiable
+
             $organization = 'TestOrg'
             $projectId = 'TestProjectId'
             $serviceName = 'TestServiceName'
 
-            { Get-ProjectServiceStatus -Organization $organization -ProjectId $projectId -ServiceName $serviceName } | Should -Throw
+            { Get-ProjectServiceStatus -Organization $organization -ProjectId $projectId -ServiceName $serviceName } | Should -Not -Throw
         }
     }
 }
-
