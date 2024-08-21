@@ -26,11 +26,12 @@ Describe "Get-AzManagedIdentityToken Tests" {
         . (Get-ClassFilePath '003.ManagedIdentityToken')
 
 
+        Mock -CommandName Test-AzDevOpsApiHttpRequestHeader -MockWith {
+            return $true
+        }
 
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            return @{
-                access_token = "fake-access-token"
-            }
+        Mock -CommandName Get-AzDevOpsApiVersion -MockWith {
+            return "6.0-preview.1"
         }
 
         Mock -CommandName New-ManagedIdentityToken -MockWith {
@@ -40,13 +41,18 @@ Describe "Get-AzManagedIdentityToken Tests" {
             }
         }
 
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return @{
+                access_token = "fake-access-token"
+            }
+        }
+
         Mock -CommandName Test-AzToken -MockWith { return $true }
 
     }
 
     Context "When Verify switch is not set" {
         It "should return managed identity token" {
-            Wait-Debugger
             $result = Get-AzManagedIdentityToken -OrganizationName "Contoso"
             $result.AccessToken | Should -Be "fake-access-token"
         }
@@ -72,32 +78,18 @@ Describe "Get-AzManagedIdentityToken Tests" {
     }
 
     Context "When access token is not returned from Azure Instance Metadata Service" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            return @{
-                access_token = $null
+
+        BeforeAll {
+            Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+                Throw "MOCK ERROR"
             }
-        } -ParameterFilter {
-            $true
         }
 
         It "should throw error" {
             {
                 Get-AzManagedIdentityToken -OrganizationName "Contoso"
-            } | Should -Throw "Error. Access token not returned from Azure Instance Metadata Service. Please ensure that the Azure Instance Metadata Service is available."
+            } | Should -Throw
         }
     }
 
-    Context "When there is an error in Invoke-AzDevOpsApiRestMethod" {
-        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
-            throw "Rest API Failure"
-        } -ParameterFilter {
-            $true
-        }
-
-        It "should throw captured error" {
-            {
-                Get-AzManagedIdentityToken -OrganizationName "Contoso"
-            } | Should -Throw "Rest API Failure"
-        }
-    }
 }

@@ -1,4 +1,23 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe "Add-AuthenticationHTTPHeader" {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzManagedIdentityToken.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Update-AzManagedIdentity
+
+    }
 
     BeforeEach {
         # Reset the global variables before each test
@@ -7,15 +26,18 @@ Describe "Add-AuthenticationHTTPHeader" {
     }
 
     It "Throws an error when the token is null" {
-        $Global:DSCAZDO_AuthenticationToken = $null
-        { Add-AuthenticationHTTPHeader } | Should -Throw "[Add-AuthenticationHTTPHeader] Error. The authentication token is null. Please ensure that the authentication token is set."
+        $Global:DSCAZDO_AuthenticationToken = @{
+            tokenType = $null
+        }
+        { Add-AuthenticationHTTPHeader } | Should -Throw '*The authentication token is null*'
     }
 
     It "Returns header for PersonalAccessToken" {
-        $Global:DSCAZDO_AuthenticationToken = @{
+        $Global:DSCAZDO_AuthenticationToken = [PSCustomObject]@{
             tokenType = 'PersonalAccessToken'
-            Get = { return "dummyPAT" }
         }
+        $Global:DSCAZDO_AuthenticationToken | Add-Member -MemberType ScriptMethod -Name Get -Value { return "dummyPAT" }
+
         $result = Add-AuthenticationHTTPHeader
         $result | Should -Be "Authorization: Basic dummyPAT"
     }
@@ -23,27 +45,31 @@ Describe "Add-AuthenticationHTTPHeader" {
     It "Returns header for ManagedIdentity when token is not expired" {
         $Global:DSCAZDO_AuthenticationToken = @{
             tokenType = 'ManagedIdentity'
-            Get = { return "dummyMIToken" }
-            isExpired = { return $false }
         }
+        $Global:DSCAZDO_AuthenticationToken | Add-Member -MemberType ScriptMethod -Name Get -Value { return "dummyPAT" }
+        $Global:DSCAZDO_AuthenticationToken | Add-Member -MemberType ScriptMethod -Name isExpired -Value { return $false }
+
         $result = Add-AuthenticationHTTPHeader
-        $result | Should -Be "Bearer dummyMIToken"
+        $result | Should -Be "Bearer dummyPAT"
     }
 
     It "Updates and returns header for ManagedIdentity when token is expired" {
         $Global:DSCAZDO_AuthenticationToken = @{
             tokenType = 'ManagedIdentity'
-            Get = { return "expiredMIToken" }
-            isExpired = { return $true }
         }
+        $Global:DSCAZDO_AuthenticationToken | Add-Member -MemberType ScriptMethod -Name Get -Value { return "dummyPAT" }
+        $Global:DSCAZDO_AuthenticationToken | Add-Member -MemberType ScriptMethod -Name isExpired -Value { return $true }
 
-        # Mock Update-AzManagedIdentityToken cmdlet
-        Mock Update-AzManagedIdentityToken {
-            return @{
+
+        # Mock Update-AzManagedIdentity cmdlet
+        Mock -CommandName Update-AzManagedIdentity -MockWith {
+            $obj = [PSCustomObject]@{
                 tokenType = 'ManagedIdentity'
-                Get = { return "newMIToken" }
-                isExpired = { return $false }
             }
+            $obj | Add-Member -MemberType ScriptMethod -Name Get -Value { return "newMIToken" }
+            $obj | Add-Member -MemberType ScriptMethod -Name isExpired -Value { return $false }
+
+            return $obj
         }
 
         $result = Add-AuthenticationHTTPHeader
@@ -55,6 +81,7 @@ Describe "Add-AuthenticationHTTPHeader" {
             tokenType = 'UnsupportedToken'
             Get = { return "dummyToken" }
         }
-        { Add-AuthenticationHTTPHeader } | Should -Throw "[Add-AuthenticationHTTPHeader] Error. The authentication token type is not supported."
+        { Add-AuthenticationHTTPHeader } | Should -Throw '*The authentication token type is not supported*'
     }
+
 }

@@ -1,11 +1,39 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe "Update-AzManagedIdentity" {
-    Mock -CommandName Get-AzManagedIdentityToken
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzManagedIdentityToken.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Import the enums
+        Import-Enums | ForEach-Object {
+            . $_.FullName
+        }
+
+        # Import the classes
+        . (Get-ClassFilePath '001.AuthenticationToken')
+        . (Get-ClassFilePath '002.PersonalAccessToken')
+        . (Get-ClassFilePath '003.ManagedIdentityToken')
+
+
+        Mock -CommandName Get-AzManagedIdentityToken -MockWith {}
+
+    }
 
     Context "When the Global Organization Name is not set" {
         It "Throws an error" {
             $Global:DSCAZDO_OrganizationName = $null
-
-            { Update-AzManagedIdentity } | Should -Throw "[Update-AzManagedIdentity] Organization Name is not set. Please run 'New-AzManagedIdentity -OrganizationName <OrganizationName>'"
+            { Update-AzManagedIdentity } | Should -Throw '*Organization Name is not set*'
         }
     }
 
@@ -35,4 +63,3 @@ Describe "Update-AzManagedIdentity" {
         }
     }
 }
-

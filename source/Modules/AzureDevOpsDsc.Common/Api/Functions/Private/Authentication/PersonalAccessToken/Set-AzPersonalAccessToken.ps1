@@ -31,7 +31,7 @@ Function Set-AzPersonalAccessToken {
 
     # If a SecureString Personal Access Token is provided, parse it and set as the Token
     if ($SecureStringPersonalAccessToken) {
-        $Token = New-PersonalAccessToken -SecureStringPersonalAccessToken $PersonalAccessToken
+        $Token = New-PersonalAccessToken -SecureStringPersonalAccessToken $SecureStringPersonalAccessToken
     } elseif ($PersonalAccessToken) {
         # TypeCast the response to a PersonalAccessToken object
         $Token = New-PersonalAccessToken -PersonalAccessToken $PersonalAccessToken

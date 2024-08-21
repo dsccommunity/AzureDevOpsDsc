@@ -7,7 +7,7 @@ Function Add-AuthenticationHTTPHeader {
     switch ($Global:DSCAZDO_AuthenticationToken.tokenType) {
 
         # If the token is null
-        {$null} {
+        {[String]::IsNullOrEmpty($_)} {
             throw "[Add-AuthenticationHTTPHeader] Error. The authentication token is null. Please ensure that the authentication token is set."
         }
         {$_ -eq 'PersonalAccessToken'} {
@@ -31,7 +31,7 @@ Function Add-AuthenticationHTTPHeader {
             {
                 Write-Verbose "[Add-AuthenticationHTTPHeader] Managed Identity Token has expired. Obtaining a new token."
                 # If so, get a new token
-                $Global:DSCAZDO_AuthenticationToken = Update-AzManagedIdentityToken -OrganizationName $Global:DSCAZDO_OrganizationName
+                $Global:DSCAZDO_AuthenticationToken = Update-AzManagedIdentity -OrganizationName $Global:DSCAZDO_OrganizationName
             }
 
             # Add the Managed Identity Token to the header
