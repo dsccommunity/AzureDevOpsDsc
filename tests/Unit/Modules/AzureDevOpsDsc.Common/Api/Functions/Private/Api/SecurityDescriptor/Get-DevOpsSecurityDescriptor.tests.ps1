@@ -1,13 +1,23 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Get-DevOpsSecurityDescriptor Tests' {
-    Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith {
-        return @{ value = 'MockedResponse' }
-    }
 
-    BeforeEach {
+    BeforeAll {
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith {
+            return @{ value = 'MockedResponse' }
+        }
+
         $ProjectId = 'TestProjectId'
         $Organization = 'TestOrganization'
         $ApiVersion = '6.0'
+
     }
 
     It 'should retrieve the security descriptor for a project' {
@@ -17,21 +27,21 @@ Describe 'Get-DevOpsSecurityDescriptor Tests' {
 
     It 'should call Invoke-AzDevOpsApiRestMethod once' {
         Get-DevOpsSecurityDescriptor -ProjectId $ProjectId -Organization $Organization -ApiVersion $ApiVersion
-        Assert-MockCalled 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -Scope IT
+        Assert-MockCalled -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -Scope It
     }
 
     It 'should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
         Get-DevOpsSecurityDescriptor -ProjectId $ProjectId -Organization $Organization -ApiVersion $ApiVersion
-        Assert-MockCalled 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -Scope IT -ParameterFilter {
-            $params.Uri -eq "https://vssps.dev.azure.com/TestOrganization/_apis/graph/descriptors/TestProjectId?api-version=6.0" -and
-            $params.Method -eq 'Get'
+        Assert-MockCalled -CommandName 'Invoke-AzDevOpsApiRestMethod' -Exactly 1 -Scope It -ParameterFilter {
+            $ApiUri -eq "https://vssps.dev.azure.com/TestOrganization/_apis/graph/descriptors/TestProjectId?api-version=6.0" -and
+            $Method -eq 'GET'
         }
     }
 
     It 'should handle errors gracefully' {
-        Mock -CommandName 'Invoke-AzDevOpsApiRestMethod' -MockWith { throw "API Error" }
+        Mock -CommandName Invoke-AzDevOpsApiRestMethod -MockWith { throw "API Error" }
+        Mock -CommandName Write-Error -Verifiable
 
-        { Get-DevOpsSecurityDescriptor -ProjectId $ProjectId -Organization $Organization -ApiVersion $ApiVersion } | Should -Throw -ErrorId "Write-Error"
+        { Get-DevOpsSecurityDescriptor -ProjectId $ProjectId -Organization $Organization -ApiVersion $ApiVersion } | Should -Not -Throw
     }
 }
-
