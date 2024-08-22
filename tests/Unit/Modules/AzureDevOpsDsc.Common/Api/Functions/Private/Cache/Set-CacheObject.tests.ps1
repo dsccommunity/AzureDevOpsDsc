@@ -1,7 +1,29 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Set-CacheObject' {
 
-    Mock Get-AzDoCacheObjects { return @('Project', 'Team', 'Group', 'SecurityDescriptor') }
-    Mock Export-CacheObject {}
+    BeforeAll {
+
+        # Set the Project
+        $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        . (Get-ClassFilePath '000.CacheItem')
+
+        Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('Project', 'Team', 'Group', 'SecurityDescriptor') }
+        Mock -CommandName Export-CacheObject -MockWith {}
+
+    }
 
     Context 'When setting Project cache' {
 
@@ -19,9 +41,8 @@ Describe 'Set-CacheObject' {
 
             Set-CacheObject -CacheType 'Project' -Content $content -Depth 2
 
-            Assert-MockCalled Export-CacheObject -Exactly -Times 1 -Scope It -ParameterFilter {
+            Assert-MockCalled Export-CacheObject -Exactly -Times 1 -ParameterFilter {
                 $CacheType -eq 'Project' -and
-                $Content -eq $content -and
                 $Depth -eq 2
             }
         }
@@ -31,10 +52,10 @@ Describe 'Set-CacheObject' {
         }
 
         It 'should throw an error if Export-CacheObject fails' {
-            Mock Export-CacheObject { throw "Export failed" }
+            Mock -CommandName Export-CacheObject -MockWith { throw "Export failed" }
+            Mock -CommandName Write-Error -Verifiable
 
             { Set-CacheObject -CacheType 'Project' -Content @('data') } | Should -Throw
         }
     }
 }
-

@@ -30,7 +30,7 @@ Function Refresh-CacheIdentity {
         isContainer = $descriptorIdentity.isContainer
     }
 
-    $Identity | Add-Member -MemberType NoteProperty -Name 'ACLIdentity' -Value $ACLIdentity
+    $Identity | Add-Member -MemberType NoteProperty -Name 'ACLIdentity' -Value $ACLIdentity -Force
 
     #
     # Add the object to the cache

@@ -52,8 +52,8 @@ function Set-CacheObject
     # Write initial verbose message
     Write-Verbose "[Set-ObjectCache] Starting to set cache object for type: $CacheType"
 
-    try {
-
+    try
+    {
         # Save content to cache file
         Write-Verbose "[Set-ObjectCache] Exporting content to cache file for type: $CacheType"
         Export-CacheObject -CacheType $CacheType -Content $Content -Depth $Depth
@@ -64,8 +64,11 @@ function Set-CacheObject
 
         Write-Verbose "[Set-ObjectCache] Successfully set cache object for type: $CacheType"
 
-    } catch {
+    }
+    catch
+    {
         Write-Error "[Set-ObjectCache] Failed to create cache for Azure DevOps API: $_"
         throw
     }
+
 }

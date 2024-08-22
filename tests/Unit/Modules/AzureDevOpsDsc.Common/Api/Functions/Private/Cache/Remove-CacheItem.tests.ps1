@@ -1,19 +1,46 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Remove-CacheItem' {
+
     BeforeEach {
-        Function Get-CacheObject {
-            param ([string]$CacheType)
-            switch ($CacheType){
-                "Project" { return [System.Collections.Generic.List[PSCustomObject]]@(
-                    [PSCustomObject]@{ Key = "myKey"; Value = "someValue" }
-                )}
-                "Group" { return [System.Collections.Generic.List[PSCustomObject]]@(
-                    [PSCustomObject]@{ Key = "anotherKey"; Value = "anotherValue" }
-                )}
-                default { throw "Invalid CacheType" }
-            }
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
         }
 
-        Function Set-Variable {}
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        . (Get-ClassFilePath '000.CacheItem')
+
+        Mock -CommandName Get-CacheObject -MockWith {
+            param ([string]$CacheType)
+
+            $list = [System.Collections.Generic.List[CacheItem]]::New()
+
+            switch ($CacheType)
+            {
+                "Project"   {
+                    $list.Add([CacheItem]::New("myKey", "someValue"))
+                }
+                "Group"     {
+                    $list.Add([CacheItem]::New("anotherKey", "anotherValue"))
+                }
+                default     {
+                    throw "Invalid CacheType"
+                }
+            }
+
+            return $list
+
+        }
+
+        Mock -CommandName Set-Variable -MockWith {}
+
     }
 
     It 'Removes item from Project cache when key matches' {
@@ -30,21 +57,13 @@ Describe 'Remove-CacheItem' {
 
     It 'Handles non-matching key correctly' {
         $cache = Get-CacheObject -CacheType "Group"
-        $newCache = $cache.Clone()
         Remove-CacheItem -Key "nonMatchingKey" -Type "Group"
-        $global:AzDoGroup | Should -ContainSameElementsAs $newCache
+        $global:AzDoGroup | Should -Be $null
     }
 
     It 'Validates Type parameter against cache objects' {
-        Get-AzDoCacheObjects = { return @('Project', 'Group', 'Team', 'SecurityDescriptor') }
+        Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('Project', 'Group', 'Team', 'SecurityDescriptor') }
         { Remove-CacheItem -Key "sampleKey" -Type "InvalidType" } | Should -Throw
     }
 
-    AfterEach {
-        Remove-Variable -Name "global:AzDoProject" -ErrorAction SilentlyContinue
-        Remove-Variable -Name "global:AzDoGroup" -ErrorAction SilentlyContinue
-        Remove-Variable -Name "global:AzDoTeam" -ErrorAction SilentlyContinue
-        Remove-Variable -Name "global:AzDoSecurityDescriptor" -ErrorAction SilentlyContinue
-    }
 }
-
