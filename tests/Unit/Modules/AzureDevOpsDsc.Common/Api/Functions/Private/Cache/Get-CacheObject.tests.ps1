@@ -1,16 +1,30 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Get-CacheObject Tests' {
-    Mock Get-AzDoCacheObjects  { return @('Project', 'Team', 'Group', 'SecurityDescriptor') }
-    Mock Import-CacheObject
 
     BeforeAll {
-        $originalEnvironment = Get-Variable -Name "ENV" -Scope Global -ErrorAction SilentlyContinue
-        if (-not $originalEnvironment) {
-            New-Variable -Name "ENV" -Value @{} -Scope Global
+
+        # Set the Project
+        $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Find-CacheItem.tests.ps1'
         }
-        $mockEnvironment = @{
-            'AZDODSC_CACHE_DIRECTORY' = 'C:\MockCacheDirectory'
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
-        Set-Variable -Name "ENV" -Value $mockEnvironment -Scope Global
+
+        . (Get-ClassFilePath '000.CacheItem')
+
+        $ENV:AZDODSC_CACHE_DIRECTORY = "C:\MockCacheDirectory"
+
+        Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('Project', 'Team', 'Group', 'SecurityDescriptor') }
+        Mock -CommandName Import-CacheObject
+
     }
 
     AfterAll {
@@ -20,7 +34,7 @@ Describe 'Get-CacheObject Tests' {
     }
 
     It 'Should throw error if environment variable is not set' {
-        Remove-Variable -Name "ENV" -Scope Global -ErrorAction SilentlyContinue
+        $ENV:AZDODSC_CACHE_DIRECTORY = $null
         { Get-CacheObject -CacheType 'Project' } | Should -Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
     }
 
@@ -34,10 +48,9 @@ Describe 'Get-CacheObject Tests' {
 
     It 'Should import cache object if not available in memory' {
         $env:AZDODSC_CACHE_DIRECTORY = "C:\MockCacheDirectory"
-        Mock Import-CacheObject { return "ImportedProjectCache" }
+        Mock -CommandName Import-CacheObject -MockWith { return "ImportedProjectCache" }
 
         $result = Get-CacheObject -CacheType 'Project'
         $result | Should -Be "ImportedProjectCache"
     }
 }
-

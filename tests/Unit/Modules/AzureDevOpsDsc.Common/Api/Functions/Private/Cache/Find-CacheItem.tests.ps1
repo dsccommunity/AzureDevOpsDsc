@@ -1,3 +1,4 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 # Find-CacheItem.Tests.ps1
 
@@ -5,19 +6,43 @@
 # Import-Module 'Path\To\Your\Module.psd1' or . .\Path\To\YourScript.ps1
 
 Describe 'Find-CacheItem' {
-    $testCacheList = @(
-        [PSCustomObject]@{ Name = 'Item1'; Value = 'Value1' },
-        [PSCustomObject]@{ Name = 'Item2'; Value = 'Value2' },
-        [PSCustomObject]@{ Name = 'MyCacheItem'; Value = 'Value3' }
-    )
+
+    BeforeAll {
+
+        # Set the Project
+        $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Find-CacheItem.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        . (Get-ClassFilePath '000.CacheItem')
+
+        $testCacheList = @(
+            [PSCustomObject]@{ Name = 'Item1'; Value = @{ Name = 'Value1' } },
+            [PSCustomObject]@{ Name = 'Item2'; Value = @{ Name = 'Value2' } },
+            [PSCustomObject]@{ Name = 'MyCacheItem'; Value = @{ Name = 'MyValue' } }
+        )
+
+    }
 
     Context 'When a matching item exists' {
+
         It 'Returns the matching item' {
-            $filter = { $_.Name -eq 'MyCacheItem' }
+
+            $filter = { $_.Value.Name -eq 'MyValue' }
             $result = $testCacheList | Find-CacheItem -Filter $filter
             $result | Should -HaveCount 1
             $result.Name | Should -Be 'MyCacheItem'
         }
+
     }
 
     Context 'When no matching item exists' {
@@ -37,4 +62,3 @@ Describe 'Find-CacheItem' {
         }
     }
 }
-
