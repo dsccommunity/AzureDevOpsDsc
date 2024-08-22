@@ -1,90 +1,91 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-$hereScript = @"
-Function Test-Initialize-CacheObject {
+Describe "Initialize-CacheObject Tests" {
 
-    Describe "Initialize-CacheObject Tests" {
+    BeforeAll {
 
-        BeforeAll {
-            Function Get-AzDoCacheObjects {
-                return @('Project', 'Team', 'Group', 'SecurityDescriptor')
-            }
-            Function Import-CacheObject {
-                param (
-                    [string]$CacheType
-                )
-            }
-            Function Set-CacheObject {
-                param (
-                    [string]$CacheType,
-                    [Object]$Content
-                )
-            }
-            $ENV:AZDODSC_CACHE_DIRECTORY = "C:\CacheDir"
-            $mockPath = "C:\CacheDir\Cache"
-            $null = New-Item -Path $($mockPath) -ItemType Directory -Force
+        # Set the Project
+        $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Find-CacheItem.tests.ps1'
         }
 
-        AfterAll {
-            Remove-Item -Path "C:\CacheDir" -Recurse -Force
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
 
-        Context "When Cache File Does Not Exist" {
+        . (Get-ClassFilePath '000.CacheItem')
 
-            It "Should Create Cache Directory If Not Exists" {
-                { Initialize-CacheObject -CacheType Project } | Should -Not -Throw
-                Test-Path -Path "$mockPath\Project.clixml" | Should -Be $true
-            }
+        # Mock the necessary Commands and Variables
+        Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('LiveProject', 'Project', 'Team', 'Group', 'SecurityDescriptor') }
+        Mock -CommandName Test-Path -MockWith { param($Path) return $false }
+        Mock -CommandName Import-CacheObject
+        Mock -CommandName Set-CacheObject
+        Mock -CommandName Remove-Item
+        Mock -CommandName New-Item
+        $ENV:AZDODSC_CACHE_DIRECTORY = 'C:\Cache'
+    }
 
-            It "Should Create New Cache Object" {
-                { Initialize-CacheObject -CacheType Project } | Should -Not -Throw
-                # Any additional assertions to check if the Set-CacheObject function is called correctly
-            }
+    Context "Valid CacheType parameter" {
+
+        It "Imports the cache object if cache file exists" {
+
+            Mock Test-Path { $true }
+
+            Initialize-CacheObject -CacheType 'Project'
+
+            Assert-MockCalled -CommandName Import-CacheObject -Exactly 1
+            Assert-MockCalled -CommandName Set-CacheObject -Exactly 0
         }
 
-        Context "When Cache File Exists" {
+        It "Creates a new cache object if cache file does not exist" {
+            Mock Test-Path { $false }
 
-            BeforeEach {
-                New-Item -Path "$mockPath\Project.clixml" -ItemType File -Force | Out-Null
-            }
+            Initialize-CacheObject -CacheType 'Project'
 
-            It "Should Import Cache Object" {
-                { Initialize-CacheObject -CacheType Project } | Should -Not -Throw
-                # Any additional assertions to check if the Import-CacheObject function is called correctly
-            }
+            Assert-MockCalled -CommandName Import-CacheObject -Exactly 0
+            Assert-MockCalled -CommandName Set-CacheObject -Exactly 1
         }
 
-        Context "When Environment Variable Not Set" {
+        It "Removes cache file if BypassFileCheck is not present and CacheType matches '^Live'" {
+            Mock Test-Path -MockWith { $true }
 
-            BeforeEach {
-                $ENV:AZDODSC_CACHE_DIRECTORY = $null
-            }
+            Wait-Debugger
+            Initialize-CacheObject -CacheType 'LiveProject'
 
-            It "Should Throw Error" {
-                { Initialize-CacheObject -CacheType Project } | Should -Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set."
-            }
-        }
-
-        Context "When BypassFileCheck is Present" {
-
-            BeforeEach {
-                New-Item -Path "$mockPath\LiveProjects.clixml" -ItemType File -Force | Out-Null
-            }
-
-            It "Should Remove Cache File for Live Cache Types Without Bypassing" {
-                { Initialize-CacheObject -CacheType LiveProjects -Verbose: $true } | Should -Not -Throw
-                Test-Path -Path "$mockPath\LiveProjects.clixml" | Should -Be $false
-            }
-
-            It "Should Not Remove Cache File for Live Cache Types When BypassFileCheck is Present" {
-                { Initialize-CacheObject -CacheType LiveProjects -BypassFileCheck -Verbose: $true } | Should -Not -Throw
-                Test-Path -Path "$mockPath\LiveProjects.clixml" | Should -Be $true
-            }
+            Assert-MockCalled -CommandName Remove-Item -Exactly 1
+            Assert-MockCalled -CommandName Import-CacheObject -Exactly 0
+            Assert-MockCalled -CommandName Set-CacheObject -Exactly 1
         }
     }
+
+    Context "Environment variable not set" {
+        BeforeEach {
+            $ENV:AZDODSC_CACHE_DIRECTORY = $null
+        }
+
+        It "Throws an exception if the environment variable is not set" {
+            {
+                Initialize-CacheObject -CacheType 'Project'
+            } | Should -Throw -ErrorMessage "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
+        }
+    }
+
+    Context "BypassFileCheck switch" {
+
+        It "Does not remove cache file if BypassFileCheck is present" {
+            Mock Test-Path { $true } -ParameterFilter { $_ -eq 'C:\Cache\Cache\LiveProjects.clixml' }
+
+            Initialize-CacheObject -CacheType 'LiveProjects' -BypassFileCheck
+
+            Assert-MockCalled -CommandName Remove-Item -Exactly 0
+            Assert-MockCalled -CommandName Import-CacheObject -Exactly 1
+            Assert-MockCalled -CommandName Set-CacheObject -Exactly 0
+        }
+    }
+
 }
-
-Test-Initialize-CacheObject
-"@
-
-Invoke-Expression $hereScript
-

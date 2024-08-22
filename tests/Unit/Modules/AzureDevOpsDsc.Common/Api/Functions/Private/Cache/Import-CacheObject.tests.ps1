@@ -1,11 +1,32 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe "Import-CacheObject Tests" {
+
     BeforeAll {
+
+        # Set the Project
+        $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Find-CacheItem.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        . (Get-ClassFilePath '000.CacheItem')
+
         # Mock the necessary Commands and Variables
         Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('Project', 'Team', 'Group', 'SecurityDescriptor') }
         Mock -CommandName Test-Path -MockWith { return $true }
         Mock -CommandName Import-Clixml -MockWith { return @([PSCustomObject]@{ Key = 'Key1'; Value = 'Value1' }, [PSCustomObject]@{ Key = 'Key2'; Value = 'Value2' }) }
         Mock -CommandName Set-Variable
         $ENV:AZDODSC_CACHE_DIRECTORY = 'C:\Cache'
+
     }
 
     Context "Valid CacheType parameter" {
@@ -37,7 +58,7 @@ Describe "Import-CacheObject Tests" {
             Import-CacheObject -CacheType 'Project'
 
             Assert-MockCalled -CommandName Write-Warning -Exactly 1 -ParameterFilter {
-                $_ -match 'Cache file not found'
+                $Message -match 'Cache file not found'
             }
         }
     }
@@ -54,13 +75,4 @@ Describe "Import-CacheObject Tests" {
         }
     }
 
-    AfterAll {
-        # Clean up Mock and Env
-        Remove-Variable -Name AZDODSC_CACHE_DIRECTORY
-        Unmock-Command -CommandName Get-AzDoCacheObjects
-        Unmock-Command -CommandName Test-Path
-        Unmock-Command -CommandName Import-Clixml
-        Unmock-Command -CommandName Set-Variable
-    }
 }
-
