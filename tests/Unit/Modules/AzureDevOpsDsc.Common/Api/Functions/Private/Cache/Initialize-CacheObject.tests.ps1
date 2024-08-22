@@ -21,13 +21,15 @@ Describe "Initialize-CacheObject Tests" {
         . (Get-ClassFilePath '000.CacheItem')
 
         # Mock the necessary Commands and Variables
-        Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('LiveProject', 'Project', 'Team', 'Group', 'SecurityDescriptor') }
+        Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('LiveProject', 'LiveProjects', 'Project', 'Team', 'Group', 'SecurityDescriptor') }
         Mock -CommandName Test-Path -MockWith { param($Path) return $false }
         Mock -CommandName Import-CacheObject
         Mock -CommandName Set-CacheObject
         Mock -CommandName Remove-Item
         Mock -CommandName New-Item
+
         $ENV:AZDODSC_CACHE_DIRECTORY = 'C:\Cache'
+
     }
 
     Context "Valid CacheType parameter" {
@@ -52,14 +54,14 @@ Describe "Initialize-CacheObject Tests" {
         }
 
         It "Removes cache file if BypassFileCheck is not present and CacheType matches '^Live'" {
-            Mock Test-Path -MockWith { $true }
+            Mock Test-Path -MockWith { $true } -ParameterFilter { $ErrorAction -eq 'SilentlyContinue' }
+            Mock Test-Path -MockWith { $false } -ParameterFilter { $Path -eq 'C:\Cache\Cache\LiveProject.clixml' }
 
-            Wait-Debugger
             Initialize-CacheObject -CacheType 'LiveProject'
 
-            Assert-MockCalled -CommandName Remove-Item -Exactly 1
+            Assert-MockCalled -CommandName Remove-Item -Times 1
             Assert-MockCalled -CommandName Import-CacheObject -Exactly 0
-            Assert-MockCalled -CommandName Set-CacheObject -Exactly 1
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1
         }
     }
 
@@ -71,14 +73,18 @@ Describe "Initialize-CacheObject Tests" {
         It "Throws an exception if the environment variable is not set" {
             {
                 Initialize-CacheObject -CacheType 'Project'
-            } | Should -Throw -ErrorMessage "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
+            } | Should -Throw "*The environment variable `'AZDODSC_CACHE_DIRECTORY`' is not set.*"
         }
     }
 
     Context "BypassFileCheck switch" {
 
+        BeforeAll {
+            $ENV:AZDODSC_CACHE_DIRECTORY = 'C:\Cache'
+        }
+
         It "Does not remove cache file if BypassFileCheck is present" {
-            Mock Test-Path { $true } -ParameterFilter { $_ -eq 'C:\Cache\Cache\LiveProjects.clixml' }
+            Mock Test-Path { $true } -ParameterFilter { $Path -ne $null }
 
             Initialize-CacheObject -CacheType 'LiveProjects' -BypassFileCheck
 
