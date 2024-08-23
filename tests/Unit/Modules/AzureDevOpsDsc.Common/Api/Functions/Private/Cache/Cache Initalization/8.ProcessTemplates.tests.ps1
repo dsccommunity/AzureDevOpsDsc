@@ -6,7 +6,7 @@ Describe 'AzDoAPI_8_ProjectProcessTemplates' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath '8.ProcessTemplates.tests'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath '8.ProcessTemplates.tests.ps1'
         }
 
         # Load the functions to test
