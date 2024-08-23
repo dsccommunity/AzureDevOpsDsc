@@ -1,25 +1,43 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe "AzDoAPI_7_IdentitySubjectDescriptors" {
-    Mock -CommandName Get-CacheObject -MockWith {
-        switch ($args[0]) {
-            'LiveGroups' { @{} }
-            'LiveUsers' { @{} }
-            'LiveServicePrinciples' { @{} }
-        }
-    }
 
-    Mock -CommandName Get-DevOpsDescriptorIdentity -MockWith {
-        @{
-            id = 'mockId'
-            descriptor = 'mockDescriptor'
-            subjectDescriptor = 'mockSubjectDescriptor'
-            providerDisplayName = 'mockProvider'
-            isActive = $true
-            isContainer = $false
-        }
-    }
+    BeforeAll {
 
-    Mock -CommandName Add-CacheItem
-    Mock -CommandName Export-CacheObject
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath '7.IdentitySubjectDescriptors.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-CacheObject -MockWith {
+            switch ($args[0]) {
+                'LiveGroups' { @{} }
+                'LiveUsers' { @{} }
+                'LiveServicePrinciples' { @{} }
+            }
+        }
+
+        Mock -CommandName Get-DevOpsDescriptorIdentity -MockWith {
+            @{
+                id = 'mockId'
+                descriptor = 'mockDescriptor'
+                subjectDescriptor = 'mockSubjectDescriptor'
+                providerDisplayName = 'mockProvider'
+                isActive = $true
+                isContainer = $false
+            }
+        }
+
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Export-CacheObject
+
+    }
 
     BeforeEach {
         $Global:DSCAZDO_OrganizationName = 'mockOrg'
@@ -77,4 +95,3 @@ Describe "AzDoAPI_7_IdentitySubjectDescriptors" {
         }
     }
 }
-

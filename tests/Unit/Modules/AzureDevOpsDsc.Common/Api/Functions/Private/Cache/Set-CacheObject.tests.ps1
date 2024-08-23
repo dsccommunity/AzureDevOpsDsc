@@ -9,7 +9,7 @@ Describe 'Set-CacheObject' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-CacheObject.tests.ps1'
         }
 
         # Load the functions to test

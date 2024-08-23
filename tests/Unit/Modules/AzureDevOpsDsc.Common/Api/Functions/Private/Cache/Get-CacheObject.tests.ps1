@@ -9,7 +9,7 @@ Describe 'Get-CacheObject Tests' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Find-CacheItem.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-CacheObject.tests.ps1'
         }
 
         # Load the functions to test

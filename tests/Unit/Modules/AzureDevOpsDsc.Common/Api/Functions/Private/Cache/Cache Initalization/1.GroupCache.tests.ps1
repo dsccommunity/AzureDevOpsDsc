@@ -9,7 +9,7 @@ Describe 'AzDoAPI_1_GroupCache' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath '1.GroupCache.tests.ps1'
         }
 
         # Load the functions to test

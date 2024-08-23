@@ -6,7 +6,7 @@ Describe 'AzDoAPI_5_PermissionsCache Tests' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath '5.PermissionsCache.tests.ps1'
         }
 
         # Load the functions to test

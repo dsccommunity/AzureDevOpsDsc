@@ -6,7 +6,7 @@ Describe 'Refresh-CacheIdentity' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Refresh-CacheObject.tests.ps1'
         }
 
         # Load the functions to test
