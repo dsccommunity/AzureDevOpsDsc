@@ -62,13 +62,25 @@ Describe "AzDoAPI_4_GitRepositoryCache Tests" {
             $ProgressPreference='SilentlyContinue'
             Mock -CommandName Write-Verbose -Verifiable
             AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg" -Verbose
+            Assert-VerifiableMock
         }
 
         It "Should catch and log errors" {
+
+            $mockProjects = @(
+                [PSCustomObject]@{ Value = @{ Name = "TestProject1" } },
+                [PSCustomObject]@{ Value = @{ Name = "TestProject2" } }
+            )
+
             Mock -CommandName Write-Error -Verifiable
             Mock -CommandName List-DevOpsGitRepository -MockWith { throw "Mocked Error" }
+            Mock -CommandName Get-CacheObject -MockWith { $mockProjects }
+
             { AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg" } | Should -Not -Throw
+
+            Assert-VerifiableMock
         }
+
     }
 
     Context "When \ is not passed" {

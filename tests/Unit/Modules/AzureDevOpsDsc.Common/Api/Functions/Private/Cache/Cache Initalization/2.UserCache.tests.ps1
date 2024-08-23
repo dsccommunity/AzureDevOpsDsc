@@ -78,6 +78,7 @@ Describe 'AzDoAPI_2_UserCache' {
 
         It 'should catch and handle the error' {
             { AzDoAPI_2_UserCache -OrganizationName 'TestOrg' } | Should -Not -Throw
+            Assert-VerifiableMock
         }
     }
 }

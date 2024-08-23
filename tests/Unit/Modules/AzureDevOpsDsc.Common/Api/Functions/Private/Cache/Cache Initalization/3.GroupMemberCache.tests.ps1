@@ -93,6 +93,7 @@ Describe 'AzDoAPI_3_GroupMemberCache' {
 
         It 'should catch and handle the error' {
             { AzDoAPI_3_GroupMemberCache -OrganizationName 'TestOrg' } | Should -Not -Throw
+            Assert-VerifiableMock
         }
     }
 }

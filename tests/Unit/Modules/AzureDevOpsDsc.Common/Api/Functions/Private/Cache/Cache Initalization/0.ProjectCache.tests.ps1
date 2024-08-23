@@ -94,6 +94,7 @@ Describe 'AzDoAPI_0_ProjectCache' {
             Mock -CommandName Write-Error -Verifiable
 
             { AzDoAPI_0_ProjectCache -OrganizationName 'MyOrganization' } | Should -Not -Throw
+            Assert-VerifiableMock
         }
 
         It 'should handle errors during cache export' {
@@ -101,6 +102,7 @@ Describe 'AzDoAPI_0_ProjectCache' {
             Mock -CommandName Write-Error -Verifiable
 
             { AzDoAPI_0_ProjectCache -OrganizationName 'MyOrganization' } | Should -Not -Throw
+            Assert-VerifiableMock
         }
     }
 }

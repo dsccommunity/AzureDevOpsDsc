@@ -84,6 +84,7 @@ Describe 'AzDoAPI_1_GroupCache' {
             Mock -CommandName Write-Error -Verifiable
 
             { AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization' } | Should -Not -Throw
+            Assert-VerifiableMock
         }
 
         It 'should handle errors during cache export' {
@@ -91,6 +92,7 @@ Describe 'AzDoAPI_1_GroupCache' {
             Mock -CommandName Write-Error -Verifiable
 
             { AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization' } | Should -Not -Throw
+            Assert-VerifiableMock
         }
     }
 }

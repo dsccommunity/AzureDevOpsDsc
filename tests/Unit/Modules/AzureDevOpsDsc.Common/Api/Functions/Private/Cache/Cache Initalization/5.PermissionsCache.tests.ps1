@@ -1,19 +1,37 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'AzDoAPI_5_PermissionsCache Tests' {
-    Mock -CommandName List-DevOpsSecurityNamespaces {
-        return @(
-            [PSCustomObject]@{ name = 'Namespace1'; namespaceId = 1; writePermission = $true; readPermission = $true; dataspaceCategory = 'category1'; actions = @('Action1','Action2') },
-            [PSCustomObject]@{ name = 'Namespace2'; namespaceId = 2; writePermission = $false; readPermission = $true; dataspaceCategory = 'category2'; actions = @('Action3','Action4') }
-        )
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName List-DevOpsSecurityNamespaces -MockWith {
+            return @(
+                [PSCustomObject]@{ name = 'Namespace1'; namespaceId = 1; writePermission = $true; readPermission = $true; dataspaceCategory = 'category1'; actions = @('Action1','Action2') },
+                [PSCustomObject]@{ name = 'Namespace2'; namespaceId = 2; writePermission = $false; readPermission = $true; dataspaceCategory = 'category2'; actions = @('Action3','Action4') }
+            )
+        }
+
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Export-CacheObject
+
+        $global:DSCAZDO_OrganizationName = "DefaultOrg"
+
     }
-
-    Mock -CommandName Add-CacheItem
-    Mock -CommandName Export-CacheObject
-
-    $global:DSCAZDO_OrganizationName = "DefaultOrg"
 
     It 'Uses provided OrganizationName parameter' {
         AzDoAPI_5_PermissionsCache -OrganizationName 'TestOrg'
-        Assert-VerifiableMocks
+        Assert-VerifiableMock
     }
 
     It 'Uses global OrganizationName when parameter is not provided' {
@@ -35,4 +53,3 @@ Describe 'AzDoAPI_5_PermissionsCache Tests' {
         Assert-MockCalled -CommandName Export-CacheObject -ParameterFilter { $CacheType -eq 'SecurityNameSpaces' -and $Depth -eq 5 }
     }
 }
-
