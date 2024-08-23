@@ -1,108 +1,96 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-# Mock List-DevOpsGroups function
-Function Mock-List-DevOpsGroups {
-    param(
-        [string]$Organization
-    )
+Describe 'AzDoAPI_1_GroupCache' {
 
-    return @(
-        @{
-            PrincipalName = "Group1"
-            OtherProperty = "Value1"
-        },
-        @{
-            PrincipalName = "Group2"
-            OtherProperty = "Value2"
-        }
-    )
-}
-
-# Mock Add-CacheItem function
-Function Mock-Add-CacheItem {
-    param(
-        [string]$Key,
-        $Value,
-        [string]$Type
-    )
-    # Simulate adding item to cache
-    Write-Output "Cached $Key with type $Type"
-}
-
-# Mock Export-CacheObject function
-Function Mock-Export-CacheObject {
-    param(
-        [string]$CacheType,
-        $Content
-    )
-    # Simulate export cache to file
-    Write-Output "Cache exported with type $CacheType"
-}
-
-# Import the Pester module
-Import-Module Pester
-
-Describe "AzDoAPI_1_GroupCache Tests" {
     BeforeAll {
-        # Mock functions
-        Mock List-DevOpsGroups { Mock-List-DevOpsGroups -Organization $Organization }
-        Mock Add-CacheItem { Mock-Add-CacheItem -Key $Key -Value $Value -Type $Type }
-        Mock Export-CacheObject { Mock-Export-CacheObject -CacheType $CacheType -Content $Content }
 
-        # Function to test
-        . $PSScriptRoot\AzDoAPI_1_GroupCache.ps1
-    }
+        # Set the Project
+        $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
 
-    It "should use global organization name if none is provided" {
-        $Global:DSCAZDO_OrganizationName = "DefaultOrg"
-        AzDoAPI_1_GroupCache
-
-        # Assertions
-        Should -Invoke List-DevOpsGroups -Exactly -ArgumentList @{ Organization = 'DefaultOrg' }
-        Should -Invoke Add-CacheItem -Times 2
-        Should -Invoke Export-CacheObject -Once
-    }
-
-    It "should use provided organization name" {
-        AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
-
-        # Assertions
-        Should -Invoke List-DevOpsGroups -Exactly -ArgumentList @{ Organization = 'MyOrg' }
-        Should -Invoke Add-CacheItem -Times 2
-        Should -Invoke Export-CacheObject -Once
-    }
-
-    It "should call Add-CacheItem for each group" {
-        AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
-
-        # Assertions
-        Should -Invoke Add-CacheItem -Times 2 -Exactly -ArgumentList @{
-            Key = 'Group1'
-            Value = @{
-                PrincipalName = 'Group1'
-                OtherProperty = 'Value1'
-            }
-            Type = 'LiveGroups'
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
         }
-        Should -Invoke Add-CacheItem -Times 2 -Exactly -ArgumentList @{
-            Key = 'Group2'
-            Value = @{
-                PrincipalName = 'Group2'
-                OtherProperty = 'Value2'
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName List-DevOpsGroups -MockWith {
+            return @(
+                [pscustomobject]@{ PrincipalName = 'Group1'; Id = 1 },
+                [pscustomobject]@{ PrincipalName = 'Group2'; Id = 2 }
+            )
+        }
+
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Export-CacheObject
+
+    }
+
+    Context 'When OrganizationName is provided' {
+
+        It 'should call List-DevOpsGroups with the correct parameters' {
+            AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization'
+
+            Assert-MockCalled List-DevOpsGroups -Exactly -Times 1 -Scope It -ParameterFilter {
+                $Organization -eq 'MyOrganization'
             }
-            Type = 'LiveGroups'
+        }
+
+        It 'should add groups to the cache' {
+            AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization'
+
+            Assert-MockCalled Add-CacheItem -Exactly -Times 2 -Scope It -ParameterFilter {
+                ($Key -eq 'Group1' -and $Value.PrincipalName -eq 'Group1') -or
+                ($Key -eq 'Group2' -and $Value.PrincipalName -eq 'Group2')
+            }
+        }
+
+        It 'should export the cache' {
+            AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization'
+
+            Assert-MockCalled Export-CacheObject -Exactly -Times 1 -Scope It -ParameterFilter {
+                $CacheType -eq 'LiveGroups' -and $Content -eq $global:AzDoLiveGroups
+            }
         }
     }
 
-    It "should export cache after adding groups" {
-        AzDoAPI_1_GroupCache -OrganizationName "MyOrg"
+    Context 'When OrganizationName is not provided' {
 
-        # Assertions
-        Should -Invoke Export-CacheObject -Exactly -ArgumentList @{
-            CacheType = 'LiveGroups'
-            Content = $null  # Assuming `$AzDoLiveGroups` can be $null in this context
+        Mock -CommandName Write-Verbose -MockWith {
+            param ($Message)
+        }
+
+        BeforeAll {
+            $Global:DSCAZDO_OrganizationName = 'GlobalOrganization'
+        }
+
+        It 'should use the global variable for organization name' {
+            AzDoAPI_1_GroupCache
+
+            Assert-MockCalled List-DevOpsGroups -Exactly -Times 1 -Scope It -ParameterFilter {
+                $Organization -eq 'GlobalOrganization'
+            }
+        }
+    }
+
+    Context 'Error handling' {
+
+        It 'should handle errors during API call' {
+            Mock -CommandName List-DevOpsGroups -MockWith { throw "API Error" }
+            Mock -CommandName Write-Error -Verifiable
+
+            { AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization' } | Should -Not -Throw
+        }
+
+        It 'should handle errors during cache export' {
+            Mock -CommandName Export-CacheObject -MockWith { throw "Export failed" }
+            Mock -CommandName Write-Error -Verifiable
+
+            { AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization' } | Should -Not -Throw
         }
     }
 }
-
-
-
