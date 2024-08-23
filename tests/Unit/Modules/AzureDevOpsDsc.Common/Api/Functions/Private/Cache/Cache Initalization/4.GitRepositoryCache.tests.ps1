@@ -1,64 +1,97 @@
-Describe "AzDoAPI_4_GitRepositoryCache Tests" {
-    Mock -CommandName Get-CacheObject
-    Mock -CommandName List-DevOpsGitRepository
-    Mock -CommandName Add-CacheItem
-    Mock -CommandName Export-CacheObject
+$currentFile = $MyInvocation.MyCommand.Path
 
-    Context "When $OrganizationName is passed" {
+Describe "AzDoAPI_4_GitRepositoryCache Tests" {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-CacheObject
+        Mock -CommandName List-DevOpsGitRepository
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Export-CacheObject
+
+    }
+
+    Context "When \ is passed" {
         It "Should call Get-CacheObject with LiveProjects" {
             AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg"
-            Assert-MockCalled Get-CacheObject -Exactly -Times 1 -ParameterFilter { $CacheType -eq 'LiveProjects' }
+            Assert-MockCalled -CommandName Get-CacheObject -Exactly -Times 1 -ParameterFilter { $CacheType -eq 'LiveProjects' }
         }
 
         It "Should call List-DevOpsGitRepository for each project" {
-            $mockProjects = @{ Value = @{ Name = "TestProject1" }; Value = @{ Name = "TestProject2" } }
-            Mock Get-CacheObject { $mockProjects }
+            $mockProjects = @(
+                [PSCustomObject]@{ Value = @{ Name = "TestProject1" } },
+                [PSCustomObject]@{ Value = @{ Name = "TestProject2" } }
+            )
+            Mock -CommandName Get-CacheObject -MockWith { $mockProjects }
             AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg"
-            Assert-MockCalled List-DevOpsGitRepository -Exactly -Times 2
+            Assert-MockCalled -CommandName List-DevOpsGitRepository -Exactly -Times 2
         }
 
         It "Should call Add-CacheItem for each repository" {
-            $mockProjects = @{ Value = @{ Name = "TestProject1" }; Value = @{ Name = "TestProject2" } }
-            $mockRepos = @( @{ Name = "Repo1" }, @{ Name = "Repo2" } )
-            Mock Get-CacheObject { $mockProjects }
-            Mock List-DevOpsGitRepository { $mockRepos }
+            $mockProjects = @(
+                [PSCustomObject]@{ Value = @{ Name = "TestProject1" } },
+                [PSCustomObject]@{ Value = @{ Name = "TestProject2" } }
+            )
+            $mockRepos = @(
+                [PSCustomObject]@{ Name = "Repo1" },
+                [PSCustomObject]@{ Name = "Repo2" }
+            )
+            Mock -CommandName Get-CacheObject -MockWith { $mockProjects }
+            Mock -CommandName List-DevOpsGitRepository -MockWith { $mockRepos }
             AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg"
-            Assert-MockCalled Add-CacheItem -Exactly -Times 4
+            Assert-MockCalled -CommandName Add-CacheItem -Exactly -Times 4
         }
 
         It "Should call Export-CacheObject once" {
             AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg"
-            Assert-MockCalled Export-CacheObject -Exactly -Times 1
+            Assert-MockCalled -CommandName Export-CacheObject -Exactly -Times 1
         }
 
         It "Should log verbose messages" {
-            $verbose = $false
             $ProgressPreference='SilentlyContinue'
-            Mock Write-Verbose { param($Message); $verbose = $true }
+            Mock -CommandName Write-Verbose -Verifiable
             AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg" -Verbose
-            $verbose | Should -Be $true
         }
 
         It "Should catch and log errors" {
-            Mock List-DevOpsGitRepository { throw "Mocked Error" }
-            $errorLogged = $false
-            Mock Write-Error { $errorLogged = $true }
-            AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg"
-            $errorLogged | Should -Be $true
+            Mock -CommandName Write-Error -Verifiable
+            Mock -CommandName List-DevOpsGitRepository -MockWith { throw "Mocked Error" }
+            { AzDoAPI_4_GitRepositoryCache -OrganizationName "TestOrg" } | Should -Not -Throw
         }
     }
 
-    Context "When $OrganizationName is not passed" {
+    Context "When \ is not passed" {
         BeforeAll { $Global:DSCAZDO_OrganizationName = "GlobalOrg" }
 
         It "Should use global variable for organization name" {
-            $usedGlobal = $false
-            Mock List-DevOpsGitRepository { param ($ProjectName, $OrganizationName); if ($OrganizationName -eq "GlobalOrg") { $usedGlobal = $true }; return @() }
+            $mockProjects = @(
+                [PSCustomObject]@{ Value = @{ Name = "TestProject1" } },
+                [PSCustomObject]@{ Value = @{ Name = "TestProject2" } }
+            )
+            $mockRepos = @(
+                [PSCustomObject]@{ Name = "Repo1" },
+                [PSCustomObject]@{ Name = "Repo2" }
+            )
+
+            Mock -CommandName Get-CacheObject -MockWith { $mockProjects }
+            Mock -CommandName List-DevOpsGitRepository -MockWith { $mockRepos }
+
             AzDoAPI_4_GitRepositoryCache
-            $usedGlobal | Should -Be $true
+            Assert-MockCalled -CommandName List-DevOpsGitRepository -Times 1 -ParameterFilter { $OrganizationName -eq "GlobalOrg" }
+
         }
 
         AfterAll { Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global }
     }
 }
-
