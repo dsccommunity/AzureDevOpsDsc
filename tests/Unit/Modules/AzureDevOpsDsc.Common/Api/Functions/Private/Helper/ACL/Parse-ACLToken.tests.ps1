@@ -6,7 +6,7 @@ Describe 'Parse-ACLToken' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Parse-ACLToken.tests.ps1'
         }
 
         # Load the functions to test

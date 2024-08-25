@@ -7,7 +7,7 @@ Describe "ConvertTo-ACLHashtable" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'ConvertTo-ACLHashtable.tests.ps1'
         }
 
         # Load the functions to test
