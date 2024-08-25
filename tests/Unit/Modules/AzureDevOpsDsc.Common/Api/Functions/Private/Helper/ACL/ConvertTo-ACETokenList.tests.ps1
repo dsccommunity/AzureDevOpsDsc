@@ -6,7 +6,7 @@ Describe "ConvertTo-ACETokenList Tests" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'ConvertTo-ACEListToken.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'ConvertTo-ACETokenList.tests.ps1'
         }
 
         # Load the functions to test
