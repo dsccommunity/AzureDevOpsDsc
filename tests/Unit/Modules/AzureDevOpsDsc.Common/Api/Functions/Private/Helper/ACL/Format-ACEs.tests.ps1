@@ -1,12 +1,29 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Format-ACEs' {
-    Mock -ModuleName AzureDevOpsDsc.Common -CommandName Get-CacheItem -MockWith {
-        @{
-            Key = 'SecurityNamespace'
-            Type = 'SecurityNamespaces'
-            Actions = @(
-                [PSCustomObject]@{ bit = 1; Name = 'Read' },
-                [PSCustomObject]@{ bit = 2; Name = 'Write' }
-            )
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Format-ACEs.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -ModuleName AzureDevOpsDsc.Common -CommandName Get-CacheItem -ParameterFilter { $Key -eq 'SecurityNamespace' } -MockWith {
+            return @{
+                Key = 'SecurityNamespace'
+                Type = 'SecurityNamespaces'
+                Actions = @(
+                    [PSCustomObject]@{ bit = 1; Name = 'Read' },
+                    [PSCustomObject]@{ bit = 2; Name = 'Write' }
+                )
+            }
         }
     }
 
@@ -40,4 +57,3 @@ Describe 'Format-ACEs' {
         { Format-ACEs -Allow 1 -Deny 0 } | Should -Throw -ErrorId ParameterBindingValidationException
     }
 }
-

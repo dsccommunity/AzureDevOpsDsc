@@ -1,18 +1,41 @@
-Describe "ConvertTo-ACL" {
-    Mock -CommandName New-ACLToken -MockWith { return @{ Token = "mockToken" } }
-    Mock -CommandName ConvertTo-ACEList -MockWith { return @( @{ Identity = "User1"; Permissions = "Read" }, @{ Identity = "User2"; Permissions = "Read, Write" } ) }
-    Mock -CommandName Group-ACEs -MockWith { param($ACEs) return $ACEs }
+$currentFile = $MyInvocation.MyCommand.Path
 
-    $permissions = @(
-        @{
-            Identity    = 'User1'
-            Permissions = 'Read'
-        },
-        @{
-            Identity    = 'User2'
-            Permissions = 'Read', 'Write'
+Describe "ConvertTo-ACL" {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
         }
-    )
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName New-ACLToken -MockWith { return @{ Token = "mockToken" } }
+        Mock -CommandName ConvertTo-ACEList -MockWith {
+            return @(
+                @{ Identity = "User1"; Permissions = "Read" },
+                @{ Identity = "User2"; Permissions = "Read, Write" }
+            )
+        }
+        Mock -CommandName Group-ACEs -MockWith { param($ACEs) return $ACEs }
+
+        $permissions = @(
+            @{
+                Identity    = 'User1'
+                Permissions = 'Read'
+            },
+            @{
+                Identity    = 'User2'
+                Permissions = 'Read', 'Write'
+            }
+        )
+
+    }
 
     It "should return an ACL with correct properties" {
         $result = ConvertTo-ACL -Permissions $permissions -SecurityNamespace 'Namespace1' -isInherited $true -OrganizationName 'Org1' -TokenName 'Token1'
@@ -30,3 +53,4 @@ Describe "ConvertTo-ACL" {
     }
 }
 
+# End of Pester tests for ConvertTo-ACL

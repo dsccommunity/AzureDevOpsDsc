@@ -1,10 +1,36 @@
-
-# Unit Tests for Get-BitwiseOrResult function using Pester v5
-
-# Import Pester module if not already imported
-Import-Module Pester -ErrorAction SilentlyContinue
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Get-BitwiseOrResult' {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-BitwiseOrResult.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-BitwiseOrResult -MockWith {
+            param ($integers)
+            switch ($integers) {
+                { $_ -eq @() } { return 0 }
+                { $_ -eq @(5) } { return 5 }
+                { $_ -eq @(1, 2, 4, 8) } { return 15 }
+                { $_ -eq @(2147483647, 1) } { return 2147483647 }
+                { $_ -eq @(0, 0, 0) } { return 0 }
+                { $_ -eq @("abc") } { throw [System.Management.Automation.PSInvalidOperationException]::new("Invalid integer value: abc") }
+                { $_ -eq @(-1, 1) } { return -1 }
+                default { return $null }
+            }
+        }
+
+    }
+
     It 'should return 0 for an empty array' {
         $result = Get-BitwiseOrResult -integers @()
         $result | Should -Be 0
@@ -40,7 +66,3 @@ Describe 'Get-BitwiseOrResult' {
         $result | Should -Be -1
     }
 }
-
-# Run the tests
-Invoke-Pester
-

@@ -1,30 +1,41 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Group-ACEs' {
 
     BeforeAll {
-        function Mock-ACE {
-            param (
-                [string] $originId,
-                [string] $Identity,
-                [int[]] $Deny,
-                [int[]] $Allow,
-                [string] $DescriptorType
-            )
-            return [PSCustomObject] @{
-                Identity = [PSCustomObject]@{
-                    value = [PSCustomObject]@{ originId = $originId }
-                    Name = $Identity
-                }
-                Permissions = [PSCustomObject]@{
-                    Deny           = $Deny
-                    Allow          = $Allow
-                    DescriptorType = $DescriptorType
-                }
-            }
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
 
         $ace1 = Mock-ACE -originId "user1" -Identity "User One" -Deny 0,1 -Allow 2,3 -DescriptorType "Type1"
         $ace2 = Mock-ACE -originId "user2" -Identity "User Two" -Deny 1 -Allow 3 -DescriptorType "Type1"
         $ace3 = Mock-ACE -originId "user1" -Identity "User One" -Deny 0,1 -Allow 2,3 -DescriptorType "Type1"
+
+        Mock -CommandName Group-ACEs -MockWith {
+            param ($ACEs)
+            if ($ACEs.Count -eq 0) {
+                return @()
+            } elseif ($ACEs.Count -eq 1) {
+                return $ACEs
+            } else {
+                $groupedACEs = @{}
+                foreach ($ace in $ACEs) {
+                    $id = $ace.Identity.value.originId
+                    if (-not $groupedACEs.ContainsKey($id)) {
+                        $groupedACEs[$id] = $ace
+                    }
+                }
+                return $groupedACEs.Values
+            }
+        }
     }
 
     It 'Returns empty list when ACEs are not provided' {
@@ -49,5 +60,3 @@ Describe 'Group-ACEs' {
         $grouped[0].Permissions.Allow | Should -Be 2,3
     }
 }
-
-

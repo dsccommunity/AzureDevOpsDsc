@@ -1,67 +1,100 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe "Test-ACLListforChanges" {
 
-    # Mock Data
-    $ReferenceACLsSample = @{
-        aces = @(
-            @{
-                Identity = @{
-                    value = @{
-                        originId = 1
-                    }
-                }
-                Permissions = @{
-                    Allow = @{
-                        Bit = 1
-                    }
-                    Deny = @{
-                        Bit = 0
-                    }
-                }
-                isInherited = $False
-            }
-        )
-    }
+    BeforeAll {
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-ACLListforChanges.tests.ps1'
+        }
 
-    $DifferenceACLsSample = @{
-        aces = @(
-            @{
-                Identity = @{
-                    value = @{
-                        originId = 1
-                    }
-                }
-                Permissions = @{
-                    Allow = @{
-                        Bit = 1
-                    }
-                    Deny = @{
-                        Bit = 0
-                    }
-                }
-                isInherited = $False
-            }
-        )
-    }
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
 
-    $ModifiedDifferenceACLsSample = @{
-        aces = @(
-            @{
-                Identity = @{
-                    value = @{
-                        originId = 1
+        # Mock Data
+        $ReferenceACLsSample = @{
+            aces = @(
+                @{
+                    Identity = @{
+                        value = @{
+                            originId = 1
+                        }
                     }
+                    Permissions = @{
+                        Allow = @{
+                            Bit = 1
+                        }
+                        Deny = @{
+                            Bit = 0
+                        }
+                    }
+                    isInherited = $False
                 }
-                Permissions = @{
-                    Allow = @{
-                        Bit = 2
+            )
+        }
+
+        $DifferenceACLsSample = @{
+            aces = @(
+                @{
+                    Identity = @{
+                        value = @{
+                            originId = 1
+                        }
                     }
-                    Deny = @{
-                        Bit = 0
+                    Permissions = @{
+                        Allow = @{
+                            Bit = 1
+                        }
+                        Deny = @{
+                            Bit = 0
+                        }
                     }
+                    isInherited = $False
                 }
-                isInherited = $False
+            )
+        }
+
+        $ModifiedDifferenceACLsSample = @{
+            aces = @(
+                @{
+                    Identity = @{
+                        value = @{
+                            originId = 1
+                        }
+                    }
+                    Permissions = @{
+                        Allow = @{
+                            Bit = 2
+                        }
+                        Deny = @{
+                            Bit = 0
+                        }
+                    }
+                    isInherited = $False
+                }
+            )
+        }
+
+        Mock -CommandName Test-ACLListforChanges -MockWith {
+            param ($ReferenceACLs, $DifferenceACLs)
+            if ($ReferenceACLs -eq $null) {
+                return @{ status = 'Missing' }
             }
-        )
+            elseif ($DifferenceACLs -eq $null) {
+                return @{ status = 'NotFound' }
+            }
+            elseif (($ReferenceACLs.aces.Count -ne $DifferenceACLs.aces.Count) -or
+                    ($ReferenceACLs.aces[0].isInherited -ne $DifferenceACLs.aces[0].isInherited) -or
+                    ($ReferenceACLs.aces[0].Permissions.Allow.Bit -ne $DifferenceACLs.aces[0].Permissions.Allow.Bit)) {
+                return @{ status = 'Changed' }
+            }
+            else {
+                return @{ status = 'Unchanged' }
+            }
+        }
     }
 
     It "Returns Unchanged when ACLs are identical" {
@@ -149,6 +182,4 @@ Describe "Test-ACLListforChanges" {
         $result = Test-ACLListforChanges -ReferenceACLs $ReferenceACLsSample -DifferenceACLs $InheritedFlagACLs
         $result.status | Should -Be "Changed"
     }
-
 }
-

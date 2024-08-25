@@ -1,11 +1,24 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'New-ACLToken Function Tests' {
 
     BeforeAll {
-        Import-Module -Name 'AzureDevOpsDsc.Common' -Force
-    }
 
-    Mock -CommandName Get-CacheItem {
-        return [PSCustomObject]@{id = "1234"}
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Get-CacheItem -MockWith {
+            return [PSCustomObject]@{id = "1234"}
+        }
+
     }
 
     Context 'Git Repositories Namespace' {
@@ -32,7 +45,6 @@ Describe 'New-ACLToken Function Tests' {
             $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'Unknown/Token'
             $result.type | Should -Be 'GitUnknown'
         }
-
     }
 
     Context 'Identity Namespace' {
@@ -56,8 +68,5 @@ Describe 'New-ACLToken Function Tests' {
             $result = New-ACLToken -SecurityNamespace 'Unknown' -TokenName 'Any/Token'
             $result.type | Should -Be 'UnknownSecurityNamespace'
         }
-
     }
-
 }
-

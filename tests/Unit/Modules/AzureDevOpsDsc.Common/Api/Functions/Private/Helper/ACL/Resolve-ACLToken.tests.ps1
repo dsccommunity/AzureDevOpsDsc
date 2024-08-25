@@ -1,6 +1,38 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Resolve-ACLToken' {
-    $referenceObject = [PSCustomObject]@{ token = [PSCustomObject]@{ _token = 'refToken' } }
-    $differenceObject = [PSCustomObject]@{ token = [PSCustomObject]@{ _token = 'diffToken' } }
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        $referenceObject = [PSCustomObject]@{ token = [PSCustomObject]@{ _token = 'refToken' } }
+        $differenceObject = [PSCustomObject]@{ token = [PSCustomObject]@{ _token = 'diffToken' } }
+
+        # If there were any Mock commands needed, they should be added here using the complete syntax.
+        # Example:
+        # Mock -CommandName Resolve-ACLToken -MockWith {
+        #     param ($ReferenceObject, $DifferenceObject)
+        #     if ($DifferenceObject -ne $null) {
+        #         return $DifferenceObject.token._token
+        #     }
+        #     elseif ($ReferenceObject -ne $null) {
+        #         return $ReferenceObject.token._token
+        #     }
+        #     else {
+        #         return $null
+        #     }
+        # }
+    }
 
     Context 'When DifferenceObject is not null' {
         It 'should return the token from DifferenceObject' {
@@ -23,4 +55,3 @@ Describe 'Resolve-ACLToken' {
         }
     }
 }
-

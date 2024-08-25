@@ -1,14 +1,25 @@
-
-# Unit tests for ConvertTo-ACETokenList function
-
-# Load the function script
-. .\ConvertTo-ACETokenList.ps1
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "ConvertTo-ACETokenList Tests" {
 
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+    }
+
     BeforeEach {
         # Mock Get-CacheItem to return a mock SecurityDescriptor
-        Mock Get-CacheItem {
+        Mock -CommandName Get-CacheItem -MockWith {
             return @{
                 actions = @(
                     @{ displayName = "Read"; name = "read" },
@@ -21,7 +32,7 @@ Describe "ConvertTo-ACETokenList Tests" {
 
     It "should return an empty list when SecurityDescriptor is not found" {
         # Mock to return $null for not found SecurityDescriptor
-        Mock Get-CacheItem { return $null }
+        Mock -CommandName Get-CacheItem -MockWith { return $null }
 
         $result = ConvertTo-ACETokenList -SecurityNamespace "TestNamespace" -ACEPermissions @(
             @{ "Read" = "Allow"; "Write" = "Deny" }
@@ -58,4 +69,3 @@ Describe "ConvertTo-ACETokenList Tests" {
 }
 
 # End of Pester tests for ConvertTo-ACETokenList
-

@@ -1,10 +1,27 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 # ConvertTo-FormattedACL.Tests.ps1
 
 Describe "ConvertTo-FormattedACL" {
-    Mock -CommandName Find-Identity -MockWith { return @{Id = "TestIdentity"} }
-    Mock -CommandName Format-ACEs -MockWith { return @{Permissions = "TestPermissions"} }
-    Mock -CommandName Parse-ACLToken -MockWith { return "FormattedToken" }
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'ConvertTo-FormattedACL.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Find-Identity -MockWith { return @{Id = "TestIdentity"} }
+        Mock -CommandName Format-ACEs -MockWith { return @{Permissions = "TestPermissions"} }
+        Mock -CommandName Parse-ACLToken -MockWith { return "FormattedToken" }
+
+    }
 
     Context "When ACL has token and ACE entries" {
         $ACL = [PSCustomObject]@{
@@ -74,4 +91,3 @@ Describe "ConvertTo-FormattedACL" {
         }
     }
 }
-

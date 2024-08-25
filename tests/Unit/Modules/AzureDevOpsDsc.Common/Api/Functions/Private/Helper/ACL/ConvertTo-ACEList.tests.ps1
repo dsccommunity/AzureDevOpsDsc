@@ -1,106 +1,67 @@
-
-# ConvertTo-ACEList.Tests.ps1
-
-# Import the module containing the function to be tested
-# Import-Module -Name 'YourModuleName'
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "ConvertTo-ACEList" {
 
-    Mock -CommandName 'Find-Identity' {
-        return @{
-            Identity = "FoundIdentity"
-        }
-    }
+    BeforeAll {
 
-    Mock -CommandName 'ConvertTo-ACETokenList' {
-        return "MockedPermissionToken"
-    }
-
-    Context "When called with valid parameters" {
-        $SecurityNamespace = "Namespace"
-        $OrganizationName = "MyOrg"
-        $Permissions = @(
-            @{
-                Identity = "User1"
-                Permission = "Read"
-            },
-            @{
-                Identity = "User2"
-                Permission = "Write"
-            }
-        )
-
-        It "Should return a list of ACEs" {
-            $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
-
-            $result | Should -HaveCount 2
-            $result[0].Identity | Should -Be "FoundIdentity"
-            $result[0].Permissions | Should -Be "MockedPermissionToken"
-            $result[1].Identity | Should -Be "FoundIdentity"
-            $result[1].Permissions | Should -Be "MockedPermissionToken"
-        }
-    }
-
-    Context "When identity search fails" {
-        Mock -CommandName 'Find-Identity' {
-            return $null
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
         }
 
-        $SecurityNamespace = "Namespace"
-        $OrganizationName = "MyOrg"
-        $Permissions = @(
-            @{
-                Identity = "User1"
-                Permission = "Read"
-            },
-            @{
-                Identity = "User2"
-                Permission = "Write"
-            }
-        )
-
-        It "Should log a warning and not include the entry in result" {
-            { ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName } | Should -Not -Throw
-
-            $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
-
-            $result | Should -HaveCount 0
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
-    }
 
-    Context "When permissions conversion fails" {
-        Mock -CommandName 'Find-Identity' {
+        # Mock external functions
+        Mock -CommandName Find-Identity -MockWith {
             return @{
-                Identity = "FoundIdentity"
+                Identity = "MockIdentity"
             }
         }
 
-        Mock -CommandName 'ConvertTo-ACETokenList' {
-            return $null
+        Mock -CommandName ConvertTo-ACETokenList -MockWith {
+            return @("MockPermission")
         }
+    }
 
-        $SecurityNamespace = "Namespace"
-        $OrganizationName = "MyOrg"
-        $Permissions = @(
-            @{
-                Identity = "User1"
-                Permission = "Read"
-            },
-            @{
-                Identity = "User2"
-                Permission = "Write"
-            }
-        )
+    It "should return a list of ACEs when valid parameters are provided" {
+        $result = ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg"
 
-        It "Should log a warning and not include the entry in result" {
-            { ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName } | Should -Not -Throw
+        $result | Should -Not -BeNullOrEmpty
+        $result[0].Identity.Identity | Should -Be "MockIdentity"
+        $result[0].Permissions | Should -Contain "MockPermission"
+    }
 
-            $result = ConvertTo-ACEList -SecurityNamespace $SecurityNamespace -Permissions $Permissions -OrganizationName $OrganizationName
+    It "should log a warning if the identity is not found" {
+        Mock -CommandName Find-Identity -MockWith { return $null }
 
-            $result | Should -HaveCount 0
-        }
+        { ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg" } | Should -Throw
+    }
+
+    It "should log a warning if permissions are not found" {
+        Mock -CommandName ConvertTo-ACETokenList -ParameterFilter {
+            param (
+                [string]$SecurityNamespace,
+                [string]$ACEPermissions
+            )
+            return $true
+        } -MockWith { return $null }
+
+        { ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg" } | Should -Throw
+    }
+
+    It "should handle empty permissions array gracefully" {
+        $result = ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @() -OrganizationName "MyOrg"
+
+        $result | Should -BeNullOrEmpty
+    }
+
+    It "should throw an error if mandatory parameters are missing" {
+        { ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) } | Should -Throw
+        { ConvertTo-ACEList -SecurityNamespace "Namespace" -OrganizationName "MyOrg" } | Should -Throw
+        { ConvertTo-ACEList -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg" } | Should -Throw
     }
 }
-
-
-

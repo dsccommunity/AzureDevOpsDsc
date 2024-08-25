@@ -1,5 +1,21 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Parse-ACLToken' {
+
     BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Export-CacheObject.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+
         $script:LocalizedDataAzACLTokenPatten = @{
             OrganizationGit    = '^org:(.+)$'
             GitProject         = '^project:(.+)$'
@@ -8,6 +24,13 @@ Describe 'Parse-ACLToken' {
             ResourcePermission = '^resource:(.+)$'
             GroupPermission    = '^group:(.+)$'
         }
+
+        # If there were any Mock commands needed, they should be added here using the complete syntax.
+        # Example:
+        # Mock -CommandName SomeCommand -MockWith {
+        #     return "mocked result"
+        # }
+
     }
 
     It 'Should parse OrganizationGit token correctly' {
@@ -58,4 +81,3 @@ Describe 'Parse-ACLToken' {
         { Parse-ACLToken -Token $token -SecurityNamespace $SecurityNamespace } | Should -Throw "Token '$token' is not recognized."
     }
 }
-
