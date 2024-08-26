@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'List-DevOpsGroupMembers' {
+Describe 'List-DevOpsGroupMembers' -Tags "Unit", "API" {
 
     BeforeAll {
 

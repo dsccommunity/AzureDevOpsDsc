@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-xAzDoPermission' {
+Describe 'Remove-xAzDoPermission' -Tags "Unit", "API" {
 
     BeforeAll {
 

@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Get-DevOpsACL" {
+Describe "Get-DevOpsACL" -Tags "Unit", "API" {
 
     BeforeAll {
 

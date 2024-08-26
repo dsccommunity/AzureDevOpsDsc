@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Get-DevOpsDescriptorIdentity' {
+Describe 'Get-DevOpsDescriptorIdentity' -Tags "Unit", "API" {
 
     BeforeAll {
 

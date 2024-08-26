@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Get-DevOpsSecurityDescriptor Tests' {
+Describe 'Get-DevOpsSecurityDescriptor Tests' -Tags "Unit", "API" {
 
     BeforeAll {
 

@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-DevOpsGroupMember' {
+Describe 'Remove-DevOpsGroupMember' -Tags "Unit", "API" {
     BeforeAll {
 
         # Load the functions to test

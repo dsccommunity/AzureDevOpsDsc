@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "List-DevOpsSecurityNamespaces" {
+Describe "List-DevOpsSecurityNamespaces" -Tags "Unit", "API" {
 
     BeforeAll {
 

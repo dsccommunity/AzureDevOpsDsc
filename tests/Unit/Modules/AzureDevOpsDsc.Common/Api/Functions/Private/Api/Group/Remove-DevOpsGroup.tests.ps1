@@ -1,11 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-DevOpsGroup' {
-    Param (
-        [string]$ApiUri = "https://dev.azure.com/myorganization",
-        [string]$ApiVersion = "6.0",
-        [string]$GroupDescriptor = "MyGroup"
-    )
+Describe 'Remove-DevOpsGroup' -Tags "Unit", "API" {
 
     BeforeAll {
 

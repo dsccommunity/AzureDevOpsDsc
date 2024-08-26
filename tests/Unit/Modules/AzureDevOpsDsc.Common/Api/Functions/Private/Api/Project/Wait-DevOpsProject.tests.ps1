@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Wait-DevOpsProject" {
+Describe "Wait-DevOpsProject" -Tags "Unit", "API" {
 
     BeforeAll {
 

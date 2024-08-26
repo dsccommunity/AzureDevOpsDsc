@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Set-xAzDoPermission Tests' {
+Describe 'Set-xAzDoPermission Tests' -Tags "Unit", "API" {
 
     BeforeAll {
 
