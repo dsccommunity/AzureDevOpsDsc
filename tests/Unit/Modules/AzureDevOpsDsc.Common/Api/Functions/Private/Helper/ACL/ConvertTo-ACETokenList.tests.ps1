@@ -15,6 +15,13 @@ Describe "ConvertTo-ACETokenList Tests" {
             . $file.FullName
         }
 
+        # Cache Item
+        . (Get-ClassFilePath '000.CacheItem')
+
+        Mock -CommandName Get-AzDoCacheObjects -MockWith {
+            return @('SecurityNamespaces')
+        }
+
     }
 
     BeforeEach {
@@ -33,12 +40,14 @@ Describe "ConvertTo-ACETokenList Tests" {
     It "should return an empty list when SecurityDescriptor is not found" {
         # Mock to return $null for not found SecurityDescriptor
         Mock -CommandName Get-CacheItem -MockWith { return $null }
+        Mock -CommandName Write-Error -Verifiable
 
         $result = ConvertTo-ACETokenList -SecurityNamespace "TestNamespace" -ACEPermissions @(
             @{ "Read" = "Allow"; "Write" = "Deny" }
         )
 
         $result | Should -BeNullOrEmpty
+        Assert-VerifiableMock
     }
 
     It "should correctly process Allow and Deny permissions" {
@@ -58,14 +67,18 @@ Describe "ConvertTo-ACETokenList Tests" {
 
     It "should filter out permissions not found in the SecurityDescriptor" {
         $acePermissions = @(
-            @{ "UnknownPermission" = "Allow"; "Read" = "Deny" }
+            @{ "UnknownPermission" = "Allow"; "Read" = "Deny"; "Write" = "Deny" }
         )
+
         $result = ConvertTo-ACETokenList -SecurityNamespace "TestNamespace" -ACEPermissions $acePermissions
 
         $result | Should -HaveCount 1
-        $result[0].Allow | Should -BeNullOrEmpty
-        $result[0].Deny.displayName | Should -Contain "Read"
+        $result.Allow | Should -BeNullOrEmpty
+        $result.Deny.displayName | Should -Contain "Read"
+        $result.Deny.displayName | Should -Contain "Write"
     }
+
+
 }
 
 # End of Pester tests for ConvertTo-ACETokenList

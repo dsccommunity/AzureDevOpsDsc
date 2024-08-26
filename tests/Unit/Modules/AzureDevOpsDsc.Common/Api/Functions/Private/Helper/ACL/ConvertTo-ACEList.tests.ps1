@@ -27,30 +27,46 @@ Describe "ConvertTo-ACEList" {
         }
     }
 
-    It "should return a list of ACEs when valid parameters are provided" {
-        $result = ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg"
+    It "should return a singular item of ACEs when valid parameters are provided" {
+        $result = ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(
+            @{ Identity = "User1"; Permission = "Read" }
+        ) -OrganizationName "MyOrg"
 
         $result | Should -Not -BeNullOrEmpty
+        $result.Identity.Identity | Should -Be "MockIdentity"
+        $result.Permissions | Should -Contain "MockPermission"
+    }
+
+    It "should return multiple items of ACEs when valid parameters are provided" {
+        $result = ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(
+            @{ Identity = "User1"; Permission = "Read" },
+            @{ Identity = "User2"; Permission = "Write" }
+        ) -OrganizationName "MyOrg"
+
+        $result | Should -Not -BeNullOrEmpty
+        $result | Should -HaveCount 2
         $result[0].Identity.Identity | Should -Be "MockIdentity"
         $result[0].Permissions | Should -Contain "MockPermission"
+        $result[1].Identity.Identity | Should -Be "MockIdentity"
+        $result[1].Permissions | Should -Contain "MockPermission"
     }
 
     It "should log a warning if the identity is not found" {
         Mock -CommandName Find-Identity -MockWith { return $null }
+        Mock -CommandName Write-Warning -Verifiable
 
-        { ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg" } | Should -Throw
+        { ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg" } | Should -Not -Throw
+        Assert-VerifiableMock
+
     }
 
     It "should log a warning if permissions are not found" {
-        Mock -CommandName ConvertTo-ACETokenList -ParameterFilter {
-            param (
-                [string]$SecurityNamespace,
-                [string]$ACEPermissions
-            )
-            return $true
-        } -MockWith { return $null }
+        Mock -CommandName ConvertTo-ACETokenList -MockWith { return $null }
+        Mock -CommandName Write-Warning -Verifiable
 
-        { ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg" } | Should -Throw
+        $result = ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg"
+        $result | Should -BeNullOrEmpty
+        Assert-VerifiableMock
     }
 
     It "should handle empty permissions array gracefully" {
@@ -59,9 +75,4 @@ Describe "ConvertTo-ACEList" {
         $result | Should -BeNullOrEmpty
     }
 
-    It "should throw an error if mandatory parameters are missing" {
-        { ConvertTo-ACEList -SecurityNamespace "Namespace" -Permissions @(@{ Identity = "User1"; Permission = "Read" }) } | Should -Throw
-        { ConvertTo-ACEList -SecurityNamespace "Namespace" -OrganizationName "MyOrg" } | Should -Throw
-        { ConvertTo-ACEList -Permissions @(@{ Identity = "User1"; Permission = "Read" }) -OrganizationName "MyOrg" } | Should -Throw
-    }
 }

@@ -42,9 +42,13 @@ Function Get-BitwiseOrResult {
     foreach ($integer in $integers) {
         if (-not [int]::TryParse($integer.ToString(), [ref]$null)) {
             Write-Error "Invalid integer value: $integer"
-            return
+            return 0
         }
         $result = $result -bor $integer
+    }
+
+    if ([String]::IsNullOrEmpty($result)) {
+        return 0
     }
 
     return $result

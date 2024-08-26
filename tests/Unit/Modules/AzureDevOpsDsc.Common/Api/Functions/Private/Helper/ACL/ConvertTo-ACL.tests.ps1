@@ -15,6 +15,7 @@ Describe "ConvertTo-ACL" {
             . $file.FullName
         }
 
+        Mock -CommandName Write-Warning
         Mock -CommandName New-ACLToken -MockWith { return @{ Token = "mockToken" } }
         Mock -CommandName ConvertTo-ACEList -MockWith {
             return @(
