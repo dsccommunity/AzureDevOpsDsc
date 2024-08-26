@@ -1,7 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Refresh-CacheIdentity' {
-
+Describe 'Refresh-CacheIdentity' -Tags "Unit", "Cache" {
     BeforeAll {
 
         # Load the functions to test

@@ -1,4 +1,4 @@
-Describe 'Refresh-CacheObject' -skip {
+Describe 'Refresh-CacheObject' -skip -Tags "Unit", "Cache" {
     BeforeAll {
         # Mocking Get-AzDoCacheObjects to return a controlled list
         Mock -CommandName 'Get-AzDoCacheObjects' -MockWith { @('Type1', 'Type2', 'Type3') }

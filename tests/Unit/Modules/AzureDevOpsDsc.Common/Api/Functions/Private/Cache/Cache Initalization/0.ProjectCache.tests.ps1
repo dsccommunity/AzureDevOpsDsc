@@ -1,7 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'AzDoAPI_0_ProjectCache' {
-
+Describe 'AzDoAPI_0_ProjectCache' -Tags "Unit", "Cache" {
     BeforeAll {
 
         # Set the Project

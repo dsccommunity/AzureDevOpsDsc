@@ -1,7 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Get-CacheItem' {
-
+Describe 'Get-CacheItem' -Tags "Unit", "Cache" {
     BeforeAll {
 
         # Set the Project

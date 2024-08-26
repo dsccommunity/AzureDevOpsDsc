@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Export-CacheObject" {
+Describe "Export-CacheObject" -Tags "Unit", "Cache" {
 
     BeforeAll {
 

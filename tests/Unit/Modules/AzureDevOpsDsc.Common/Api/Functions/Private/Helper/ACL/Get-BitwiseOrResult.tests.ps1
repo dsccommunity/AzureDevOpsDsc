@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Get-BitwiseOrResult' {
+Describe 'Get-BitwiseOrResult' -Tags "Unit", "ACL", "Helper" {
 
     BeforeAll {
 

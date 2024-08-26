@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Initialize-CacheObject Tests" {
+Describe "Initialize-CacheObject Tests" -Tags "Unit", "Cache" {
 
     BeforeAll {
 

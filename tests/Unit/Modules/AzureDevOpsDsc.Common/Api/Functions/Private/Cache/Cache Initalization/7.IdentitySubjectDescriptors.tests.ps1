@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "AzDoAPI_7_IdentitySubjectDescriptors" {
+Describe "AzDoAPI_7_IdentitySubjectDescriptors" -Tags "Unit", "Cache" {
 
     BeforeAll {
 

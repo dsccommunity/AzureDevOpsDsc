@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'AzDoAPI_6_ServicePrinciple' {
+Describe 'AzDoAPI_6_ServicePrinciple' -Tags "Unit", "Cache" {
 
     BeforeAll {
 

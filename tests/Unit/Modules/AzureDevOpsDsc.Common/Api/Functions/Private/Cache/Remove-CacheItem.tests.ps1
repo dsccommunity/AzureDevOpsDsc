@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-CacheItem' {
+Describe 'Remove-CacheItem' -Tags "Unit", "Cache" {
 
     BeforeEach {
 

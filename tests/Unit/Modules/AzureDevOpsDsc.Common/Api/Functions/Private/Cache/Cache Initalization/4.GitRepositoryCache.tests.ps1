@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "AzDoAPI_4_GitRepositoryCache Tests" {
+Describe "AzDoAPI_4_GitRepositoryCache Tests" -Tags "Unit", "Cache" {
 
     BeforeAll {
 

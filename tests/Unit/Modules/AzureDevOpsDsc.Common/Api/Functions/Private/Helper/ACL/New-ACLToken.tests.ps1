@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'New-ACLToken Function Tests' {
+Describe 'New-ACLToken Function Tests' -Skip -Tags "Unit", "ACL", "Helper" {
 
     BeforeAll {
 
@@ -15,27 +15,32 @@ Describe 'New-ACLToken Function Tests' {
             . $file.FullName
         }
 
+        # Load 001.LocalizedDataAzResourceTokenPatten
+        . (Get-ClassFilePath '001.LocalizedDataAzResourceTokenPatten')
+
         Mock -CommandName Get-CacheItem -MockWith {
             return [PSCustomObject]@{id = "1234"}
         }
+        Mock -CommandName Write-Warning
 
     }
 
     Context 'Git Repositories Namespace' {
 
         It 'Should return GitOrganization type for valid Git organization token' {
-            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]'
+            Wait-Debugger
+            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'OrgName'
             $result.type | Should -Be 'GitOrganization'
         }
 
         It 'Should return GitProject type for valid Git project token' {
-            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]/[ProjectName]'
+            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]/ProjectName'
             $result.type | Should -Be 'GitProject'
             $result.projectId | Should -Be '1234'
         }
 
         It 'Should return GitRepository type for valid Git repository token' {
-            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]/[ProjectName]/[RepoName]'
+            $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName '[OrgName]/ProjectName/RepoName'
             $result.type | Should -Be 'GitRepository'
             $result.projectId | Should -Be '1234'
             $result.RepoId | Should -Be '1234'

@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Add-CacheItem" {
+Describe "Add-CacheItem" -Tags "Unit", "Cache" {
 
     BeforeAll {
 
