@@ -1,18 +1,33 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Get-AzDevOpsProject' {
-    Param (
-        [string]$ApiUri = 'https://dev.azure.com/test_org/_apis/',
-        [string]$Pat = 'fake_pat',
-        [string]$ProjectId = 'fake_project_id',
-        [string]$ProjectName = 'fake_project_name'
-    )
 
-    Mock Get-CacheItem {
+    BeforeAll {
+
+        # Set the Project
+        $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzDevOpsProject.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        Wait-Debugger
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+    }
+
+
+    Mock -CommandName Get-CacheItem -MockWith {
         return @{
-            Key = $ProjectName
+            Key = $using:ProjectName
             Value = @{
-                ProjectId = $ProjectId
-                ProjectName = $ProjectName
+                ProjectId = $using:ProjectId
+                ProjectName = $using:ProjectName
             }
         }
     }
@@ -55,4 +70,3 @@ Describe 'Get-AzDevOpsProject' {
         $result.ProjectName | Should -Be $ProjectName
     }
 }
-
