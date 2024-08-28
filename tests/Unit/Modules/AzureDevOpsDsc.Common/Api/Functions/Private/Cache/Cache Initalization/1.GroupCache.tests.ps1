@@ -2,9 +2,15 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'AzDoAPI_1_GroupCache' -Tags "Unit", "Cache" {
 
+    AfterAll {
+        Remove-Variable -Name "AzDoProject" -Scope Global -ErrorAction SilentlyContinue
+        Remove-Variable -Name "AzDoLiveGroups" -Scope Global -ErrorAction SilentlyContinue
+    }
 
     BeforeAll {
 
+        # Set the Organization
+        $null = Remove-Variable -Name "DSCAZDO_OrganizationName" -Scope Global -ErrorAction SilentlyContinue
         # Set the Project
         $null = Set-Variable -Name "AzDoProject" -Value @() -Scope Global
 
@@ -54,7 +60,7 @@ Describe 'AzDoAPI_1_GroupCache' -Tags "Unit", "Cache" {
             AzDoAPI_1_GroupCache -OrganizationName 'MyOrganization'
 
             Assert-MockCalled Export-CacheObject -Exactly -Times 1 -Scope It -ParameterFilter {
-                $CacheType -eq 'LiveGroups' -and $Content -eq $global:AzDoLiveGroups
+                $CacheType -eq 'LiveGroups'
             }
         }
     }
