@@ -41,7 +41,7 @@ Function Format-AzDoProjectName {
     }
 
     # Format the group name with the organization name.
-    $formattedGroupName = '[{0}]\{1}' -f $splitGroupName[0], $splitGroupName[1]
+    $formattedGroupName = '[{0}]\{1}' -f $splitGroupName[0].Trim(), $splitGroupName[1].Trim()
 
     return $formattedGroupName
 }

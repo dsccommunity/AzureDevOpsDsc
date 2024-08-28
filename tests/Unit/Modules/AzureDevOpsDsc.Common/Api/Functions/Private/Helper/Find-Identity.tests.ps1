@@ -7,7 +7,7 @@ Describe 'Find-Identity Function Tests' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath "ConvertTo-Base64String.tests.ps1"
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath "Find-Identity.tests.ps1"
         }
 
         # Load the functions to test
