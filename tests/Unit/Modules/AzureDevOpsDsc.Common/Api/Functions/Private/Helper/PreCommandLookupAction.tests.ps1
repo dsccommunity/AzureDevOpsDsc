@@ -1,4 +1,5 @@
-Describe "PreCommandLookupAction" {
+# Not implemented
+Describe "PreCommandLookupAction" -skip {
     BeforeAll {
         $global:ExecutionContext = [pscustomobject]@{
             InvokeCommand = [pscustomobject]@{

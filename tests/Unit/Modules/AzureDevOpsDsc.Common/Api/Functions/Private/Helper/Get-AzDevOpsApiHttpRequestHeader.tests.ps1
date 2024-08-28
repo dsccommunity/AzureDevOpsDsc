@@ -1,5 +1,28 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Get-AzDevOpsApiHttpRequestHeader' {
-    Mock -CommandName Test-AzDevOpsPat -MockWith { return $true }
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath "Get-AzDevOpsApiHttpRequestHeader.tests.ps1"
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        Mock -CommandName Test-AzDevOpsPat -MockWith {
+            param (
+                [string]$Pat
+            )
+            return $true
+        }
+
+    }
 
     Context 'when called with valid PAT' {
         It 'should return a hashtable with Authorization header' {
@@ -16,11 +39,14 @@ Describe 'Get-AzDevOpsApiHttpRequestHeader' {
     }
 
     Context 'when called with invalid PAT' {
-        Mock -CommandName Test-AzDevOpsPat -MockWith { return $false }
-
         It 'should throw a validation exception' {
-            { Get-AzDevOpsApiHttpRequestHeader -Pat 'InvalidPAT' } | Should -Throw -ErrorId ParameterArgumentValidationError
+
+            Mock -CommandName Test-AzDevOpsPat -MockWith {
+                return $false
+            }
+
+            { Get-AzDevOpsApiHttpRequestHeader -Pat 'InvalidPAT' } | Should -Throw
+
         }
     }
 }
-

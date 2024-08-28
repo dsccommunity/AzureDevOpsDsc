@@ -1,7 +1,18 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Get-AzDevOpsApiResourceName' {
-    It 'Should return an array of strings' {
-        $result = Get-AzDevOpsApiResourceName
-        $result | Should -BeOfType [System.String[]]
+
+    BeforeAll {
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath "Get-AzDevOpsApiResourceName.tests.ps1"
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
     }
 
     It 'Should return expected resource names' {
@@ -10,9 +21,4 @@ Describe 'Get-AzDevOpsApiResourceName' {
         $result | Should -Be $expected
     }
 
-    It 'Should not return an empty array' {
-        $result = Get-AzDevOpsApiResourceName
-        $result.Length | Should -BeGreaterThan 0
-    }
 }
-

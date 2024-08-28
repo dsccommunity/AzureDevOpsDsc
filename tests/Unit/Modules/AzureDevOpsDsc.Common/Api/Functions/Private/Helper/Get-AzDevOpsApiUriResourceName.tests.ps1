@@ -1,4 +1,6 @@
-Describe 'Get-AzDevOpsApiUriResourceName Tests' {
+$currentFile = $MyInvocation.MyCommand.Path
+# Ignore the file. It is not used.
+Describe 'Get-AzDevOpsApiUriResourceName Tests' -skip {
 
     BeforeEach {
         function Test-AzDevOpsApiResourceName {

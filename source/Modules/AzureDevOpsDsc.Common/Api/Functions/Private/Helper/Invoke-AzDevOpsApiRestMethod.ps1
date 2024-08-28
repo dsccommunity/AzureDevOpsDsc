@@ -144,7 +144,7 @@ function Invoke-AzDevOpsApiRestMethod
         # If the API resouce is overwelmed, wait for the specified number of seconds before sending the request
         elseif (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5))
         {
-            Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Resource is overwelmed. Waiting for {0} seconds to reset the TSTUs." -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
+            Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Resource is overwhelmed. Waiting for {0} seconds to reset the TSTUs." -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
             Start-Sleep -Milliseconds $RetryIntervalMs
         }
 
@@ -178,6 +178,7 @@ function Invoke-AzDevOpsApiRestMethod
 
                 #
                 # Test to see if there is no continuation token
+
                 if ([String]::IsNullOrEmpty($responseHeaders.'x-ms-continuationtoken'))
                 {
                     # If not, set the continuation token to False
@@ -206,12 +207,12 @@ function Invoke-AzDevOpsApiRestMethod
             {
                 # Zero out the 'Authorization' header
                 $invokeRestMethodParameters.Headers.Authorization = $null
-
                 # Check to see if it is an HTTP 429 (Too Many Requests) error
                 if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::TooManyRequests)
                 {
                     # If so, wait for the specified number of seconds before retrying
-                    $retryAfter = $_.Exception.Response.Headers | ForEach-Object { if ($_.Key -eq "Retry-After") { return $_.Value } }
+                    $retryAfter = $_.Exception.Response.Headers['Retry-After']
+
                     if ($retryAfter)
                     {
                         $retryAfter = [int]$retryAfter

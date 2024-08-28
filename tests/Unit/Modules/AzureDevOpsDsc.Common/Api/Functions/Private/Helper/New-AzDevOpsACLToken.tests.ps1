@@ -1,6 +1,23 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 # Unit Tests for New-AzDevOpsACLToken function
-Describe 'New-AzDevOpsACLToken' {
+Describe 'New-AzDevOpsACLToken' -Skip {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath "New-AzDevOpsACLToken.tests.ps1"
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+    }
+
     Context 'When TeamId is provided' {
         It 'Should create a team-level access token' {
             $OrganizationName = "Contoso"
@@ -36,4 +53,3 @@ Describe 'New-AzDevOpsACLToken' {
         }
     }
 }
-

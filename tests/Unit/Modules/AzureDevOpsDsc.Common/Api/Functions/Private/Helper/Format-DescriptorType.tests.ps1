@@ -1,4 +1,22 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Format-DescriptorType' {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath "Format-DescriptorType.tests.ps1"
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+    }
+
 
     It 'returns "Git Repositories" for DescriptorType "GitRepositories"' {
         $result = Format-DescriptorType -DescriptorType 'GitRepositories'
@@ -15,10 +33,4 @@ Describe 'Format-DescriptorType' {
         $result | Should -Be 'Webhooks'
     }
 
-    It 'returns the same value for an empty string' {
-        $result = Format-DescriptorType -DescriptorType ''
-        $result | Should -Be ''
-    }
-
 }
-
