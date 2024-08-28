@@ -6,7 +6,7 @@ Describe 'Test-AzDevOpsApiResourceId' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'ConvertTo-ACEList.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-AzDevOpsApiResourceId.tests.ps1'
         }
 
         # Load the functions to test

@@ -4,7 +4,7 @@ Describe 'Test-AzDevOpsApiVersion' {
     BeforeAll {
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-AzDevOpsApiUri.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-AzDevOpsApiVersion.tests.ps1'
         }
 
         # Load the functions to test
