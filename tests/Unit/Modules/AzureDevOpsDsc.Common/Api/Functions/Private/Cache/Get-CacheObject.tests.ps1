@@ -28,6 +28,9 @@ Describe 'Get-CacheObject Tests' -Tags "Unit", "Cache" {
     }
 
     AfterAll {
+
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
+
         if ($originalEnvironment) {
             Set-Variable -Name "ENV" -Value $originalEnvironment -Scope Global
         }

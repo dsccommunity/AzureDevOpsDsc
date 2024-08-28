@@ -35,6 +35,10 @@ Describe 'Refresh-CacheIdentity' -Tags "Unit", "Cache" {
 
     }
 
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -ErrorAction SilentlyContinue
+    }
+
     BeforeEach {
         $identity = [PSCustomObject]@{ descriptor = 'descriptor123' }
     }

@@ -29,6 +29,10 @@ Describe "Import-CacheObject Tests" -Tags "Unit", "Cache" {
 
     }
 
+    AfterAll {
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
+    }
+
     Context "Valid CacheType parameter" {
 
         It "Imports the cache object successfully" {

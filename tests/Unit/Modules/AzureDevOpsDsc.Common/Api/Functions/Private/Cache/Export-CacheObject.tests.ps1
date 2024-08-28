@@ -2,6 +2,10 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 Describe "Export-CacheObject" -Tags "Unit", "Cache" {
 
+    AfterAll {
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
+    }
+
     BeforeAll {
 
         # Set the Project

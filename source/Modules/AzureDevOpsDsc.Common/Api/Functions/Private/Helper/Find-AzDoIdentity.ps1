@@ -73,8 +73,8 @@ Function Find-AzDoIdentity {
             Write-Verbose "[Find-AzDoIdentity] Performing a lookup using the display name '$Identity'."
 
             # Perform a lookup using the existing username
-            $User = $CachedUsers | Where-Object { $_.value.displayName -eq $Identity }
-            $Group = $CachedGroups | Where-Object { $_.value.displayName -eq $Identity }
+            [Array]$User = $CachedUsers | Where-Object { $_.value.displayName -eq $Identity }
+            [Array]$Group = $CachedGroups | Where-Object { $_.value.displayName -eq $Identity }
 
             # Write the number of users and groups found
             Write-Verbose "[Find-AzDoIdentity] Found $($User.Count) users and $($Group.Count) groups with the display name '$Identity'."

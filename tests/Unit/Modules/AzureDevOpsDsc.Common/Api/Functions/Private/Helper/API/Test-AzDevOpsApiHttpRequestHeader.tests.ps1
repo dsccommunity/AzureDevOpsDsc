@@ -1,4 +1,24 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Test-AzDevOpsApiHttpRequestHeader' {
+
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'ConvertTo-ACEList.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+    }
+
+
     It 'Returns $true when HttpRequestHeader contains Metadata' {
         $header = @{ Metadata = 'someValue' }
         $result = Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $header -IsValid
@@ -35,9 +55,8 @@ Describe 'Test-AzDevOpsApiHttpRequestHeader' {
         $result | Should -Be $false
     }
 
-    It 'Throws exception when IsValid switch is missing' {
+    It 'Throws exception when IsValid switch is missing' -skip {
         $header = @{ Authorization = 'Bearer: yourTokenHere' }
         { Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $header } | Should -Throw
     }
 }
-

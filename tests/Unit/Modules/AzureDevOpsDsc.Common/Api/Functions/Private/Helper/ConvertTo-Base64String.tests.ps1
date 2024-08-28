@@ -1,18 +1,20 @@
-Describe "ConvertTo-Base64String" {
-    BeforeAll {
-        function ConvertTo-Base64String {
-            [CmdletBinding()]
-            param (
-                [Parameter(Mandatory, ValueFromPipeline)]
-                [ValidateNotNullOrEmpty()]
-                [String]
-                $InputObject
-            )
+$currentFile = $MyInvocation.MyCommand.Path
 
-            process {
-                [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($InputObject))
-            }
+Describe "ConvertTo-Base64String" {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath "ConvertTo-Base64String.tests.ps1"
         }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
     }
 
     It "should convert a string to a Base64 string" {
@@ -34,7 +36,7 @@ Describe "ConvertTo-Base64String" {
 
     It "should handle special characters correctly" {
         $input = "!@#$%^&*()_+|"
-        $expected = "IUAjJCVeJiooKV8rfg=="
+        $expected = "IUAjJCVeJiooKV8rfA=="
 
         $result = ConvertTo-Base64String -InputObject $input
 
@@ -50,4 +52,3 @@ Describe "ConvertTo-Base64String" {
         $result | Should -Be $expected
     }
 }
-

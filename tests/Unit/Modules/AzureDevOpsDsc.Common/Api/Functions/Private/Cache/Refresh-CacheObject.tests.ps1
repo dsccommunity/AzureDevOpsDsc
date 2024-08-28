@@ -1,4 +1,5 @@
 Describe 'Refresh-CacheObject' -skip -Tags "Unit", "Cache" {
+
     BeforeAll {
         # Mocking Get-AzDoCacheObjects to return a controlled list
         Mock -CommandName 'Get-AzDoCacheObjects' -MockWith { @('Type1', 'Type2', 'Type3') }
@@ -12,6 +13,10 @@ Describe 'Refresh-CacheObject' -skip -Tags "Unit", "Cache" {
                 [string] $Type
             )
         }
+    }
+
+    AfterAll {
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
     }
 
     Context 'Valid Type' {

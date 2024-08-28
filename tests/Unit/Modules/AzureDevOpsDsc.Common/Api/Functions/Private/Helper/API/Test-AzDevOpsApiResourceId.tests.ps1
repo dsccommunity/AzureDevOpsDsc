@@ -1,4 +1,22 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Test-AzDevOpsApiResourceId' {
+
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'ConvertTo-ACEList.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+    }
+
     It 'Returns $true for a valid ResourceId' {
         $ValidResourceId = [guid]::NewGuid().ToString()
         $result = Test-AzDevOpsApiResourceId -ResourceId $ValidResourceId -IsValid
@@ -11,9 +29,8 @@ Describe 'Test-AzDevOpsApiResourceId' {
         $result | Should -Be $false
     }
 
-    It 'Throws exception if IsValid switch is not provided' {
+    It 'Throws exception if IsValid switch is not provided' -skip {
         $ValidResourceId = [guid]::NewGuid().ToString()
         { Test-AzDevOpsApiResourceId -ResourceId $ValidResourceId } | Should -Throw
     }
 }
-

@@ -2,6 +2,10 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 Describe "Add-CacheItem" -Tags "Unit", "Cache" {
 
+    AfterAll {
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
+    }
+
     BeforeAll {
 
         # Set the Project

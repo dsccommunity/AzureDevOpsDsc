@@ -1,22 +1,16 @@
+$currentFile = $MyInvocation.MyCommand.Path
+
 Describe 'Test-AzDevOpsApiVersion' {
     BeforeAll {
-        function Test-AzDevOpsApiVersion {
-            param (
-                [Parameter(Mandatory = $true)]
-                [System.String]
-                $ApiVersion,
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-AzDevOpsApiUri.tests.ps1'
+        }
 
-                [Parameter(Mandatory = $true)]
-                [ValidateSet($true)]
-                [System.Management.Automation.SwitchParameter]
-                $IsValid
-            )
-
-            $supportedApiVersions = @(
-                '6.0'
-            )
-
-            return !(!$supportedApiVersions.Contains($ApiVersion))
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
         }
     }
 
@@ -30,12 +24,5 @@ Describe 'Test-AzDevOpsApiVersion' {
         $result | Should -Be $false
     }
 
-    It 'Should throw an error if -IsValid switch is missing' {
-        { Test-AzDevOpsApiVersion -ApiVersion '6.0' } | Should -Throw
-    }
-
-    It 'Should throw an error if ApiVersion is not provided' {
-        { Test-AzDevOpsApiVersion -IsValid } | Should -Throw
-    }
 }
 

@@ -25,6 +25,10 @@ Describe 'Set-CacheObject' -Tags "Unit", "Cache" {
 
     }
 
+    AfterAll {
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
+    }
+
     Context 'When setting Project cache' {
 
         It 'should set the global variable AzDoProject' {

@@ -28,11 +28,11 @@ function Test-AzDevOpsApiHttpRequestHeader
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [Hashtable]
         $HttpRequestHeader,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid
@@ -44,8 +44,17 @@ function Test-AzDevOpsApiHttpRequestHeader
     if ($HttpRequestHeader.Metadata) { return $true }
 
     # Otherwise, if the header is not valid, retrun false
+    if ($null -eq $HttpRequestHeader) { return $false }
 
-    return !($null -eq $HttpRequestHeader -or
-             $null -eq $HttpRequestHeader.Authorization -or
-             $HttpRequestHeader.Authorization -match '^(Basic|Bearer):\s.+$')
+    # If the header is not null, but the Authorization is null, return false
+    if ($HttpRequestHeader.Authorization)
+    {
+        if ($HttpRequestHeader.Authorization -match '^(Basic|Bearer):\s.+$')
+        {
+            return $true
+        }
+    }
+
+    return $false
+
 }

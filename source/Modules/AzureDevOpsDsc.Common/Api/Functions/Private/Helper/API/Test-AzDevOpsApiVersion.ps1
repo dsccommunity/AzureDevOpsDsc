@@ -27,11 +27,11 @@ function Test-AzDevOpsApiVersion
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ApiVersion,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet($true)]
         [System.Management.Automation.SwitchParameter]
         $IsValid

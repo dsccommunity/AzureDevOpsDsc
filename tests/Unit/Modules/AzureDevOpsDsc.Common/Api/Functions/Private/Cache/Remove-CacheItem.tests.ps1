@@ -2,7 +2,13 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Remove-CacheItem' -Tags "Unit", "Cache" {
 
-    BeforeEach {
+    AfterAll {
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
+    }
+
+    BeforeAll {
+
+        Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
 
         # Load the functions to test
         if ($null -eq $currentFile) {
