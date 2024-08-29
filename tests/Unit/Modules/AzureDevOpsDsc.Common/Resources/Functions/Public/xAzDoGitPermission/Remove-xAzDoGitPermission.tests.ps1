@@ -45,8 +45,6 @@ Describe "Remove-xAzDoGitPermission" {
 
     }
 
-    #TODO: Add more tests
-
     BeforeEach {
 
         $params = @{
@@ -74,7 +72,8 @@ Describe "Remove-xAzDoGitPermission" {
 
     It "Does not call Remove-GitRepositoryPermission if Filtered is null" {
 
-        Mock -Name 'Get-CacheItem' -MockWith {
+        Mock -CommandName Write-Error -Verifiable
+        Mock -CommandName Get-CacheItem -MockWith {
             switch ($Type) {
                 'LiveACLList' { @(@{ token = 'repoV2/notMatchingValue' }) }
                 default { $null }
@@ -87,4 +86,73 @@ Describe "Remove-xAzDoGitPermission" {
         Assert-VerifiableMock
 
     }
+
+    It "Does not call Remove-GitRepositoryPermission if ACLs are null" {
+
+        Mock -CommandName Write-Error -Verifiable
+        Mock -CommandName Get-CacheItem -MockWith {
+            switch ($Type) {
+                'LiveACLList' { $null }
+                default { $null }
+            }
+        }
+
+        Remove-xAzDoGitPermission @params
+
+        Assert-MockCalled -CommandName Remove-xAzDoPermission -Exactly 0
+        Assert-VerifiableMock
+
+    }
+
+    It "Does not call Remove-GitRepositoryPermission if Repository is null" {
+
+        Mock -CommandName Write-Error -Verifiable
+        Mock -CommandName Get-CacheItem -MockWith {
+            switch ($Type) {
+                'LiveRepositories' { $null }
+                default { $null }
+            }
+        }
+
+        Remove-xAzDoGitPermission @params
+
+        Assert-MockCalled -CommandName Remove-xAzDoPermission -Exactly 0
+        Assert-VerifiableMock
+
+    }
+
+    It "Does not call Remove-GitRepositoryPermission if Project is null" {
+
+        Mock -CommandName Write-Error -Verifiable
+        Mock -CommandName Get-CacheItem -MockWith {
+            switch ($Type) {
+                'LiveProjects' { $null }
+                default { $null }
+            }
+        }
+
+        Remove-xAzDoGitPermission @params
+
+        Assert-MockCalled -CommandName Remove-xAzDoPermission -Exactly 0
+        Assert-VerifiableMock
+
+    }
+
+    It "Does not call Remove-GitRepositoryPermission if SecurityNamespace is null" {
+
+        Mock -CommandName Write-Error -Verifiable
+        Mock -CommandName Get-CacheItem -MockWith {
+            switch ($Type) {
+                'SecurityNamespaces' { $null }
+                default { $null }
+            }
+        }
+
+        Remove-xAzDoGitPermission @params
+
+        Assert-MockCalled -CommandName Remove-xAzDoPermission -Exactly 0
+        Assert-VerifiableMock
+
+    }
+
 }

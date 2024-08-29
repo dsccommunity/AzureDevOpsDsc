@@ -29,10 +29,41 @@ Function Remove-xAzDoGitPermission {
     #
     # Security Namespace ID
 
+    # Get the Security Namespace
     $SecurityNamespace  = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
+
+    # If the Security Namespace is null, return
+    if (-not $SecurityNamespace) {
+        Write-Error "[New-xAzDoGitPermission] Security Namespace not found."
+        return
+    }
+
+    # Get the Project
     $Project            = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
+
+    # If the Project is null, return
+    if (-not $Project) {
+        Write-Error "[New-xAzDoGitPermission] Project not found."
+        return
+    }
+
+    # Get the Repository
     $Repository         = Get-CacheItem -Key "$ProjectName\$RepositoryName" -Type 'LiveRepositories'
+
+    # If the Repository is null, return
+    if (-not $Repository) {
+        Write-Error "[New-xAzDoGitPermission] Repository not found."
+        return
+    }
+
+    # Get the ACLs
     $DescriptorACLList  = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
+
+    # If the ACLs are null, return
+    if (-not $DescriptorACLList) {
+        Write-Error "[New-xAzDoGitPermission] ACLs not found."
+        return
+    }
 
     #
     # Filter the ACLs that pertain to the Git Repository

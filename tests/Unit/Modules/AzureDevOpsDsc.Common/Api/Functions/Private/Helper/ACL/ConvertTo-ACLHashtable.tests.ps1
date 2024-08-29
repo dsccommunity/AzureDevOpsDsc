@@ -76,6 +76,7 @@ Describe "ConvertTo-ACLHashtable" -Tags "Unit", "ACL", "Helper" {
         )
 
         $descriptorMatchToken = "token2"
+        Mock -CommandName Write-Warning
 
     }
 
@@ -94,6 +95,31 @@ Describe "ConvertTo-ACLHashtable" -Tags "Unit", "ACL", "Helper" {
         $result.value[1].acesDictionary.descriptor1 | Should -Not -BeNullOrEmpty
         $result.value[1].acesDictionary.descriptor1.allow | Should -Be 1
         $result.value[1].acesDictionary.descriptor1.deny | Should -Be 0
+
+    }
+
+    It "Correctly converts and builds the ACL hashtable when the descriptor match token is not found" {
+
+        $descriptorACLList = @(
+            [PSCustomObject]@{
+                token = "token3"
+                inheritPermissions = $true
+                acesDictionary = @{
+                    descriptor3 = @{
+                        allow = 1
+                        deny = 0
+                    }
+                }
+            }
+        )
+
+        $result = ConvertTo-ACLHashtable -ReferenceACLs $referenceACLs -DescriptorACLList $descriptorACLList -DescriptorMatchToken 'token4'
+
+        $result.Count | Should -Be 2
+        $result.value[0].token | Should -Be 'token3'
+        $result.value[0].inheritPermissions | Should -Be $true
+        $result.value[1].token | Should -Be 'token2'
+        $result.value[1].inheritPermissions | Should -Be $true
 
     }
 }
