@@ -13,7 +13,7 @@ Describe 'Set-xAzDoGitPermission' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoGitPermission.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoGitPermission.tests.ps1'
         }
 
         # Load the functions to test

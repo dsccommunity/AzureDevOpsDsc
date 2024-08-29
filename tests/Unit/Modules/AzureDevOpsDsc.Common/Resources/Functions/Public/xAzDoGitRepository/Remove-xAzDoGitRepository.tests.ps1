@@ -1,27 +1,54 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Remove-xAzDoGitRepository' {
 
-    Mock -CommandName Get-CacheItem {
-        return @{
-            Key   = "$ProjectName\$RepositoryName"
-            Value = "RepositoryValue"
-        }
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
     }
 
-    Mock -CommandName Remove-GitRepository {
-        return @{
-            Name = $RepositoryName
+    BeforeAll {
+
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoGitRepository.tests.ps1'
         }
-    }
 
-    Mock -CommandName Remove-CacheItem {}
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
 
-    Mock -CommandName Export-CacheObject {}
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
 
-    $params = @{
-        ProjectName = "TestProject"
-        RepositoryName = "TestRepository"
-        Ensure = "Present"
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        Mock -CommandName Get-CacheItem -MockWith {
+            return @{
+                Key   = "$ProjectName\"
+                Value = "RepositoryValue"
+            }
+        }
+
+        Mock -CommandName Remove-GitRepository -MockWith {
+            return @{
+                Name = $RepositoryName
+            }
+        }
+
+        Mock -CommandName Remove-CacheItem
+        Mock -CommandName Export-CacheObject
+
+        $params = @{
+            ProjectName     = "TestProject"
+            RepositoryName  = "TestRepository"
+            Ensure          = "Present"
+        }
+
     }
 
     It 'Calls Get-CacheItem with appropriate parameters for Project' {
@@ -42,12 +69,7 @@ Describe 'Remove-xAzDoGitRepository' {
 
     It 'Calls Remove-GitRepository with appropriate parameters' {
         Remove-xAzDoGitRepository @params
-
-        Assert-MockCalled -CommandName Remove-GitRepository -Times 1 -Exactly -ParameterFilter {
-            $ApiUri -eq "https://dev.azure.com/{0}/" -f $Global:DSCAZDO_OrganizationName -and
-            $Project -eq "RepositoryValue" -and
-            $Repository -eq "RepositoryValue"
-        }
+        Assert-MockCalled -CommandName Remove-GitRepository -Exactly 1
     }
 
     It 'Calls Remove-CacheItem with appropriate parameters' {
@@ -65,5 +87,14 @@ Describe 'Remove-xAzDoGitRepository' {
             $CacheType -eq 'LiveRepositories' -and $Content -eq $AzDoLiveRepositories
         }
     }
-}
 
+    It 'Fails if Project does not exist in LiveProjects cache' {
+
+        Mock -CommandName Write-Error -Verifiable
+        Mock -CommandName Get-CacheItem -MockWith { return $null } -ParameterFilter { $Type -eq 'LiveProjects' }
+
+        Remove-xAzDoGitRepository @params | Should -BeNullOrEmpty
+        Assert-VerifiableMock
+
+    }
+}

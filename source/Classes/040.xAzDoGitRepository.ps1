@@ -71,7 +71,7 @@ class xAzDoGitRepository : AzDevOpsDscResourceBase
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
     {
-        return @()
+        return @('ProjectName', 'RepositoryName', 'SourceRepository')
     }
 
     hidden [Hashtable]GetDscCurrentStateProperties([PSCustomObject]$CurrentResourceObject)

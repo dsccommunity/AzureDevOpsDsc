@@ -37,6 +37,12 @@ Function Remove-xAzDoGitRepository
         Repository  = Get-CacheItem -Key "$ProjectName\$RepositoryName" -Type 'LiveRepositories'
     }
 
+    # Check if the project exists in the LiveProjects cache
+    if (($null -eq $params.Project) -or ($null -eq $params.Repository)) {
+        Write-Error "[Remove-xAzDoGitRepository] Project '$($ProjectName)' or Repository '$($RepositoryName)' does not exist in the LiveProjects or LiveRepositories cache. Skipping change."
+        return
+    }
+
     # Create a new repository
     $value = Remove-GitRepository @params
 

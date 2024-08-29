@@ -55,6 +55,8 @@ Function Get-xAzDoGitRepository {
     if ($repository) {
         Write-Verbose "[Get-xAzDoGitRepository] The Repository '$RepositoryName' was found in the Live Cache."
         $getRepositoryResult.status = [DSCGetSummaryState]::Unchanged
+        return $getRepositoryResult
+
     } else {
         Write-Verbose "[Get-xAzDoGitRepository] The Repository '$RepositoryName' was not found in the Live Cache."
         $getRepositoryResult.status = [DSCGetSummaryState]::NotFound

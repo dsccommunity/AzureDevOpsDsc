@@ -49,7 +49,7 @@ function Test-AzDevOpsApiHttpRequestHeader
     # If the header is not null, but the Authorization is null, return false
     if ($HttpRequestHeader.Authorization)
     {
-        if ($HttpRequestHeader.Authorization -match '^(Basic|Bearer):\s.+$')
+        if ($HttpRequestHeader.Authorization -match '^(Basic|Bearer)(:\s|\s).+$')
         {
             return $true
         }

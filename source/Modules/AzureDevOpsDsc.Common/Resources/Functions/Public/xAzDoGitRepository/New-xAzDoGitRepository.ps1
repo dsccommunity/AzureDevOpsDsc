@@ -39,6 +39,12 @@ Function New-xAzDoGitRepository {
         SourceRepository = $SourceRepository
     }
 
+    if ($null -eq $params.Project) {
+        Write-Error "[New-xAzDoGitRepository] Project '$($ProjectName)' does not exist in the LiveProjects cache. Skipping change."
+        return
+    }
+
+
     # Create a new repository
     $value = New-GitRepository @params
 

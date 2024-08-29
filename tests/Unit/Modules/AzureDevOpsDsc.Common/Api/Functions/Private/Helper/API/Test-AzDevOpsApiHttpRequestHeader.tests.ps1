@@ -37,6 +37,12 @@ Describe 'Test-AzDevOpsApiHttpRequestHeader' {
         $result | Should -Be $true
     }
 
+    It 'Returns $true when HttpRequestHeader.Authorization is a valid Bearer token with space and no colon' {
+        $header = @{ Authorization = 'Bearer yourTokenHere' }
+        $result = Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $header -IsValid
+        $result | Should -Be $true
+    }
+
     It 'Returns $false when HttpRequestHeader.Authorization is null' {
         $header = @{ Authorization = $null }
         $result = Test-AzDevOpsApiHttpRequestHeader -HttpRequestHeader $header -IsValid

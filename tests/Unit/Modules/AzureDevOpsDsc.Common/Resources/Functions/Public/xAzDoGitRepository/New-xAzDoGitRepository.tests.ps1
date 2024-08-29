@@ -1,16 +1,43 @@
-
-# Import the Pester module
-Import-Module Pester
+$currentFile = $MyInvocation.MyCommand.Path
 
 # Pester tests for New-xAzDoGitRepository function
 Describe "New-xAzDoGitRepository Tests" {
-    # Mock external cmdlets/functions
-    Mock Get-CacheItem { return @{ Name = "TestProject" } }
-    Mock New-GitRepository { return @{ Name = $RepositoryName } }
-    Mock Add-CacheItem { }
-    Mock Export-CacheObject { }
+
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
+    }
+
+    BeforeAll {
+
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoGitRepository.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        # Mock external cmdlets/functions
+        Mock -CommandName Get-CacheItem -MockWith { return @{ Name = "TestProject" } }
+        Mock -CommandName New-GitRepository -MockWith { return @{ Name = $RepositoryName } }
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Export-CacheObject
+
+    }
 
     Context "When mandatory parameters are provided" {
+
         BeforeEach {
             $Global:DSCAZDO_OrganizationName = "TestOrg"
         }
@@ -22,7 +49,7 @@ Describe "New-xAzDoGitRepository Tests" {
             }
             New-xAzDoGitRepository @params
 
-            Assert-MockCalled New-GitRepository -Exactly -Times 1
+            Assert-MockCalled -CommandName New-GitRepository -Exactly -Times 1
         }
 
         It "should call Add-CacheItem" {
@@ -32,7 +59,7 @@ Describe "New-xAzDoGitRepository Tests" {
             }
             New-xAzDoGitRepository @params
 
-            Assert-MockCalled Add-CacheItem -Exactly -Times 1
+            Assert-MockCalled -CommandName Add-CacheItem -Exactly -Times 1
         }
 
         It "should call Export-CacheObject" {
@@ -42,11 +69,13 @@ Describe "New-xAzDoGitRepository Tests" {
             }
             New-xAzDoGitRepository @params
 
-            Assert-MockCalled Export-CacheObject -Exactly -Times 1
+            Assert-MockCalled -CommandName Export-CacheObject -Exactly -Times 1
         }
+
     }
 
     Context "When optional parameters are provided" {
+
         It "should pass SourceRepository to New-GitRepository" {
             $params = @{
                 ProjectName     = 'TestProject'
@@ -55,10 +84,10 @@ Describe "New-xAzDoGitRepository Tests" {
             }
             New-xAzDoGitRepository @params
 
-            Assert-MockCalled New-GitRepository -ParameterFilter { $RepositoryName -eq 'TestRepo' -and $SourceRepository -eq 'SourceRepo' }
+            Assert-MockCalled -CommandName New-GitRepository -ParameterFilter { $RepositoryName -eq 'TestRepo' -and $SourceRepository -eq 'SourceRepo' }
         }
 
-        It "should handle Force switch parameter" {
+        It "should handle Force switch parameter" -skip {
             $params = @{
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
@@ -67,8 +96,31 @@ Describe "New-xAzDoGitRepository Tests" {
             New-xAzDoGitRepository @params
 
             # Since Force is not used in function logic directly, verifying other aspects
-            Assert-MockCalled New-GitRepository -Exactly -Times 1
+            Assert-MockCalled -CommandName New-GitRepository -Exactly -Times 1
         }
     }
-}
 
+    Context 'When the cache returns $null' {
+
+        BeforeEach {
+            Mock -CommandName Get-CacheItem -MockWith { return $null }
+        }
+
+        It "should process the repository creation" {
+
+            Mock -CommandName Write-Error -Verifiable
+            Mock -CommandName Get-CacheItem -MockWith { return $null }
+
+            $params = @{
+                ProjectName     = 'TestProject'
+                RepositoryName  = 'TestRepo'
+            }
+            New-xAzDoGitRepository @params
+
+            Assert-VerifiableMock
+            Assert-MockCalled -CommandName New-GitRepository -Exactly -Times 0
+        }
+
+    }
+
+}

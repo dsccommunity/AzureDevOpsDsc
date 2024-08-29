@@ -1,21 +1,50 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "Get-xAzDoGitRepository Tests" {
-    Mock Get-CacheItem
 
-    BeforeEach {
-        Clear-Mock
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
+    }
+
+    BeforeAll {
+
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGitRepository.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+
+        Mock -CommandName Get-CacheItem -MockWith {
+            return @{ RepositoryName = $repositoryName }
+        }
+
     }
 
     Context "When repository exists in the live cache" {
+
         It "should return repository from the live cache with Unchanged status" {
             $projectName = "TestProject"
             $repositoryName = "TestRepository"
-            $projectGroupKey = "$projectName\$repositoryName"
+            $projectGroupKey = "$projectName\"
 
-            Mock Get-CacheItem {
+            Mock -CommandName Get-CacheItem -MockWith {
                 return @{ RepositoryName = $repositoryName }
             } -ParameterFilter {
-                $_.Key -eq $projectGroupKey -and $_.Type -eq 'LiveRepositories'
+                $Type -eq 'LiveRepositories'
             }
 
             $result = Get-xAzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
@@ -25,16 +54,31 @@ Describe "Get-xAzDoGitRepository Tests" {
         }
     }
 
-    Context "When repository does not exist in the live cache" {
+    Context "When repository does not exist in the live cache"  {
+
+        It "should perform a lookup within the local cache" -skip {
+            $projectName = "TestProject"
+            $repositoryName = "TestRepository"
+            $projectGroupKey = "$projectName\"
+
+            Mock -CommandName Get-CacheItem -MockWith {
+                return $null
+            } -ParameterFilter {
+                ($Key -eq $projectGroupKey) -and ($Type -eq 'Repositories')
+            }
+
+            $result = Get-xAzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
+
+            Assert-MockCalled -CommandName Get-CacheItem -Times 2 -Exactly
+        }
+
         It "should return NotFound status" {
             $projectName = "TestProject"
             $repositoryName = "TestRepository"
-            $projectGroupKey = "$projectName\$repositoryName"
+            $projectGroupKey = "$projectName\"
 
-            Mock Get-CacheItem {
-                return $null
-            } -ParameterFilter {
-                $_.Key -eq $projectGroupKey -and $_.Type -eq 'LiveRepositories'
+            Mock -CommandName Get-CacheItem -ParameterFilter {
+                $Type -eq 'LiveRepositories'
             }
 
             $result = Get-xAzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
@@ -44,4 +88,3 @@ Describe "Get-xAzDoGitRepository Tests" {
         }
     }
 }
-

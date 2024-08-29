@@ -2,13 +2,17 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'Get-xAzDoGitPermission Tests' {
 
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
+    }
+
     BeforeAll {
 
         $Global:DSCAZDO_OrganizationName = 'TestOrganization'
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Add-CacheItem.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGitPermission.tests.ps1'
         }
 
         # Load the functions to test
