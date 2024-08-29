@@ -32,6 +32,11 @@ Function New-xAzDoGitPermission {
     $SecurityNamespace = Get-CacheItem -Key 'Git Repositories' -Type 'SecurityNamespaces'
     $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
 
+    if (($null -eq $SecurityNamespace) -or ($null -eq $Project)) {
+        Write-Warning "[New-xAzDoGitPermission] Security Namespace or Project not found."
+        return
+    }
+
     #
     # Serialize the ACLs
 

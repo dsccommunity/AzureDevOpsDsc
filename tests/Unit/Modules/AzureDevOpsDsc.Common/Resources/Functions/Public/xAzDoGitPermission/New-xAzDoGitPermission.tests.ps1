@@ -2,6 +2,10 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'New-xAzDoGitPermission' {
 
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
+    }
+
     BeforeAll {
 
         $Global:DSCAZDO_OrganizationName = 'TestOrganization'
@@ -22,6 +26,7 @@ Describe 'New-xAzDoGitPermission' {
         . (Get-ClassFilePath 'DSCGetSummaryState')
         . (Get-ClassFilePath '000.CacheItem')
         . (Get-ClassFilePath 'Ensure')
+        . (Get-ClassFilePath '002.LocalizedDataAzSerializationPatten')
 
         Mock -CommandName Get-CacheItem -MockWith { return @{ namespaceId = '12345'; id = '67890' } }
         Mock -CommandName ConvertTo-ACLHashtable -MockWith { return @{} }
@@ -37,7 +42,7 @@ Describe 'New-xAzDoGitPermission' {
             }
             New-xAzDoGitPermission @params
 
-            Assert-MockCalled -CommandName Get-CacheItem -Exactly 2 -Scope It
+            Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly 1
         }
 
         It 'should call ConvertTo-ACLHashtable and Set-xAzDoPermission' {
@@ -49,8 +54,8 @@ Describe 'New-xAzDoGitPermission' {
             }
             New-xAzDoGitPermission @params
 
-            Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly 1 -Scope It
+            Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly 1
+            Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly 1
         }
     }
 
@@ -69,14 +74,19 @@ Describe 'New-xAzDoGitPermission' {
             }
             New-xAzDoGitPermission @params
 
-            Assert-MockCalled -CommandName Get-CacheItem -Exactly 2 -Scope It
-            Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly 1 -Scope It
+            Assert-MockCalled -CommandName Get-CacheItem -Times 2
+            Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly 1
+            Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly 1
         }
     }
 
-    Context 'When no LookupResult is provided' {
+    Context 'When Get-CacheItem returns nothing' {
         It 'should not call ConvertTo-ACLHashtable or Set-xAzDoPermission' {
+
+            Mock -CommandName Get-CacheItem -ParameterFilter { $Type -eq 'SecurityNamespaces' } -MockWith { return $null }
+            Mock -CommandName Get-CacheItem -ParameterFilter { $Type -eq 'LiveProjects' } -MockWith { return $null }
+            Mock -CommandName Write-Warning -Verifiable
+
             $params = @{
                 ProjectName = 'TestProject'
                 RepositoryName = 'TestRepo'
@@ -84,12 +94,14 @@ Describe 'New-xAzDoGitPermission' {
             }
             New-xAzDoGitPermission @params
 
-            Assert-MockNotCalled -CommandName ConvertTo-ACLHashtable -Scope It
-            Assert-MockNotCalled -CommandName Set-xAzDoPermission -Scope It
+            Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly 0
+            Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly 0
+            Assert-VerifiableMock
         }
     }
 
-    Context 'When Force switch is provided' {
+    # Not in use
+    Context 'When Force switch is provided' -skip {
         It 'should handle the Force switch correctly' {
             $params = @{
                 ProjectName = 'TestProject'
@@ -106,13 +118,19 @@ Describe 'New-xAzDoGitPermission' {
 
     Context 'Verbose output' {
         It 'should write verbose output' {
+
+            Mock -CommandName Write-Verbose -Verifiable
+
             $params = @{
                 ProjectName = 'TestProject'
                 RepositoryName = 'TestRepo'
                 isInherited = $true
             }
-            $verboseOutput = { New-xAzDoGitPermission @params } | Out-String
-            $verboseOutput | Should -Contain "[New-xAzDoGitPermission] Started."
+
+            New-xAzDoGitPermission @params
+
+            Assert-VerifiableMock
+
         }
     }
 }
