@@ -53,9 +53,9 @@ Function Find-Functions {
 
     #
     # Using the File path of the test file, work out the function that is being tested
-
     $FunctionName = (Get-Item -LiteralPath $TestFilePath).BaseName -replace '\.tests$', ''
     $files += "$($FunctionName).ps1"
+
 
     #
     # Load the function into the AST and look for the mock commands.

@@ -53,7 +53,7 @@ Function New-xAzDoGroupPermission {
     $serializeACLParams = @{
         ReferenceACLs = $LookupResult.propertiesChanged
         DescriptorACLList = Get-CacheItem -Key $SecurityNamespace.namespaceId -Type 'LiveACLList'
-        DescriptorMatchToken = ($LocalizedDataAzSerilizationPatten.GroupPermission -f $Project.id, $Group.id)
+        DescriptorMatchToken = ($LocalizedDataAzSerializationPatten.GroupPermission -f $Project.id, $Group.id)
     }
 
     $params = @{

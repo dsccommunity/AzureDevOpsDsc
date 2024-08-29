@@ -1,4 +1,4 @@
-data LocalizedDataAzSerilizationPatten
+data LocalizedDataAzSerializationPatten
 {
 @'
 

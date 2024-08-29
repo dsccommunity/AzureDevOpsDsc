@@ -97,7 +97,25 @@ Function Get-xAzDoGitPermission {
     # Get the ACL List and format the ACLS
     Write-Verbose "[Get-xAzDoGitPermission] ACL Lookup Params: $($ACLLookupParams | Out-String)"
 
-    $DifferenceACLs = Get-DevOpsACL @ACLLookupParams | ConvertTo-FormattedACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
+    # Get the ACLs for the Repository
+    $DevOpsACLs = Get-DevOpsACL @ACLLookupParams
+
+    # Test if the ACLs were found
+    if ($DevOpsACLs -eq $null) {
+        Write-Warning "[Get-xAzDoGitPermission] No ACLs found for the repository."
+        $getGroupResult.status = [DSCGetSummaryState]::NotFound
+        return $getGroupResult
+    }
+
+    # Convert the ACLs to a formatted ACL
+    $DifferenceACLs = $DevOpsACLs | ConvertTo-FormattedACL -SecurityNamespace $SecurityNamespace -OrganizationName $OrganizationName
+
+    # Test if the ACLs were found
+    if ($DifferenceACLs -eq $null) {
+        Write-Warning "[Get-xAzDoGitPermission] No ACLs found for the repository."
+        $getGroupResult.status = [DSCGetSummaryState]::NotFound
+        return $getGroupResult
+    }
 
     $DifferenceACLs = $DifferenceACLs | Where-Object {
         ($_.Token.Type -eq 'GitRepository') -and ($_.Token.RepoId -eq $repository.id)
