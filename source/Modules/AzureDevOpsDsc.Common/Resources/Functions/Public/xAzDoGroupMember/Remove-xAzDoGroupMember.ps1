@@ -33,6 +33,12 @@ Function Remove-xAzDoGroupMember {
     # Check the cache for the group
     $LiveGroupMembers = @(Get-CacheItem -Key $Key -Type 'LiveGroupMembers')
 
+    # If the group identity or key is not found, write a warning message to the console and return.
+    if ([String]::IsNullOrEmpty($GroupIdentity) -or [String]::IsNullOrWhiteSpace($GroupIdentity)) {
+        Write-Warning "[Remove-xAzDoGroupMember] Unable to find identity for group '$GroupName'."
+        return
+    }
+
     $params = @{
         GroupIdentity = $GroupIdentity
         ApiUri = 'https://vssps.dev.azure.com/{0}/' -f $Global:DSCAZDO_OrganizationName
@@ -42,7 +48,7 @@ Function Remove-xAzDoGroupMember {
     Write-Verbose "[Remove-xAzDoGroupMember] Group members: $($LiveGroupMembers.principalName -join ',')."
 
     # Define the members
-    $members = [System.Collections.Generic.List[object]]::new()
+    #$members = [System.Collections.Generic.List[object]]::new()
 
     # Fetch the group members and perform a lookup of the members
     ForEach ($MemberIdentity in $LiveGroupMembers) {
@@ -52,7 +58,7 @@ Function Remove-xAzDoGroupMember {
         $identity = Find-AzDoIdentity -Identity $MemberIdentity.principalName
 
         # If the identity is not found, write a warning message to the console and continue to the next member.
-        if ($null -eq $identity) {
+        if ([String]::IsNullOrEmpty($identity) -or [String]::IsNullOrWhiteSpace($identity)) {
             Write-Warning "[Remove-xAzDoGroupMember] Unable to find identity for member '$($MemberIdentity.principalName)'."
             continue
         }
@@ -64,14 +70,16 @@ Function Remove-xAzDoGroupMember {
 
     }
 
+    <#
     # If the group members are not found, write a warning message to the console and return.
     if ($members.Count -eq 0) {
         Write-Warning "[Remove-xAzDoGroupMember] No group members found: $($GroupMembers -join ',')."
         return
     }
+    #>
 
     # Add the group to the cache
-    Write-Verbose "[Remove-xAzDoGroupMember] Added group '$GroupName' with members to the cache."
+    Write-Verbose "[Remove-xAzDoGroupMember] Removed group '$GroupName' with members to the cache."
     Remove-CacheItem -Key $GroupIdentity.principalName -Type 'LiveGroupMembers'
 
     Write-Verbose "[Remove-xAzDoGroupMember] Updated global cache with live group information."

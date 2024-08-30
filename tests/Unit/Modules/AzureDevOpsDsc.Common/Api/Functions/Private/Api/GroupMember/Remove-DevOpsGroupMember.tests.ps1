@@ -5,7 +5,7 @@ Describe 'Remove-DevOpsGroupMember' -Tags "Unit", "API" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-DevOpsGroupMember.tests.ps1'
         }
 
         # Load the functions to test

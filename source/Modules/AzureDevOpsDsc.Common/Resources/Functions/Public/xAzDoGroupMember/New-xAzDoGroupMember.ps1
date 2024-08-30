@@ -35,6 +35,13 @@ Function New-xAzDoGroupMember {
     $CachedGroupMembers = Get-CacheObject -CacheType 'LiveGroupMembers'
     Write-Verbose "[New-xAzDoGroupMember] Retrieved cached group members."
 
+    # Check if the group members are already cached
+    if (($null -ne $CachedGroupMembers) -and ($CachedGroupMembers.ContainsKey($GroupIdentity.principalName))) {
+        Write-Error "[New-xAzDoGroupMember] Group members are already cached for group '$GroupName'."
+        return
+    }
+
+
     $params = @{
         GroupIdentity = $GroupIdentity
         ApiUri = 'https://vssps.dev.azure.com/{0}/' -f $Global:DSCAZDO_OrganizationName

@@ -1,36 +1,68 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe "New-xAzDoGroupMember" {
 
-    Mock -ModuleName 'AzDoModule' -CommandName 'Find-AzDoIdentity' {
-        param ($Identity)
-        return [PSCustomObject]@{ displayName = $Identity; originId = [guid]::NewGuid().ToString() }
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
+        Remove-Variable -Name AzDoLiveGroupMembers -Scope Global
     }
 
-    Mock -ModuleName 'AzDoModule' -CommandName 'Get-CacheObject' {
-        param ($CacheType)
-        return @()
+    BeforeAll {
+
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+        $global:AzDoLiveGroupMembers = @{}
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoGroupMember.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+
+        Mock -CommandName Find-AzDoIdentity -MockWith {
+            param ($Identity)
+            return [PSCustomObject]@{
+                displayName = $Identity
+                originId = [guid]::NewGuid().ToString()
+                principalName = 'mockPrincipalName'
+            }
+        }
+
+        Mock -CommandName Get-CacheObject -MockWith {
+            param ($CacheType)
+            return @()
+        }
+
+        Mock -CommandName New-DevOpsGroupMember -MockWith {
+            param ($params, $MemberIdentity)
+            return $MemberIdentity
+        }
+
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Set-CacheObject
+
     }
-
-    Mock -ModuleName 'AzDoModule' -CommandName 'New-DevOpsGroupMember' {
-        param ($params, $MemberIdentity)
-        return $MemberIdentity
-    }
-
-    Mock -ModuleName 'AzDoModule' -CommandName 'Add-CacheItem' {}
-
-    Mock -ModuleName 'AzDoModule' -CommandName 'Set-CacheObject' {}
-
-    $global:DSCAZDO_OrganizationName = 'testOrg'
-    $global:AzDoLiveGroupMembers = @{}
 
     Context "When valid parameters are passed" {
+
         It "Should call Find-AzDoIdentity for the group name" {
             $GroupName = 'TestGroup'
             $GroupMembers = @('User1', 'User2')
 
             New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
 
-            Assert-MockCalled -ModuleName 'AzDoModule' -CommandName 'Find-AzDoIdentity' -Times 1 -Exactly -Scope It
+            Assert-MockCalled -CommandName Find-AzDoIdentity -Times 3 -Exactly -Scope It
         }
 
         It "Should add members to the group" {
@@ -39,7 +71,7 @@ Describe "New-xAzDoGroupMember" {
 
             New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
 
-            Assert-MockCalled -ModuleName 'AzDoModule' -CommandName 'New-DevOpsGroupMember' -Times 2 -Exactly -Scope It
+            Assert-MockCalled -CommandName New-DevOpsGroupMember -Times 2 -Exactly -Scope It
         }
 
         It "Should cache group members" {
@@ -48,23 +80,39 @@ Describe "New-xAzDoGroupMember" {
 
             New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
 
-            Assert-MockCalled -ModuleName 'AzDoModule' -CommandName 'Add-CacheItem' -Times 1 -Exactly -Scope It
-            Assert-MockCalled -ModuleName 'AzDoModule' -CommandName 'Set-CacheObject' -Times 1 -Exactly -Scope It
+            Assert-MockCalled -CommandName Add-CacheItem -Times 1 -Exactly -Scope It
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1 -Exactly -Scope It
         }
     }
 
     Context "When no members are found" {
-        Mock -ModuleName 'AzDoModule' -CommandName 'Find-AzDoIdentity' {
-            param ($Identity)
-            return $null
+
+        BeforeAll {
+            Mock -CommandName 'Find-AzDoIdentity' -MockWith {
+                param ($Identity)
+                return $null
+            }
         }
 
-        It "Should write a warning when no members are found" {
+        It "Should write an error when no identities are found" {
+            Mock -CommandName Write-Warning
             $GroupName = 'TestGroup'
             $GroupMembers = @('User1', 'User2')
 
-            { New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers } | Should -Throw -ErrorId 'PSScriptCmdlet:WriteWarning'
+            $result = New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
+            Assert-MockCalled -Times 1 -ParameterFilter { $Message -like "*Unable to find identity for member*" } -CommandName Write-Warning
+        }
+
+        It "Should write a warning when no members are found" {
+            Mock -CommandName Write-Warning
+            Mock -CommandName Find-AzDoIdentity -ParameterFilter { ($Identity -eq 'User1') -or ($Identity -eq 'User2') }
+            $GroupName = 'TestGroup'
+            $GroupMembers = @('User1', 'User2')
+
+            New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
+
+            Assert-MockCalled -CommandName 'Write-Warning' -ParameterFilter { $Message -like "*No group members found*" }
+
         }
     }
 }
-
