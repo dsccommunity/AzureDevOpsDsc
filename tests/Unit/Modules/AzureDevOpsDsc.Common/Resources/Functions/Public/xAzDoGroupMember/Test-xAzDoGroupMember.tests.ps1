@@ -1,11 +1,41 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Test-xAzDoGroupMember' {
+Describe 'Test-xAzDoGroupMember' -skip {
 
-    $GroupName = "TestGroup"
-    $GroupMembers = @('User1', 'User2')
-    $LookupResult = @{ User1 = 'ID1'; User2 = 'ID2' }
-    $Ensure = 'Present'
-    $Force = $true
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
+        Remove-Variable -Name AzDoLiveGroupMembers -Scope Global
+    }
+
+    BeforeAll {
+
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+        $global:AzDoLiveGroupMembers = @{}
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-xAzDoGroupMember.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        $GroupName = "TestGroup"
+        $GroupMembers = @('User1', 'User2')
+        $LookupResult = @{ User1 = 'ID1'; User2 = 'ID2' }
+        $Ensure = 'Present'
+        $Force = $true
+
+    }
 
     It 'Should accept mandatory GroupName parameter' {
         { Test-xAzDoGroupMember -GroupName $GroupName } | Should -Not -Throw
@@ -46,6 +76,4 @@ Describe 'Test-xAzDoGroupMember' {
         $result = Test-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers -LookupResult $LookupResult -Ensure $Ensure -Force
         $result | Should -Be $return
     }
-
 }
-

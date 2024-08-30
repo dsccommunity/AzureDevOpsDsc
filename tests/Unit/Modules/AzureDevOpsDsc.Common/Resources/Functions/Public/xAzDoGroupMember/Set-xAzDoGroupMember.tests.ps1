@@ -39,6 +39,14 @@ Describe 'Set-xAzDoGroupMember' {
         Mock -CommandName Get-CacheItem -MockWith {
             return @()
         }
+
+        Mock -CommandName Get-Cacheitem -ParameterFilter { $Type -eq 'LiveGroupMembers' } -MockWith {
+            return @(
+                @{ principalName = 'user1'; originId = 'user1OriginId'; displayName = 'User 1' },
+                @{ principalName = 'user2'; originId = 'user2OriginId'; displayName = 'User 2' }
+            )
+        }
+
         Mock -CommandName New-DevOpsGroupMember -MockWith {
             return $true
         }
@@ -77,7 +85,7 @@ Describe 'Set-xAzDoGroupMember' {
                 }
             }
 
-            Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 1 -Scope It
+            Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 1
         }
 
         It 'Should call Remove-DevOpsGroupMember with correct parameters' {
@@ -97,7 +105,124 @@ Describe 'Set-xAzDoGroupMember' {
                 }
             }
 
-            Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 1 -Scope It
+            Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 1
+        }
+
+        it "should add and remove members" {
+            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+
+            $params = @{
+                GroupIdentity = @{
+                    principalName = "GroupName";
+                    originId = "GroupOriginId";
+                    displayName = "Test Group"
+                }
+                ApiUri = 'https://vssps.dev.azure.com/{0}/' -f $Global:DSCAZDO_OrganizationName
+                MemberIdentity = @{
+                    principalName = 'user1';
+                    originId = 'user1OriginId';
+                    displayName = 'User 1'
+                }
+            }
+
+            Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 1
+
+            $params = @{
+                GroupIdentity = @{
+                    principalName = "GroupName";
+                    originId = "GroupOriginId";
+                    displayName = "Test Group"
+                }
+                ApiUri = 'https://vssps.dev.azure.com/{0}/' -f $Global:DSCAZDO_OrganizationName
+                MemberIdentity = @{
+                    principalName = 'user2';
+                    originId = 'user2OriginId';
+                    displayName = 'User 2'
+                }
+            }
+
+            Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 1
+
+        }
+
+    }
+
+    Context "when a circular reference is detected" {
+
+        it "should ignore adding the member" {
+
+            Mock Write-Warning -Verifiable
+
+            $LookupResult = @{
+                propertiesChanged = @(
+                    @{ action = 'Add'; value = @{ principalName = 'user1'; originId = 'GroupOriginId'; displayName = 'User 1' } },
+                    @{ action = 'Remove'; value = @{ principalName = 'user2'; originId = 'GroupOriginId'; displayName = 'User 2' } }
+                )
+            }
+
+            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+
+            Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 0
+            Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 0
+            Assert-VerifiableMock
+
+        }
+
+        it "should ignore removing the member" {
+
+            Mock Write-Warning -Verifiable
+
+            $LookupResult = @{
+                propertiesChanged = @(
+                    @{ action = 'Add'; value = @{ principalName = 'user1'; originId = 'GroupOriginId'; displayName = 'User 1' } },
+                    @{ action = 'Remove'; value = @{ principalName = 'user2'; originId = 'GroupOriginId'; displayName = 'User 2' } }
+                )
+            }
+
+            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+
+            Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 0
+            Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 0
+            Assert-VerifiableMock
+
+        }
+
+    }
+
+    Context "when functions called return '`$null'" {
+
+        it "should not start when Get-CacheItem returns `$null" {
+
+            Mock -CommandName Get-CacheItem -ParameterFilter { $Type -eq 'LiveGroupMembers' }
+            Mock -CommandName Write-Error
+
+            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+
+            Assert-MockCalled -CommandName 'Write-Error' -Exactly 1 -ParameterFilter { $Message -like '*LiveGroupMembers cache for group*' }
+            Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 0
+            Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 0
+
+        }
+
+        it "should not call New-DevOpsGroupMember" {
+
+            Mock -CommandName New-DevOpsGroupMember -MockWith { return $null }
+
+            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+
+            Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 1
+
+        }
+
+        it "should not call Remove-DevOpsGroupMember" {
+
+            Mock -CommandName Remove-DevOpsGroupMember -MockWith { return $null }
+
+            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+
+            Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 1
+
         }
     }
+
 }

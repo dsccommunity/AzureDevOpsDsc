@@ -32,6 +32,12 @@ Function Set-xAzDoGroupMember {
     $members = [System.Collections.ArrayList]::New()
     Get-CacheItem -Key $Key -Type 'LiveGroupMembers' | ForEach-Object { $members.Add($_) }
 
+    # If the members are null or empty, stop.
+    if (($null -eq $GroupMembers) -or ($members.Count -eq 0)) {
+        Write-Error "[Set-xAzDoGroupMember] No members found in the LiveGroupMembers cache for group '$Key'."
+        return
+    }
+
     # If the lookup result is not provided, we need to look it up.
     if ($null -eq $LookupResult.propertiesChanged) {
         Throw "[Set-xAzDoGroupMember] - LookupResult.propertiesChanged is required."
