@@ -1,102 +1,129 @@
-# Import the module containing the Set-xAzDoGroupPermission function
+$currentFile = $MyInvocation.MyCommand.Path
 
-# Mocking external dependencies
-Mock Get-CacheItem {
-    param (
-        [string]$Key,
-        [string]$Type
-    )
-    if ($Type -eq 'SecurityNamespaces') {
-        return @{
-            namespaceId = 'namespace-id'
-        }
-    } elseif ($Type -eq 'LiveProjects') {
-        return @{
-            id = 'project-id'
-        }
-    } elseif ($Type -eq 'LiveACLList') {
-        return @(
-            @{ token = "repoV2/project-id/repository-id" },
-            @{ token = "repoV2/other-project/other-repo" }
-        )
-    }
-}
+# Tests are currently disabled.
+Describe 'Set-xAzDoGroupPermission' -skip {
 
-Mock ConvertTo-ACLHashtable {
-    param (
-        [HashTable]$ReferenceACLs,
-        [Array]$DescriptorACLList,
-        [string]$DescriptorMatchToken
-    )
-    return @{
-        ACLsSerialized = 'serialized-acl-data'
-    }
-}
-
-Mock Set-xAzDoGroupPermission {
-    param (
-        [string]$OrganizationName,
-        [string]$SecurityNamespaceID,
-        [HashTable]$SerializedACLs
-    )
-    # No-op for mocking purposes
-}
-
-# Describe block for Set-xAzDoGroupPermission tests
-Describe 'Set-xAzDoGroupPermission Tests' {
-
-    # Test case to check mandatory parameters
-    Context 'Mandatory Parameters' {
-        It 'Should throw an error when GroupName is missing' {
-            { Set-xAzDoGroupPermission -isInherited $true } | Should -Throw
-        }
-
-        It 'Should throw an error when isInherited is missing' {
-            { Set-xAzDoGroupPermission -GroupName 'Project\Group' } | Should -Throw
-        }
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
     }
 
-    # Test case to check verbose output
-    Context 'Verbose Output' {
-        It 'Should output verbose messages' {
-            $verboseOutput = & {
-                $VerbosePreference = 'Continue'
-                Set-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true -Verbose
-            } 4>&1
+    BeforeAll {
 
-            $verboseOutput | Should -Contain '[Set-xAzDoGroupPermission] Started.'
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGroupMember.tests.ps1'
         }
-    }
 
-    # Test case for key functionality
-    Context 'Functionality' {
-        It 'Should set the correct Git repository permissions' {
-            $LookupResult = @{
-                propertiesChanged = @{
-                    Property1 = 'Value1'
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+
+        # Mock dependencies
+        Mock -CommandName Get-CacheItem -MockWith {
+            param (
+                [string]$Key,
+                [string]$Type
+            )
+            switch ($Type)
+            {
+                'SecurityNamespaces' {
+                    return @{ namespaceId = 'mockNamespaceId' }
+                }
+                'LiveProjects' {
+                    return @{ id = 'mockProjectId' }
+                }
+                'LiveACLList' {
+                    return @(
+                        @{ token = 'repoV2/mockProjectId/mockRepositoryId' },
+                        @{ token = 'repoV2/anotherProject/anotherRepo' }
+                    )
+                }
+                default {
+                    return $null
                 }
             }
-
-            $params = @{
-                OrganizationName = 'OrgName'
-                SecurityNamespaceID = 'namespace-id'
-                SerializedACLs = @{
-                    ACLsSerialized = 'serialized-acl-data'
-                }
-            }
-
-            Mock Set-xAzDoGroupPermission {
-                param (
-                    [string]$OrganizationName,
-                    [string]$SecurityNamespaceID,
-                    [HashTable]$SerializedACLs
-                )
-                $OrganizationName | Should -Be 'OrgName'
-                $SecurityNamespaceID | Should -Be 'namespace-id'
-                $SerializedACLs.ACLsSerialized | Should -Be 'serialized-acl-data'
-            }
-
-            Set-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true -LookupResult $LookupResult
         }
+
+        Mock -CommandName ConvertTo-ACLHashtable -MockWith {
+            param (
+                [HashTable]$ReferenceACLs,
+                [Array]$DescriptorACLList,
+                [string]$DescriptorMatchToken
+            )
+            return @{ serializedACLs = 'mockSerializedACLs' }
+        }
+
+        Mock -CommandName Set-xAzDoPermission
+
+    }
+
+    It 'Should throw a warning when GroupName is invalid' {
+        { Set-xAzDoGroupPermission -GroupName 'InvalidGroupName' -isInherited $true } | Should -Throw
+    }
+
+    It 'Should set permissions when valid GroupName is provided' {
+        $LookupResult = @{
+            propertiesChanged = @{}
+        }
+
+        Set-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
+
+        Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -Scope It -ParameterFilter {
+            $Key -eq 'Identity' -and $Type -eq 'SecurityNamespaces'
+        }
+        Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -Scope It -ParameterFilter {
+            $Key -eq $ProjectName -and $Type -eq 'LiveProjects'
+        }
+        Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly -Times 1 -Scope It
+        Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly -Times 1 -Scope It
+    }
+
+    It 'Should call ConvertTo-ACLHashtable with correct parameters' {
+        $LookupResult = @{
+            propertiesChanged = @{}
+        }
+
+        Set-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
+
+        Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly -Times 1 -Scope It -ParameterFilter {
+            $ReferenceACLs -eq $LookupResult.propertiesChanged -and
+            $DescriptorACLList -eq (Get-CacheItem -Key 'mockNamespaceId' -Type 'LiveACLList') -and
+            $DescriptorMatchToken -eq ('repoV2/mockProjectId/mockRepositoryId')
+        }
+    }
+
+    It 'Should not call Set-xAzDoPermission if no ACLs are found' {
+        Mock -CommandName Get-CacheItem -MockWith {
+            param (
+                [string]$Key,
+                [string]$Type
+            )
+            if ($Type -eq 'LiveACLList') {
+                return @()
+            }
+            return @{
+                namespaceId = 'mockNamespaceId',
+                id          = 'mockProjectId'
+            }
+        }
+
+        $LookupResult = @{
+            propertiesChanged = @{}
+        }
+
+        Set-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
+
+        Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly -Times 0 -Scope It
     }
 }

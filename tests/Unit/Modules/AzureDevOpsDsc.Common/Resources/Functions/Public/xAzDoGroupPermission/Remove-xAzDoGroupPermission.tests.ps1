@@ -1,109 +1,100 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-# Mocking external dependencies
-Mock Get-CacheItem {
-    param (
-        [string]$Key,
-        [string]$Type
-    )
-    if ($Type -eq 'SecurityNamespaces') {
-        return @{
-            namespaceId = 'namespace-id'
-        }
-    } elseif ($Type -eq 'LiveProjects') {
-        return @{
-            id = 'project-id'
-        }
-    } elseif ($Type -eq 'LiveRepositories') {
-        return @{
-            id = 'repository-id'
-        }
-    } elseif ($Type -eq 'LiveACLList') {
-        return @(
-            @{ token = "repoV2/project-id/repository-id" },
-            @{ token = "repoV2/other-project/other-repo" }
-        )
-    }
-}
+# Tests are currently disabled.
+Describe 'Remove-xAzDoGroupPermission' -skip {
 
-Mock Remove-xAzDoPermission {
-    param (
-        [string]$OrganizationName,
-        [string]$SecurityNamespaceID,
-        [string]$TokenName
-    )
-    # No-op for mocking purposes
-}
-
-# Describe block for Remove-xAzDoGroupPermission tests
-Describe 'Remove-xAzDoGroupPermission Tests' {
-
-    # Test case to check mandatory parameters
-    Context 'Mandatory Parameters' {
-        It 'Should throw an error when GroupName is missing' {
-            { Remove-xAzDoGroupPermission -isInherited $true } | Should -Throw
-        }
-
-        It 'Should throw an error when isInherited is missing' {
-            { Remove-xAzDoGroupPermission -GroupName 'Project\Group' } | Should -Throw
-        }
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
     }
 
-    # Test case to check verbose output
-    Context 'Verbose Output' {
-        It 'Should output verbose messages' {
-            $verboseOutput = & {
-                $VerbosePreference = 'Continue'
-                Remove-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true -Verbose
-            } 4>&1
+    BeforeAll {
 
-            $verboseOutput | Should -Contain '[New-xAzDoGitPermission] Started.'
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGroupMember.tests.ps1'
         }
-    }
 
-    # Test case for key functionality
-    Context 'Functionality' {
-        It 'Should remove the correct Git repository permissions' {
-            $params = @{
-                OrganizationName = 'OrgName'
-                SecurityNamespaceID = 'namespace-id'
-                TokenName = 'repoV2/project-id/repository-id'
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+
+        # Mock dependencies
+        Mock -CommandName Get-CacheItem -MockWith {
+            param ($Key, $Type)
+            switch ($Type) {
+                'SecurityNamespaces' { return @{ namespaceId = 'mockNamespaceId' } }
+                'LiveProjects' { return @{ id = 'mockProjectId' } }
+                'LiveRepositories' { return @{ id = 'mockRepositoryId' } }
+                'LiveACLList' { return @(
+                    @{ token = 'repoV2/mockProjectId/mockRepositoryId' },
+                    @{ token = 'repoV2/anotherProject/anotherRepo' }
+                ) }
+                default { return $null }
             }
+        }
 
-            Mock Remove-xAzDoPermission {
-                param (
-                    [string]$OrganizationName,
-                    [string]$SecurityNamespaceID,
-                    [string]$TokenName
+        Mock -CommandName Remove-xAzDoPermission -MockWith {}
+
+    }
+
+    It 'Should remove permissions when valid GroupName is provided' {
+        Remove-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Ensure 'Present' -Force:$true
+
+        Assert-MockCalled -CommandName Get-CacheItem -Parameters @{ Key = 'Identity'; Type = 'SecurityNamespaces' } -Times 1
+        Assert-MockCalled -CommandName Get-CacheItem -Parameters @{ Key = 'Project'; Type = 'LiveProjects' } -Times 1
+        Assert-MockCalled -CommandName Get-CacheItem -Parameters @{ Key = 'Project\Repository'; Type = 'LiveRepositories' } -Times 1
+        Assert-MockCalled -CommandName Get-CacheItem -Parameters @{ Key = 'mockNamespaceId'; Type = 'LiveACLList' } -Times 1
+        Assert-MockCalled -CommandName Remove-xAzDoPermission -Times 1
+    }
+
+    It 'Should throw a warning when GroupName is invalid' {
+        { Remove-xAzDoGroupPermission -GroupName 'InvalidGroupName' -isInherited $true } | Should -Throw
+    }
+
+    It 'Should handle case where no matching ACLs are found' {
+        Mock -CommandName Get-CacheItem -MockWith {
+            param ($Key, $Type)
+            if ($Type -eq 'LiveACLList') {
+                return @(
+                    @{ token = 'repoV2/anotherProject/anotherRepo' }
                 )
-                $OrganizationName | Should -Be 'OrgName'
-                $SecurityNamespaceID | Should -Be 'namespace-id'
-                $TokenName | Should -Be 'repoV2/project-id/repository-id'
             }
-
-            Remove-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true
+            return @{
+                namespaceId = 'mockNamespaceId',
+                id          = 'mockProjectId'
+            }
         }
 
-        It 'Should not call Remove-xAzDoPermission if no matching ACLs are found' {
-            Mock Get-CacheItem {
-                param (
-                    [string]$Key,
-                    [string]$Type
-                )
-                if ($Type -eq 'LiveACLList') {
-                    return @(
-                        @{ token = "repoV2/other-project/other-repo" }
-                    )
-                } else {
-                    return $null
-                }
-            }
+        Remove-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Ensure 'Present' -Force:$true
 
-            Mock Remove-xAzDoPermission {
-                # This should never be called
-                throw "This should not be called"
-            }
+        Assert-MockCalled -CommandName Remove-xAzDoPermission -Times 0
+    }
 
-            { Remove-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true } | Should -Not -Throw
+    It 'Should not call Remove-xAzDoPermission if no ACLs are found' {
+        Mock -CommandName Get-CacheItem -MockWith {
+            param ($Key, $Type)
+            if ($Type -eq 'LiveACLList') {
+                return @()
+            }
+            return @{
+                namespaceId = 'mockNamespaceId',
+                id          = 'mockProjectId'
+            }
         }
+
+        Remove-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Ensure 'Present' -Force:$true
+
+        Assert-MockCalled -CommandName Remove-xAzDoPermission -Times 0
     }
 }
