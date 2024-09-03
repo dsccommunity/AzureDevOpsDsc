@@ -41,7 +41,6 @@ Describe "xAzDoGroupPermission intergration tests" -skip {
 
         New-Group $GroupName -ProjectName $PROJECTNAME
         New-Group 'Group1' -ProjectName $PROJECTNAME
-        Wait-Debugger
 
     }
 
@@ -78,7 +77,6 @@ Describe "xAzDoGroupPermission intergration tests" -skip {
             # Set the Method to 'Test' to verify that the git repository exists.
             $parameters.Method = 'Test'
 
-            Wait-Debugger
             # Invoke the DSC resource with the specified parameters and store the result.
             $result = Invoke-DscResource @parameters
 

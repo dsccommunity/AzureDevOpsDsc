@@ -28,7 +28,6 @@ Describe 'New-ACLToken Function Tests' -Skip -Tags "Unit", "ACL", "Helper" {
     Context 'Git Repositories Namespace' {
 
         It 'Should return GitOrganization type for valid Git organization token' {
-            Wait-Debugger
             $result = New-ACLToken -SecurityNamespace 'Git Repositories' -TokenName 'OrgName'
             $result.type | Should -Be 'GitOrganization'
         }

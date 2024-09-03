@@ -93,7 +93,6 @@ Function Test-ACLListforChanges
 
     if ($ReferenceACLs.inherited -ne $DifferenceACLs.inherited)
     {
-        Wait-Debugger
         Write-Verbose "[Test-ACLListforChanges] Inherited flag is not equal."
         $result.status = "Changed"
         $result.reason += @{

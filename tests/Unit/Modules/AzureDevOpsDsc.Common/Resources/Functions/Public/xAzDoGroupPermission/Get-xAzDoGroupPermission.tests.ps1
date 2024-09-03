@@ -107,7 +107,6 @@ Describe 'Get-xAzDoGroupPermission' -skip {
     It 'Should return group result with correct properties when valid GroupName is provided' {
 
         $result = Get-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true
-        Wait-Debugger
 
         $result | Should -Not -BeNullOrEmpty
         $result.project | Should -Be 'Project'

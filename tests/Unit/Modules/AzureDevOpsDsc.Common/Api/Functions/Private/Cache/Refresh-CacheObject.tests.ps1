@@ -27,7 +27,6 @@ Describe 'Refresh-CacheObject' -skip -Tags "Unit", "Cache" {
 
     Context 'Invalid Type' -Skip {
         It 'Throws an error for invalid type' {
-            Wait-Debugger
             { Refresh-CacheObject -Type 'InvalidType' } | Should -Throw
         }
     }

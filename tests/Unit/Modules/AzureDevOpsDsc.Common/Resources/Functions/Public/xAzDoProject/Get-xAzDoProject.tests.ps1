@@ -14,7 +14,7 @@ Describe 'Get-AzDevOpsProject' {
 
         # Load the functions to test
         $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
-        Wait-Debugger
+
         ForEach ($file in $files) {
             . $file.FullName
         }
