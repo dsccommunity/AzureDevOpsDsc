@@ -1,49 +1,97 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Remove-AzDevOpsProject" {
-    Mock -CommandName Test-AzDevOpsApiUri {
-        return $true
+Describe "Remove-xAzDoProject" {
+
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
     }
 
-    Mock -CommandName Test-AzDevOpsPat {
-        return $true
+    BeforeAll {
+
+        # Set the organization name
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoOrganizationGroup.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        Mock -CommandName Test-AzDevOpsProjectName -MockWith { return $true }
+        Mock -CommandName Get-CacheItem -MockWith { return @{ id = '12345' } }
+        Mock -CommandName Remove-DevOpsProject
+        Mock -CommandName Remove-CacheItem
+        Mock -CommandName Export-CacheObject
+
     }
 
-    Mock -CommandName Test-AzDevOpsProjectId {
-        return $true
-    }
+    Context "When the project exists in cache" {
 
-    Mock -CommandName Remove-AzDevOpsApiResource {
-        return $null
-    }
+        It "Should remove the project from Azure DevOps and update the cache" {
+            # Arrange
+            $Global:DSCAZDO_OrganizationName = "TestOrg"
+            $projectName = "TestProject"
 
-    Context "When Force parameter is not supplied" {
-        It "Should call Remove-AzDevOpsApiResource with correct parameters if ShouldProcess is approved" {
-            Remove-AzDevOpsProject -ApiUri "https://dev.azure.com/someOrganizationName/_apis/" -Pat "SomePat" -ProjectId "SomeProjectId" -Confirm:$false
+            # Act
+            Remove-xAzDoProject -ProjectName $projectName
 
-            Assert-MockCalled -CommandName Remove-AzDevOpsApiResource -Exactly -Times 1 -Scope It -Parameters @{
-                ApiUri = "https://dev.azure.com/someOrganizationName/_apis/"
-                Pat = "SomePat"
-                ResourceName = "Project"
-                ResourceId = "SomeProjectId"
-                Force = $false
-                Wait = $true
+            # Assert
+            Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -ParameterFilter {
+                ($Key -eq $projectName) -and
+                ($Type -eq 'LiveProjects')
             }
+
+            Assert-MockCalled -CommandName Remove-DevOpsProject -Exactly -Times 1 -ParameterFilter {
+                ($Organization -eq "TestOrg") -and
+                ($ProjectId -eq '12345')
+            }
+
+            Assert-MockCalled -CommandName Remove-CacheItem -Exactly -Times 1 -ParameterFilter {
+                ($Key -eq $projectName) -and
+                ($Type -eq 'LiveProjects')
+            }
+
+            Assert-MockCalled -CommandName Export-CacheObject -Exactly -Times 1 -ParameterFilter {
+                ($CacheType -eq 'LiveProjects') -and
+                ($Content -eq $AzDoLiveProjects)
+            }
+
         }
     }
 
-    Context "When Force parameter is supplied" {
-        It "Should call Remove-AzDevOpsApiResource with Force parameter set to true" {
-            Remove-AzDevOpsProject -ApiUri "https://dev.azure.com/someOrganizationName/_apis/" -Pat "SomePat" -ProjectId "SomeProjectId" -Force
+    Context "When the project does not exist in cache" {
 
-            Assert-MockCalled -CommandName Remove-AzDevOpsApiResource -Exactly -Times 1 -Scope It -Parameters @{
-                ApiUri = "https://dev.azure.com/someOrganizationName/_apis/"
-                Pat = "SomePat"
-                ResourceName = "Project"
-                ResourceId = "SomeProjectId"
-                Force = $true
-                Wait = $true
+        It "Should not attempt to remove the project or update the cache" {
+
+            Mock -CommandName Get-CacheItem
+
+            # Arrange
+            $Global:DSCAZDO_OrganizationName = "TestOrg"
+            $projectName = "NonExistentProject"
+
+            # Act
+            Remove-xAzDoProject -ProjectName $projectName
+
+            # Assert
+            Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -ParameterFilter {
+                $Key -eq $projectName
+                $Type -eq 'LiveProjects'
             }
+            Assert-MockCalled -CommandName Remove-DevOpsProject -Exactly -Times 0
+            Assert-MockCalled -CommandName Remove-CacheItem -Exactly -Times 0
+            Assert-MockCalled -CommandName Export-CacheObject -Exactly -Times 0
+
         }
     }
 }
-

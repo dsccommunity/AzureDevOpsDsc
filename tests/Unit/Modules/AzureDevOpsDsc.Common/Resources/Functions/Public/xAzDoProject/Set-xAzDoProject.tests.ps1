@@ -1,126 +1,94 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-# Define the function mock and the tests for Set-AzDevOpsProject
-function Test-AzDevOpsApiUri {
-    param($ApiUri)
-    return $true
-}
+Describe "Set-xAzDoProject" {
 
-function Test-AzDevOpsPat {
-    param($Pat)
-    return $true
-}
-
-function Test-AzDevOpsProjectId {
-    param($ProjectId)
-    return $true
-}
-
-function Test-AzDevOpsProjectName {
-    param($ProjectName)
-    return $true
-}
-
-function Test-AzDevOpsProjectDescription {
-    param($ProjectDescription)
-    return $true
-}
-
-function Set-AzDevOpsApiResource {
-    param($ApiUri, $Pat, $ResourceName, $ResourceId, $Resource, $Force, $Wait)
-    return $null
-}
-
-function Get-AzDevOpsProject {
-    param($ApiUri, $Pat, $ProjectId, $ProjectName)
-    return @{
-        "id" = $ProjectId
-        "name" = $ProjectName
-        "description" = "some description"
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
     }
-}
 
-Describe 'Set-AzDevOpsProject' {
-    Mock -ModuleName ModuleName -CommandName Test-AzDevOpsApiUri -MockWith { $true }
-    Mock -ModuleName ModuleName -CommandName Test-AzDevOpsPat -MockWith { $true }
-    Mock -ModuleName ModuleName -CommandName Test-AzDevOpsProjectId -MockWith { $true }
-    Mock -ModuleName ModuleName -CommandName Test-AzDevOpsProjectName -MockWith { $true }
-    Mock -ModuleName ModuleName -CommandName Test-AzDevOpsProjectDescription -MockWith { $true }
-    Mock -ModuleName ModuleName -CommandName Set-AzDevOpsApiResource -MockWith { $null }
-    Mock -ModuleName ModuleName -CommandName Get-AzDevOpsProject -MockWith {
-        param($ApiUri, $Pat, $ProjectId, $ProjectName)
-        return @{
-            "id" = $ProjectId
-            "name" = $ProjectName
-            "description" = "Updated description"
+    BeforeAll {
+
+        # Set the organization name
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoProject.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        Mock -CommandName Test-AzDevOpsProjectName -MockWith {
+            return $true
+        }
+
+        Mock -CommandName Get-CacheItem -MockWith {
+            param ($Key, $Type)
+            if ($Type -eq 'LiveProjects')
+            {
+                return @{ id = '12345' }
+            }
+            elseif ($Type -eq 'LiveProcesses')
+            {
+                return @{ id = '67890' }
+            }
+        }
+
+        Mock -CommandName Update-DevOpsProject -MockWith {
+            return @{ url = "http://devopsprojecturl" }
+        }
+
+        Mock -CommandName Wait-DevOpsProject
+        Mock -CommandName AzDoAPI_0_ProjectCache
+
+    }
+
+    Context "When setting a project" {
+
+        It "Should update the project in Azure DevOps and refresh the cache" {
+            # Arrange
+            $Global:DSCAZDO_OrganizationName = "TestOrg"
+            $projectName = "TestProject"
+            $projectDescription = "Test Description"
+            $sourceControlType = "Git"
+            $processTemplate = "Agile"
+            $visibility = "Private"
+
+            # Act
+            Set-xAzDoProject -ProjectName $projectName -ProjectDescription $projectDescription -SourceControlType $sourceControlType -ProcessTemplate $processTemplate -Visibility $visibility
+
+            # Assert
+            Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -ParameterFilter {
+                ($Key -eq $projectName) -and
+                ($Type -eq 'LiveProjects')
+            }
+            Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -ParameterFilter {
+                ($Key -eq $processTemplate) -and
+                ($Type -eq 'LiveProcesses')
+            }
+            Assert-MockCalled -CommandName Update-DevOpsProject -Exactly -Times 1 -ParameterFilter {
+                ($organization -eq "TestOrg") -and
+                ($projectId -eq '12345') -and
+                ($description -eq $projectDescription) -and
+                ($processTemplateId -eq '67890')
+            }
+            Assert-MockCalled -CommandName Wait-DevOpsProject -Exactly -Times 1 -ParameterFilter {
+                ($ProjectURL -eq "http://devopsprojecturl") -and
+                ($OrganizationName -eq "TestOrg")
+            }
+            Assert-MockCalled -CommandName AzDoAPI_0_ProjectCache -Exactly -Times 1 -ParameterFilter {
+                $OrganizationName -eq "TestOrg"
+            }
         }
     }
-
-    It 'Should return the updated project details' {
-        $result = Set-AzDevOpsProject -ApiUri 'https://dev.azure.com/someOrganizationName/_apis/' `
-                                      -Pat 'SomePAT' `
-                                      -ProjectId 'SomeProjectId' `
-                                      -ProjectName 'SomeProjectName' `
-                                      -ProjectDescription 'SomeProjectDescription' `
-                                      -Force
-        $result | Should -Not -BeNullOrEmpty
-        $result.id | Should -Be 'SomeProjectId'
-        $result.name | Should -Be 'SomeProjectName'
-        $result.description | Should -Be 'Updated description'
-    }
-
-    It 'Should call Test-AzDevOpsApiUri' {
-        Set-AzDevOpsProject -ApiUri 'https://dev.azure.com/someOrganizationName/_apis/' `
-                            -Pat 'SomePAT' `
-                            -ProjectId 'SomeProjectId' `
-                            -ProjectName 'SomeProjectName' `
-                            -ProjectDescription 'SomeProjectDescription' `
-                            -Force
-
-        Assert-MockCalled Test-AzDevOpsApiUri -Exactly 1 -Scope It
-    }
-
-    It 'Should call Test-AzDevOpsPat' {
-        Set-AzDevOpsProject -ApiUri 'https://dev.azure.com/someOrganizationName/_apis/' `
-                            -Pat 'SomePAT' `
-                            -ProjectId 'SomeProjectId' `
-                            -ProjectName 'SomeProjectName' `
-                            -ProjectDescription 'SomeProjectDescription' `
-                            -Force
-
-        Assert-MockCalled Test-AzDevOpsPat -Exactly 1 -Scope It
-    }
-
-    It 'Should call Test-AzDevOpsProjectId' {
-        Set-AzDevOpsProject -ApiUri 'https://dev.azure.com/someOrganizationName/_apis/' `
-                            -Pat 'SomePAT' `
-                            -ProjectId 'SomeProjectId' `
-                            -ProjectName 'SomeProjectName' `
-                            -ProjectDescription 'SomeProjectDescription' `
-                            -Force
-
-        Assert-MockCalled Test-AzDevOpsProjectId -Exactly 1 -Scope It
-    }
-
-    It 'Should call Set-AzDevOpsApiResource' {
-        Set-AzDevOpsProject -ApiUri 'https://dev.azure.com/someOrganizationName/_apis/' `
-                            -Pat 'SomePAT' `
-                            -ProjectId 'SomeProjectId' `
-                            -ProjectName 'SomeProjectName' `
-                            -ProjectDescription 'SomeProjectDescription' `
-                            -Force
-
-        Assert-MockCalled Set-AzDevOpsApiResource -Exactly 1 -Scope It
-    }
-
-    It 'Should call Get-AzDevOpsProject' {
-        Set-AzDevOpsProject -ApiUri 'https://dev.azure.com/someOrganizationName/_apis/' `
-                            -Pat 'SomePAT' `
-                            -ProjectId 'SomeProjectId' `
-                            -ProjectName 'SomeProjectName' `
-                            -ProjectDescription 'SomeProjectDescription' `
-                            -Force
-
-        Assert-MockCalled Get-AzDevOpsProject -Exactly 1 -Scope It
-    }
 }
-

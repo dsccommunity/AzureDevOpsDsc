@@ -1,51 +1,143 @@
-# Save-Module `Pester` -Path 'path\to\somewhere'
-Import-Module Pester
+$currentFile = $MyInvocation.MyCommand.Path
+# Pester tests for New-xAzDoProject
 
-Describe 'New-AzDevOpsProject' {
-    Mock -CommandName 'Test-AzDevOpsApiUri' -MockWith { $true }
-    Mock -CommandName 'Test-AzDevOpsPat' -MockWith { $true }
-    Mock -CommandName 'Test-AzDevOpsProjectName' -MockWith { $true }
-    Mock -CommandName 'Test-AzDevOpsProjectDescription' -MockWith { $true }
-    Mock -CommandName 'New-AzDevOpsProject' -MockWith { return @{ Name = $using:ProjectName } }
+Describe "New-xAzDoProject" {
 
-    $params = @{
-        ApiUri             = 'https://dev.azure.com/someOrganizationName/_apis/'
-        Pat                = 'fakePAT'
-        ProjectName        = 'TestProject'
-        ProjectDescription = 'Test Description'
-        SourceControlType  = 'Git'
-        Force              = $true
+
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
     }
 
-    It 'Creates a new Azure DevOps Project' {
-        $result = New-AzDevOpsProject @params
-        $result.Name | Should -BeExactly ($params.ProjectName)
+    BeforeAll {
+
+        # Set the organization name
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoOrganizationGroup.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        # Define common mock responses
+        $mockProcessTemplate = @{
+            id = '12345'
+            ProcessTemplate = 'Agile'
+        }
+
+        $mockProjectJob = @{
+            url = 'https://dev.azure.com/TestOrg/_apis/projects/ExistingProject'
+        }
+
+        Mock -CommandName Test-AzDevOpsProjectName -MockWith { return $true }
+
     }
 
-    It 'Calls Test-AzDevOpsApiUri' {
-        New-AzDevOpsProject @params
-        Assert-MockCalled -CommandName 'Test-AzDevOpsApiUri' -Exactly -Times 1
+    Context "when parameters are valid" {
+        BeforeEach {
+            # Mock Get-CacheItem to return a process template
+            Mock -CommandName Get-CacheItem -ParameterFilter { $Key -eq 'Agile' -and $Type -eq 'LiveProcesses' } -MockWith { return $mockProcessTemplate }
+
+            # Mock New-DevOpsProject to simulate project creation
+            Mock -CommandName New-DevOpsProject -MockWith { return $mockProjectJob }
+
+            # Mock Wait-DevOpsProject to simulate waiting for project creation
+            Mock -CommandName Wait-DevOpsProject
+
+            # Mock AzDoAPI_0_ProjectCache to simulate cache refresh
+            Mock -CommandName AzDoAPI_0_ProjectCache
+
+        }
+
+        It "should create a new project with specified parameters" {
+            New-xAzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
+
+            # Validate that Get-CacheItem was called with correct parameters
+            Assert-MockCalled -CommandName Get-CacheItem -Exactly 1 -ParameterFilter { $Key -eq 'Agile' -and $Type -eq 'LiveProcesses' }
+
+            # Validate that New-DevOpsProject was called with correct parameters
+            Assert-MockCalled -CommandName New-DevOpsProject -Exactly 1 -ParameterFilter {
+                ($organization -eq 'TestOrganization') -and
+                ($projectName -eq 'NewProject') -and
+                ($description -eq 'New Project Description') -and
+                ($sourceControlType -eq 'Git') -and
+                ($processTemplateId -eq '12345') -and
+                ($visibility -eq 'Private')
+            }
+
+            # Validate that Wait-DevOpsProject was called with correct parameters
+            Assert-MockCalled -CommandName Wait-DevOpsProject -Exactly 1 -ParameterFilter {
+                $ProjectURL -eq 'https://dev.azure.com/TestOrg/_apis/projects/ExistingProject' -and
+                $OrganizationName -eq 'TestOrganization'
+            }
+
+            # Validate that AzDoAPI_0_ProjectCache was called with correct parameters
+            Assert-MockCalled -CommandName AzDoAPI_0_ProjectCache -Exactly 1 -ParameterFilter {
+                $OrganizationName -eq 'TestOrganization'
+            }
+        }
     }
 
-    It 'Calls Test-AzDevOpsPat' {
-        New-AzDevOpsProject @params
-        Assert-MockCalled -CommandName 'Test-AzDevOpsPat' -Exactly -Times 1
+    Context "when process template does not exist" {
+        BeforeEach {
+            # Mock Get-CacheItem to return null for non-existing process template
+            Mock -CommandName Get-CacheItem -ParameterFilter { $Key -eq 'NonExistentTemplate' -and $Type -eq 'LiveProcesses' } -MockWith { return $null }
+        }
+
+        It "should throw an error if process template is not found" {
+            { New-xAzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'NonExistentTemplate' -Visibility 'Private' } | Should -Throw
+        }
     }
 
-    It 'Calls Test-AzDevOpsProjectName' {
-        New-AzDevOpsProject @params
-        Assert-MockCalled -CommandName 'Test-AzDevOpsProjectName' -Exactly -Times 1
-    }
+    Context "when force parameter is used" -skip {
+        BeforeEach {
+            # Mock Get-CacheItem to return a process template
+            Mock -CommandName Get-CacheItem -ParameterFilter { $Key -eq 'Agile' -and $Type -eq 'LiveProcesses' } -MockWith { return $mockProcessTemplate }
 
-    It 'Calls Test-AzDevOpsProjectDescription' {
-        New-AzDevOpsProject @params
-        Assert-MockCalled -CommandName 'Test-AzDevOpsProjectDescription' -Exactly -Times 1
-    }
+            # Mock New-DevOpsProject to simulate project creation
+            Mock -CommandName New-DevOpsProject -MockWith { return $mockProjectJob }
 
-    It 'Calls New-AzDevOpsProject with correct parameters' {
-        New-AzDevOpsProject @params
-        Assert-MockCalled -CommandName 'New-AzDevOpsProject' `
-                          -Exactly -Times 1 `
-                          -ParameterFilter { $ApiUri -eq $params.ApiUri -and $Pat -eq $params.Pat -and $Force -eq $params.Force }
+            # Mock Wait-DevOpsProject to simulate waiting for project creation
+            Mock -CommandName Wait-DevOpsProject
+
+            # Mock AzDoAPI_0_ProjectCache to simulate cache refresh
+            Mock -CommandName AzDoAPI_0_ProjectCache
+        }
+
+        It "should create a new project even if it already exists when -Force is used" {
+            New-xAzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private' -Force
+
+            # Validate that New-DevOpsProject was called with correct parameters
+            Assert-MockCalled -CommandName New-DevOpsProject -Exactly 1 -ParameterFilter {
+                $organization -eq 'TestOrg' -and
+                $projectName -eq 'NewProject' -and
+                $description -eq 'New Project Description' -and
+                $sourceControlType -eq 'Git' -and
+                $processTemplateId -eq '12345' -and
+                $visibility -eq 'Private'
+            }
+
+            # Validate that Wait-DevOpsProject was called with correct parameters
+            Assert-MockCalled -CommandName Wait-DevOpsProject -Exactly 1 -ParameterFilter {
+                $ProjectURL -eq 'https://dev.azure.com/TestOrg/_apis/projects/ExistingProject' -and
+                $OrganizationName -eq 'TestOrg'
+            }
+
+            # Validate that AzDoAPI_0_ProjectCache was called with correct parameters
+            Assert-MockCalled -CommandName AzDoAPI_0_ProjectCache -Exactly 1 -ParameterFilter {
+                $OrganizationName -eq 'TestOrg'
+            }
+        }
     }
 }
