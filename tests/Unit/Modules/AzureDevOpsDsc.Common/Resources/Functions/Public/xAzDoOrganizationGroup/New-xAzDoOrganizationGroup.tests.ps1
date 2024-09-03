@@ -1,68 +1,76 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
 Describe 'New-xAzDoOrganizationGroup' {
-    Mock -CommandName New-DevOpsGroup -MockWith {
-        return [PSCustomObject]@{
-            principalName = 'TestGroup'
-            GroupName = $GroupName
-            GroupDescription = $GroupDescription
-        }
+
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
     }
 
-    Mock -CommandName Add-CacheItem
-    Mock -CommandName Set-CacheObject
+    BeforeAll {
 
-    BeforeEach {
         $Global:DSCAZDO_OrganizationName = 'TestOrganization'
-    }
 
-    It 'Should create a new DevOps group and update caches' {
-        $GroupName = 'TestGroup'
-        $GroupDescription = 'Test Description'
-
-        $result = New-xAzDoOrganizationGroup -GroupName $GroupName -GroupDescription $GroupDescription
-
-        Assert-MockCalled -CommandName New-DevOpsGroup -Exactly 1 -Scope It
-        Assert-MockCalled -CommandName Add-CacheItem -Exactly 2 -Scope It
-        Assert-MockCalled -CommandName Set-CacheObject -Exactly 2 -Scope It
-
-        $result | Should -Not -BeNullOrEmpty
-    }
-
-    It 'Should pass the correct parameters to New-DevOpsGroup' {
-        $GroupName = 'TestGroup'
-        $GroupDescription = 'Test Description'
-
-        New-xAzDoOrganizationGroup -GroupName $GroupName -GroupDescription $GroupDescription
-
-        $params = @{
-            GroupName = $GroupName
-            GroupDescription = $GroupDescription
-            ApiUri = "https://vssps.dev.azure.com/TestOrganization"
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoOrganizationGroup.tests.ps1'
         }
 
-        Assert-MockCalled -CommandName New-DevOpsGroup -Exactly 1 -Scope It -ParameterFilter { $GroupName -eq $params.GroupName -and $GroupDescription -eq $params.GroupDescription -and $ApiUri -eq $params.ApiUri }
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        # Mock the external functions used within New-xAzDoOrganizationGroup
+        Mock -CommandName New-DevOpsGroup -MockWith {
+            return @{
+                principalName = "testPrincipalName"
+            }
+        }
+
+        Mock -CommandName Refresh-CacheIdentity
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Set-CacheObject
+
     }
 
-    It 'Should add the group to the caches correctly' {
-        New-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description'
+    Context 'When GroupName is provided' {
+        It 'Should create a new DevOps group with correct parameters' {
+            $params = @{
+                GroupName = 'TestGroup'
+                GroupDescription = 'Test Description'
+            }
 
-        Assert-MockCalled -CommandName Add-CacheItem -ParameterFilter {
-            $Key -eq 'TestGroup' -and
-            $Type -eq 'LiveGroups'
-        } -Scope It
+            $result = New-xAzDoOrganizationGroup @params
 
-        Assert-MockCalled -CommandName Add-CacheItem -ParameterFilter {
-            $Key -eq 'TestGroup' -and
-            $Type -eq 'Group'
-        } -Scope It
+            Assert-MockCalled -CommandName New-DevOpsGroup -Exactly -Times 1
+            Assert-MockCalled -CommandName Refresh-CacheIdentity -Exactly -Times 1
+            Assert-MockCalled -CommandName Add-CacheItem -Exactly -Times 1
+            Assert-MockCalled -CommandName Set-CacheObject -Exactly -Times 1
+        }
+    }
 
-        Assert-MockCalled -CommandName Set-CacheObject -ParameterFilter {
-            $CacheType -eq 'LiveGroups'
-        } -Scope It
+    Context 'Verbose logs' {
+        It 'Should log verbose messages' {
 
-        Assert-MockCalled -CommandName Set-CacheObject -ParameterFilter {
-            $CacheType -eq 'Group'
-        } -Scope It
+            Mock -CommandName Write-Verbose
+
+            $params = @{
+                GroupName = 'TestGroup'
+                GroupDescription = 'Test Description'
+                Verbose = $true
+            }
+
+            $verboseOutput = New-xAzDoOrganizationGroup @params
+
+            Assert-MockCalled -CommandName Write-Verbose -ParameterFilter { $Message -like "*Creating a new DevOps group with GroupName: 'TestGroup', GroupDescription: 'Test Description'*" }
+            Assert-MockCalled -CommandName Write-Verbose -ParameterFilter { $Message -like "*Updated global AzDoGroup cache object.*" }
+        }
     }
 }
-

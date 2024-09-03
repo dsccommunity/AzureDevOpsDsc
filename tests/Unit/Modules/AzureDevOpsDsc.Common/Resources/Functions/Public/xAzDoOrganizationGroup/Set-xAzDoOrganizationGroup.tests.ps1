@@ -1,73 +1,175 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Set-xAzDoOrganizationGroup Tests" {
-    Mock -CommandName Set-DevOpsGroup
-    Mock -CommandName Remove-CacheItem
-    Mock -CommandName Add-CacheItem
-    Mock -CommandName Set-CacheObject
+Describe 'Set-xAzDoOrganizationGroup' {
 
-    $params = @{
-        GroupName        = "MyGroup"
-        GroupDescription = "MyGroupDescription"
-        LookupResult     = @{
-            Status     = [DSCGetSummaryState]::Current
-            liveCache  = @{
-                descriptor   = "desc123"
-                principalName = "oldPrincipalName"
-            }
-            localCache = @{
-                principalName = "localPrincipalName"
+    AfterAll {
+        Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
+        Remove-Variable -Name AzDoGroup -Scope Global
+    }
+
+    BeforeAll {
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoOrganizationGroup.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        # Mock the external functions used within Set-xAzDoOrganizationGroup
+        Mock -CommandName Set-DevOpsGroup -MockWith {
+            return @{
+                principalName = 'testPrincipalName'
+                descriptor = 'testDescriptor'
             }
         }
-        Ensure = $null
-        Force  = $false
+
+        Mock -CommandName Refresh-CacheIdentity
+        Mock -CommandName Remove-CacheItem
+        Mock -CommandName Add-CacheItem
+        Mock -CommandName Set-CacheObject
+        Mock -CommandName Write-Warning
+
+    }
+    BeforeEach {
+        # Reset global variables before each test
+        $Global:DSCAZDO_OrganizationName = "TestOrg"
+        $Global:AzDoGroup = @{}
     }
 
-    It "Should warn and return when the group has been renamed" {
-        $params.LookupResult.Status = [DSCGetSummaryState]::Renamed
+    Context 'When group has been renamed' {
+        It 'Should write a warning and return without setting the group' {
+            $lookupResult = @{
+                Status = [DSCGetSummaryState]::Renamed
+                liveCache = @{
+                    descriptor = 'liveDescriptor'
+                }
+                localCache = @{
+                    principalName = 'localPrincipalName'
+                }
+            }
 
-        $result = Set-xAzDoOrganizationGroup @params
+            $result = Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
 
-        Assert-MockCalled Write-Warning -Exactly -Times 1 -Scope It
-        $result | Should -BeNullOrEmpty
-    }
-
-    It "Should call Set-DevOpsGroup with correct params" {
-        $params.LookupResult.Status = [DSCGetSummaryState]::Current
-
-        $result = Set-xAzDoOrganizationGroup @params
-
-        Assert-MockCalled Set-DevOpsGroup -Exactly -Times 1 -ParameterFilter {
-            $_.ApiUri -eq "https://vssps.dev.azure.com/" + $Global:DSCAZDO_OrganizationName -and
-            $_.GroupName -eq "MyGroup" -and
-            $_.GroupDescription -eq "MyGroupDescription" -and
-            $_.GroupDescriptor -eq "desc123"
+            $result | Should -BeNullOrEmpty
+            Assert-MockCalled -CommandName Set-DevOpsGroup -Times 0 -Scope It
+            Assert-MockCalled -CommandName Refresh-CacheIdentity -Times 0 -Scope It
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 0 -Scope It
+            Assert-MockCalled -CommandName Add-CacheItem -Times 0 -Scope It
+            Assert-MockCalled -CommandName Set-CacheObject -Times 0 -Scope It
         }
     }
 
-    It "Should update live cache correctly" {
-        $params.LookupResult.Status = [DSCGetSummaryState]::Current
+    Context 'When group needs to be set' {
+        It 'Should set the group and update the caches' {
+            $lookupResult = @{
+                Status = [DSCGetSummaryState]::None
+                liveCache = @{
+                    descriptor = 'liveDescriptor'
+                }
+                localCache = @{
+                    principalName = 'localPrincipalName'
+                }
+            }
 
-        $result = Set-xAzDoOrganizationGroup @params
+            $result = Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult
 
-        Assert-MockCalled Remove-CacheItem -ParameterFilter { $_.Key -eq "oldPrincipalName" -and $_.Type -eq 'LiveGroups' }
-        Assert-MockCalled Add-CacheItem -ParameterFilter { $_.Key -eq "MyGroup" -and $_.Type -eq 'LiveGroups' }
-        Assert-MockCalled Set-CacheObject -ParameterFilter { $_.CacheType -eq 'LiveGroups' }
+            $result | Should -Not -BeNullOrEmpty
+            $result.principalName | Should -Be 'testPrincipalName'
+
+            Assert-MockCalled -CommandName Set-DevOpsGroup -Exactly -Times 1 -ParameterFilter {
+                $ApiUri -eq 'https://vssps.dev.azure.com/TestOrg' -and
+                $GroupName -eq 'TestGroup' -and
+                $GroupDescription -eq 'Test Description' -and
+                $GroupDescriptor -eq 'liveDescriptor'
+            }
+
+            Assert-MockCalled -CommandName Refresh-CacheIdentity -Exactly -Times 1 -ParameterFilter {
+                $Identity.principalName -eq 'testPrincipalName' -and
+                $CacheType -eq 'LiveGroups'
+            }
+
+            Assert-MockCalled -CommandName Remove-CacheItem -Exactly -Times 1 -ParameterFilter {
+                $Key -eq 'localPrincipalName' -and
+                $Type -eq 'Group'
+            }
+
+            Assert-MockCalled -CommandName Add-CacheItem -Exactly -Times 1 -ParameterFilter {
+                $Key -eq 'testPrincipalName' -and
+                $Type -eq 'Group'
+            }
+
+            Assert-MockCalled -CommandName Set-CacheObject -Exactly -Times 1 -ParameterFilter {
+                $CacheType -eq 'Group'
+            }
+        }
     }
 
-    It "Should update local cache correctly" {
-        $params.LookupResult.Status = [DSCGetSummaryState]::Current
+    Context 'When there is no local cache' {
+        It 'Should set the group and update the caches without removing any cache item' {
+            $lookupResult = @{
+                Status = [DSCGetSummaryState]::None
+                liveCache = @{
+                    descriptor = 'liveDescriptor'
+                }
+                localCache = $null
+            }
 
-        $result = Set-xAzDoOrganizationGroup @params
+            $result = Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult
 
-        Assert-MockCalled Remove-CacheItem -ParameterFilter { $_.Key -eq "localPrincipalName" -and $_.Type -eq 'Groups' }
-        Assert-MockCalled Add-CacheItem -ParameterFilter { $_.Key -eq "MyGroup" -and $_.Type -eq 'Groups' }
-        Assert-MockCalled Set-CacheObject -ParameterFilter { $_.CacheType -eq 'Groups' }
+            $result | Should -Not -BeNullOrEmpty
+            $result.principalName | Should -Be 'testPrincipalName'
+
+            Assert-MockCalled -CommandName Set-DevOpsGroup -Exactly -Times 1 -ParameterFilter {
+                $ApiUri -eq 'https://vssps.dev.azure.com/TestOrg' -and
+                $GroupName -eq 'TestGroup' -and
+                $GroupDescription -eq 'Test Description' -and
+                $GroupDescriptor -eq 'liveDescriptor'
+            }
+
+            Assert-MockCalled -CommandName Refresh-CacheIdentity -Exactly -Times 1 -ParameterFilter {
+                $Identity.principalName -eq 'testPrincipalName' -and
+                $CacheType -eq 'LiveGroups'
+            }
+
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 0 -Scope It
+            Assert-MockCalled -CommandName Add-CacheItem -Exactly -Times 1 -ParameterFilter {
+                $Key -eq 'testPrincipalName' -and
+                $Type -eq 'Group'
+            }
+
+            Assert-MockCalled -CommandName Set-CacheObject -Exactly -Times 1 -ParameterFilter {
+                $CacheType -eq 'Group'
+            }
+        }
     }
 
-    It "Should throw if Set-DevOpsGroup throws" {
-        Mock Set-DevOpsGroup { throw "API Error" } -Verifiable -VerifiableBehavior Strict
+    Context 'When an exception occurs while setting the group' {
 
-        { Set-xAzDoOrganizationGroup @params } | Should -Throw "API Error"
+        It 'Should throw the exception' {
+
+            Mock -CommandName Set-DevOpsGroup -MockWith {
+                throw 'An error occurred'
+            }
+
+            $lookupResult = @{
+                Status = [DSCGetSummaryState]::None
+                liveCache = @{
+                    descriptor = 'liveDescriptor'
+                }
+                localCache = $null
+            }
+
+            { Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult } | Should -Throw 'An error occurred'
+        }
     }
 }
-

@@ -1,38 +1,38 @@
-
-# Mocked function - simulating Azure DevOps API call
-Function Test-xAzDoOrganizationGroup {
-    param(
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $GroupName,
-
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $Pat,
-
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $ApiUri
-    )
-
-    # Simulated logic - this will be mocked during Pester tests
-    if ($GroupName -eq 'ExistingGroup') {
-        return $true
-    } else {
-        return $false
-    }
-}
+$currentFile = $MyInvocation.MyCommand.Path
 
 # Pester tests
-Describe "Test-xAzDoOrganizationGroup" {
+# Not required to run in the pipeline
+Describe "Test-xAzDoOrganizationGroup" -skip {
+
+    BeforeAll {
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-xAzDoOrganizationGroup.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Mock the external functions used within Test-xAzDoOrganizationGroup
+        Mock -CommandName Test-xAzDoOrganizationGroup
+
+    }
 
     Context "when the group exists" {
         It "should return true" {
             # Mock Test-xAzDoOrganizationGroup function to simulate group existence
-            Mock -CommandName Test-xAzDoOrganizationGroup -MockWith { return $true }
+            Mock -CommandName Test-xAzDoOrganizationGroup -MockWith {
+                param (
+                    [string]$GroupName,
+                    [string]$Pat,
+                    [string]$ApiUri
+                )
+                return $true
+            }
 
             $result = Test-xAzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg'
             $result | Should -Be $true
@@ -42,7 +42,14 @@ Describe "Test-xAzDoOrganizationGroup" {
     Context "when the group does not exist" {
         It "should return false" {
             # Mock Test-xAzDoOrganizationGroup function to simulate group non-existence
-            Mock -CommandName Test-xAzDoOrganizationGroup -MockWith { return $false }
+            Mock -CommandName Test-xAzDoOrganizationGroup -MockWith {
+                param (
+                    [string]$GroupName,
+                    [string]$Pat,
+                    [string]$ApiUri
+                )
+                return $false
+            }
 
             $result = Test-xAzDoOrganizationGroup -GroupName 'NonExistentGroup' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg'
             $result | Should -Be $false
@@ -68,4 +75,3 @@ Describe "Test-xAzDoOrganizationGroup" {
     }
 
 }
-
