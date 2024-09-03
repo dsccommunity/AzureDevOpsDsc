@@ -99,7 +99,7 @@ Function Get-xAzDoProjectGroup {
             # The group has been renamed or deleted and recreated.
 
             # Perform a lookup in the live cache to see if the group has been deleted and recreated.
-            $renamedGroup = $livegroup | Find-CacheItem { $_.originId -eq $livegroup.originId }
+            $renamedGroup = $livegroup | Find-CacheItem -Filter { $_.originId -eq $livegroup.originId }
 
             # If renamed group is not null, the group has been renamed.
             if ($null -ne $renamedGroup) {
@@ -178,6 +178,7 @@ Function Get-xAzDoProjectGroup {
         if ($livegroup.displayName -ne $GroupName )                   { $getGroupResult.propertiesChanged += 'displayName' }
         # If the properties are the same, the group is unchanged. If not, the group has been changed.
         $getGroupResult.status = ($getGroupResult.propertiesChanged.count -ne 0) ? [DSCGetSummaryState]::Changed : [DSCGetSummaryState]::Unchanged
+
         if ($getGroupResult.status -ne [DSCGetSummaryState]::Unchanged) {
             # Add the reason
             #$getGroupResult.Reasons += [DscResourceReason]::New('xAzDoOrganizationGroup:xAzDoOrganizationGroup:Missing', 'The group is missing')
