@@ -14,7 +14,7 @@ Describe "Get-xAzDoProject" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoOrganizationGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoProject.tests.ps1'
         }
 
         # Load the functions to test

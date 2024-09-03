@@ -9,7 +9,7 @@ Describe "Test-AzDevOpsProject" -Skip {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoProject.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-xAzDoProject.tests.ps1'
         }
 
         # Load the functions to test
