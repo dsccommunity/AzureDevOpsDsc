@@ -13,7 +13,7 @@ Describe 'Remove-xAzDoGroupPermission' -skip {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoGroupPermission.tests.ps1'
         }
 
         # Load the functions to test
@@ -71,7 +71,7 @@ Describe 'Remove-xAzDoGroupPermission' -skip {
                 )
             }
             return @{
-                namespaceId = 'mockNamespaceId',
+                namespaceId = 'mockNamespaceId'
                 id          = 'mockProjectId'
             }
         }
@@ -88,7 +88,7 @@ Describe 'Remove-xAzDoGroupPermission' -skip {
                 return @()
             }
             return @{
-                namespaceId = 'mockNamespaceId',
+                namespaceId = 'mockNamespaceId'
                 id          = 'mockProjectId'
             }
         }

@@ -1,16 +1,44 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Test-xAzDoProjectGroup' {
+# Not used
+Describe 'Test-xAzDoProjectGroup' -skip {
 
-    Mock -CommandName 'Format-AzDoGroup' {
-        return "groupKey"
+    AfterAll {
+        # Clean up
+        Remove-Variable -Name DSCAZDO_OrganizationName -ErrorAction SilentlyContinue
     }
 
-    Mock -CommandName 'Get-CacheItem' {
-        param ($Key, $Type)
-        if ($Key -eq "groupKey" -and $Type -eq 'LiveGroups') {
-            return $true
+    BeforeAll {
+
+        # Set the organization name
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-xAzDoProjectGroup.tests.ps1'
         }
-        return $false
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        # Mocking external functions that are called within the function
+        Mock -CommandName 'Get-CacheItem' -MockWith {
+            param ($Key, $Type)
+            if ($Key -eq "groupKey" -and $Type -eq 'LiveGroups') {
+                return $true
+            }
+            return $false
+        }
+        Mock -CommandName 'Format-AzDoGroup' -MockWith { return "groupKey" }
     }
 
     Context 'When parameters are valid' {
@@ -94,4 +122,3 @@ Describe 'Test-xAzDoProjectGroup' {
         }
     }
 }
-

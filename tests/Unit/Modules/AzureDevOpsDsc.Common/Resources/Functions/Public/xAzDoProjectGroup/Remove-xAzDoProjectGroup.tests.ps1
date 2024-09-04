@@ -1,59 +1,121 @@
+$currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-xAzDoProjectGroup Tests' {
-    Mock Remove-DevOpsGroup
-    Mock Remove-CacheItem
-    Mock Set-CacheObject
+Describe 'Remove-xAzDoProjectGroup' {
 
-    BeforeEach {
-        $Global:DSCAZDO_OrganizationName = 'DummyOrg'
-        $Global:AZDOLiveGroups = @{}
-        $Global:AzDoGroup = @{}
-        $LookupResult = @{
-            liveCache = [PSCustomObject]@{
-                Descriptor = 'live-descriptor'
-                principalName = 'live-principal'
+    AfterAll {
+        # Clean up
+        Remove-Variable -Name DSCAZDO_OrganizationName -ErrorAction SilentlyContinue
+    }
+
+    BeforeAll {
+
+        # Set the organization name
+        $Global:DSCAZDO_OrganizationName = 'TestOrganization'
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoProjectGroup.tests.ps1'
+        }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        # Load the summary state
+        . (Get-ClassFilePath 'DSCGetSummaryState')
+        . (Get-ClassFilePath '000.CacheItem')
+        . (Get-ClassFilePath 'Ensure')
+
+        $mockProjectName = "TestProject"
+        $mockGroupName = "TestGroup"
+        $mockDescription = "TestDescription"
+
+        # Mocking external functions that are called within the function
+        Mock -CommandName Remove-DevOpsGroup -Verifiable
+        Mock -CommandName Remove-CacheItem -Verifiable
+        Mock -CommandName Set-CacheObject -Verifiable
+
+    }
+
+    Context 'When LookupResult has no cache items' {
+        It 'Should return without calling any other functions' {
+            $LookupResult = @{
+                liveCache = $null
+                localCache = $null
             }
-            localCache = [PSCustomObject]@{
-                Descriptor = 'local-descriptor'
-                principalName = 'local-principal'
+
+            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+
+            Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 0 -Exactly
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 0 -Exactly
+            Assert-MockCalled -CommandName Set-CacheObject -Times 0 -Exactly
+        }
+    }
+
+    Context 'When LookupResult has liveCache but no localCache' {
+
+        It 'Should call Remove-DevOpsGroup and remove cache items' {
+            $LookupResult = @{
+                liveCache = @{
+                    Descriptor = 'liveDescriptor'
+                    principalName = 'livePrincipal'
+                }
+                localCache = $null
             }
+
+            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+
+            Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 1 -Exactly
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'LiveGroups' }
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1 -Exactly -ParameterFilter { $cacheType -eq 'LiveGroups' }
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -Exactly -ParameterFilter { $type -eq 'Group' }
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1 -Exactly -ParameterFilter { $cacheType -eq 'Group' }
         }
     }
 
-    It 'Removes group when liveCache is present' {
-        Remove-xAzDoProjectGroup -GroupName 'Group1' -ProjectName 'Project1' -LookupResult $LookupResult -Ensure 'Present'
-        Assert-MockCalled Remove-DevOpsGroup -Exactly 1 -Scope It -Parameters @{
-            GroupDescriptor = 'live-descriptor'
-            ApiUri = 'https://vssps.dev.azure.com/DummyOrg'
+    Context 'When LookupResult has both liveCache and localCache' {
+        It 'Should use liveCache descriptor and principal name' {
+            $LookupResult = @{
+                liveCache = @{
+                    Descriptor = 'liveDescriptor'
+                    principalName = 'livePrincipal'
+                }
+                localCache = @{
+                    Descriptor = 'localDescriptor'
+                    principalName = 'localPrincipal'
+                }
+            }
+
+            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+
+            Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 1
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'LiveGroups' }
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1 -ParameterFilter { $cacheType -eq 'LiveGroups' }
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'Group' }
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1 -ParameterFilter { $cacheType -eq 'Group' }
         }
-        Assert-MockCalled Remove-CacheItem -Exactly 2 -Scope It -ParameterFilter {
-            $_.Key -eq 'live-principal' -and $_.Type -eq 'LiveGroups'
-        }
-        Assert-MockCalled Set-CacheObject -Exactly 2 -Scope It
     }
 
-    It 'Removes group when only localCache is present' {
-        $LookupResult.liveCache = $null
-        Remove-xAzDoProjectGroup -GroupName 'Group1' -ProjectName 'Project1' -LookupResult $LookupResult -Ensure 'Present'
-        Assert-MockCalled Remove-DevOpsGroup -Exactly 1 -Scope It -Parameters @{
-            GroupDescriptor = 'local-descriptor'
-            ApiUri = 'https://vssps.dev.azure.com/DummyOrg'
-        }
-        Assert-MockCalled Remove-CacheItem -Exactly 2 -Scope It -ParameterFilter {
-            $_.Key -eq 'local-principal' -and $_.Type -eq 'Group'
-        }
-        Assert-MockCalled Set-CacheObject -Exactly 2 -Scope It
-    }
+    Context 'When only localCache exists' {
+        It 'Should use localCache descriptor and principal name' {
+            $LookupResult = @{
+                liveCache = $null
+                localCache = @{
+                    Descriptor = 'localDescriptor'
+                    principalName = 'localPrincipal'
+                }
+            }
 
-    It 'Returns when no cache items exist' {
-        $LookupResult = @{
-            liveCache = $null
-            localCache = $null
+            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+
+            Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 1
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'LiveGroups' }
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1 -ParameterFilter { $cacheType -eq 'LiveGroups' }
+            Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'Group' }
+            Assert-MockCalled -CommandName Set-CacheObject -Times 1 -ParameterFilter { $cacheType -eq 'Group' }
         }
-        Remove-xAzDoProjectGroup -GroupName 'Group1' -ProjectName 'Project1' -LookupResult $LookupResult -Ensure 'Present'
-        Assert-MockCalled Remove-DevOpsGroup -Exactly 0 -Scope It
-        Assert-MockCalled Remove-CacheItem -Exactly 0 -Scope It
-        Assert-MockCalled Set-CacheObject -Exactly 0 -Scope It
     }
 }
-
