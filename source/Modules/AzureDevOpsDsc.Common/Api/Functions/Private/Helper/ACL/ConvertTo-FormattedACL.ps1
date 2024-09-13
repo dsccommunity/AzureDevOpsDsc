@@ -102,11 +102,13 @@ Function ConvertTo-FormattedACL {
             inherited = $ACL.inheritPermissions
             aces      = $ACEs
         }
+
         $ACLList.Add($formattedACL)
     }
 
     end {
         Write-Verbose "[ConvertTo-FormattedACL] Completed."
+
         return $ACLList
     }
 }

@@ -51,49 +51,68 @@ Describe 'Find-Identity Function Tests' {
 
     }
 
-    It 'Should return group identity for valid group descriptor' {
-        $result = Find-Identity -Name 'groupDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
+    Context "when searching the existing cache" {
 
-        $result.value.ACLIdentity.descriptor | Should -Be 'groupDescriptor'
-    }
+        It 'Should return group identity for valid group descriptor' {
+            $result = Find-Identity -Name 'groupDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
 
-    It 'Should return user identity for valid user descriptor' {
-        $result = Find-Identity -Name 'userDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-
-        $result.value.ACLIdentity.descriptor | Should -Be 'userDescriptor'
-    }
-
-    It 'Should return null for non-existent descriptor' {
-
-        Mock -CommandName Get-DevOpsDescriptorIdentity -MockWith {
-            return $null
+            $result.value.ACLIdentity.descriptor | Should -Be 'groupDescriptor'
         }
 
-        $result = Find-Identity -Name 'nonExistentDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-        $result | Should -BeNullOrEmpty
-    }
+        It 'Should return user identity for valid user descriptor' {
+            $result = Find-Identity -Name 'userDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
 
-    It 'Should return identity from API if not found in cache' {
-        Mock -CommandName Get-CacheObject -MockWith {
-            @{}
+            $result.value.ACLIdentity.descriptor | Should -Be 'userDescriptor'
         }
 
-        $result = Find-Identity -Name 'apiDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-        $result.ACLIdentity.descriptor | Should -Be 'apiDescriptor'
-    }
-
-    It 'Should return null for multiple identities with the same name' {
-        Mock -CommandName Get-CacheObject -MockWith {
-            @{
-                value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'duplicateDescriptor'; id = 'duplicateId' } }
-            }, @{
-                value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'duplicateDescriptor'; id = 'duplicateId' } }
+        It 'Should return null for multiple identities with the same name' {
+            Mock -CommandName Get-CacheObject -MockWith {
+                @{
+                    value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'duplicateDescriptor'; id = 'duplicateId' } }
+                }, @{
+                    value = [PSCustomObject]@{ ACLIdentity = [PSCustomObject]@{ descriptor = 'duplicateDescriptor'; id = 'duplicateId' } }
+                }
             }
+
+            $result = Find-Identity -Name 'duplicateDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
+
+            $result | Should -BeNullOrEmpty
         }
 
-        $result = Find-Identity -Name 'duplicateDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
-
-        $result | Should -BeNullOrEmpty
     }
+
+    Context "when searching the API" {
+
+        It 'Should return null for non-existent descriptor' {
+
+            Mock -CommandName Get-DevOpsDescriptorIdentity -MockWith {
+                return $null
+            }
+
+            $result = Find-Identity -Name 'nonExistentDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
+            $result | Should -BeNullOrEmpty
+        }
+
+        It 'Should attempt to search the cache again using the ID this time' {
+            Mock Write-Warning -Verifiable
+            Mock Write-Verbose -Verifiable
+            Mock -CommandName Get-DevOpsDescriptorIdentity -MockWith {
+                return @{
+                    id = 'groupId'
+                    descriptor = 'mockDescriptor'
+                }
+            }
+
+            $result = Find-Identity -Name 'unknownName' -OrganizationName 'TestOrg' -SearchType 'descriptor'
+
+            Assert-MockCalled Get-DevOpsDescriptorIdentity
+            $result.value.ACLIdentity.descriptor | Should -Be 'groupDescriptor'
+            Assert-VerifiableMock
+        }
+
+    }
+
+
+
 
 }

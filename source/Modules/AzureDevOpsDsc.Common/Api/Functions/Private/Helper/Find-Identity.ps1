@@ -123,6 +123,7 @@ Function Find-Identity {
 
         if ($groupIdentity) {
             Write-Verbose "[Find-Identity] Found group identity for '$Name'."
+            Write-Verbose "[Find-Identity] $SearchType"
             return $groupIdentity
         } elseif ($userIdentity) {
             Write-Verbose "[Find-Identity] Found user identity for '$Name'."
@@ -140,14 +141,47 @@ Function Find-Identity {
             Descriptor = $Name
         }
 
+        Write-Verbose "[Find-Identity] Performing a lookup via the API."
+        Write-Verbose "[Find-Identity] $SearchType"
+
         try {
             # Get the identity
             $identity = Get-DevOpsDescriptorIdentity @params
-            return $identity
         } catch {
             Write-Error "Failed to retrieve identity via API: $_"
             return $null
         }
+
+        # Attempt to match the identity using the ID
+        $groupIdentity = $CachedGroups | Where-Object { $_.value.ACLIdentity.id -eq $identity.id }
+        $userIdentity = $CachedUsers | Where-Object { $_.value.ACLIdentity.id -eq $identity.id }
+        $servicePrincipalIdentity = $CachedServicePrincipals | Where-Object { $_.value.ACLIdentity.id -eq $identity.id }
+
+        # Test if the identity was found
+        if ($groupIdentity -or $userIdentity -or $servicePrincipalIdentity) {
+
+            # Check if multiple identities were found.
+            if (($groupIdentity -and $userIdentity) -or ($groupIdentity -and $servicePrincipalIdentity) -or ($userIdentity -and $servicePrincipalIdentity)) {
+                Write-Warning "[Find-Identity] Found multiple identities with the ID '$($identity.id)'. Returning null."
+                return $null
+            }
+
+            if ($groupIdentity) {
+                Write-Verbose "[Find-Identity] Found group identity for '$Name'."
+                return $groupIdentity
+            } elseif ($userIdentity) {
+                Write-Verbose "[Find-Identity] Found user identity for '$Name'."
+                return $userIdentity
+            } elseif ($servicePrincipalIdentity) {
+                Write-Verbose "[Find-Identity] Found service principal identity for '$Name'."
+                return $servicePrincipalIdentity
+            }
+        }
+
+        # If no identity was found, write a warning and return null
+        Write-Warning "[Find-Identity] No identity found for '$Name'."
+        return $null
+
     }
 
     # Return null if no identity was found
