@@ -1,35 +1,65 @@
-Describe 'Refresh-CacheObject' -skip -Tags "Unit", "Cache" {
+# Tests for Refresh-CacheObject function
 
-    BeforeAll {
-        # Mocking Get-AzDoCacheObjects to return a controlled list
-        Mock -CommandName 'Get-AzDoCacheObjects' -MockWith { @('Type1', 'Type2', 'Type3') }
+# Import the module containing the Refresh-CacheObject function if necessary
+# Import-Module YourModuleName
 
-        # Defining the function to test
-        function Refresh-CacheObject
-        {
-            param (
-                [Parameter(Mandatory)]
-                [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
-                [string] $Type
-            )
-        }
-    }
+$currentFile = $MyInvocation.MyCommand.Path
+
+
+Describe "Refresh-CacheObject" -tags Unit, Cache {
 
     AfterAll {
         Remove-Variable -Name AzDoProject -ErrorAction SilentlyContinue
     }
 
-    Context 'Valid Type' {
-        It 'Accepts a valid type from the cache' {
-            Refresh-CacheObject -Type 'Type1' | Should -Not -Throw
+    BeforeAll {
+
+        # Load the functions to test
+        if ($null -eq $currentFile) {
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-CacheItem.tests.ps1'
         }
+
+        # Load the functions to test
+        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        ForEach ($file in $files) {
+            . $file.FullName
+        }
+
+        . (Get-ClassFilePath '000.CacheItem')
+
+        # Mock the Get-AzDoCacheObjects function to return a list of valid cache types
+        Mock -CommandName Get-AzDoCacheObjects -MockWith { return @('Type1', 'Type2', 'Type3') }
+
+        # Mock the Remove-Variable cmdlet to prevent actual removal of variables
+        Mock -CommandName Remove-Variable
+
+        # Mock the Import-CacheObject function to prevent actual import actions
+        Mock -CommandName Import-CacheObject
+
     }
 
-    Context 'Invalid Type' -Skip {
-        It 'Throws an error for invalid type' {
-            { Refresh-CacheObject -Type 'InvalidType' } | Should -Throw
+    Context "When CacheType is valid" {
+        It "Should unload and reload the cache object of type 'Type1'" {
+            $cacheType = 'Type1'
+            Refresh-CacheObject -CacheType $cacheType
+
+            # Verify that Remove-Variable was called with the correct parameters
+            Assert-MockCalled -CommandName Remove-Variable -Exactly 1 -ParameterFilter { $Name -eq "AzDoType1" }
+
+            # Verify that Import-CacheObject was called with the correct parameter
+            Assert-MockCalled -CommandName Import-CacheObject -Exactly 1 -ParameterFilter { $CacheType -eq 'Type1' }
+        }
+
+        It "Should unload and reload the cache object of type 'Type2'" {
+            $cacheType = 'Type2'
+            Refresh-CacheObject -CacheType $cacheType
+
+            # Verify that Remove-Variable was called with the correct parameters
+            Assert-MockCalled -CommandName Remove-Variable -Exactly 1 -ParameterFilter { $Name -eq "AzDoType2" }
+
+            # Verify that Import-CacheObject was called with the correct parameter
+            Assert-MockCalled -CommandName Import-CacheObject -Exactly 1 -ParameterFilter { $CacheType -eq 'Type2' }
         }
     }
 
 }
-

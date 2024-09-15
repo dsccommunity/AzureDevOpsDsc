@@ -33,6 +33,7 @@ Describe "New-xAzDoGitRepository Tests" {
         Mock -CommandName New-GitRepository -MockWith { return @{ Name = $RepositoryName } }
         Mock -CommandName Add-CacheItem
         Mock -CommandName Export-CacheObject
+        Mock -CommandName Refresh-CacheObject
 
     }
 
@@ -70,6 +71,16 @@ Describe "New-xAzDoGitRepository Tests" {
             New-xAzDoGitRepository @params
 
             Assert-MockCalled -CommandName Export-CacheObject -Exactly -Times 1
+        }
+
+        It "should call Refresh-CacheObject" {
+            $params = @{
+                ProjectName     = 'TestProject'
+                RepositoryName  = 'TestRepo'
+            }
+            New-xAzDoGitRepository @params
+
+            Assert-MockCalled -CommandName Refresh-CacheObject -Exactly -Times 1
         }
 
     }

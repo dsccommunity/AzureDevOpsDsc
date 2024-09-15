@@ -51,6 +51,7 @@ Function New-xAzDoGitRepository {
     # Add the repository to the LiveRepositories cache and write to verbose log
     Add-CacheItem -Key "$ProjectName\$RepositoryName" -Value $value -Type 'LiveRepositories'
     Export-CacheObject -CacheType 'LiveRepositories' -Content $AzDoLiveRepositories
+    Refresh-CacheObject -CacheType 'LiveRepositories'
     Write-Verbose "[New-xAzDoGitRepository] Added new group to LiveGroups cache with key: '$($value.Name)'"
 
 }
