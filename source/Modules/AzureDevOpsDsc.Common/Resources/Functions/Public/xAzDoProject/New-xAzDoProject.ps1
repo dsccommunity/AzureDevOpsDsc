@@ -68,9 +68,9 @@ function New-xAzDoProject
     Wait-DevOpsProject -ProjectURL $projectJob.url -OrganizationName $OrganizationName
 
     #
-    # Once the project has been created, refresh the project cache.
+    # Once the project has been created, refresh the entire cache.
 
-    AzDoAPI_0_ProjectCache -OrganizationName $OrganizationName
+    Refresh-AzDoCache -OrganizationName $OrganizationName
 
 }
 

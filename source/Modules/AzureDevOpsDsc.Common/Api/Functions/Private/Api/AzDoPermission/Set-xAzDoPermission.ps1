@@ -33,6 +33,8 @@ Function Set-xAzDoPermission
         Body = $SerializedACLs | ConvertTo-Json -Depth 4
     }
 
+    Write-Verbose "[Set-xAzDoPermission] Body: $($params.Body)"
+
     try {
         # Call the Invoke-AzDevOpsApiRestMethod function with the parameters defined above.
         # The "@" symbol is used to pass the hashtable as splatting parameters.

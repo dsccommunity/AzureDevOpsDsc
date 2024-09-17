@@ -82,7 +82,7 @@ function AzDoAPI_7_IdentitySubjectDescriptors
         $cacheParams = @{
             Key = $AzDoLiveUser.Key
             Value = $AzDoLiveUser
-            Type = 'LiveGroups'
+            Type = 'LiveUsers'
             SuppressWarning = $true
         }
 
@@ -115,7 +115,7 @@ function AzDoAPI_7_IdentitySubjectDescriptors
         $cacheParams = @{
             Key = $AzDoLiveServicePrinciple.Key
             Value = $AzDoLiveServicePrinciple
-            Type = 'LiveGroups'
+            Type = 'LiveServicePrinciples'
             SuppressWarning = $true
         }
 
