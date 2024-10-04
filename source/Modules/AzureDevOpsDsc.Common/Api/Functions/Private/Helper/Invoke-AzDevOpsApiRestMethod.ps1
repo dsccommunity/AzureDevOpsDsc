@@ -93,7 +93,11 @@ function Invoke-AzDevOpsApiRestMethod
 
         [Parameter()]
         [Switch]
-        $NoAuthentication
+        $NoAuthentication,
+
+        [Parameter()]
+        [Switch]
+        $AzureArcAuthentication
 
     )
 
@@ -205,6 +209,14 @@ function Invoke-AzDevOpsApiRestMethod
             }
             catch
             {
+
+                # If AzureArcAuthentication is present, then we need to handle the error differently.
+                # Stop and Pass the error back to the caller. The caller will handle the error.
+                if ($AzureArcAuthentication.IsPresent)
+                {
+                    throw $_
+                }
+
                 # Zero out the 'Authorization' header
                 $invokeRestMethodParameters.Headers.Authorization = $null
                 # Check to see if it is an HTTP 429 (Too Many Requests) error
