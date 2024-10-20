@@ -13,6 +13,10 @@ configuration of Azure DevOps and Azure DevOps Server.
 
 This project has adopted this [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Usage
+
+Please review the following [Usage Documentation](USAGE.md)
+
 ## Releases
 
 For each merge to the branch `main` a preview release will be

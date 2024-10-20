@@ -1,10 +1,14 @@
 output/
+.devcontainer/
+internal-tests/
+LCM/Datum/*
 
 **.bak
 *.local.*
 !**/README.md
 .kitchen/
 
+*.clixml
 *.suo
 *.user
 *.coverage
@@ -16,3 +20,7 @@ node_modules
 package-lock.json
 
 CodeCoverage.JaCoCo.xml
+.vscode/launch.json
+Temp/*
+TestProject.yml
+TestProject2.yml

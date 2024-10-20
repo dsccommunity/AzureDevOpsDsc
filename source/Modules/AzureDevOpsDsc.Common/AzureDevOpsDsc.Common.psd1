@@ -22,21 +22,67 @@
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport = @(
 
-        'New-AzManagedIdentity',
+        #
+        # LCM Supporting Functions
 
         'Get-AzDevOpsServicesUri',
         'Get-AzDevOpsServicesApiUri',
-
         'Get-AzDevOpsOperation',
         'Test-AzDevOpsOperation',
+        'Initialize-CacheObject',
 
-        'Get-AzDevOpsProject',
-        'New-AzDevOpsProject',
-        'Set-AzDevOpsProject',
-        'Remove-AzDevOpsProject',
-        'Test-AzDevOpsProject',
+        'New-AzDoAuthenticationProvider',
+        'Get-AzDoCacheObjects',
+        'AzDoAPI_0_ProjectCache',
+        'AzDoAPI_1_GroupCache',
+        'AzDoAPI_2_UserCache',
+        'AzDoAPI_3_GroupMemberCache',
 
-        'New-AzManagedIdentity'
+        #
+        # DSC Class Based Resources
+        'Get-xAzDoProject',
+        'New-xAzDoProject',
+        'Set-xAzDoProject',
+        'Remove-xAzDoProject',
+        'Test-xAzDoProject',
+
+        'Get-xAzDoProjectGroup',
+        'New-xAzDoProjectGroup',
+        'Set-xAzDoProjectGroup',
+        'Remove-xAzDoProjectGroup',
+        'Test-xAzDoProjectGroup',
+
+        'Get-xAzDoOrganizationGroup',
+        'New-xAzDoOrganizationGroup',
+        'Set-xAzDoOrganizationGroup',
+        'Remove-xAzDoOrganizationGroup',
+        'Test-xAzDoOrganizationGroup',
+
+        'Get-xAzDoGroupMember',
+        'New-xAzDoGroupMember',
+        'Set-xAzDoGroupMember',
+        'Remove-xAzDoGroupMember',
+        'Test-xAzDoGroupMember'
+
+        'Get-xAzDoGitRepository',
+        'New-xAzDoGitRepository',
+        'Remove-xAzDoGitRepository',
+
+        'Get-xAzDoGitPermission',
+        'New-xAzDoGitPermission',
+        'Remove-xAzDoGitPermission',
+        'Set-xAzDoGitPermission',
+
+        'Get-xAzDoGroupPermission',
+        'New-xAzDoGroupPermission',
+        'Remove-xAzDoGroupPermission',
+        'Set-xAzDoGroupPermission',
+
+        'Get-xAzDoProjectServices',
+        'Set-xAzDoProjectServices',
+        'Test-xAzDoProjectServices',
+        'Remove-xAzDoProjectServices'
+
     )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

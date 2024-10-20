@@ -26,15 +26,19 @@ function Test-AzDevOpsPat
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $Pat,
 
-        [Parameter(Mandatory = $true)]
-        [ValidateSet($true)]
+        [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $IsValid
     )
+
+    # If the Pat token is blank it means that managed identity is being used.
+    # In this case, the function will return $true.
+
+    if ([System.String]::IsNullOrWhiteSpace($Pat)) { return $true }
 
     return !([System.String]::IsNullOrWhiteSpace($Pat) -or
              $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
