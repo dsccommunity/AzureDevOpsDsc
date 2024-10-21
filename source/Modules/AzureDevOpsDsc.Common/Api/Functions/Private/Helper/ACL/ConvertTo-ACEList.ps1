@@ -27,11 +27,12 @@ Author: Your Name
 Date: Today's Date
 #>
 
-Function ConvertTo-ACEList {
+Function ConvertTo-ACEList
+{
     [CmdletBinding()]
     param (
         # Mandatory parameter: the security namespace as a string.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$SecurityNamespace,
 
         # Mandatory parameter: an array of permissions objects.
@@ -39,7 +40,7 @@ Function ConvertTo-ACEList {
         [Object[]]$Permissions = @(),
 
         # Mandatory parameter: the organization name as a string.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$OrganizationName
     )
 
@@ -53,7 +54,8 @@ Function ConvertTo-ACEList {
     $ACEs = [System.Collections.Generic.List[HashTable]]::new()
 
     # Iterate through each of the permissions and construct the ACE token.
-    ForEach ($Permission in $Permissions) {
+    ForEach ($Permission in $Permissions)
+    {
 
         Write-Verbose "[ConvertTo-ACEList] Constructing ACE for $($Permission.Identity)."
 
@@ -78,12 +80,14 @@ Function ConvertTo-ACEList {
         }
 
         # If the Identity is not found, log a warning.
-        if (-not $ht.Identity) {
+        if (-not $ht.Identity)
+        {
             Write-Warning "[ConvertTo-ACEList] Identity $($Permission.Identity) was not found. This will not be added to the ACEs list."
             continue
         }
         # If the Permissions are not found, log a warning.
-        if (-not $ht.Permissions) {
+        if (-not $ht.Permissions)
+        {
             Write-Warning "[ConvertTo-ACEList] Permissions for $($Permission.Identity) were not found. This will not be added to the ACEs list."
             continue
         }

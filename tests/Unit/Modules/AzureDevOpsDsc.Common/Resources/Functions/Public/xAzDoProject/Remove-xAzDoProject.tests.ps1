@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Remove-xAzDoProject" {
+Describe "Remove-AzDoProject" {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -13,7 +13,7 @@ Describe "Remove-xAzDoProject" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoProject.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-AzDoProject.tests.ps1'
         }
 
         # Load the functions to test
@@ -44,7 +44,7 @@ Describe "Remove-xAzDoProject" {
             $projectName = "TestProject"
 
             # Act
-            Remove-xAzDoProject -ProjectName $projectName
+            Remove-AzDoProject -ProjectName $projectName
 
             # Assert
             Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -ParameterFilter {
@@ -81,7 +81,7 @@ Describe "Remove-xAzDoProject" {
             $projectName = "NonExistentProject"
 
             # Act
-            Remove-xAzDoProject -ProjectName $projectName
+            Remove-AzDoProject -ProjectName $projectName
 
             # Assert
             Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -ParameterFilter {

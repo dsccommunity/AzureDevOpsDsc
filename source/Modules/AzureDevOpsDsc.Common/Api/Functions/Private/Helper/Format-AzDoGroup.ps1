@@ -17,15 +17,16 @@ Returns: "[Contoso]\Developers"
 
 #>
 
-Function Format-AzDoGroup {
+Function Format-AzDoGroup
+{
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [Alias('ProjectName', 'Organization')]
         [string]
         $Prefix,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]
         $GroupName
     )
@@ -41,4 +42,5 @@ Function Format-AzDoGroup {
     Write-Verbose "[Format-AzDoGroup] Resulting User Principal Name: '$userPrincipalName'."
 
     return $userPrincipalName
+
 }

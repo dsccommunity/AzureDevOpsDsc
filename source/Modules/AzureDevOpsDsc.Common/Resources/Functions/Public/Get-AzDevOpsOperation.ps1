@@ -51,7 +51,9 @@ function Get-AzDevOpsOperation
         Pat = $Pat;
         ResourceName = 'Operation'
     }
-    If(![System.String]::IsNullOrWhiteSpace($OperationId)){
+
+    if (-not[System.String]::IsNullOrWhiteSpace($OperationId))
+    {
         $azDevOpsApiResourceParameters.ResourceId = $OperationId
     }
 
@@ -59,9 +61,11 @@ function Get-AzDevOpsOperation
     [System.Management.Automation.PSObject[]]$apiResources = Get-AzDevOpsApiResource @azDevOpsApiResourceParameters
 
     # Filter "Operation" resources
-    If(![System.String]::IsNullOrWhiteSpace($OperationId)){
+    if (-not[System.String]::IsNullOrWhiteSpace($OperationId))
+    {
         $apiResources = $apiResources | Where-Object { $_.id -eq $OperationId }
     }
 
     return [System.Management.Automation.PSObject[]]$apiResources
+
 }

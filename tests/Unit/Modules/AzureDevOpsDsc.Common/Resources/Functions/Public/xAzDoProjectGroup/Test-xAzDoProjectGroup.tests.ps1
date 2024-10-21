@@ -1,7 +1,7 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
 # Not used
-Describe 'Test-xAzDoProjectGroup' -skip {
+Describe 'Test-AzDoProjectGroup' -skip {
 
     AfterAll {
         # Clean up
@@ -15,7 +15,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-xAzDoProjectGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-AzDoProjectGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -49,7 +49,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
                 Current = @{ description = 'Group Description' }
             }
 
-            $result = Test-xAzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
+            $result = Test-AzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
             $result | Should -BeTrue
         }
 
@@ -61,7 +61,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
                 Current = @{ description = $GroupDescription }
             }
 
-            $result = Test-xAzDoProjectGroup -GroupName $GroupName -GroupDescription $GroupDescription -GetResult $GetResult
+            $result = Test-AzDoProjectGroup -GroupName $GroupName -GroupDescription $GroupDescription -GetResult $GetResult
             $result | Should -BeFalse
         }
 
@@ -73,7 +73,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
                 Cache = @{}
             }
 
-            $result = Test-xAzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
+            $result = Test-AzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
             $result | Should -BeTrue
         }
 
@@ -85,7 +85,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
                 Cache = $null
             }
 
-            $result = Test-xAzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
+            $result = Test-AzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
             $result | Should -BeTrue
         }
 
@@ -97,7 +97,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
                 Cache = @{}
             }
 
-            $result = Test-xAzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
+            $result = Test-AzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
             $result | Should -BeTrue
         }
 
@@ -107,7 +107,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
                 Status = [DSCGetSummaryState]::Renamed
             }
 
-            $result = Test-xAzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
+            $result = Test-AzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
             $result | Should -BeFalse
         }
 
@@ -117,7 +117,7 @@ Describe 'Test-xAzDoProjectGroup' -skip {
                 Status = [DSCGetSummaryState]::Missing
             }
 
-            $result = Test-xAzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
+            $result = Test-AzDoProjectGroup -GroupName $GroupName -GetResult $GetResult
             $result | Should -BeTrue
         }
     }

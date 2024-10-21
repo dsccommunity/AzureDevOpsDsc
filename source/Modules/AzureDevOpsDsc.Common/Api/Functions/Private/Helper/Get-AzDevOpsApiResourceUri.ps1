@@ -59,7 +59,6 @@ function Get-AzDevOpsApiResourceUri
 
     [string]$apiResourceUri = $ApiUri
 
-
     # Obtain URI-specific names relating to $ResourceName
     [string]$apiUriResourceAreaName = Get-AzDevOpsApiUriAreaName -ResourceName $ResourceName
     [string]$apiUriResourceName = Get-AzDevOpsApiUriResourceName -ResourceName $ResourceName
@@ -71,17 +70,14 @@ function Get-AzDevOpsApiResourceUri
         $apiResourceUri = $apiResourceUri + "$apiUriResourceAreaName/"
     }
 
-
     # Append the URI-specific, 'ResourceName' of the 'Resource' onto the URI
     $apiResourceUri = $apiResourceUri + "$apiUriResourceName/"
-
 
     # Append the identifier of the resource, if provided
     if (![System.String]::IsNullOrWhiteSpace($ResourceId))
     {
         $apiResourceUri = $apiResourceUri + "$ResourceId/"
     }
-
 
     # Append any parameters to the URI
     $apiResourceUriParameters = @{
@@ -93,11 +89,9 @@ function Get-AzDevOpsApiResourceUri
 
     $apiResourceUri = $apiResourceUri + '?'
     $apiResourceUriParameters.Keys | ForEach-Object {
-
         $apiResourceUri = $apiResourceUri + '&' + $_ + '=' + $apiResourceUriParameters[$_]
     }
     $apiResourceUri = $apiResourceUri.Replace('/?&','?') # Tidy up the end of base URI where initial parameter begins
-
 
     return $apiResourceUri
 }

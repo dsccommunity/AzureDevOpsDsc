@@ -30,10 +30,11 @@ None.
 .NOTES
 This function is part of the AzureDevOpsDsc module and is used for caching Azure DevOps API responses.
 #>
-Function Export-CacheObject {
+Function Export-CacheObject
+{
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]$CacheType,
 
@@ -49,18 +50,22 @@ Function Export-CacheObject {
     Write-Verbose "[Export-ObjectCache] Starting export process for cache type: $CacheType"
 
     # Use the Enviroment Variables to set the Cache Directory Path
-    if ($ENV:AZDODSC_CACHE_DIRECTORY) {
+    if ($ENV:AZDODSC_CACHE_DIRECTORY)
+    {
         $CacheDirectoryPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Cache"
-    } else {
+    }
+    else
+    {
         Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
     }
 
-    try {
-
+    try
+    {
         $cacheFilePath = Join-Path -Path $CacheDirectoryPath -ChildPath "$CacheType.clixml"
 
         # Create cache directory if it does not exist
-        if (-not (Test-Path -Path $CacheDirectoryPath)) {
+        if (-not (Test-Path -Path $CacheDirectoryPath))
+        {
             Write-Verbose "[Export-ObjectCache] Creating cache directory at path: $CacheDirectoryPath"
             New-Item -Path $CacheDirectoryPath -ItemType Directory | Out-Null
         }
@@ -72,8 +77,9 @@ Function Export-CacheObject {
         # Confirm completion of export process
         Write-Verbose "[Export-ObjectCache] Export process completed successfully for cache type: $CacheType"
 
-    } catch {
-        Write-Error "[Export-ObjectCache] Failed to create cache for Azure DevOps API: $_"
-        throw
+    }
+    catch
+    {
+        throw "[Export-ObjectCache] Failed to create cache for Azure DevOps API: $_"
     }
 }

@@ -1,7 +1,30 @@
+<#
+.SYNOPSIS
+Initializes the Git repository cache for Azure DevOps projects.
+
+.DESCRIPTION
+The AzDoAPI_4_GitRepositoryCache function initializes the Git repository cache by enumerating live projects and retrieving their repositories from Azure DevOps. The repositories are then added to the cache.
+
+.PARAMETER OrganizationName
+The name of the Azure DevOps organization. If not provided, the function uses the global variable $Global:DSCAZDO_OrganizationName.
+
+.EXAMPLE
+AzDoAPI_4_GitRepositoryCache -OrganizationName "MyOrganization"
+Initializes the Git repository cache for the specified Azure DevOps organization.
+
+.EXAMPLE
+AzDoAPI_4_GitRepositoryCache
+Initializes the Git repository cache using the global organization name variable.
+
+.NOTES
+This function uses verbose logging to indicate the progress and actions taken during the cache initialization process. It also handles errors by logging them as errors.
+
+#>
 function AzDoAPI_4_GitRepositoryCache
 {
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory = $false)]
         [string]$OrganizationName
     )
 

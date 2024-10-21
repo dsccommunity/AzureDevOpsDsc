@@ -28,30 +28,34 @@ Test-ObjectProperty -Object $object -PropertyName "Email"
 # Returns $false
 #>
 
-Function Test-ObjectProperty {
+Function Test-ObjectProperty
+{
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [System.Object]
         $Object,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $PropertyName
     )
 
     # If the object is a hashtable, check if the key exists
-    if ($Object -is [System.Collections.Hashtable]) {
+    if ($Object -is [System.Collections.Hashtable])
+    {
         return $Object.ContainsKey($PropertyName)
     }
     # If the object is a PSCustomObject, check if the property exists
-    elseif ($Object -is [PSCustomObject]) {
+    elseif ($Object -is [PSCustomObject])
+    {
         return $Object.PSObject.Properties.Name -contains $PropertyName
     }
     # If the object is a PSObject, check if the property exists
-    elseif ($Object -is [PSObject]) {
+    elseif ($Object -is [PSObject])
+    {
         return $Object.PSObject.Properties.Name -contains $PropertyName
     }
 

@@ -21,7 +21,8 @@ Function Initialize-Log {
     }
 
     # Ensure the log directory exists
-    if (-not (Test-Path -Path $LogDirectory)) {
+    if (-not (Test-Path -Path $LogDirectory))
+    {
         Write-Verbose "[Initialize-Log] Log directory does not exist. Creating directory."
         New-Item -ItemType Directory -Path $LogDirectory -Force | Out-Null
     }

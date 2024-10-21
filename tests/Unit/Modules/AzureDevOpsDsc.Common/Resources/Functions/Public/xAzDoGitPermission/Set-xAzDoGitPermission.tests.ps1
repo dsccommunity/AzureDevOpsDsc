@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Set-xAzDoGitPermission' {
+Describe 'Set-AzDoGitPermission' {
 
 
     AfterAll {
@@ -13,7 +13,7 @@ Describe 'Set-xAzDoGitPermission' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoGitPermission.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoGitPermission.tests.ps1'
         }
 
         # Load the functions to test
@@ -31,7 +31,7 @@ Describe 'Set-xAzDoGitPermission' {
 
         Mock -CommandName Get-CacheItem -MockWith { return @{ namespaceId = 'SampleNamespaceId' } }
         Mock -CommandName ConvertTo-ACLHashtable -MockWith { return 'SerializedACLs' }
-        Mock -CommandName Set-xAzDoPermission
+        Mock -CommandName Set-AzDoPermission
 
         $ProjectName = 'TestProject'
         $RepositoryName = 'TestRepo'
@@ -63,25 +63,25 @@ Describe 'Set-xAzDoGitPermission' {
         Mock ConvertTo-ACLHashtable -MockWith {
             return 'SerializedACLs'
         }
-        Mock Set-xAzDoPermission -MockWith {
+        Mock Set-AzDoPermission -MockWith {
             return $null
         }
 
     }
 
     It 'Calls Get-CacheItem with the correct parameters for security namespace' {
-        Set-xAzDoGitPermission @params
+        Set-AzDoGitPermission @params
         Assert-MockCalled Get-CacheItem -Exactly 1 -ParameterFilter { ($Key -eq 'Git Repositories') -and ($Type -eq 'SecurityNamespaces') }
     }
 
     It 'Calls Get-CacheItem with the correct parameters for the project' {
-        Set-xAzDoGitPermission @params
+        Set-AzDoGitPermission @params
         Assert-MockCalled Get-CacheItem -Exactly 1 -ParameterFilter { ($Key -eq $ProjectName) -and ($Type -eq 'LiveProjects') }
     }
 
-    It 'Calls Set-xAzDoPermission with the correct parameters' {
-        Set-xAzDoGitPermission @params
-        Assert-MockCalled Set-xAzDoPermission -Exactly 1 -ParameterFilter {
+    It 'Calls Set-AzDoPermission with the correct parameters' {
+        Set-AzDoGitPermission @params
+        Assert-MockCalled Set-AzDoPermission -Exactly 1 -ParameterFilter {
             ($OrganizationName -eq 'TestOrg') -and
             ($SecurityNamespaceID -eq 'SampleNamespaceId') -and
             ($SerializedACLs -eq 'SerializedACLs')
@@ -89,7 +89,7 @@ Describe 'Set-xAzDoGitPermission' {
     }
 
     It 'Serializes ACLs using ConvertTo-ACLHashtable with correct parameters' {
-        Set-xAzDoGitPermission @params
+        Set-AzDoGitPermission @params
         Assert-MockCalled ConvertTo-ACLHashtable -Exactly 1 -ParameterFilter {
             $ReferenceACLs -eq 'someValue'
         }
@@ -100,7 +100,7 @@ Describe 'Set-xAzDoGitPermission' {
         Mock Get-CacheItem -MockWith { return $null }
         Mock Write-Error -Verifiable
 
-        Set-xAzDoGitPermission @params
+        Set-AzDoGitPermission @params
         Assert-VerifiableMock
     }
 

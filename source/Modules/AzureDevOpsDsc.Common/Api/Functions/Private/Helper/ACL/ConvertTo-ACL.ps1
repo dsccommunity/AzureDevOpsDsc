@@ -41,7 +41,8 @@ A list of Access Control Lists (ACLs) created from the provided permissions.
 Author: Your Name
 Date: Today's Date
 #>
-Function ConvertTo-ACL {
+Function ConvertTo-ACL
+{
     [CmdletBinding()]
     param (
         # Mandatory parameter: an array of hash tables containing permissions.
@@ -93,7 +94,8 @@ Function ConvertTo-ACL {
     }
 
     # If the ACEs are empty, write a warning and return.
-    if ($ACL.aces.Count -eq 0) {
+    if ($ACL.aces.Count -eq 0)
+    {
         Write-Warning "[ConvertTo-ACL] No ACEs were created. Returning."
         return $ACL
     }

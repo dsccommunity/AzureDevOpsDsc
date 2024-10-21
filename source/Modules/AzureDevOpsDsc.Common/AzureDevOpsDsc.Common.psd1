@@ -40,48 +40,48 @@
 
         #
         # DSC Class Based Resources
-        'Get-xAzDoProject',
-        'New-xAzDoProject',
-        'Set-xAzDoProject',
-        'Remove-xAzDoProject',
-        'Test-xAzDoProject',
+        'Get-AzDoProject',
+        'New-AzDoProject',
+        'Set-AzDoProject',
+        'Remove-AzDoProject',
+        'Test-AzDoProject',
 
-        'Get-xAzDoProjectGroup',
-        'New-xAzDoProjectGroup',
-        'Set-xAzDoProjectGroup',
-        'Remove-xAzDoProjectGroup',
-        'Test-xAzDoProjectGroup',
+        'Get-AzDoProjectGroup',
+        'New-AzDoProjectGroup',
+        'Set-AzDoProjectGroup',
+        'Remove-AzDoProjectGroup',
+        'Test-AzDoProjectGroup',
 
-        'Get-xAzDoOrganizationGroup',
-        'New-xAzDoOrganizationGroup',
-        'Set-xAzDoOrganizationGroup',
-        'Remove-xAzDoOrganizationGroup',
-        'Test-xAzDoOrganizationGroup',
+        'Get-AzDoOrganizationGroup',
+        'New-AzDoOrganizationGroup',
+        'Set-AzDoOrganizationGroup',
+        'Remove-AzDoOrganizationGroup',
+        'Test-AzDoOrganizationGroup',
 
-        'Get-xAzDoGroupMember',
-        'New-xAzDoGroupMember',
-        'Set-xAzDoGroupMember',
-        'Remove-xAzDoGroupMember',
-        'Test-xAzDoGroupMember'
+        'Get-AzDoGroupMember',
+        'New-AzDoGroupMember',
+        'Set-AzDoGroupMember',
+        'Remove-AzDoGroupMember',
+        'Test-AzDoGroupMember'
 
-        'Get-xAzDoGitRepository',
-        'New-xAzDoGitRepository',
-        'Remove-xAzDoGitRepository',
+        'Get-AzDoGitRepository',
+        'New-AzDoGitRepository',
+        'Remove-AzDoGitRepository',
 
-        'Get-xAzDoGitPermission',
-        'New-xAzDoGitPermission',
-        'Remove-xAzDoGitPermission',
-        'Set-xAzDoGitPermission',
+        'Get-AzDoGitPermission',
+        'New-AzDoGitPermission',
+        'Remove-AzDoGitPermission',
+        'Set-AzDoGitPermission',
 
-        'Get-xAzDoGroupPermission',
-        'New-xAzDoGroupPermission',
-        'Remove-xAzDoGroupPermission',
-        'Set-xAzDoGroupPermission',
+        'Get-AzDoGroupPermission',
+        'New-AzDoGroupPermission',
+        'Remove-AzDoGroupPermission',
+        'Set-AzDoGroupPermission',
 
-        'Get-xAzDoProjectServices',
-        'Set-xAzDoProjectServices',
-        'Test-xAzDoProjectServices',
-        'Remove-xAzDoProjectServices'
+        'Get-AzDoProjectServices',
+        'Set-AzDoProjectServices',
+        'Test-AzDoProjectServices',
+        'Remove-AzDoProjectServices'
 
     )
 

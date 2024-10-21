@@ -38,8 +38,10 @@ function Test-AzDevOpsPat
     # If the Pat token is blank it means that managed identity is being used.
     # In this case, the function will return $true.
 
-    if ([System.String]::IsNullOrWhiteSpace($Pat)) { return $true }
+    if ([System.String]::IsNullOrWhiteSpace($Pat))
+    {
+        return $true
+    }
 
-    return !([System.String]::IsNullOrWhiteSpace($Pat) -or
-             $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
+    return (-not([System.String]::IsNullOrWhiteSpace($Pat)) -or $Pat.Length -ne 52) # Note: 52 is the current/expected length of PAT
 }

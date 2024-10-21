@@ -1,7 +1,7 @@
 $currentFile = $MyInvocation.MyCommand.Path
-# Pester tests for New-xAzDoProject
+# Pester tests for New-AzDoProject
 
-Describe "New-xAzDoProject" {
+Describe "New-AzDoProject" {
 
 
     AfterAll {
@@ -15,7 +15,7 @@ Describe "New-xAzDoProject" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoProject.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-AzDoProject.tests.ps1'
         }
 
         # Load the functions to test
@@ -61,7 +61,7 @@ Describe "New-xAzDoProject" {
         }
 
         It "should create a new project with specified parameters" {
-            New-xAzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
+            New-AzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
 
             # Validate that Get-CacheItem was called with correct parameters
             Assert-MockCalled -CommandName Get-CacheItem -Exactly 1 -ParameterFilter { $Key -eq 'Agile' -and $Type -eq 'LiveProcesses' }
@@ -96,7 +96,7 @@ Describe "New-xAzDoProject" {
         }
 
         It "should throw an error if process template is not found" {
-            { New-xAzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'NonExistentTemplate' -Visibility 'Private' } | Should -Throw
+            { New-AzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'NonExistentTemplate' -Visibility 'Private' } | Should -Throw
         }
     }
 
@@ -116,7 +116,7 @@ Describe "New-xAzDoProject" {
         }
 
         It "should create a new project even if it already exists when -Force is used" {
-            New-xAzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private' -Force
+            New-AzDoProject -ProjectName 'NewProject' -ProjectDescription 'New Project Description' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private' -Force
 
             # Validate that New-DevOpsProject was called with correct parameters
             Assert-MockCalled -CommandName New-DevOpsProject -Exactly 1 -ParameterFilter {

@@ -33,7 +33,7 @@ Function Remove-DevOpsGroup {
         [String]
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default),
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]
         $OrganizationName,
 
@@ -43,7 +43,7 @@ Function Remove-DevOpsGroup {
     )
 
     $params = @{
-        Uri = "https://vssps.dev.azure.com/{0}/_apis/graph/groups/{1}?api-version={2}" -f $OrganizationName, $GroupDescriptor, $ApiVersion
+        Uri = 'https://vssps.dev.azure.com/{0}/_apis/graph/groups/{1}?api-version={2}' -f $OrganizationName, $GroupDescriptor, $ApiVersion
         Method = 'Delete'
         ContentType = 'application/json'
     }

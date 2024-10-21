@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'New-xAzDoOrganizationGroup' {
+Describe 'New-AzDoOrganizationGroup' {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -12,7 +12,7 @@ Describe 'New-xAzDoOrganizationGroup' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoOrganizationGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-AzDoOrganizationGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -27,7 +27,7 @@ Describe 'New-xAzDoOrganizationGroup' {
         . (Get-ClassFilePath '000.CacheItem')
         . (Get-ClassFilePath 'Ensure')
 
-        # Mock the external functions used within New-xAzDoOrganizationGroup
+        # Mock the external functions used within New-AzDoOrganizationGroup
         Mock -CommandName New-DevOpsGroup -MockWith {
             return @{
                 principalName = "testPrincipalName"
@@ -47,7 +47,7 @@ Describe 'New-xAzDoOrganizationGroup' {
                 GroupDescription = 'Test Description'
             }
 
-            $result = New-xAzDoOrganizationGroup @params
+            $result = New-AzDoOrganizationGroup @params
 
             Assert-MockCalled -CommandName New-DevOpsGroup -Exactly -Times 1
             Assert-MockCalled -CommandName Refresh-CacheIdentity -Exactly -Times 1
@@ -67,7 +67,7 @@ Describe 'New-xAzDoOrganizationGroup' {
                 Verbose = $true
             }
 
-            $verboseOutput = New-xAzDoOrganizationGroup @params
+            $verboseOutput = New-AzDoOrganizationGroup @params
 
             Assert-MockCalled -CommandName Write-Verbose -ParameterFilter { $Message -like "*Creating a new DevOps group with GroupName: 'TestGroup', GroupDescription: 'Test Description'*" }
             Assert-MockCalled -CommandName Write-Verbose -ParameterFilter { $Message -like "*Updated global AzDoGroup cache object.*" }

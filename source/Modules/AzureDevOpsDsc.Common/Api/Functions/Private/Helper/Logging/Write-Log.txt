@@ -4,11 +4,11 @@ Function Write-Log
     param
     (
         # The message to be logged.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$Message,
 
         # The type of log message.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Verbose', 'Warning')]
         [string]$Type
     )

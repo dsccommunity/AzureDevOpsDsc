@@ -105,12 +105,14 @@ Function Test-ACLListforChanges
 
     #
     # Test each of the Reference ACLs
-    ForEach ($ReferenceACL in $ReferenceACLs) {
+    ForEach ($ReferenceACL in $ReferenceACLs)
+    {
 
         $acl = $DifferenceACLs | Where-Object { $_.Identity.value.originId -eq $ReferenceACL.Identity.value.originId }
 
         # Test if the ACL is not found in the Difference ACL.
-        if ($null -eq $acl) {
+        if ($null -eq $acl)
+        {
             $result.status = "Changed"
             $result.propertiesChanged = $ReferenceACLs
             $result.reason += @{
@@ -121,7 +123,8 @@ Function Test-ACLListforChanges
         }
 
         # Test the inherited flag.
-        if ($ReferenceACL.isInherited -ne $acl.isInherited) {
+        if ($ReferenceACL.isInherited -ne $acl.isInherited)
+        {
             $result.status = "Changed"
             $result.propertiesChanged = $ReferenceACLs
             $result.reason += @{
@@ -133,13 +136,15 @@ Function Test-ACLListforChanges
 
         # Iterate through the ACEs and compare them.
 
-        ForEach ($ReferenceACE in $ReferenceACL.ACEs) {
+        ForEach ($ReferenceACE in $ReferenceACL.ACEs)
+        {
 
             # Check if the ACE is found in the Difference ACL.
             $ace = $DifferenceACLs.ACEs | Where-Object { $_.Identity.value.originId -eq $ReferenceACE.Identity.value.originId }
 
             # Check if the ACE is not found in the Difference ACL.
-            if ($null -eq $ace) {
+            if ($null -eq $ace)
+            {
                 $result.status = "Changed"
                 $result.propertiesChanged = $ReferenceACLs
                 $result.reason += @{
@@ -201,12 +206,14 @@ Function Test-ACLListforChanges
     #
     # Test each of the Difference ACLs
 
-    foreach ($DifferenceACL in $DifferenceACLs) {
+    foreach ($DifferenceACL in $DifferenceACLs)
+    {
 
         $acl = $ReferenceACLs | Where-Object { $_.Identity.value.originId -eq $DifferenceACL.Identity.value.originId }
 
         # Test if the ACL is not found in the Reference ACL.
-        if ($null -eq $acl) {
+        if ($null -eq $acl)
+        {
             $result.status = "Changed"
             $result.reason += @{
                 Value = $DifferenceACL

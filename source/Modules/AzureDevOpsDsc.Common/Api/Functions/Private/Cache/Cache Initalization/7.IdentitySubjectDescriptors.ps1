@@ -1,7 +1,31 @@
+<#
+.SYNOPSIS
+    Initializes and updates the identity subject descriptors cache for Azure DevOps groups, users, and service principals.
+
+.DESCRIPTION
+    The AzDoAPI_7_IdentitySubjectDescriptors function retrieves and updates the identity subject descriptors for Azure DevOps groups, users, and service principals.
+    It uses the provided organization name or a global variable if no organization name is provided. The function enumerates the live groups, users, and service principals
+    from the cache, queries their identities, and updates the cache with the retrieved identity information.
+
+.PARAMETER OrganizationName
+    The name of the Azure DevOps organization. If not provided, the function uses the global variable $Global:DSCAZDO_OrganizationName.
+
+.EXAMPLE
+    PS> AzDoAPI_7_IdentitySubjectDescriptors -OrganizationName "MyOrganization"
+    Initializes and updates the identity subject descriptors cache for the specified Azure DevOps organization.
+
+.EXAMPLE
+    PS> AzDoAPI_7_IdentitySubjectDescriptors
+    Initializes and updates the identity subject descriptors cache using the global organization name.
+
+.NOTES
+    This function is part of the AzureDevOpsDsc module and is used internally to manage the identity subject descriptors cache.
+#>
 function AzDoAPI_7_IdentitySubjectDescriptors
 {
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory = $false)]
         [string]$OrganizationName
     )
 
@@ -31,10 +55,9 @@ function AzDoAPI_7_IdentitySubjectDescriptors
     }
 
     # Iterate through each of the groups and query the Identity and add to the cache
-    ForEach ($AzDoLiveGroup in $AzDoLiveGroups) {
-
+    ForEach ($AzDoLiveGroup in $AzDoLiveGroups)
+    {
         $identity = Get-DevOpsDescriptorIdentity @params -SubjectDescriptor $AzDoLiveGroup.value.descriptor
-
         $ACLIdentity = [PSCustomObject]@{
             id = $identity.id
             descriptor = $identity.descriptor
@@ -64,8 +87,8 @@ function AzDoAPI_7_IdentitySubjectDescriptors
     #
     # Iterate through each of the users and query the Identity and add to the cache
 
-    ForEach ($AzDoLiveUser in $AzDoLiveUsers) {
-
+    ForEach ($AzDoLiveUser in $AzDoLiveUsers)
+    {
         $identity = Get-DevOpsDescriptorIdentity @params -SubjectDescriptor $AzDoLiveUser.value.descriptor
 
         $ACLIdentity = [PSCustomObject]@{
@@ -97,8 +120,8 @@ function AzDoAPI_7_IdentitySubjectDescriptors
     #
     # Iterate through each of the service principals and query the Identity and add to the cache
 
-    ForEach ($AzDoLiveServicePrinciple in $AzDoLiveServicePrinciples) {
-
+    ForEach ($AzDoLiveServicePrinciple in $AzDoLiveServicePrinciples)
+    {
         $identity = Get-DevOpsDescriptorIdentity @params -SubjectDescriptor $AzDoLiveServicePrinciple.value.descriptor
 
         $ACLIdentity = [PSCustomObject]@{
@@ -126,6 +149,5 @@ function AzDoAPI_7_IdentitySubjectDescriptors
 
     # Update the cache
     Export-CacheObject -CacheType 'LiveServicePrinciples' -Content $AzDoLiveServicePrinciples
-
 
 }

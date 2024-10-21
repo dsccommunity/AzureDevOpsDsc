@@ -3,7 +3,7 @@ Function List-DevOpsGroups {
     [OutputType([System.Object])]
     Param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Organization,
         [Parameter()]
@@ -20,7 +20,8 @@ Function List-DevOpsGroups {
     # Invoke the Rest API to get the groups
     $groups = Invoke-APIRestMethod @params
 
-    if ($null -eq $groups.value) {
+    if ($null -eq $groups.value)
+    {
         return $null
     }
 

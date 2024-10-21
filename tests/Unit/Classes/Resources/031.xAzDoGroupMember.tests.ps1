@@ -11,10 +11,10 @@ if ($Global:ClassesLoaded -eq $null)
     . $preInitialize.FullName -RepositoryPath $RepositoryRoot
 }
 
-Describe 'xAzDoGroupMember' {
+Describe 'AzDoGroupMember' {
     BeforeAll {
         # Mock functions that interact with external resources
-        function Get-xAzDoGroupMember
+        function Get-AzDoGroupMember
         {
             param (
                 [string]$GroupName,
@@ -28,7 +28,7 @@ Describe 'xAzDoGroupMember' {
             }
         }
 
-        function New-xAzDoGroupMember
+        function New-AzDoGroupMember
         {
             param (
                 [string]$GroupName,
@@ -40,7 +40,7 @@ Describe 'xAzDoGroupMember' {
             Write-Output "New group member added to: $GroupName"
         }
 
-        function Update-xAzDoGroupMember
+        function Update-AzDoGroupMember
         {
             param (
                 [string]$GroupName,
@@ -52,7 +52,7 @@ Describe 'xAzDoGroupMember' {
             Write-Output "Group members updated in: $GroupName"
         }
 
-        function Remove-xAzDoGroupMember
+        function Remove-AzDoGroupMember
         {
             param (
                 [string]$GroupName,
@@ -67,7 +67,7 @@ Describe 'xAzDoGroupMember' {
     Context 'When getting the current state of group members' {
         It 'Should return the current state properties' {
             # Arrange
-            $groupMember = [xAzDoGroupMember]::new()
+            $groupMember = [AzDoGroupMember]::new()
             $groupMember.GroupName = "MyGroup"
             $groupMember.GroupMembers = @("User1", "User2")
 

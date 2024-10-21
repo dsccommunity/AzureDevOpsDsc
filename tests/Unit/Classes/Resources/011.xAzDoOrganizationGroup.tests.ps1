@@ -11,7 +11,7 @@ if ($Global:ClassesLoaded -eq $null)
     . $preInitialize.FullName -RepositoryPath $RepositoryRoot
 }
 
-Describe 'xAzDoOrganizationGroup' {
+Describe 'AzDoOrganizationGroup' {
     # Mocking AzDevOpsDscResourceBase class since it's not provided
     Class AzDevOpsDscResourceBase {
         [void] Construct() {}
@@ -19,7 +19,7 @@ Describe 'xAzDoOrganizationGroup' {
 
     Context 'Constructor' {
         It 'should initialize properties correctly when given valid parameters' {
-            $organizationGroup = [xAzDoOrganizationGroup]::new()
+            $organizationGroup = [AzDoOrganizationGroup]::new()
             $organizationGroup.GroupName = "MyGroup"
             $organizationGroup.GroupDescription = "This is my group."
 
@@ -30,7 +30,7 @@ Describe 'xAzDoOrganizationGroup' {
 
     Context 'GetDscResourcePropertyNamesWithNoSetSupport Method' {
         It 'should return an empty array' {
-            $organizationGroup = [xAzDoOrganizationGroup]::new()
+            $organizationGroup = [AzDoOrganizationGroup]::new()
 
             $result = $organizationGroup.GetDscResourcePropertyNamesWithNoSetSupport()
 
@@ -40,7 +40,7 @@ Describe 'xAzDoOrganizationGroup' {
 
     Context 'GetDscCurrentStateProperties Method' {
         It 'should return properties with Ensure set to Absent if CurrentResourceObject is null' {
-            $organizationGroup = [xAzDoOrganizationGroup]::new()
+            $organizationGroup = [AzDoOrganizationGroup]::new()
 
             $result = $organizationGroup.GetDscCurrentStateProperties($null)
 
@@ -48,7 +48,7 @@ Describe 'xAzDoOrganizationGroup' {
         }
 
         It 'should return current state properties from CurrentResourceObject' {
-            $organizationGroup = [xAzDoOrganizationGroup]::new()
+            $organizationGroup = [AzDoOrganizationGroup]::new()
             $currentResourceObject = [PSCustomObject]@{
                 GroupName = "MyGroup"
                 GroupDescription = "This is my group"

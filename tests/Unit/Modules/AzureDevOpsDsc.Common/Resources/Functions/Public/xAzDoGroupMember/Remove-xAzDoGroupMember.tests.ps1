@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-xAzDoGroupMember Tests' {
+Describe 'Remove-AzDoGroupMember Tests' {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -14,7 +14,7 @@ Describe 'Remove-xAzDoGroupMember Tests' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-AzDoGroupMember.tests.ps1'
         }
 
         # Load the functions to test
@@ -59,7 +59,7 @@ Describe 'Remove-xAzDoGroupMember Tests' {
     Context "when functioning correctly" {
         It 'Should remove group members correctly' {
             $GroupName = 'TestGroup'
-            $result = Remove-xAzDoGroupMember -GroupName $GroupName
+            $result = Remove-AzDoGroupMember -GroupName $GroupName
 
             Assert-MockCalled -CommandName Find-AzDoIdentity -Times 1
             Assert-MockCalled -CommandName Get-CacheItem -Times 1
@@ -71,7 +71,7 @@ Describe 'Remove-xAzDoGroupMember Tests' {
             Mock -CommandName Write-Warning
 
             $GroupName = 'TestGroup'
-            $result = Remove-xAzDoGroupMember -GroupName $GroupName
+            $result = Remove-AzDoGroupMember -GroupName $GroupName
 
             Assert-MockCalled -CommandName Write-Warning -ParameterFilter { $Message -like '*No group members found*'} -Exactly 0
             Assert-MockCalled -CommandName Remove-CacheItem -Times 1
@@ -86,7 +86,7 @@ Describe 'Remove-xAzDoGroupMember Tests' {
             Mock -CommandName Write-Warning
 
             $GroupName = 'TestGroup'
-            $result = Remove-xAzDoGroupMember -GroupName $GroupName
+            $result = Remove-AzDoGroupMember -GroupName $GroupName
 
             Assert-MockCalled -CommandName Find-AzDoIdentity -Exactly 1
             Assert-MockCalled -CommandName Remove-DevOpsGroupMember -Exactly 0
@@ -105,7 +105,7 @@ Describe 'Remove-xAzDoGroupMember Tests' {
 
             Mock -CommandName Write-Warning
 
-            $result = Remove-xAzDoGroupMember -GroupName $GroupName
+            $result = Remove-AzDoGroupMember -GroupName $GroupName
 
             Assert-MockCalled -CommandName Write-Warning -ParameterFilter { $Message -like '*Unable to find identity*'} -Exactly 2
             Assert-MockCalled -CommandName Remove-DevOpsGroupMember -Exactly 0
@@ -125,7 +125,7 @@ Describe 'Remove-xAzDoGroupMember Tests' {
             Mock -CommandName Write-Warning
 
             $GroupName = 'TestGroup'
-            $result = Remove-xAzDoGroupMember -GroupName $GroupName
+            $result = Remove-AzDoGroupMember -GroupName $GroupName
 
             Assert-MockCalled -CommandName Write-Warning -ParameterFilter { $Message -like '*Unable to find identity*'} -Exactly 1
             Assert-MockCalled -CommandName Remove-DevOpsGroupMember -Exactly 0

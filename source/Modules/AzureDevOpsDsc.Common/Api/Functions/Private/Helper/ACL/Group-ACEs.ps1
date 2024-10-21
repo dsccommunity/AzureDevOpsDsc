@@ -1,4 +1,29 @@
-Function Group-ACEs {
+<#
+.SYNOPSIS
+    Groups Access Control Entries (ACEs) by identity and permissions.
+
+.DESCRIPTION
+    The Group-ACEs function takes an array of ACE objects and groups them by their identity.
+    It then further groups the identities by their permissions. The function returns a list
+    of grouped ACEs.
+
+.PARAMETER ACEs
+    An array of ACE objects to be grouped. Each ACE object should have an Identity and Permissions property.
+
+.OUTPUTS
+    System.Collections.Generic.List[HashTable]
+    A list of hash tables where each hash table represents a grouped ACE with its identity and permissions.
+
+.EXAMPLE
+    $aces = Get-ACEs
+    $groupedACEs = Group-ACEs -ACEs $aces
+    Write-Output $groupedACEs
+
+.NOTES
+    The function uses verbose output to provide detailed information about its processing steps.
+#>
+Function Group-ACEs
+{
     param(
         # Mandatory parameter: an array of ACE objects.
         [Parameter()]
@@ -8,7 +33,8 @@ Function Group-ACEs {
     Write-Verbose "[Group-ACE] Started."
 
     # Check if the ACEs are not found.
-    if (-not $ACEs) {
+    if (-not $ACEs)
+    {
         Write-Verbose "[Group-ACE] ACEs not found."
         return
     }
@@ -39,8 +65,8 @@ Function Group-ACEs {
     Write-Verbose "[Group-ACE] Grouping multiple identities by permissions."
 
     # Group the multiple identities by the permissions
-    ForEach ($item in $Multiple) {
-
+    ForEach ($item in $Multiple)
+    {
         Write-Verbose "[Group-ACE] Processing multiple identity: $($item.Group[0].Identity)"
 
         # Create a new hash table for the group

@@ -22,7 +22,8 @@
     Date:   Current Date
 #>
 
-Function Wait-DevOpsProject {
+Function Wait-DevOpsProject
+{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -37,7 +38,7 @@ Function Wait-DevOpsProject {
     )
 
     $params = @{
-        Uri    = "{0}" -f $ProjectURL
+        Uri    = '{0}' -f $ProjectURL
         Method = "GET"
     }
 
@@ -45,13 +46,15 @@ Function Wait-DevOpsProject {
 
     # Loop until the project is created
     $counter = 0
-    do {
+    do
+    {
         Write-Verbose "[Wait-DevOpsProject] Sending request to check project status..."
         $response = Invoke-AzDevOpsApiRestMethod @params
         $project = $response
 
         # Check the status of the project
-        switch ($response.status) {
+        switch ($response.status)
+        {
             'creating' {
                 Write-Verbose "[Wait-DevOpsProject] Project is still being created..."
                 Start-Sleep -Seconds 5
@@ -80,7 +83,9 @@ Function Wait-DevOpsProject {
 
     } while ($counter -lt 10)
 
-    if ($counter -ge 10) {
+    if ($counter -ge 10)
+    {
         Write-Error "[Wait-DevOpsProject] Timed out waiting for project to be created."
     }
+
 }

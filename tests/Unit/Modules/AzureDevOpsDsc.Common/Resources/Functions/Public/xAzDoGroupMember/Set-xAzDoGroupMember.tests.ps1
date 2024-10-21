@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Set-xAzDoGroupMember' {
+Describe 'Set-AzDoGroupMember' {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -14,7 +14,7 @@ Describe 'Set-xAzDoGroupMember' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoGroupMember.tests.ps1'
         }
 
         # Load the functions to test
@@ -69,7 +69,7 @@ Describe 'Set-xAzDoGroupMember' {
 
         It 'Should call New-DevOpsGroupMember with correct parameters' {
 
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             $params = @{
                 GroupIdentity = @{
@@ -89,7 +89,7 @@ Describe 'Set-xAzDoGroupMember' {
         }
 
         It 'Should call Remove-DevOpsGroupMember with correct parameters' {
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             $params = @{
                 GroupIdentity = @{
@@ -109,7 +109,7 @@ Describe 'Set-xAzDoGroupMember' {
         }
 
         it "should add and remove members" {
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             $params = @{
                 GroupIdentity = @{
@@ -160,7 +160,7 @@ Describe 'Set-xAzDoGroupMember' {
                 )
             }
 
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 0
             Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 0
@@ -179,7 +179,7 @@ Describe 'Set-xAzDoGroupMember' {
                 )
             }
 
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 0
             Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 0
@@ -196,7 +196,7 @@ Describe 'Set-xAzDoGroupMember' {
             Mock -CommandName Get-CacheItem -ParameterFilter { $Type -eq 'LiveGroupMembers' }
             Mock -CommandName Write-Error
 
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             Assert-MockCalled -CommandName 'Write-Error' -Exactly 1 -ParameterFilter { $Message -like '*LiveGroupMembers cache for group*' }
             Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 0
@@ -208,7 +208,7 @@ Describe 'Set-xAzDoGroupMember' {
 
             Mock -CommandName New-DevOpsGroupMember -MockWith { return $null }
 
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             Assert-MockCalled -CommandName 'New-DevOpsGroupMember' -Exactly 1
 
@@ -218,7 +218,7 @@ Describe 'Set-xAzDoGroupMember' {
 
             Mock -CommandName Remove-DevOpsGroupMember -MockWith { return $null }
 
-            Set-xAzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
+            Set-AzDoGroupMember -GroupName 'TestGroup' -LookupResult $LookupResult -Ensure 'Present'
 
             Assert-MockCalled -CommandName 'Remove-DevOpsGroupMember' -Exactly 1
 

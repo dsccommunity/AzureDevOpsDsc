@@ -1,12 +1,12 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Set-xAzDoPermission Tests' -Tags "Unit", "API" {
+Describe 'Set-AzDoPermission Tests' -Tags "Unit", "API" {
 
     BeforeAll {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoPermission.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoPermission.tests.ps1'
         }
 
         # Load the functions to test
@@ -28,9 +28,9 @@ Describe 'Set-xAzDoPermission Tests' -Tags "Unit", "API" {
 
     Context 'When Mandatory Parameters are provided' {
         It 'Should call Invoke-AzDevOpsApiRestMethod with correct parameters' {
-            $expectedUri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}" -f $OrganizationName, $SecurityNamespaceID, $ApiVersion
+            $expectedUri = 'https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}' -f $OrganizationName, $SecurityNamespaceID, $ApiVersion
 
-            Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion
+            Set-AzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion
 
             Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
                 $Uri -eq $expectedUri
@@ -42,9 +42,9 @@ Describe 'Set-xAzDoPermission Tests' -Tags "Unit", "API" {
 
     Context 'When ApiVersion is not provided' {
         It 'Should call ExampleFunction and get default ApiVersion' {
-            $expectedUri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}" -f $OrganizationName, $SecurityNamespaceID, "6.0-preview.1"
+            $expectedUri = 'https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}' -f $OrganizationName, $SecurityNamespaceID, "6.0-preview.1"
 
-            Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs
+            Set-AzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs
 
             Assert-MockCalled -CommandName Get-AzDevOpsApiVersion -Exactly 1
             Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1 -ParameterFilter {
@@ -62,7 +62,7 @@ Describe 'Set-xAzDoPermission Tests' -Tags "Unit", "API" {
             Mock -CommandName Invoke-AzDevOpsApiRestMethod { throw "API call failed" }
             Mock -CommandName Write-Error
 
-            $result = Set-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion
+            $result = Set-AzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -SerializedACLs $SerializedACLs -ApiVersion $ApiVersion
 
             $result | Should -BeNullOrEmpty
             Assert-MockCalled -CommandName Invoke-AzDevOpsApiRestMethod -Exactly 1

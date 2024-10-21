@@ -1,9 +1,9 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-# Import the module containing Set-xAzDoProjectGroup if it's in a different file.
+# Import the module containing Set-AzDoProjectGroup if it's in a different file.
 # . .\path\to\your\module.psm1
 
-Describe 'Set-xAzDoProjectGroup' {
+Describe 'Set-AzDoProjectGroup' {
 
     AfterAll {
         # Clean up
@@ -17,7 +17,7 @@ Describe 'Set-xAzDoProjectGroup' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoProjectGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoProjectGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -55,7 +55,7 @@ Describe 'Set-xAzDoProjectGroup' {
                 }
             }
 
-            $result = Set-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+            $result = Set-AzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
 
             Assert-MockCalled -CommandName Set-DevOpsGroup -Times 0 -Exactly
             Assert-MockCalled -CommandName Refresh-CacheIdentity -Times 0 -Exactly
@@ -79,7 +79,7 @@ Describe 'Set-xAzDoProjectGroup' {
 
             $Global:DSCAZDO_OrganizationName = 'TestOrg'
 
-            $result = Set-xAzDoProjectGroup -GroupName 'TestGroup' -GroupDescription 'TestDescription' -ProjectName 'TestProject' -LookupResult $LookupResult
+            $result = Set-AzDoProjectGroup -GroupName 'TestGroup' -GroupDescription 'TestDescription' -ProjectName 'TestProject' -LookupResult $LookupResult
 
             Assert-MockCalled -CommandName Set-DevOpsGroup -Times 1 -Exactly -ParameterFilter {
                 ($ApiUri -eq "https://vssps.dev.azure.com/TestOrg") -and
@@ -121,7 +121,7 @@ Describe 'Set-xAzDoProjectGroup' {
 
             $Global:DSCAZDO_OrganizationName = 'TestOrg'
 
-            $result = Set-xAzDoProjectGroup -GroupName 'TestGroup' -GroupDescription 'TestDescription' -ProjectName 'TestProject' -LookupResult $LookupResult
+            $result = Set-AzDoProjectGroup -GroupName 'TestGroup' -GroupDescription 'TestDescription' -ProjectName 'TestProject' -LookupResult $LookupResult
 
             Assert-MockCalled -CommandName Remove-CacheItem -Times 0 -Exactly
         }

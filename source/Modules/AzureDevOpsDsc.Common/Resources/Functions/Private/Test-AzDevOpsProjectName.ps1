@@ -40,9 +40,9 @@ function Test-AzDevOpsProjectName
         $AllowWildcard
     )
 
-    return !([System.String]::IsNullOrWhiteSpace($ProjectName) -or
+    return -not([System.String]::IsNullOrWhiteSpace($ProjectName) -or
              ($ProjectName.Contains('%') -or
-              (!$AllowWildcard -and $ProjectName.Contains('*')) -or
+              (-not($AllowWildcard) -and $ProjectName.Contains('*')) -or
               $ProjectName.StartsWith(' ') -or
               $ProjectName.EndsWith(' ')))
 }

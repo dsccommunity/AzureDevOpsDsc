@@ -140,7 +140,13 @@ function Invoke-APIRestMethod
                 if ($_.Exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::TooManyRequests)
                 {
                     # If so, wait for the specified number of seconds before retrying
-                    $retryAfter = $_.Exception.Response.Headers | ForEach-Object { if ($_.Key -eq "Retry-After") { return $_.Value } }
+                    $retryAfter = $_.Exception.Response.Headers | ForEach-Object {
+                        if ($_.Key -eq "Retry-After")
+                        {
+                            return $_.Value
+                        }
+                    }
+
                     if ($retryAfter)
                     {
                         $retryAfter = [int]$retryAfter

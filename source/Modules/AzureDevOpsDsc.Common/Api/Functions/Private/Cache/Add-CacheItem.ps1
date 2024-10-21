@@ -1,40 +1,41 @@
-Function Add-CacheItem {
-    <#
-    .SYNOPSIS
-    Add a cache item to the cache.
+<#
+.SYNOPSIS
+Add a cache item to the cache.
 
-    .DESCRIPTION
-    Adds a cache item to the cache with a specified key, value, and type.
+.DESCRIPTION
+Adds a cache item to the cache with a specified key, value, and type.
 
-    .PARAMETER Key
-    The key of the cache item to add.
+.PARAMETER Key
+The key of the cache item to add.
 
-    .PARAMETER Value
-    The value of the cache item to add.
+.PARAMETER Value
+The value of the cache item to add.
 
-    .PARAMETER Type
-    The type of the cache item to add. Valid values are 'Project', 'Team', 'Group', 'SecurityDescriptor'.
+.PARAMETER Type
+The type of the cache item to add. Valid values are 'Project', 'Team', 'Group', 'SecurityDescriptor'.
 
-    .EXAMPLE
-    Add-CacheItem -Key 'MyKey' -Value 'MyValue' -Type 'Project'
+.EXAMPLE
+Add-CacheItem -Key 'MyKey' -Value 'MyValue' -Type 'Project'
 
-    .NOTES
-    This function is private and should not be used directly.
-    #>
+.NOTES
+This function is private and should not be used directly.
+#>
+Function Add-CacheItem
+{
     [CmdletBinding()]
     param (
         # The key of the cache item to add
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Key,
 
         # The value of the cache item to add
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [object]
         $Value,
 
         # The type of the cache item to add
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]
         $Type,
@@ -46,10 +47,10 @@ Function Add-CacheItem {
 
     Write-Verbose "[Add-CacheItem] Retrieving the current cache."
     [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
-    #Get-AzDevOpsCache -CacheType $Type
 
     # If the cache is empty, create a new cache
-    if ($cache.count -eq 0) {
+    if ($cache.count -eq 0)
+    {
         Write-Verbose "[Add-CacheItem] Cache is empty. Creating new cache."
         $cache = [System.Collections.Generic.List[CacheItem]]::New()
     }
@@ -60,12 +61,15 @@ Function Add-CacheItem {
     Write-Verbose "[Add-CacheItem] Checking if the cache already contains the key: '$Key'."
     $existingItem = $cache | Where-Object { $_.Key -eq $Key }
 
-    if ($existingItem) {
-
+    if ($existingItem)
+    {
         # If the cache already contains the key, remove the existing item
-        if ($SuppressWarning.IsPresent) {
+        if ($SuppressWarning.IsPresent)
+        {
             Write-Verbose "[Add-CacheItem] A cache item with the key '$Key' already exists. Flushing key from the cache."
-        } else {
+        }
+        else
+        {
             Write-Warning "[Add-CacheItem] A cache item with the key '$Key' already exists. Flushing key from the cache."
         }
 
@@ -76,7 +80,8 @@ Function Add-CacheItem {
         [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
 
         # If the cache is empty, create a new cache
-        if ($cache.count -eq 0) {
+        if ($cache.count -eq 0)
+        {
             Write-Verbose "[Add-CacheItem] Cache is empty. Creating new cache."
             $cache = [System.Collections.Generic.List[CacheItem]]::New()
         }

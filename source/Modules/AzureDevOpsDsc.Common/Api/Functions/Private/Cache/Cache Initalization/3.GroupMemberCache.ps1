@@ -1,7 +1,29 @@
+<#
+.SYNOPSIS
+Initializes and updates the Azure DevOps group member cache.
+
+.DESCRIPTION
+The `AzDoAPI_3_GroupMemberCache` function initializes and updates the cache for Azure DevOps group members.
+It retrieves the live group and user caches, iterates through each group, and updates the cache with the members of each group.
+
+.PARAMETER OrganizationName
+The name of the Azure DevOps organization. If not provided, the global variable `$Global:DSCAZDO_OrganizationName` is used.
+
+.EXAMPLE
+AzDoAPI_3_GroupMemberCache -OrganizationName "MyOrganization"
+Initializes and updates the group member cache for the specified Azure DevOps organization.
+
+.NOTES
+- This function relies on the `Get-CacheObject`, `List-DevOpsGroupMembers`, and `Add-CacheItem` functions.
+- The cache is exported to a file at the end of the function.
+- Verbose output is used to indicate the progress of the function.
+
+#>
 function AzDoAPI_3_GroupMemberCache
 {
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory = $false)]
         [string]$OrganizationName
     )
 
@@ -49,11 +71,15 @@ function AzDoAPI_3_GroupMemberCache
             $azdoUserMembers = $AzDoLiveUsers.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
             $azdoGroupMembers = $AzDoLiveGroups.value | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor }
 
-            $azdoUserMembers | Select-Object *,@{Name="Type";Exp={"user"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor } | ForEach-Object {
+            # Add the users to the cache
+            $azdoUserMembers = $azdoUserMembers | Select-Object *,@{Name="Type";Exp={"user"}}
+            $azdoUserMembers | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor } | ForEach-Object {
                 $null = $members.Add($_)
             }
 
-            $azdoGroupMembers | Select-Object *,@{Name="Type";Exp={"group"}} | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor } | ForEach-Object {
+            # Add the groups to the cache
+            $azdoGroupMembers = $azdoGroupMembers | Select-Object *,@{Name="Type";Exp={"group"}}
+            $azdoGroupMembers | Where-Object { $_.descriptor -in $groupMembers.memberDescriptor } | ForEach-Object {
                 $null = $members.Add($_)
             }
 

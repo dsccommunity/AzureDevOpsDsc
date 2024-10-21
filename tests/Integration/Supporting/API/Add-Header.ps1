@@ -4,7 +4,8 @@ Function Add-Header {
 
     $headerValue = ""
 
-    switch ($Global:DSCAZDO_AuthenticationToken.tokenType) {
+    switch ($Global:DSCAZDO_AuthenticationToken.tokenType)
+    {
 
         # If the token is null
         {$null} {
@@ -16,7 +17,7 @@ Function Add-Header {
             # Personal Access Token
 
             # Add the Personal Access Token to the header
-            $headerValue = "Authorization: Basic {0}" -f $Global:DSCAZDO_AuthenticationToken.Token
+            $headerValue = 'Authorization: Basic {0}' -f $Global:DSCAZDO_AuthenticationToken.Token
             break
         }
         {$_ -eq 'ManagedIdentity'} {

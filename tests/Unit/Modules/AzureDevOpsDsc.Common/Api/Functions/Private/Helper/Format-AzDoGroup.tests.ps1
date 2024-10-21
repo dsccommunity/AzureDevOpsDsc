@@ -25,7 +25,7 @@ Describe 'Format-AzDoGroup' {
                     [string]$GroupName
                 )
 
-                return "[{0}]\{1}" -f $Prefix.Trim('[]'), $GroupName
+                return '[{0}]\{1}' -f $Prefix.Trim('[]'), $GroupName
             }
 
             $result = Format-AzDoGroup -Prefix "Contoso" -GroupName "Developers"
@@ -39,7 +39,7 @@ Describe 'Format-AzDoGroup' {
                     [string]$GroupName
                 )
 
-                return "[{0}]\{1}" -f $Prefix.Trim('[]'), $GroupName
+                return '[{0}]\{1}' -f $Prefix.Trim('[]'), $GroupName
             }
 
             $result = Format-AzDoGroup -Prefix "[Contoso]" -GroupName "Developers"
@@ -53,7 +53,7 @@ Describe 'Format-AzDoGroup' {
                     [string]$GroupName
                 )
 
-                return "[{0}]\{1}" -f $Prefix.Trim('[]'), $GroupName
+                return '[{0}]\{1}' -f $Prefix.Trim('[]'), $GroupName
             }
 
             $result = Format-AzDoGroup -Prefix "[Contoso]" -GroupName "Developers"

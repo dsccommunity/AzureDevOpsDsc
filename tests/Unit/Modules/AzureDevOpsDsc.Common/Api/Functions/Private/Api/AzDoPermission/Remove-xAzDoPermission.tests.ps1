@@ -1,12 +1,12 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-xAzDoPermission' -Tags "Unit", "API" {
+Describe 'Remove-AzDoPermission' -Tags "Unit", "API" {
 
     BeforeAll {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoPermission.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-AzDoPermission.tests.ps1'
         }
 
         # Load the functions to test
@@ -34,7 +34,7 @@ Describe 'Remove-xAzDoPermission' -Tags "Unit", "API" {
             Mock -CommandName Write-Error
 
             # Act
-            $result = Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
+            $result = Remove-AzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
 
             # Assert
             $result | Should -BeNullOrEmpty
@@ -58,7 +58,7 @@ Describe 'Remove-xAzDoPermission' -Tags "Unit", "API" {
             Mock -CommandName Write-Error
 
             # Act
-            $result = Remove-xAzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
+            $result = Remove-AzDoPermission -OrganizationName $OrganizationName -SecurityNamespaceID $SecurityNamespaceID -TokenName $TokenName -ApiVersion $ApiVersion
             $result | Should -BeNullOrEmpty
 
             # Assert

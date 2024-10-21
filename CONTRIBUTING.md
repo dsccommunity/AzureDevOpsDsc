@@ -240,7 +240,7 @@ class ClassName : AzDevOpsDscResourceBase
 
     [ClassName] Get()
     {
-        return [xAzDoProject]$($this.GetDscCurrentStateProperties())
+        return [AzDoProject]$($this.GetDscCurrentStateProperties())
     }
 
     hidden [System.String[]]GetDscResourcePropertyNamesWithNoSetSupport()
@@ -281,7 +281,7 @@ This format helps users understand each property and method of your resource, pr
 
 ### Naming the Resource
 
-The resource name must start with the prefix xAzDo, such as xAzDoProject.
+The resource name must start with the prefix xAzDo, such as AzDoProject.
 
 ### Guidelines for Documentation
 
@@ -409,7 +409,7 @@ Here's an example:
 Function Get-ClassName {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [Alias('Name')]
         [System.String]$ResourceParameter,
 
@@ -430,13 +430,13 @@ The `Get` function performs the lookup of the resource properties and calculates
 The changed contents are stored within the `LookupResult.PropertiesChanged` property.
 
 ```PowerShell
-Function Get-xAzDoProjectServices {
+Function Get-AzDoProjectServices {
 
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject[]])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [Alias('Name')]
         [System.String]$ProjectName,
 
@@ -634,7 +634,7 @@ Write-Verbose "[New-GitRepository] Creating new repository '$($RepositoryName)' 
 
 # Define parameters for creating a new DevOps group
 $params = @{
-    ApiUri = "{0}/{1}/_apis/git/repositories?api-version={2}" -f $ApiUri, $Project.name, $ApiVersion
+    ApiUri = '{0}/{1}/_apis/git/repositories?api-version={2}' -f $ApiUri, $Project.name, $ApiVersion
     Method = 'POST'
     ContentType = 'application/json'
     Body = @{

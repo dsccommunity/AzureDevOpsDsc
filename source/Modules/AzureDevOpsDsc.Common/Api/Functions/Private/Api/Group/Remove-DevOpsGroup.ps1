@@ -23,13 +23,13 @@ Remove-DevOpsGroup -ApiUri "https://dev.azure.com/myorganization" -GroupDescript
 This example removes the group with the specified group descriptor from Azure DevOps.
 
 #>
-
-Function Remove-DevOpsGroup {
+Function Remove-DevOpsGroup
+{
     [CmdletBinding()]
     [OutputType([System.Management.Automation.PSObject])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ApiUri,
 
@@ -43,15 +43,17 @@ Function Remove-DevOpsGroup {
     )
 
     $params = @{
-        Uri = "{0}/_apis/graph/groups/{1}?api-version={2}" -f $ApiUri, $GroupDescriptor, $ApiVersion
+        Uri = '{0}/_apis/graph/groups/{1}?api-version={2}' -f $ApiUri, $GroupDescriptor, $ApiVersion
         Method = 'Delete'
         ContentType = 'application/json'
     }
 
-    try {
+    try
+    {
         return (Invoke-AzDevOpsApiRestMethod @params)
     }
-    catch {
+    catch
+    {
         Write-Error "Failed to remove group: $_"
     }
 }

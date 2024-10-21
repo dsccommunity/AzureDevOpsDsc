@@ -1,6 +1,6 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 param(
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory = $true)]
     [String]$TestFrameworkConfigurationPath
 )
 

@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Set-xAzDoOrganizationGroup' {
+Describe 'Set-AzDoOrganizationGroup' {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -10,7 +10,7 @@ Describe 'Set-xAzDoOrganizationGroup' {
     BeforeAll {
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoOrganizationGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoOrganizationGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -25,7 +25,7 @@ Describe 'Set-xAzDoOrganizationGroup' {
         . (Get-ClassFilePath '000.CacheItem')
         . (Get-ClassFilePath 'Ensure')
 
-        # Mock the external functions used within Set-xAzDoOrganizationGroup
+        # Mock the external functions used within Set-AzDoOrganizationGroup
         Mock -CommandName Set-DevOpsGroup -MockWith {
             return @{
                 principalName = 'testPrincipalName'
@@ -58,7 +58,7 @@ Describe 'Set-xAzDoOrganizationGroup' {
                 }
             }
 
-            $result = Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
+            $result = Set-AzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
 
             $result | Should -BeNullOrEmpty
             Assert-MockCalled -CommandName Set-DevOpsGroup -Times 0 -Scope It
@@ -81,7 +81,7 @@ Describe 'Set-xAzDoOrganizationGroup' {
                 }
             }
 
-            $result = Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult
+            $result = Set-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult
 
             $result | Should -Not -BeNullOrEmpty
             $result.principalName | Should -Be 'testPrincipalName'
@@ -124,7 +124,7 @@ Describe 'Set-xAzDoOrganizationGroup' {
                 localCache = $null
             }
 
-            $result = Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult
+            $result = Set-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult
 
             $result | Should -Not -BeNullOrEmpty
             $result.principalName | Should -Be 'testPrincipalName'
@@ -169,7 +169,7 @@ Describe 'Set-xAzDoOrganizationGroup' {
                 localCache = $null
             }
 
-            { Set-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult } | Should -Throw 'An error occurred'
+            { Set-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Description' -LookupResult $lookupResult } | Should -Throw 'An error occurred'
         }
     }
 }

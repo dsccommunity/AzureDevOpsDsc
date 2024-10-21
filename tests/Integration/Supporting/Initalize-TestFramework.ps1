@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory = $true)]
     [String]$TestFrameworkConfigurationPath
 )
 
@@ -30,11 +30,15 @@ if ($TestFrameworkConfiguration.AuthenticationType -eq 'PAT')
     # Authenticate with a Personal Access Token
     #New-AuthProvider -OrganizationName $TestFrameworkConfiguration.Organization -PersonalAccessToken $TestFrameworkConfiguration.PATToken
     New-AzDoAuthenticationProvider -OrganizationName $TestFrameworkConfiguration.Organization -PersonalAccessToken $TestFrameworkConfiguration.PATToken
-} elseif ($TestFrameworkConfiguration.AuthenticationType -eq 'ManagedIdentity') {
+}
+elseif ($TestFrameworkConfiguration.AuthenticationType -eq 'ManagedIdentity')
+{
     # Authenticate with a Managed Identity
     #New-AuthProvider -OrganizationName $TestFrameworkConfiguration.Organization -useManagedIdentity
     New-AzDoAuthenticationProvider -OrganizationName $TestFrameworkConfiguration.Organization -useManagedIdentity
-} else {
+}
+else
+{
     throw "[Initialize-TestFramework] Invalid Authentication Type: $($TestFrameworkConfiguration.AuthenticationType)"
 }
 

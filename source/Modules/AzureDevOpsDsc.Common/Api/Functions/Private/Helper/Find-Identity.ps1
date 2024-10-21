@@ -28,16 +28,17 @@
     Returns the ACLIdentity object of the identity with the name "JohnDoe" if found. Otherwise, returns null.
 #>
 
-Function Find-Identity {
+Function Find-Identity
+{
     [CmdletBinding()]
     param(
         # The name of the identity to search for.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$Name,
 
         # The name of the organization.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$OrganizationName,
 
@@ -53,19 +54,22 @@ Function Find-Identity {
     Write-Verbose "[Find-Identity] Organization Name: $OrganizationName"
     Write-Verbose "[Find-Identity] Search Type: $SearchType"
 
-    try {
+    try
+    {
         $CachedGroups = Get-CacheObject -CacheType 'LiveGroups'
         $CachedUsers = Get-CacheObject -CacheType 'LiveUsers'
         $CachedServicePrincipals = Get-CacheObject -CacheType 'LiveServicePrinciples'
-    } catch {
+    }
+    catch
+    {
         Write-Error "Failed to retrieve cache objects: $_"
         return $null
     }
 
     #
     # Define the lookup table based on the search type
-
-    switch ($SearchType) {
+    switch ($SearchType)
+    {
         'descriptor' {
             $lookup = @{
                 groupIdentitySB             = { $_.value.ACLIdentity.descriptor -eq $Name }
@@ -115,24 +119,40 @@ Function Find-Identity {
     $servicePrincipalIdentity = $CachedServicePrincipals | Where-Object $lookup.servicePrincipalIdentitySB
 
     # Check if multiple identities were found.
-    if ($groupIdentity -or $userIdentity -or $servicePrincipalIdentity) {
-        if (($groupIdentity -and $userIdentity) -or ($groupIdentity -and $servicePrincipalIdentity) -or ($userIdentity -and $servicePrincipalIdentity)) {
+    if ($groupIdentity -or $userIdentity -or $servicePrincipalIdentity)
+    {
+
+        if (
+                ($groupIdentity -and $userIdentity) -or
+                ($groupIdentity -and $servicePrincipalIdentity) -or
+                ($userIdentity -and $servicePrincipalIdentity)
+        )
+        {
             Write-Warning "[Find-Identity] Found multiple identities with the name '$Name'. Returning null."
             return $null
         }
 
-        if ($groupIdentity) {
+        if ($groupIdentity)
+        {
             Write-Verbose "[Find-Identity] Found group identity for '$Name'."
             Write-Verbose "[Find-Identity] $SearchType"
             return $groupIdentity
-        } elseif ($userIdentity) {
+        }
+        elseif ($userIdentity)
+        {
             Write-Verbose "[Find-Identity] Found user identity for '$Name'."
             return $userIdentity
-        } elseif ($servicePrincipalIdentity) {
+        }
+        elseif ($servicePrincipalIdentity)
+        {
             Write-Verbose "[Find-Identity] Found service principal identity for '$Name'."
             return $servicePrincipalIdentity
         }
-    } else {
+
+    }
+    else
+    {
+
         Write-Warning "[Find-Identity] No identity found for '$Name'. Performing a lookup via the API."
 
         # Perform a lookup via the API
@@ -144,10 +164,13 @@ Function Find-Identity {
         Write-Verbose "[Find-Identity] Performing a lookup via the API."
         Write-Verbose "[Find-Identity] $SearchType"
 
-        try {
+        try
+        {
             # Get the identity
             $identity = Get-DevOpsDescriptorIdentity @params
-        } catch {
+        }
+        catch
+        {
             Write-Error "Failed to retrieve identity via API: $_"
             return $null
         }
@@ -158,21 +181,31 @@ Function Find-Identity {
         $servicePrincipalIdentity = $CachedServicePrincipals | Where-Object { $_.value.ACLIdentity.id -eq $identity.id }
 
         # Test if the identity was found
-        if ($groupIdentity -or $userIdentity -or $servicePrincipalIdentity) {
-
+        if ($groupIdentity -or $userIdentity -or $servicePrincipalIdentity)
+        {
             # Check if multiple identities were found.
-            if (($groupIdentity -and $userIdentity) -or ($groupIdentity -and $servicePrincipalIdentity) -or ($userIdentity -and $servicePrincipalIdentity)) {
+            if (
+                    ($groupIdentity -and $userIdentity) -or
+                    ($groupIdentity -and $servicePrincipalIdentity) -or
+                    ($userIdentity -and $servicePrincipalIdentity)
+                )
+            {
                 Write-Warning "[Find-Identity] Found multiple identities with the ID '$($identity.id)'. Returning null."
                 return $null
             }
 
-            if ($groupIdentity) {
+            if ($groupIdentity)
+            {
                 Write-Verbose "[Find-Identity] Found group identity for '$Name'."
                 return $groupIdentity
-            } elseif ($userIdentity) {
+            }
+            elseif ($userIdentity)
+            {
                 Write-Verbose "[Find-Identity] Found user identity for '$Name'."
                 return $userIdentity
-            } elseif ($servicePrincipalIdentity) {
+            }
+            elseif ($servicePrincipalIdentity)
+            {
                 Write-Verbose "[Find-Identity] Found service principal identity for '$Name'."
                 return $servicePrincipalIdentity
             }

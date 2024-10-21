@@ -29,19 +29,21 @@ function Import-CacheObject
 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]$CacheType
-
     )
 
     # Write initial verbose message
     Write-Verbose "[Import-CacheObject] Starting to import cache object for type: $CacheType"
 
     # Use the Enviroment Variables to set the Cache Directory Path
-    if ($ENV:AZDODSC_CACHE_DIRECTORY) {
+    if ($ENV:AZDODSC_CACHE_DIRECTORY)
+    {
         $CacheDirectoryPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Cache"
-    } else {
+    }
+    else
+    {
         Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
     }
 
@@ -73,7 +75,10 @@ function Import-CacheObject
         {
             $Content | ForEach-Object {
                 # If the key is empty, skip the item
-                if ([string]::IsNullOrEmpty($_.Key)) { return }
+                if ([string]::IsNullOrEmpty($_.Key))
+                {
+                    return
+                }
 
                 # Create a new CacheItem object and add it to the list
                 $newCache.Add([CacheItem]::New($_.Key, $_.Value))
@@ -84,9 +89,9 @@ function Import-CacheObject
         Set-Variable -Name "AzDo$CacheType" -Value $newCache -Scope Global -Force
         Write-Verbose "[Import-CacheObject] Cache object imported successfully for '$CacheType'."
 
-    } catch
+    }
+    catch
     {
-        Write-Error "[Import-CacheObject] Failed to import cache for Azure DevOps API: $_"
-        throw $_
+        throw "[Import-CacheObject] Failed to import cache for Azure DevOps API: $_"
     }
 }

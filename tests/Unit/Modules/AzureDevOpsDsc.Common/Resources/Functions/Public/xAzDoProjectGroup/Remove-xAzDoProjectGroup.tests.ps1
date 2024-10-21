@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-xAzDoProjectGroup' {
+Describe 'Remove-AzDoProjectGroup' {
 
     AfterAll {
         # Clean up
@@ -14,7 +14,7 @@ Describe 'Remove-xAzDoProjectGroup' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoProjectGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-AzDoProjectGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -47,7 +47,7 @@ Describe 'Remove-xAzDoProjectGroup' {
                 localCache = $null
             }
 
-            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+            $result = Remove-AzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 0 -Exactly
             Assert-MockCalled -CommandName Remove-CacheItem -Times 0 -Exactly
@@ -66,7 +66,7 @@ Describe 'Remove-xAzDoProjectGroup' {
                 localCache = $null
             }
 
-            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+            $result = Remove-AzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 1 -Exactly
             Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'LiveGroups' }
@@ -89,7 +89,7 @@ Describe 'Remove-xAzDoProjectGroup' {
                 }
             }
 
-            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+            $result = Remove-AzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 1
             Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'LiveGroups' }
@@ -109,7 +109,7 @@ Describe 'Remove-xAzDoProjectGroup' {
                 }
             }
 
-            $result = Remove-xAzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
+            $result = Remove-AzDoProjectGroup -GroupName 'TestGroup' -ProjectName 'TestProject' -LookupResult $LookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 1
             Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -ParameterFilter { $type -eq 'LiveGroups' }

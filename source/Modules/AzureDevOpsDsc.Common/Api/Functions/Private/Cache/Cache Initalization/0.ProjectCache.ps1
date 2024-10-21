@@ -23,16 +23,19 @@ Author: [Author Name]
 Date: [Date]
 #>
 
-Function AzDoAPI_0_ProjectCache {
+Function AzDoAPI_0_ProjectCache
+{
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory = $false)]
         [string]$OrganizationName
     )
 
     # Use a verbose statement to indicate the start of the function.
     Write-Verbose "Starting 'AzDoAPI_0_ProjectCache' function."
 
-    if (-not $OrganizationName) {
+    if (-not $OrganizationName)
+    {
         # If no organization name is provided, use a global variable as fallback
         Write-Verbose "No organization name provided as parameter; using global variable."
         $OrganizationName = $Global:DSCAZDO_OrganizationName
@@ -43,7 +46,8 @@ Function AzDoAPI_0_ProjectCache {
         Organization = $OrganizationName
     }
 
-    try {
+    try
+    {
         # Inform about the API call being made with the parameters
         Write-Verbose "Calling 'List-DevOpsProjects' with parameters: $($params | Out-String)"
 
@@ -52,7 +56,8 @@ Function AzDoAPI_0_ProjectCache {
         $projectsArr = [System.Collections.ArrayList]::new()
 
         # Iterate through each project and get the security descriptors
-        foreach ($project in $projects) {
+        foreach ($project in $projects)
+        {
             # Add the Project
             $securityDescriptor = Get-DevOpsSecurityDescriptor -ProjectId $project.Id -Organization $OrganizationName
             # Add the security descriptor to the project object
@@ -63,7 +68,8 @@ Function AzDoAPI_0_ProjectCache {
         Write-Verbose "'List-DevOpsProjects' returned a total of $($projects.Count) projects."
 
         # Iterate through each project in the response and add them to the cache
-        foreach ($project in $projectsArr) {
+        foreach ($project in $projectsArr)
+        {
             # Log the addition of each project to the cache
             Write-Verbose "Adding Project '$($project.Name)' to the cache."
             # Add the project to the cache with its name as the key
@@ -76,7 +82,9 @@ Function AzDoAPI_0_ProjectCache {
         # Indicate completion of adding projects to cache
         Write-Verbose "Completed adding projects to cache."
 
-    } catch {
+    }
+    catch
+    {
         # Handle any exceptions that occur during the try block
         Write-Error "An error occurred: $_"
     }

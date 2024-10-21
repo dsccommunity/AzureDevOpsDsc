@@ -29,7 +29,8 @@ Author: Michael Zanatta
 Date: 06/26/2024
 #>
 
-Function ConvertTo-FormattedACL {
+Function ConvertTo-FormattedACL
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -42,18 +43,21 @@ Function ConvertTo-FormattedACL {
         [String]$OrganizationName
     )
 
-    begin {
+    begin
+    {
         Write-Verbose "[ConvertTo-FormattedACL] Started."
         $ACLList = [System.Collections.Generic.List[HashTable]]::new()
     }
 
-    process {
+    process
+    {
         # Logging
         Write-Verbose "[ConvertTo-FormattedACL] Processing ACL: $($ACL.token)"
         Write-Verbose "[ConvertTo-FormattedACL] ACL: $($ACL | ConvertTo-Json)"
 
         # If the token is empty, skip it.
-        if (-not $ACL.token) {
+        if (-not $ACL.token)
+        {
             Write-Verbose "[ConvertTo-FormattedACL] Current token is empty. Skipping."
             Write-Warning "[ConvertTo-FormattedACL] Current token is empty. Skipping. ACL: $($ACL | ConvertTo-Json)"
             return
@@ -64,7 +68,8 @@ Function ConvertTo-FormattedACL {
         Write-Verbose "[ConvertTo-FormattedACL] Found ACE entries: $($ACEEntries.Count)"
 
         # If the ACE entries are empty, skip it.
-        if ($ACEEntries.Count -eq 0) {
+        if ($ACEEntries.Count -eq 0)
+        {
             Write-Verbose "[ConvertTo-FormattedACL] Current ACE entries are empty. Skipping."
             Write-Warning "[ConvertTo-FormattedACL] Current ACE entries are empty. Skipping. ACL: $($ACL | ConvertTo-Json)"
             return
@@ -80,14 +85,16 @@ Function ConvertTo-FormattedACL {
         Write-Verbose "[ConvertTo-FormattedACL] Found ACEs: $($ACEs.Count)"
 
         # If the ACEs are empty, skip it.
-        if ($ACEs.Count -eq 0) {
+        if ($ACEs.Count -eq 0)
+        {
             Write-Verbose "[ConvertTo-FormattedACL] Current ACEs are empty. Skipping."
             Write-Warning "[ConvertTo-FormattedACL] Current ACEs are empty. Skipping. ACL: $($ACL | ConvertTo-Json)"
             return
         }
 
         # Create the Formatted ACL Object
-        foreach ($ACE in $ACEs) {
+        foreach ($ACE in $ACEs)
+        {
             Write-Verbose "[ConvertTo-FormattedACL] Matching identity for ACE: $($ACE.Name)"
             $ACE."Identity" = Find-Identity -Name $ACE.Name -OrganizationName $OrganizationName
             Write-Verbose "[ConvertTo-FormattedACL] Formatting ACE: $($ACE.Name) - Allow $($ACE.value.allow) - Deny $($ACE.value.deny)"
@@ -106,9 +113,9 @@ Function ConvertTo-FormattedACL {
         $ACLList.Add($formattedACL)
     }
 
-    end {
+    end
+    {
         Write-Verbose "[ConvertTo-FormattedACL] Completed."
-
         return $ACLList
     }
 }

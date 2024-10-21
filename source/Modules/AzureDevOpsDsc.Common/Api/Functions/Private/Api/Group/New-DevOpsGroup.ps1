@@ -32,21 +32,19 @@ Creates a new group named "MyGroup" in Azure DevOps within the specified project
 
 #>
 # Define a function to create a new Azure DevOps Group
-Function New-DevOpsGroup {
-    # CmdletBinding attribute specifies that this function is written as an advanced function
+Function New-DevOpsGroup
+{
     [CmdletBinding()]
-    # OutputType attribute defines the output type of the function which is PSObject in this case
     [OutputType([System.Management.Automation.PSObject])]
-    # Parameters block defining the parameters accepted by the function
     param
     (
         # Parameter attribute marks this as a mandatory parameter that the user must supply when calling the function.
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ApiUri, # The URI for the Azure DevOps API.
 
         # Mandatory parameter for the group name
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $GroupName,
 
@@ -68,7 +66,7 @@ Function New-DevOpsGroup {
 
     # Hashtable to hold parameters for the API request
     $params = @{
-        Uri = "{0}/_apis/graph/groups?api-version={1}" -f $ApiUri, $ApiVersion
+        Uri = '{0}/_apis/graph/groups?api-version={1}' -f $ApiUri, $ApiVersion
         Method = 'Post'
         ContentType = 'application/json'
         Body = @{
@@ -78,17 +76,20 @@ Function New-DevOpsGroup {
     }
 
     # If ProjectScopeDescriptor is provided, modify the URI to include it
-    if ($ProjectScopeDescriptor) {
-        $params.Uri = "{0}/_apis/graph/groups?scopeDescriptor={1}&api-version={2}" -f $ApiUri, $ProjectScopeDescriptor, $ApiVersion
+    if ($ProjectScopeDescriptor)
+    {
+        $params.Uri = '{0}/_apis/graph/groups?scopeDescriptor={1}&api-version={2}' -f $ApiUri, $ProjectScopeDescriptor, $ApiVersion
     }
 
     # Try to invoke the REST method to create the group and return the result
-    try {
+    try
+    {
         $group = Invoke-AzDevOpsApiRestMethod @params
         return $group
     }
     # Catch any exceptions and write an error message
-    catch {
+    catch
+    {
         Write-Error "Failed to create group: $_"
     }
 }

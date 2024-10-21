@@ -58,12 +58,11 @@ function New-DevOpsProject
         [Parameter()]
         [String]
         $ApiVersion = $(Get-AzDevOpsApiVersion | Select-Object -Last 1)
-
     )
 
     # Validate the parameters
     $params = @{
-        Uri              = "https://dev.azure.com/{0}/_apis/projects?api-version={1}" -f $Organization, $ApiVersion
+        Uri              = 'https://dev.azure.com/{0}/_apis/projects?api-version={1}' -f $Organization, $ApiVersion
         Method           = "POST"
         Body             = @{
             name         = $ProjectName
@@ -88,15 +87,16 @@ function New-DevOpsProject
         # Invoke the Azure DevOps REST API to create the project
         $response = Invoke-AzDevOpsApiRestMethod @params
 
-        if ($null -eq $response) {
+        if ($null -eq $response)
+        {
             Throw "[New-DevOpsProject] Failed to create the Azure DevOps project: No response returned"
         }
 
         # Output the response which contains the created project details
         return $response
-    } catch
+    }
+    catch
     {
         Write-Error "[New-DevOpsProject] Failed to create the Azure DevOps project: $_"
     }
-
 }

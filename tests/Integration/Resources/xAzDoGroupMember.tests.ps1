@@ -1,4 +1,4 @@
-Describe "xAzDoGroupMember Integration Tests" {
+Describe "AzDoGroupMember Integration Tests" {
 
     BeforeAll {
 
@@ -7,7 +7,7 @@ Describe "xAzDoGroupMember Integration Tests" {
 
         # Define common parameters
         $parameters = @{
-            Name = 'xAzDoGroupMember'
+            Name = 'AzDoGroupMember'
             ModuleName = 'AzureDevOpsDsc'
         }
 
@@ -36,7 +36,7 @@ Describe "xAzDoGroupMember Integration Tests" {
             # Define properties for the DSC resource.
             # In this case, we specify a project name 'TESTPROJECT_GROUPMEMBER'.
             $parameters.property = @{
-                GroupName = "[{0}]\TESTGROUP" -f $PROJECTNAME
+                GroupName = '[{0}]\TESTGROUP' -f $PROJECTNAME
                 GroupMembers = "[$PROJECTNAME]\Group1", "[$PROJECTNAME]\Group2"
             }
 

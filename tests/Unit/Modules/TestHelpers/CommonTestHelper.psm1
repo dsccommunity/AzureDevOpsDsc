@@ -264,7 +264,7 @@ function Set-OutputDirAsModulePath
     if ($ENV:PSModulePath -like "*$($RepositoryRoot)*") { return }
 
     $ModulePath = '{0}{1}\' -f (($IsLinux) ? ':' : ';'), $RepositoryRoot
-    $ENV:PSModulePath = "{0}{1}\output" -f $ENV:PSModulePath, $ModulePath
-    $ENV:PSModulePath = "{0}{1}\output\AzureDevOpsDsc\0.0.0\Modules" -f $ENV:PSModulePath, $ModulePath
+    $ENV:PSModulePath = '{0}{1}\output' -f $ENV:PSModulePath, $ModulePath
+    $ENV:PSModulePath = '{0}{1}\output\AzureDevOpsDsc\0.0.0\Modules' -f $ENV:PSModulePath, $ModulePath
 
 }

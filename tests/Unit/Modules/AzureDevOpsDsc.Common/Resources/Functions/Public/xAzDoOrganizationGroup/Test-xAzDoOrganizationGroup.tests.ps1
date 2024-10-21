@@ -2,12 +2,12 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 # Pester tests
 # Not required to run in the pipeline
-Describe "Test-xAzDoOrganizationGroup" -skip {
+Describe "Test-AzDoOrganizationGroup" -skip {
 
     BeforeAll {
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-xAzDoOrganizationGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-AzDoOrganizationGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -17,15 +17,15 @@ Describe "Test-xAzDoOrganizationGroup" -skip {
             . $file.FullName
         }
 
-        # Mock the external functions used within Test-xAzDoOrganizationGroup
-        Mock -CommandName Test-xAzDoOrganizationGroup
+        # Mock the external functions used within Test-AzDoOrganizationGroup
+        Mock -CommandName Test-AzDoOrganizationGroup
 
     }
 
     Context "when the group exists" {
         It "should return true" {
-            # Mock Test-xAzDoOrganizationGroup function to simulate group existence
-            Mock -CommandName Test-xAzDoOrganizationGroup -MockWith {
+            # Mock Test-AzDoOrganizationGroup function to simulate group existence
+            Mock -CommandName Test-AzDoOrganizationGroup -MockWith {
                 param (
                     [string]$GroupName,
                     [string]$Pat,
@@ -34,15 +34,15 @@ Describe "Test-xAzDoOrganizationGroup" -skip {
                 return $true
             }
 
-            $result = Test-xAzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg'
+            $result = Test-AzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg'
             $result | Should -Be $true
         }
     }
 
     Context "when the group does not exist" {
         It "should return false" {
-            # Mock Test-xAzDoOrganizationGroup function to simulate group non-existence
-            Mock -CommandName Test-xAzDoOrganizationGroup -MockWith {
+            # Mock Test-AzDoOrganizationGroup function to simulate group non-existence
+            Mock -CommandName Test-AzDoOrganizationGroup -MockWith {
                 param (
                     [string]$GroupName,
                     [string]$Pat,
@@ -51,26 +51,26 @@ Describe "Test-xAzDoOrganizationGroup" -skip {
                 return $false
             }
 
-            $result = Test-xAzDoOrganizationGroup -GroupName 'NonExistentGroup' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg'
+            $result = Test-AzDoOrganizationGroup -GroupName 'NonExistentGroup' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg'
             $result | Should -Be $false
         }
     }
 
     Context "when there is an empty GroupName parameter" {
         It "should throw an error" {
-            { Test-xAzDoOrganizationGroup -GroupName '' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg' } | Should -Throw
+            { Test-AzDoOrganizationGroup -GroupName '' -Pat 'dummyPat' -ApiUri 'https://dev.azure.com/myorg' } | Should -Throw
         }
     }
 
     Context "when there is an empty Pat parameter" {
         It "should throw an error" {
-            { Test-xAzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat '' -ApiUri 'https://dev.azure.com/myorg' } | Should -Throw
+            { Test-AzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat '' -ApiUri 'https://dev.azure.com/myorg' } | Should -Throw
         }
     }
 
     Context "when there is an empty ApiUri parameter" {
         It "should throw an error" {
-            { Test-xAzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat 'dummyPat' -ApiUri '' } | Should -Throw
+            { Test-AzDoOrganizationGroup -GroupName 'ExistingGroup' -Pat 'dummyPat' -ApiUri '' } | Should -Throw
         }
     }
 

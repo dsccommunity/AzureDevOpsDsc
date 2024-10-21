@@ -20,18 +20,18 @@ Get-DevOpsDescriptorIdentity -OrganizationName "MyOrg" -SubjectDescriptor "subje
 This example retrieves the identity associated with the subject descriptor "subject:abcd1234" in the Azure DevOps organization "MyOrg".
 
 #>
-Function Get-DevOpsDescriptorIdentity {
-
+Function Get-DevOpsDescriptorIdentity
+{
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
-        [Parameter(Mandatory, ParameterSetName = 'Default')]
-        [Parameter(Mandatory, ParameterSetName = 'Descriptors')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Default')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Descriptors')]
         [string]$OrganizationName,
 
-        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Default')]
         [String]$SubjectDescriptor,
 
-        [Parameter(Mandatory, ParameterSetName = 'Descriptors')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Descriptors')]
         [String]$Descriptor,
 
         [Parameter(ParameterSetName = 'Default')]
@@ -41,23 +41,27 @@ Function Get-DevOpsDescriptorIdentity {
     )
 
     # Determine the query parameter based on the parameter set
-    if ($SubjectDescriptor) {
+    if ($SubjectDescriptor)
+    {
         $query = "subjectDescriptors=$SubjectDescriptor"
-    } else {
+    }
+    else
+    {
         $query = "descriptors=$Descriptor"
     }
 
     #
     # Construct the URL for the API call
     $params = @{
-        Uri = "https://vssps.dev.azure.com/{0}/_apis/identities?{1}&api-version={2}" -f $OrganizationName, $query, $ApiVersion
+        Uri = 'https://vssps.dev.azure.com/{0}/_apis/identities?{1}&api-version={2}' -f $OrganizationName, $query, $ApiVersion
         Method = 'Get'
     }
 
     # Invoke the REST API call
     $identity = Invoke-AzDevOpsApiRestMethod @params
 
-    if (($null -eq $identity.value) -or ($identity.count -gt 1)) {
+    if (($null -eq $identity.value) -or ($identity.count -gt 1))
+    {
         return $null
     }
 

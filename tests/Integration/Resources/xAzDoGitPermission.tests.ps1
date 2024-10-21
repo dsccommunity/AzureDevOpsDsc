@@ -1,6 +1,6 @@
 
 
-Describe "xAzDoGitPermission Integration Tests" {
+Describe "AzDoGitPermission Integration Tests" {
 
     BeforeAll {
 
@@ -8,7 +8,7 @@ Describe "xAzDoGitPermission Integration Tests" {
         $PROJECTNAME = 'TESTPROJECT_GIT_PERMISSION'
 
         $parameters = @{
-            Name = 'xAzDoGitPermission'
+            Name = 'AzDoGitPermission'
             ModuleName = 'AzureDevOpsDsc'
             property = @{
                 ProjectName = $PROJECTNAME

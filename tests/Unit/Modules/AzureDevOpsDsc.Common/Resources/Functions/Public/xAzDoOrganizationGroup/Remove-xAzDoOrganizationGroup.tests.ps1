@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-xAzDoOrganizationGroup' {
+Describe 'Remove-AzDoOrganizationGroup' {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -12,7 +12,7 @@ Describe 'Remove-xAzDoOrganizationGroup' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoOrganizationGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-AzDoOrganizationGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -27,7 +27,7 @@ Describe 'Remove-xAzDoOrganizationGroup' {
         . (Get-ClassFilePath '000.CacheItem')
         . (Get-ClassFilePath 'Ensure')
 
-        # Mock the external functions used within Remove-xAzDoOrganizationGroup
+        # Mock the external functions used within Remove-AzDoOrganizationGroup
         Mock -CommandName Remove-DevOpsGroup
         Mock -CommandName Remove-CacheItem
         Mock -CommandName Set-CacheObject
@@ -48,7 +48,7 @@ Describe 'Remove-xAzDoOrganizationGroup' {
                 localCache = $null
             }
 
-            Remove-xAzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
+            Remove-AzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Times 0
             Assert-MockCalled -CommandName Remove-CacheItem -Times 0
@@ -66,7 +66,7 @@ Describe 'Remove-xAzDoOrganizationGroup' {
                 localCache = $null
             }
 
-            Remove-xAzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
+            Remove-AzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Exactly -Times 1 -ParameterFilter {
                 $GroupDescriptor -eq 'LiveDescriptor' -and
@@ -88,7 +88,7 @@ Describe 'Remove-xAzDoOrganizationGroup' {
                 }
             }
 
-            Remove-xAzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
+            Remove-AzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Exactly -Times 1 -ParameterFilter {
                 $GroupDescriptor -eq 'LocalDescriptor' -and
@@ -113,7 +113,7 @@ Describe 'Remove-xAzDoOrganizationGroup' {
                 }
             }
 
-            Remove-xAzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
+            Remove-AzDoOrganizationGroup -GroupName 'TestGroup' -LookupResult $lookupResult
 
             Assert-MockCalled -CommandName Remove-DevOpsGroup -Exactly -Times 1 -ParameterFilter {
                 $GroupDescriptor -eq 'LiveDescriptor' -and

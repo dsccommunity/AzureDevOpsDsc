@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Set-xAzDoProject" {
+Describe "Set-AzDoProject" {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -13,7 +13,7 @@ Describe "Set-xAzDoProject" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoProject.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoProject.tests.ps1'
         }
 
         # Load the functions to test
@@ -65,7 +65,7 @@ Describe "Set-xAzDoProject" {
             $visibility = "Private"
 
             # Act
-            Set-xAzDoProject -ProjectName $projectName -ProjectDescription $projectDescription -SourceControlType $sourceControlType -ProcessTemplate $processTemplate -Visibility $visibility
+            Set-AzDoProject -ProjectName $projectName -ProjectDescription $projectDescription -SourceControlType $sourceControlType -ProcessTemplate $processTemplate -Visibility $visibility
 
             # Assert
             Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -ParameterFilter {

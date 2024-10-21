@@ -119,8 +119,10 @@ function Wait-AzDevOpsApiResource
     # Wait/Sleep while...
     # 1) Resource is currently absent but waiting for presence or;
     # 2) Resource is currently present but waiting for absence
-    while (($IsPresent -and -not $testAzDevOpsApiResource) -or
-           ($IsAbsent -and $testAzDevOpsApiResource))
+    while (
+        ($IsPresent -and -not $testAzDevOpsApiResource) -or
+        ($IsAbsent -and $testAzDevOpsApiResource)
+    )
     {
         Start-Sleep -Milliseconds $WaitIntervalMilliseconds
 
@@ -130,8 +132,14 @@ function Wait-AzDevOpsApiResource
             New-InvalidOperationException -Message $errorMessage
         }
 
-        [bool]$testAzDevOpsApiResource = Test-AzDevOpsApiResource -ApiUri $ApiUri -Pat $Pat `
-                                                                  -ResourceName $ResourceName `
-                                                                  -ResourceId $ResourceId
+        $params = @{
+            ApiUri = $ApiUri
+            Pat = $Pat
+            ResourceName = $ResourceName
+            ResourceId = $ResourceId
+        }
+
+        [bool]$testAzDevOpsApiResource = Test-AzDevOpsApiResource @params
+
     }
 }

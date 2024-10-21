@@ -1,3 +1,31 @@
+<#
+.SYNOPSIS
+Sets the status of a specified project service in Azure DevOps.
+
+.DESCRIPTION
+The Set-ProjectServiceStatus function updates the status of a specified service within a given project in an Azure DevOps organization. It constructs the appropriate URI and sends a PATCH request with the provided body content.
+
+.PARAMETER Organization
+The name of the Azure DevOps organization.
+
+.PARAMETER ProjectId
+The ID of the project within the Azure DevOps organization.
+
+.PARAMETER ServiceName
+The name of the service whose status is to be set.
+
+.PARAMETER Body
+The body content to be sent in the PATCH request. This should be an object that will be converted to JSON.
+
+.PARAMETER ApiVersion
+The API version to use for the request. If not specified, the default API version is retrieved using Get-AzDevOpsApiVersion.
+
+.EXAMPLE
+Set-ProjectServiceStatus -Organization "myOrg" -ProjectId "12345" -ServiceName "myService" -Body $bodyContent
+
+.NOTES
+This function requires the Azure DevOps REST API and the Invoke-AzDevOpsApiRestMethod cmdlet to be available.
+#>
 function Set-ProjectServiceStatus
 {
     [CmdletBinding()]

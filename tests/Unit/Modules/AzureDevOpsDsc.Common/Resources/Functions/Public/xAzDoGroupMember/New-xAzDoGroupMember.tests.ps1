@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "New-xAzDoGroupMember" {
+Describe "New-AzDoGroupMember" {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -14,7 +14,7 @@ Describe "New-xAzDoGroupMember" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-AzDoGroupMember.tests.ps1'
         }
 
         # Load the functions to test
@@ -60,7 +60,7 @@ Describe "New-xAzDoGroupMember" {
             $GroupName = 'TestGroup'
             $GroupMembers = @('User1', 'User2')
 
-            New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
+            New-AzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
 
             Assert-MockCalled -CommandName Find-AzDoIdentity -Times 3 -Exactly -Scope It
         }
@@ -69,7 +69,7 @@ Describe "New-xAzDoGroupMember" {
             $GroupName = 'TestGroup'
             $GroupMembers = @('User1', 'User2')
 
-            New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
+            New-AzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
 
             Assert-MockCalled -CommandName New-DevOpsGroupMember -Times 2 -Exactly -Scope It
         }
@@ -78,7 +78,7 @@ Describe "New-xAzDoGroupMember" {
             $GroupName = 'TestGroup'
             $GroupMembers = @('User1', 'User2')
 
-            New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
+            New-AzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
 
             Assert-MockCalled -CommandName Add-CacheItem -Times 1 -Exactly -Scope It
             Assert-MockCalled -CommandName Set-CacheObject -Times 1 -Exactly -Scope It
@@ -99,7 +99,7 @@ Describe "New-xAzDoGroupMember" {
             $GroupName = 'TestGroup'
             $GroupMembers = @('User1', 'User2')
 
-            $result = New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
+            $result = New-AzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
             Assert-MockCalled -Times 1 -ParameterFilter { $Message -like "*Unable to find identity for member*" } -CommandName Write-Warning
         }
 
@@ -109,7 +109,7 @@ Describe "New-xAzDoGroupMember" {
             $GroupName = 'TestGroup'
             $GroupMembers = @('User1', 'User2')
 
-            New-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
+            New-AzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers
 
             Assert-MockCalled -CommandName 'Write-Warning' -ParameterFilter { $Message -like "*No group members found*" }
 

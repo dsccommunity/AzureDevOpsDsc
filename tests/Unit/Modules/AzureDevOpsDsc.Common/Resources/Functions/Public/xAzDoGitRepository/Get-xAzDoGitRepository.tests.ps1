@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Get-xAzDoGitRepository Tests" {
+Describe "Get-AzDoGitRepository Tests" {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -12,7 +12,7 @@ Describe "Get-xAzDoGitRepository Tests" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGitRepository.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzDoGitRepository.tests.ps1'
         }
 
         # Load the functions to test
@@ -47,7 +47,7 @@ Describe "Get-xAzDoGitRepository Tests" {
                 $Type -eq 'LiveRepositories'
             }
 
-            $result = Get-xAzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
+            $result = Get-AzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
 
             $result.status | Should -Be "Unchanged"
             $result.Ensure | Should -Be "Absent"
@@ -67,7 +67,7 @@ Describe "Get-xAzDoGitRepository Tests" {
                 ($Key -eq $projectGroupKey) -and ($Type -eq 'Repositories')
             }
 
-            $result = Get-xAzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
+            $result = Get-AzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
 
             Assert-MockCalled -CommandName Get-CacheItem -Times 2 -Exactly
         }
@@ -81,7 +81,7 @@ Describe "Get-xAzDoGitRepository Tests" {
                 $Type -eq 'LiveRepositories'
             }
 
-            $result = Get-xAzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
+            $result = Get-AzDoGitRepository -ProjectName $projectName -RepositoryName $repositoryName
 
             $result.status | Should -Be "NotFound"
             $result.Ensure | Should -Be "Absent"

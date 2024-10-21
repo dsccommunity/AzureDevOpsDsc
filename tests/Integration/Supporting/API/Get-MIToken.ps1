@@ -2,7 +2,7 @@ Function Get-MIToken {
     [CmdletBinding()]
     param (
         # Organization Name
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]
         $OrganizationName
     )
@@ -24,7 +24,10 @@ Function Get-MIToken {
     # Invoke the RestAPI
     try { $response = Invoke-RestMethod @ManagedIdentityParams } catch { Throw $_ }
     # Test the response
-    if ($null -eq $response.access_token) { throw "Error. Access token not returned from Azure Instance Metadata Service. Please ensure that the Azure Instance Metadata Service is available." }
+    if ($null -eq $response.access_token)
+    {
+        throw "Error. Access token not returned from Azure Instance Metadata Service. Please ensure that the Azure Instance Metadata Service is available."
+    }
 
     # Return the token if the verify switch is not set
     return @{

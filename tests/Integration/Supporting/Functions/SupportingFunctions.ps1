@@ -9,7 +9,7 @@ Function New-Project {
     # Create a new project
 
     $projectParams = @{
-        Name = 'xAzDoProject'
+        Name = 'AzDoProject'
         ModuleName = 'AzureDevOpsDsc'
         Method = 'Set'
         property = @{
@@ -32,7 +32,7 @@ Function New-Repository {
     # Create a new repository
 
     $parameters = @{
-        Name = 'xAzDoGitRepository'
+        Name = 'AzDoGitRepository'
         ModuleName = 'AzureDevOpsDsc'
         Method = 'Set'
         property = @{
@@ -58,7 +58,7 @@ Function New-Group {
     # Create a new group
 
     $groupParams = @{
-        Name = 'xAzDoProjectGroup'
+        Name = 'AzDoProjectGroup'
         ModuleName = 'AzureDevOpsDsc'
         Method = 'Set'
         property = @{

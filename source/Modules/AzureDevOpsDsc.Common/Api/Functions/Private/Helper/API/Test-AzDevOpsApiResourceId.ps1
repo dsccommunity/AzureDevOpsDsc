@@ -36,6 +36,6 @@ function Test-AzDevOpsApiResourceId
         $IsValid
     )
 
-
     return !(![guid]::TryParse($ResourceId, $([ref][guid]::Empty)))
+
 }

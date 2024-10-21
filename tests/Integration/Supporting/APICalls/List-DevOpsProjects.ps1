@@ -3,7 +3,7 @@ function List-DevOpsProjects
 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$OrganizationName,
 
         [Parameter()]

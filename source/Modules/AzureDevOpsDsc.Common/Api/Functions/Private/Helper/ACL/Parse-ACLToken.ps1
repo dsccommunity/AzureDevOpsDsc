@@ -1,9 +1,10 @@
-Function Parse-ACLToken {
+Function Parse-ACLToken
+{
     param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]$Token,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Identity', 'Git Repositories')]
         [String]$SecurityNamespace
     )
@@ -16,9 +17,11 @@ Function Parse-ACLToken {
 
     #
     # Git Repositories
-    if ($SecurityNamespace -eq 'Git Repositories') {
+    if ($SecurityNamespace -eq 'Git Repositories')
+    {
         # Match the Token with the Regex Patterns
-        switch -regex ($Token.Trim()) {
+        switch -regex ($Token.Trim())
+        {
             $LocalizedDataAzACLTokenPatten.OrganizationGit {
                 $result.type = 'OrganizationGit'
                 break;
@@ -46,10 +49,13 @@ Function Parse-ACLToken {
 
     #
     # Identity
-    } elseif ($SecurityNamespace -eq 'Identity') {
+    }
+    elseif ($SecurityNamespace -eq 'Identity')
+    {
 
         # Match the Token with the Regex Patterns
-        switch -regex ($Token.Trim()) {
+        switch -regex ($Token.Trim())
+        {
 
             $LocalizedDataAzACLTokenPatten.ResourcePermission {
                 $result.type = 'ResourcePermission'

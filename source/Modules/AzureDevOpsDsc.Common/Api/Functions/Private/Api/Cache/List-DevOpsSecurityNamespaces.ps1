@@ -1,7 +1,27 @@
-Function List-DevOpsSecurityNamespaces {
+<#
+.SYNOPSIS
+    Retrieves the security namespaces for a specified Azure DevOps organization.
+
+.DESCRIPTION
+    The List-DevOpsSecurityNamespaces function invokes the Azure DevOps REST API to retrieve the security namespaces for a given organization.
+    It returns the namespaces if available, otherwise returns null.
+
+.PARAMETER OrganizationName
+    The name of the Azure DevOps organization for which to retrieve the security namespaces.
+
+.EXAMPLE
+    List-DevOpsSecurityNamespaces -OrganizationName "Contoso"
+
+    This example retrieves the security namespaces for the "Contoso" Azure DevOps organization.
+
+.NOTES
+    This function uses the Invoke-AzDevOpsApiRestMethod cmdlet to make the REST API call.
+#>
+Function List-DevOpsSecurityNamespaces
+{
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]$OrganizationName
     )
 
@@ -14,7 +34,6 @@ Function List-DevOpsSecurityNamespaces {
         Method = 'Get'
     }
 
-    #
     # Invoke the Rest API to get the groups
     $namespaces = Invoke-AzDevOpsApiRestMethod @params
 
@@ -23,7 +42,6 @@ Function List-DevOpsSecurityNamespaces {
         return $null
     }
 
-    #
     # Return the groups from the cache
     return $namespaces.Value
 

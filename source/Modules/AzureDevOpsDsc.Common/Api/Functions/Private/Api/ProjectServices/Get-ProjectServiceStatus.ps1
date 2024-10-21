@@ -1,3 +1,35 @@
+<#
+.SYNOPSIS
+Retrieves the status of a specified project service in Azure DevOps.
+
+.DESCRIPTION
+The Get-ProjectServiceStatus function retrieves the status of a specified service within a project in Azure DevOps.
+It constructs the appropriate URI and makes a REST API call to fetch the service status. If the service status is
+'undefined', it is treated as 'enabled'.
+
+.PARAMETER Organization
+The name of the Azure DevOps organization.
+
+.PARAMETER ProjectId
+The ID of the project in Azure DevOps.
+
+.PARAMETER ServiceName
+The name of the service whose status is to be retrieved.
+
+.PARAMETER ApiVersion
+The API version to use for the request. If not specified, the default API version is used.
+
+.OUTPUTS
+System.Object
+Returns the state of the specified service.
+
+.EXAMPLE
+PS> Get-ProjectServiceStatus -Organization "MyOrg" -ProjectId "12345" -ServiceName "MyService"
+This command retrieves the status of the service "MyService" in the project with ID "12345" within the organization "MyOrg".
+
+.NOTES
+If the service status is 'undefined', it is treated as 'enabled'.
+#>
 function Get-ProjectServiceStatus
 {
     [CmdletBinding()]

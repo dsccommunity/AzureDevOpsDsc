@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe "Get-xAzDoGroupMember Tests" {
+Describe "Get-AzDoGroupMember Tests" {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -12,7 +12,7 @@ Describe "Get-xAzDoGroupMember Tests" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzDoGroupMember.tests.ps1'
         }
 
         # Load the functions to test
@@ -54,7 +54,7 @@ Describe "Get-xAzDoGroupMember Tests" {
 
         Mock -CommandName Get-CacheItem -MockWith { $null }
 
-        $result = Get-xAzDoGroupMember @params
+        $result = Get-AzDoGroupMember @params
         $result.status | Should -Be ([DSCGetSummaryState]::Unchanged)
     }
 
@@ -69,7 +69,7 @@ Describe "Get-xAzDoGroupMember Tests" {
 
         Mock -CommandName Get-CacheItem -MockWith { $null }
 
-        $result = Get-xAzDoGroupMember @params
+        $result = Get-AzDoGroupMember @params
         $result.status | Should -Be ([DSCGetSummaryState]::NotFound)
     }
 
@@ -84,7 +84,7 @@ Describe "Get-xAzDoGroupMember Tests" {
 
         Mock -CommandName Get-CacheItem -MockWith { $null }
 
-        $result = Get-xAzDoGroupMember @params
+        $result = Get-AzDoGroupMember @params
         $result.status | Should -Be ([DSCGetSummaryState]::NotFound)
     }
 
@@ -97,7 +97,7 @@ Describe "Get-xAzDoGroupMember Tests" {
             Force        = $false
         }
 
-        $result = Get-xAzDoGroupMember @params
+        $result = Get-AzDoGroupMember @params
         $result.status | Should -Be ([DSCGetSummaryState]::Missing)
     }
 
@@ -113,7 +113,7 @@ Describe "Get-xAzDoGroupMember Tests" {
             Force        = $false
         }
 
-        $result = Get-xAzDoGroupMember @params
+        $result = Get-AzDoGroupMember @params
         $result.status | Should -Be ([DSCGetSummaryState]::Unchanged)
 
     }
@@ -128,7 +128,7 @@ Describe "Get-xAzDoGroupMember Tests" {
             Force        = $false
         }
 
-        $result = Get-xAzDoGroupMember @params
+        $result = Get-AzDoGroupMember @params
         $result.status | Should -Be ([DSCGetSummaryState]::Changed)
         $result.propertiesChanged[0].action | Should -Be 'Remove'
         $result.propertiesChanged[0].value.originId | Should -Be 'MockMember2'
@@ -148,7 +148,7 @@ Describe "Get-xAzDoGroupMember Tests" {
             Force        = $true
         }
 
-        $result = Get-xAzDoGroupMember @params
+        $result = Get-AzDoGroupMember @params
         $result.status | Should -Be ([DSCGetSummaryState]::Changed)
         $result.propertiesChanged[0].action | Should -Be 'Remove'
         $result.propertiesChanged[0].value.originId | Should -Be 'MockMember2'

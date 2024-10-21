@@ -24,29 +24,35 @@ New-AzDevOpsACLToken -OrganizationName "Contoso" -ProjectId "MyProject"
 Creates a token for project-level access to the specified Azure DevOps project.
 #>
 
-function New-AzDevOpsACLToken {
+function New-AzDevOpsACLToken
+{
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$OrganizationName,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$ProjectId,
 
         [Parameter()]
         [string]$TeamId
     )
 
-    process {
-        if ($TeamId) {
+    process
+    {
+        if ($TeamId)
+        {
             # Construct a token for team-level access
             $token = "vstfs:///Classification/TeamProject/$ProjectId/$TeamId"
-        } else {
+        }
+        else
+        {
             # Construct a token for project-level access
             $token = "vstfs:///Classification/TeamProject/$ProjectId"
         }
 
         return $token
+
     }
 
 }

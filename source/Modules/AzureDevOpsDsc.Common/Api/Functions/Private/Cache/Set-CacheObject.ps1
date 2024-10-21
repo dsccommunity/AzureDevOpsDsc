@@ -37,7 +37,7 @@ function Set-CacheObject
 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]$CacheType,
 
@@ -67,8 +67,7 @@ function Set-CacheObject
     }
     catch
     {
-        Write-Error "[Set-ObjectCache] Failed to create cache for Azure DevOps API: $_"
-        throw
+        throw "[Set-ObjectCache] Failed to create cache for Azure DevOps API: $_"
     }
 
 }

@@ -37,9 +37,13 @@ function Test-AzDevOpsProjectDescription
         $IsValid
     )
 
-    return !($ProjectDescription -eq $null -or
-             ($ProjectDescription.Contains('%') -or
-              $ProjectDescription.Contains('*') -or
-              $ProjectDescription.StartsWith(' ') -or
-              $ProjectDescription.EndsWith(' ')))
+    return (
+            [String]::IsNullOrWhiteSpace($ProjectDescription) -or
+            (
+                $ProjectDescription.Contains('%') -or
+                $ProjectDescription.Contains('*') -or
+                $ProjectDescription.StartsWith(' ') -or
+                $ProjectDescription.EndsWith(' ')
+            )
+    )
 }

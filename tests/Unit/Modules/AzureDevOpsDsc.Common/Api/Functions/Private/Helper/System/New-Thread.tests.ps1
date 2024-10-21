@@ -3,7 +3,7 @@ Describe 'New-Thread' -skip {
         function New-Thread {
             [CmdletBinding()]
             param (
-                [Parameter(Mandatory)]
+                [Parameter(Mandatory = $true)]
                 [ScriptBlock]$ScriptBlock
             )
 

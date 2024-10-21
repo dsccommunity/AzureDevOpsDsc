@@ -25,7 +25,7 @@ Function ConvertTo-FormattedToken {
     [CmdletBinding()]
     param (
         # Define a mandatory parameter named 'Token' of type Object array
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [Object[]]$Token
     )
 
@@ -36,7 +36,8 @@ Function ConvertTo-FormattedToken {
     $string = ""
 
     # Determine the type of the token and format accordingly
-    switch ($Token) {
+    switch ($Token)
+    {
         # If the token type is 'GitOrganization'
         {$_.type -eq 'GitOrganization'} {
             $string = 'repoV2'

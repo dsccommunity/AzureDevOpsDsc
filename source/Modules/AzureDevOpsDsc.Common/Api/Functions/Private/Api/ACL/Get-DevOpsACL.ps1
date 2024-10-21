@@ -1,10 +1,10 @@
 function Get-DevOpsACL
 {
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$OrganizationName,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]$SecurityDescriptorId,
 
         [Parameter()]
@@ -12,10 +12,9 @@ function Get-DevOpsACL
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default)
     )
 
-    #
     # Construct the URL for the API call
     $params = @{
-        Uri = "https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}" -f $OrganizationName, $SecurityDescriptorId, $ApiVersion
+        Uri = 'https://dev.azure.com/{0}/_apis/accesscontrollists/{1}?api-version={2}' -f $OrganizationName, $SecurityDescriptorId, $ApiVersion
         Method = 'Get'
     }
 

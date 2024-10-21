@@ -11,10 +11,10 @@ if ($Global:ClassesLoaded -eq $null)
     . $preInitialize.FullName -RepositoryPath $RepositoryRoot
 }
 
-Describe 'xAzDoProjectGroup' {
+Describe 'AzDoProjectGroup' {
     BeforeAll {
         # Mock functions that interact with external resources
-        function Get-xAzDoProjectGroup
+        function Get-AzDoProjectGroup
         {
             param (
                 [string]$GroupName,
@@ -30,7 +30,7 @@ Describe 'xAzDoProjectGroup' {
             }
         }
 
-        function New-xAzDoProjectGroup
+        function New-AzDoProjectGroup
         {
             param (
                 [string]$ProjectName,
@@ -43,7 +43,7 @@ Describe 'xAzDoProjectGroup' {
             Write-Output "New project group created: $GroupName in project $ProjectName"
         }
 
-        function Update-xAzDoProjectGroup
+        function Update-AzDoProjectGroup
         {
             param (
                 [string]$ProjectName,
@@ -56,7 +56,7 @@ Describe 'xAzDoProjectGroup' {
             Write-Output "Project group updated: $GroupName in project $ProjectName"
         }
 
-        function Remove-xAzDoProjectGroup
+        function Remove-AzDoProjectGroup
         {
             param (
                 [string]$ProjectName,
@@ -72,7 +72,7 @@ Describe 'xAzDoProjectGroup' {
     Context 'When getting the current state of a project group' {
         It 'Should return the current state properties' {
             # Arrange
-            $projectGroup = [xAzDoProjectGroup]::new()
+            $projectGroup = [AzDoProjectGroup]::new()
             $projectGroup.ProjectName = "MyProject"
             $projectGroup.GroupName = "MyGroup"
             $projectGroup.GroupDescription = "This is my project group."

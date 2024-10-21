@@ -32,10 +32,11 @@ This function is part of the AzureDevOpsDsc module.
 https://github.com/Azure/AzureDevOpsDsc
 
 #>
-function Get-CacheObject {
+function Get-CacheObject
+{
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]$CacheType
     )
@@ -44,21 +45,28 @@ function Get-CacheObject {
     Write-Verbose "[Get-ObjectCache] Attempting to retrieve cache object for type: $CacheType"
 
     # Use the Enviroment Variables to set the Cache Directory Path
-    if ($ENV:AZDODSC_CACHE_DIRECTORY) {
+    if ($ENV:AZDODSC_CACHE_DIRECTORY)
+    {
         $CacheDirectoryPath = Join-Path -Path $ENV:AZDODSC_CACHE_DIRECTORY -ChildPath "Cache"
-    } else {
+    }
+    else
+    {
         Throw "The environment variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the variable to the path of the cache directory."
     }
 
-    try {
+    try
+    {
         # Attempt to get the variable from the global scope
         $var = Get-Variable -Name "AzDo$CacheType" -Scope Global -ErrorAction SilentlyContinue
 
-        if ($var) {
+        if ($var)
+        {
             Write-Verbose "[Get-ObjectCache] Cache object found in memory for type: $CacheType"
             # If the variable is found, return the content of the cache. Dont use $var here, since it will a different object type.
             $var = Get-Variable -Name "AzDo$CacheType" -ValueOnly -Scope Global
-        } else {
+        }
+        else
+        {
             Write-Verbose "[Get-ObjectCache] Cache object not found in memory, attempting to import for type: $CacheType"
             $var = Import-CacheObject -CacheType $CacheType
         }
@@ -67,8 +75,9 @@ function Get-CacheObject {
         Write-Verbose "[Get-ObjectCache] Returning imported cache object for type: $CacheDirectoryPath"
         return $var
 
-    } catch {
-        Write-Error "[Get-ObjectCache] Failed to get cache for Azure DevOps API: $_"
-        throw
+    }
+    catch
+    {
+        throw "[Get-ObjectCache] Failed to get cache for Azure DevOps API: $_"
     }
 }

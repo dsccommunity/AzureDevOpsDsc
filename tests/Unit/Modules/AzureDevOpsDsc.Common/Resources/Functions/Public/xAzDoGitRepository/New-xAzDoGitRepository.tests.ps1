@@ -1,7 +1,7 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-# Pester tests for New-xAzDoGitRepository function
-Describe "New-xAzDoGitRepository Tests" {
+# Pester tests for New-AzDoGitRepository function
+Describe "New-AzDoGitRepository Tests" {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -13,7 +13,7 @@ Describe "New-xAzDoGitRepository Tests" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoGitRepository.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-AzDoGitRepository.tests.ps1'
         }
 
         # Load the functions to test
@@ -48,7 +48,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
             }
-            New-xAzDoGitRepository @params
+            New-AzDoGitRepository @params
 
             Assert-MockCalled -CommandName New-GitRepository -Exactly -Times 1
         }
@@ -58,7 +58,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
             }
-            New-xAzDoGitRepository @params
+            New-AzDoGitRepository @params
 
             Assert-MockCalled -CommandName Add-CacheItem -Exactly -Times 1
         }
@@ -68,7 +68,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
             }
-            New-xAzDoGitRepository @params
+            New-AzDoGitRepository @params
 
             Assert-MockCalled -CommandName Export-CacheObject -Exactly -Times 1
         }
@@ -78,7 +78,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
             }
-            New-xAzDoGitRepository @params
+            New-AzDoGitRepository @params
 
             Assert-MockCalled -CommandName Refresh-CacheObject -Exactly -Times 1
         }
@@ -93,7 +93,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 RepositoryName  = 'TestRepo'
                 SourceRepository= 'SourceRepo'
             }
-            New-xAzDoGitRepository @params
+            New-AzDoGitRepository @params
 
             Assert-MockCalled -CommandName New-GitRepository -ParameterFilter { $RepositoryName -eq 'TestRepo' -and $SourceRepository -eq 'SourceRepo' }
         }
@@ -104,7 +104,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 RepositoryName  = 'TestRepo'
                 Force           = $true
             }
-            New-xAzDoGitRepository @params
+            New-AzDoGitRepository @params
 
             # Since Force is not used in function logic directly, verifying other aspects
             Assert-MockCalled -CommandName New-GitRepository -Exactly -Times 1
@@ -126,7 +126,7 @@ Describe "New-xAzDoGitRepository Tests" {
                 ProjectName     = 'TestProject'
                 RepositoryName  = 'TestRepo'
             }
-            New-xAzDoGitRepository @params
+            New-AzDoGitRepository @params
 
             Assert-VerifiableMock
             Assert-MockCalled -CommandName New-GitRepository -Exactly -Times 0

@@ -11,10 +11,10 @@ if ($Global:ClassesLoaded -eq $null)
     . $preInitialize.FullName -RepositoryPath $RepositoryRoot
 }
 
-Describe 'xAzDoGitPermission' {
+Describe 'AzDoGitPermission' {
     BeforeAll {
         # Mock functions that interact with external resources
-        function Get-xAzDoGitPermission
+        function Get-AzDoGitPermission
         {
             param (
                 [string]$ProjectName,
@@ -30,7 +30,7 @@ Describe 'xAzDoGitPermission' {
             }
         }
 
-        function New-xAzDoGitPermission
+        function New-AzDoGitPermission
         {
             param (
                 [string]$ProjectName,
@@ -44,7 +44,7 @@ Describe 'xAzDoGitPermission' {
             Write-Output "New Git permissions set for: $ProjectName/$RepositoryName"
         }
 
-        function Update-xAzDoGitPermission
+        function Update-AzDoGitPermission
         {
             param (
                 [string]$ProjectName,
@@ -58,7 +58,7 @@ Describe 'xAzDoGitPermission' {
             Write-Output "Git permissions updated for: $ProjectName/$RepositoryName"
         }
 
-        function Remove-xAzDoPermission
+        function Remove-AzDoPermission
         {
             param (
                 [string]$ProjectName,
@@ -74,7 +74,7 @@ Describe 'xAzDoGitPermission' {
     Context 'When getting the current state of Git permissions' {
         It 'Should return the current state properties' {
             # Arrange
-            $gitPermission = [xAzDoGitPermission]::new()
+            $gitPermission = [AzDoGitPermission]::new()
             $gitPermission.ProjectName = "MyProject"
             $gitPermission.RepositoryName = "MyRepository"
 

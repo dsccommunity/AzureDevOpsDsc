@@ -1,8 +1,8 @@
-# Save this script as New-xAzDoProjectGroup.Tests.ps1
+# Save this script as New-AzDoProjectGroup.Tests.ps1
 
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'New-xAzDoProjectGroup' {
+Describe 'New-AzDoProjectGroup' {
 
     BeforeAll {
 
@@ -11,7 +11,7 @@ Describe 'New-xAzDoProjectGroup' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-xAzDoProjectGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'New-AzDoProjectGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -57,7 +57,7 @@ Describe 'New-xAzDoProjectGroup' {
                 ProjectName = 'TestProject'
             }
 
-            $result = New-xAzDoProjectGroup @params
+            $result = New-AzDoProjectGroup @params
 
             Assert-MockCalled Get-CacheItem -Exactly 1
             Assert-MockCalled New-DevOpsGroup -Exactly 1
@@ -72,7 +72,7 @@ Describe 'New-xAzDoProjectGroup' {
                 ProjectName = 'TestProject'
             }
 
-            $result = New-xAzDoProjectGroup @params
+            $result = New-AzDoProjectGroup @params
 
             Assert-MockCalled Add-CacheItem -Exactly 1
             Assert-MockCalled Set-CacheObject -Exactly 1
@@ -93,7 +93,7 @@ Describe 'New-xAzDoProjectGroup' {
                 ProjectName = 'TestProject'
             }
 
-            $result = New-xAzDoProjectGroup @params
+            $result = New-AzDoProjectGroup @params
 
             Assert-MockCalled Get-CacheItem -Exactly 1
             Assert-MockCalled Write-Warning -Exactly 1

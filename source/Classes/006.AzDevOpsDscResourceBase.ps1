@@ -57,7 +57,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         #
         # Determine the type of Token (PersonalAccessToken or ManagedIdentity)
 
-        switch ($tokenObject.tokenType.ToString()) {
+        switch ($tokenObject.tokenType.ToString())
+        {
 
             # If the Token is empty
             { [String]::IsNullOrEmpty($_) } {
@@ -84,7 +85,8 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
         #
         # Initialize the cache objects. Don't delete the cache objects since they are used by other resources.
-        Get-AzDoCacheObjects | ForEach-Object {
+        Get-AzDoCacheObjects | ForEach-Object
+        {
             Initialize-CacheObject -CacheType $_ -BypassFileCheck -Debug
             Write-Verbose "[AzDevOpsDscResourceBase] Initialized cache object of type: $_"
         }
@@ -131,7 +133,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         $getParameters.Keys | ForEach-Object {
             $props."$_" = $this."$_"
         }
-
 
         $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
         $props.Ensure       = $props.LookupResult.Ensure
@@ -274,16 +275,16 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         elseif ($RequiredAction -eq [RequiredAction]::Remove)
         {
 
-        return $desiredStateParameters
+            return $desiredStateParameters
 
-        return @{
-                ApiUri                      = $DesiredStateProperties.ApiUri
-                Pat                         = $DesiredStateProperties.Pat
-                Force                       = $true
+            return @{
+                    ApiUri                      = $DesiredStateProperties.ApiUri
+                    Pat                         = $DesiredStateProperties.Pat
+                    Force                       = $true
 
-                # Set this from the 'Current' state as we would expect this to have an existing key/ID value to use
-                "$IdPropertyName" = $CurrentStateProperties."$IdPropertyName"
-            }
+                    # Set this from the 'Current' state as we would expect this to have an existing key/ID value to use
+                    "$IdPropertyName" = $CurrentStateProperties."$IdPropertyName"
+                }
         }
         # If the desired state/action is to add/new or update/set  the resource, start with the values in the $DesiredStateProperties variable, and amend
         elseif ($RequiredAction -in @([RequiredAction]::New, [RequiredAction]::Set))
@@ -301,13 +302,11 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
                 $desiredStateParameters.Remove($IdPropertyName)
             }
 
-
             # Do not need/want this passing as a parameter (the action taken will determine the desired state)
             $desiredStateParameters.Remove('Ensure')
 
             # Add this to 'Force' subsequent function call
             $desiredStateParameters.Force = $true
-
 
             # Some DSC properties are only supported for 'New' and 'Remove' actions, but not 'Set' ones (these need to be removed)
             [System.String[]]$unsupportedForSetPropertyNames = $this.GetDscResourcePropertyNamesWithNoSetSupport()

@@ -1,31 +1,29 @@
+<#
+.SYNOPSIS
+Get a cache item from the cache.
 
+.DESCRIPTION
+Get a cache item from the cache.
 
+.PARAMETER Key
+The key of the cache item to get.
+
+.EXAMPLE
+Get-CacheItem -Key 'MyKey'
+
+.NOTES
+This function is private and should not be used directly.
+#>
 function Get-CacheItem
 {
-    <#
-    .SYNOPSIS
-    Get a cache item from the cache.
-
-    .DESCRIPTION
-    Get a cache item from the cache.
-
-    .PARAMETER Key
-    The key of the cache item to get.
-
-    .EXAMPLE
-    Get-CacheItem -Key 'MyKey'
-
-    .NOTES
-    This function is private and should not be used directly.
-    #>
     [CmdletBinding()]
     [OutputType([CacheItem])]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Key,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateScript({$_ -in (Get-AzDoCacheObjects)})]
         [string]
         $Type,
@@ -39,13 +37,17 @@ function Get-CacheItem
     {
         [System.Collections.Generic.List[CacheItem]]$cache = Get-CacheObject -CacheType $Type
         $cacheItem = $cache.Where({$_.Key -eq $Key})
-    } catch
+    }
+    catch
     {
         $cacheItem = $null
         Write-Verbose $_
     }
 
-    if ($null -eq $cacheItem) { return $null }
+    if ($null -eq $cacheItem)
+    {
+        return $null
+    }
 
     if ($Filter -ne $null)
     {

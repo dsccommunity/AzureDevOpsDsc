@@ -40,7 +40,7 @@ function Remove-DevOpsProject
 
     # Define the API version to use
     $params = @{
-        Uri              = "https://dev.azure.com/{0}/_apis/projects/{1}?api-version={2}" -f $Organization, $ProjectId, $ApiVersion
+        Uri              = 'https://dev.azure.com/{0}/_apis/projects/{1}?api-version={2}' -f $Organization, $ProjectId, $ApiVersion
         Method           = "DELETE"
     }
 

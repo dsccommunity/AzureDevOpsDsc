@@ -11,10 +11,10 @@ if ($Global:ClassesLoaded -eq $null)
     . $preInitialize.FullName -RepositoryPath $RepositoryRoot
 }
 
-Describe 'xAzDoGitRepository' {
+Describe 'AzDoGitRepository' {
     BeforeAll {
         # Mock functions that interact with external resources
-        function Get-xAzDoGitRepository
+        function Get-AzDoGitRepository
         {
             param (
                 [string]$ProjectName,
@@ -29,7 +29,7 @@ Describe 'xAzDoGitRepository' {
             }
         }
 
-        function New-xAzDoGitRepository
+        function New-AzDoGitRepository
         {
             param (
                 [string]$ProjectName,
@@ -42,7 +42,7 @@ Describe 'xAzDoGitRepository' {
             Write-Output "New Git repository created: $ProjectName/$GitRepositoryName"
         }
 
-        function Update-xAzDoGitRepository
+        function Update-AzDoGitRepository
         {
             param (
                 [string]$ProjectName,
@@ -55,7 +55,7 @@ Describe 'xAzDoGitRepository' {
             Write-Output "Git repository updated: $ProjectName/$GitRepositoryName"
         }
 
-        function Remove-xAzDoGitRepository
+        function Remove-AzDoGitRepository
         {
             param (
                 [string]$ProjectName,
@@ -71,7 +71,7 @@ Describe 'xAzDoGitRepository' {
     Context 'When getting the current state of a Git repository' {
         It 'Should return the current state properties' {
             # Arrange
-            $gitRepository = [xAzDoGitRepository]::new()
+            $gitRepository = [AzDoGitRepository]::new()
             $gitRepository.ProjectName = "MyProject"
             $gitRepository.RepositoryName = "MyRepository"
 

@@ -109,7 +109,7 @@ function Wait-AzDevOpsOperation
         $testOperationParameters.IsSuccessful = $IsSuccessful
     }
 
-    while (!(Test-AzDevOpsOperation @testOperationParameters))
+    while (-not(Test-AzDevOpsOperation @testOperationParameters))
     {
         Start-Sleep -Milliseconds $WaitIntervalMilliseconds
 

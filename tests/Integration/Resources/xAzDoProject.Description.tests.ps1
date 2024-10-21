@@ -1,4 +1,4 @@
-Describe "xAzDoProject Integration Tests - With Description" {
+Describe "AzDoProject Integration Tests - With Description" {
 
     BeforeAll {
 
@@ -6,7 +6,7 @@ Describe "xAzDoProject Integration Tests - With Description" {
 
         # Define common parameters
         $parameters = @{
-            Name = 'xAzDoProject'
+            Name = 'AzDoProject'
             ModuleName = 'AzureDevOpsDsc'
         }
 

@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Set-xAzDoGitRepository' -Skip {
+Describe 'Set-AzDoGitRepository' -Skip {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -10,7 +10,7 @@ Describe 'Set-xAzDoGitRepository' -Skip {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoGitRepository.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoGitRepository.tests.ps1'
         }
 
         # Load the functions to test

@@ -48,4 +48,5 @@ function Test-AzDevOpsApiTimeoutExceeded
     )
 
     return $($(New-TimeSpan -Start $StartTime -End $EndTime).TotalMilliseconds -gt $TimeoutMs)
+
 }

@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Test-xAzDoGroupMember' -skip {
+Describe 'Test-AzDoGroupMember' -skip {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -14,7 +14,7 @@ Describe 'Test-xAzDoGroupMember' -skip {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Test-AzDoGroupMember.tests.ps1'
         }
 
         # Load the functions to test
@@ -38,42 +38,42 @@ Describe 'Test-xAzDoGroupMember' -skip {
     }
 
     It 'Should accept mandatory GroupName parameter' {
-        { Test-xAzDoGroupMember -GroupName $GroupName } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName } | Should -Not -Throw
     }
 
     It 'Should accept optional GroupMembers parameter' {
-        { Test-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers } | Should -Not -Throw
     }
 
     It 'Should accept optional LookupResult parameter' {
-        { Test-xAzDoGroupMember -GroupName $GroupName -LookupResult $LookupResult } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -LookupResult $LookupResult } | Should -Not -Throw
     }
 
     It 'Should accept optional Ensure parameter' {
-        { Test-xAzDoGroupMember -GroupName $GroupName -Ensure $Ensure } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -Ensure $Ensure } | Should -Not -Throw
     }
 
     It 'Should accept Force switch parameter' {
-        { Test-xAzDoGroupMember -GroupName $GroupName -Force } | Should -Not -Throw
-        { Test-xAzDoGroupMember -GroupName $GroupName -Force:$false } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -Force } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -Force:$false } | Should -Not -Throw
     }
 
     It 'Should fail without mandatory GroupName parameter' {
-        { Test-xAzDoGroupMember } | Should -Throw
+        { Test-AzDoGroupMember } | Should -Throw
     }
 
     It 'Should handle null or empty GroupMembers parameter' {
-        { Test-xAzDoGroupMember -GroupName $GroupName -GroupMembers $null } | Should -Not -Throw
-        { Test-xAzDoGroupMember -GroupName $GroupName -GroupMembers @() } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -GroupMembers $null } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -GroupMembers @() } | Should -Not -Throw
     }
 
     It 'Should handle null or empty LookupResult parameter' {
-        { Test-xAzDoGroupMember -GroupName $GroupName -LookupResult $null } | Should -Not -Throw
-        { Test-xAzDoGroupMember -GroupName $GroupName -LookupResult @{} } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -LookupResult $null } | Should -Not -Throw
+        { Test-AzDoGroupMember -GroupName $GroupName -LookupResult @{} } | Should -Not -Throw
     }
 
     It 'Should return the expected result' {
-        $result = Test-xAzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers -LookupResult $LookupResult -Ensure $Ensure -Force
+        $result = Test-AzDoGroupMember -GroupName $GroupName -GroupMembers $GroupMembers -LookupResult $LookupResult -Ensure $Ensure -Force
         $result | Should -Be $return
     }
 }

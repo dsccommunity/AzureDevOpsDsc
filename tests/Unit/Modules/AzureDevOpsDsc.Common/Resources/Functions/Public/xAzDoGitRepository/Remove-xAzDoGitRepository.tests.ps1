@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Remove-xAzDoGitRepository' {
+Describe 'Remove-AzDoGitRepository' {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -12,7 +12,7 @@ Describe 'Remove-xAzDoGitRepository' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-xAzDoGitRepository.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-AzDoGitRepository.tests.ps1'
         }
 
         # Load the functions to test
@@ -52,7 +52,7 @@ Describe 'Remove-xAzDoGitRepository' {
     }
 
     It 'Calls Get-CacheItem with appropriate parameters for Project' {
-        Remove-xAzDoGitRepository @params
+        Remove-AzDoGitRepository @params
 
         Assert-MockCalled -CommandName Get-CacheItem -Times 1 -Exactly -ParameterFilter {
             $Key -eq "TestProject" -and $Type -eq "LiveProjects"
@@ -60,7 +60,7 @@ Describe 'Remove-xAzDoGitRepository' {
     }
 
     It 'Calls Get-CacheItem with appropriate parameters for Repository' {
-        Remove-xAzDoGitRepository @params
+        Remove-AzDoGitRepository @params
 
         Assert-MockCalled -CommandName Get-CacheItem -Times 1 -Exactly -ParameterFilter {
             $Key -eq "TestProject\TestRepository" -and $Type -eq "LiveRepositories"
@@ -68,12 +68,12 @@ Describe 'Remove-xAzDoGitRepository' {
     }
 
     It 'Calls Remove-GitRepository with appropriate parameters' {
-        Remove-xAzDoGitRepository @params
+        Remove-AzDoGitRepository @params
         Assert-MockCalled -CommandName Remove-GitRepository -Exactly 1
     }
 
     It 'Calls Remove-CacheItem with appropriate parameters' {
-        Remove-xAzDoGitRepository @params
+        Remove-AzDoGitRepository @params
 
         Assert-MockCalled -CommandName Remove-CacheItem -Times 1 -Exactly -ParameterFilter {
             $Key -eq "TestProject\TestRepository" -and $Type -eq "LiveRepositories"
@@ -81,7 +81,7 @@ Describe 'Remove-xAzDoGitRepository' {
     }
 
     It 'Calls Export-CacheObject with appropriate parameters' {
-        Remove-xAzDoGitRepository @params
+        Remove-AzDoGitRepository @params
 
         Assert-MockCalled -CommandName Export-CacheObject -Times 1 -Exactly -ParameterFilter {
             $CacheType -eq 'LiveRepositories' -and $Content -eq $AzDoLiveRepositories
@@ -93,7 +93,7 @@ Describe 'Remove-xAzDoGitRepository' {
         Mock -CommandName Write-Error -Verifiable
         Mock -CommandName Get-CacheItem -MockWith { return $null } -ParameterFilter { $Type -eq 'LiveProjects' }
 
-        Remove-xAzDoGitRepository @params | Should -BeNullOrEmpty
+        Remove-AzDoGitRepository @params | Should -BeNullOrEmpty
         Assert-VerifiableMock
 
     }

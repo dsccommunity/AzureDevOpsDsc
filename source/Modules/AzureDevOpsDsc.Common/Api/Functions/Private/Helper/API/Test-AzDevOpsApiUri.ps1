@@ -37,7 +37,10 @@ function Test-AzDevOpsApiUri
     )
 
     # The APIUri is not mandatory. If it is not provided, the function will return $true.
-    if ([String]::IsNullOrEmpty($ApiUri)) { return $true }
+    if ([String]::IsNullOrEmpty($ApiUri))
+    {
+        return $true
+    }
 
     return !(($ApiUri -inotlike 'http://*' -and
               $ApiUri -inotlike 'https://*') -or

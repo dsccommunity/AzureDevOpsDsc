@@ -73,14 +73,14 @@ Here is an example of how to invoke a resource using the module:
 1. Invoke the DSC Resource:
 
     ```powershell
-    Invoke-DscResource -Name 'xAzDoProjectGroup' -Method Set -Property $properties -ModuleName 'AzureDevOpsDsc'
+    Invoke-DscResource -Name 'AzDoProjectGroup' -Method Set -Property $properties -ModuleName 'AzureDevOpsDsc'
     ```
 
 By following these steps, you can successfully set up and use the module with Azure DevOps.
 
-## Implementation using `xAzDoDSCDatum`
+## Implementation using `AzDO-DSC-LCM`
 
-[Current Source](https://github.com/ZanattaMichael/xAzDoDSCDatum)
+[Current Source](https://github.com/ZanattaMichael/AzDO-DSC-LCM)
 
 This module includes a custom Local Configuration Manager (LCM) built on Datum. By utilizing YAML resource files, similar to Ansible playbooks, administrators can manage their environment using Configuration as Code (CaC).
 
@@ -96,7 +96,7 @@ variables: {
 resources:
 
   - name: Project
-    type: AzureDevOpsDsc/xAzDoProject
+    type: AzureDevOpsDsc/AzDoProject
     properties:
       projectName: $ProjectName
       projectDescription: $ProjectDescription
@@ -115,9 +115,9 @@ variables:
 
 resources:
   - name: Project Services
-    type: AzureDevOpsDsc/xAzDoProjectServices
+    type: AzureDevOpsDsc/AzDoProjectServices
     dependsOn:
-      - AzureDevOpsDsc/xAzDoProject/Project
+      - AzureDevOpsDsc/AzDoProject/Project
     properties:
       projectName: $ProjectName
       BuildPipelines: disabled
@@ -128,7 +128,7 @@ resources:
 
 - **Parameters**: This section is reserved for any input parameters that the configuration might require.
 - **Variables**: Here, you can define reusable variables such as `ProjectName` and `ProjectDescription`.
-- **Resources**: This section defines the actual resources to be managed. In this example, we have a resource named "Project Services" of type `AzureDevOpsDsc/xAzDoProjectServices`. 
+- **Resources**: This section defines the actual resources to be managed. In this example, we have a resource named "Project Services" of type `AzureDevOpsDsc/AzDoProjectServices`. 
 
 #### Resource Properties
 
@@ -136,4 +136,4 @@ resources:
 - `BuildPipelines`: Set to `disabled`.
 - `AzureArtifact`: Set to `disabled`.
 
-The `dependsOn` attribute ensures that the "Project Services" resource will only be configured after the `AzureDevOpsDsc/xAzDoProject/Project` resource has been set up.
+The `dependsOn` attribute ensures that the "Project Services" resource will only be configured after the `AzureDevOpsDsc/AzDoProject/Project` resource has been set up.

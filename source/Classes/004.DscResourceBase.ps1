@@ -29,8 +29,7 @@ class DscResourceBase
             [System.Reflection.PropertyInfo]$propertyInfo = $_
             $PropertyName = $_.Name
 
-            $propertyInfo.GetCustomAttributes($true) |
-            ForEach-Object {
+            $propertyInfo.GetCustomAttributes($true) | ForEach-Object {
 
                 if ($_.TypeId.Name -eq 'DscPropertyAttribute' -and
                     $_.Key -eq $true)
@@ -67,8 +66,7 @@ class DscResourceBase
             $propertyInfo = $_
             $PropertyName = $_.Name
 
-            $propertyInfo.GetCustomAttributes($true) |
-            ForEach-Object {
+            $propertyInfo.GetCustomAttributes($true) | ForEach-Object {
 
                 if ($_.TypeId.Name -eq 'DscPropertyAttribute')
                 {

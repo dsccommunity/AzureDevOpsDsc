@@ -14,26 +14,26 @@ New-AzDoAuthenticationProvider -OrganizationName "Contoso"
 This example creates a new Azure Managed Identity for the organization named "Contoso".
 
 #>
-Function New-AzDoAuthenticationProvider {
-
+Function New-AzDoAuthenticationProvider
+{
     [CmdletBinding(DefaultParameterSetName = 'PersonalAccessToken')]
     param (
         # Organization Name
-        [Parameter(Mandatory, ParameterSetName = 'PersonalAccessToken')]
-        [Parameter(Mandatory, ParameterSetName = 'SecureStringPersonalAccessToken')]
-        [Parameter(Mandatory, ParameterSetName = 'ManagedIdentity')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'PersonalAccessToken')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SecureStringPersonalAccessToken')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ManagedIdentity')]
         [Alias('OrgName')]
         [String]
         $OrganizationName,
 
         # Personal Access Token
-        [Parameter(Mandatory, ParameterSetName = 'PersonalAccessToken')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'PersonalAccessToken')]
         [Alias('PAT')]
         [String]
         $PersonalAccessToken,
 
         # SecureString Personal Access Token
-        [Parameter(Mandatory, ParameterSetName = 'SecureStringPersonalAccessToken')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SecureStringPersonalAccessToken')]
         [Alias('SecureStringPAT')]
         [SecureString]
         $SecureStringPersonalAccessToken,
@@ -60,7 +60,8 @@ Function New-AzDoAuthenticationProvider {
     )
 
     # Test if $ENV:AZDODSC_CACHE_DIRECTORY is set. If not, throw an error.
-    if ($null -eq $ENV:AZDODSC_CACHE_DIRECTORY) {
+    if ($null -eq $ENV:AZDODSC_CACHE_DIRECTORY)
+    {
         Throw "[New-AzDoAuthenticationProvider] The Environment Variable 'AZDODSC_CACHE_DIRECTORY' is not set. Please set the Environment Variable 'AZDODSC_CACHE_DIRECTORY' to the Cache Directory."
     }
 
@@ -70,52 +71,55 @@ Function New-AzDoAuthenticationProvider {
 
     #
     # If the parameterset is PersonalAccessToken
-    if ($PSCmdlet.ParameterSetName -eq 'PersonalAccessToken') {
+    if ($PSCmdlet.ParameterSetName -eq 'PersonalAccessToken')
+    {
 
         Write-Verbose "[New-AzDoAuthenticationProvider] Creating a new Personal Access Token with OrganizationName $OrganizationName."
 
         # if the NoVerify switch is not set, verify the Token.
-        if ($NoVerify) {
+        if ($NoVerify)
+        {
             $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken
-        } else {
+        }
+        else
+        {
             $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken -Verify
         }
 
     }
-    #
     # If the parameterset is ManagedIdentity
-    elseif ($PSCmdlet.ParameterSetName -eq 'ManagedIdentity') {
+    elseif ($PSCmdlet.ParameterSetName -eq 'ManagedIdentity')
+    {
 
         Write-Verbose "[New-AzDoAuthenticationProvider] Creating a new Azure Managed Identity with OrganizationName $OrganizationName."
         # If the Token is not Valid. Get a new Token.
 
-        if ($NoVerify) {
+        if ($NoVerify)
+        {
             $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName
-        } else {
+        }
+        else
+        {
             $Global:DSCAZDO_AuthenticationToken = Get-AzManagedIdentityToken -OrganizationName $OrganizationName -Verify
         }
 
     }
-    #
     # If the parameterset is SecureStringPersonalAccessToken
-    elseif ($PSCmdlet.ParameterSetName -eq 'SecureStringPersonalAccessToken') {
+    elseif ($PSCmdlet.ParameterSetName -eq 'SecureStringPersonalAccessToken')
+    {
         Write-Verbose "[New-AzDoAuthenticationProvider] Creating a new Personal Access Token with OrganizationName $OrganizationName."
         # If the Token is not Valid. Get a new Token.
         $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -SecureStringPersonalAccessToken $SecureStringPersonalAccessToken
     }
 
-    #
     # Export the Token information to the Cache Directory
-
-    if ($isResource.IsPresent) {
+    if ($isResource.IsPresent)
+    {
         Write-Verbose "[New-AzDoAuthenticationProvider] isResource is set. The Token will not be exported."
         return
     }
 
-    #
     # Initialize the Cache
-
-    # Initialize the Cache Objects
     Get-AzDoCacheObjects | ForEach-Object {
         Initialize-CacheObject -CacheType $_
     }
@@ -125,7 +129,6 @@ Function New-AzDoAuthenticationProvider {
         . $_.Name -OrganizationName $AzureDevopsOrganizationName
     }
 
-    #
     # Export the Token to the Cache Directory
 
     # Create an Object Containing the Organization Name.

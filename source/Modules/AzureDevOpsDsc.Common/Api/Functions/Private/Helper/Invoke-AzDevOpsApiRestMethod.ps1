@@ -110,8 +110,8 @@ function Invoke-AzDevOpsApiRestMethod
         ResponseHeadersVariable     = 'responseHeaders'
     }
 
-    Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Invoking the Azure DevOps API REST method '{0}'." -f $HttpMethod)
-    Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] API URI: {0}" -f $ApiUri)
+    Write-Verbose -Message ('[Invoke-AzDevOpsApiRestMethod] Invoking the Azure DevOps API REST method {0}' -f $HttpMethod)
+    Write-Verbose -Message ('[Invoke-AzDevOpsApiRestMethod] API URI: {0}' -f $ApiUri)
 
     # Remove the 'Body' and 'ContentType' if not relevant to request
     if ($HttpMethod -in $('Get','Delete'))
@@ -128,14 +128,14 @@ function Invoke-AzDevOpsApiRestMethod
 
     while ($CurrentNoOfRetryAttempts -lt $RetryAttempts)
     {
+        <#
+            Slow down the retry attempts if the API resource is close to being overwelmed
+            If there are any retry attempts, wait for the specified number of seconds before retrying
+        #>
 
-        #
-        # Slow down the retry attempts if the API resource is close to being overwelmed
-
-        # If there are any retry attempts, wait for the specified number of seconds before retrying
         if (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.retryAfter -ge 0))
         {
-            Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Waiting for {0} seconds before retrying." -f $Global:DSCAZDO_APIRateLimit.retryAfter)
+            Write-Verbose -Message ('[Invoke-AzDevOpsApiRestMethod] Waiting for {0} seconds before retrying.' -f $Global:DSCAZDO_APIRateLimit.retryAfter)
             Start-Sleep -Seconds $Global:DSCAZDO_APIRateLimit.retryAfter
         }
 
@@ -148,15 +148,15 @@ function Invoke-AzDevOpsApiRestMethod
         # If the API resouce is overwelmed, wait for the specified number of seconds before sending the request
         elseif (($null -ne $Global:DSCAZDO_APIRateLimit.xRateLimitRemaining) -and ($Global:DSCAZDO_APIRateLimit.xRateLimitRemaining -lt 5))
         {
-            Write-Verbose -Message ("[Invoke-AzDevOpsApiRestMethod] Resource is overwhelmed. Waiting for {0} seconds to reset the TSTUs." -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
+            Write-Verbose -Message ('[Invoke-AzDevOpsApiRestMethod] Resource is overwhelmed. Waiting for {0} seconds to reset the TSTUs.' -f $Global:DSCAZDO_APIRateLimit.xRateLimitReset)
             Start-Sleep -Milliseconds $RetryIntervalMs
         }
 
         #
         # Invoke the REST method. Loop until the Continuation Token is False.
 
-        Do {
-
+        Do
+        {
             #
             # Add the Authentication Header
 
@@ -230,7 +230,9 @@ function Invoke-AzDevOpsApiRestMethod
                         $retryAfter = [int]$retryAfter
                         Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $retryAfter seconds before retrying."
                         $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($retryAfter)
-                    } else {
+                    }
+                    else
+                    {
                         # If the Retry-After header is not present, wait for the specified number of milliseconds before retrying
                         Write-Verbose -Message "Received a 'Too Many Requests' response from the Azure DevOps API. Waiting for $RetryIntervalMs milliseconds before retrying."
                         $Global:DSCAZDO_APIRateLimit = [APIRateLimit]::New($RetryIntervalMs)
@@ -247,7 +249,6 @@ function Invoke-AzDevOpsApiRestMethod
 
                 # Break the continuation token loop so that the next attempt can be made
                 break;
-
             }
 
         } Until (-not $isContinuationToken)

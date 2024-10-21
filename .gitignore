@@ -24,3 +24,4 @@ CodeCoverage.JaCoCo.xml
 Temp/*
 TestProject.yml
 TestProject2.yml
+settings.json

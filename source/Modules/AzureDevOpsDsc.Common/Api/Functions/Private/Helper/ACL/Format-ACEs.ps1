@@ -35,7 +35,7 @@ Function Format-ACEs
         [Int]$Allow=0,
         [Parameter()]
         [Int]$Deny=0,
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$SecurityNamespace
     )
 

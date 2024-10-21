@@ -1,6 +1,6 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
-Describe 'Get-xAzDoOrganizationGroup' {
+Describe 'Get-AzDoOrganizationGroup' {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -12,7 +12,7 @@ Describe 'Get-xAzDoOrganizationGroup' {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoOrganizationGroup.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzDoOrganizationGroup.tests.ps1'
         }
 
         # Load the functions to test
@@ -52,13 +52,13 @@ Describe 'Get-xAzDoOrganizationGroup' {
         }
 
         It 'should return unchanged status if properties match' {
-            $result = Get-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
+            $result = Get-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
             $result.status | Should -Be 'Unchanged'
             $result.Ensure | Should -Be 'Present'
         }
 
         It 'should return changed status if properties differ' {
-            $result = Get-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'New Description'
+            $result = Get-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'New Description'
             $result.status | Should -Be 'Changed'
             $result.propertiesChanged | Should -Contain 'Description'
         }
@@ -75,7 +75,7 @@ Describe 'Get-xAzDoOrganizationGroup' {
         }
 
         It 'should detect renamed group' {
-            $result = Get-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
+            $result = Get-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
             $result.status | Should -Be 'Changed'
             $result.propertiesChanged[0] | Should -Be 'Name'
         }
@@ -92,7 +92,7 @@ Describe 'Get-xAzDoOrganizationGroup' {
         }
 
         It 'should return not found status' {
-            $result = Get-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
+            $result = Get-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
             $result.status | Should -Be 'NotFound'
             $result.propertiesChanged | Should -Be @('description', 'displayName')
         }
@@ -109,12 +109,12 @@ Describe 'Get-xAzDoOrganizationGroup' {
         }
 
         It 'should return changed' {
-            $result = Get-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
+            $result = Get-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
             $result.status | Should -Be 'Changed'
         }
 
         It 'should return changed if properties differ' {
-            $result = Get-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'New Description'
+            $result = Get-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'New Description'
             $result.status | Should -Be 'Changed'
             $result.propertiesChanged | Should -Contain 'description'
         }
@@ -131,7 +131,7 @@ Describe 'Get-xAzDoOrganizationGroup' {
         }
 
         It 'should return not found status' {
-            $result = Get-xAzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
+            $result = Get-AzDoOrganizationGroup -GroupName 'TestGroup' -GroupDescription 'Test Group'
             $result.status | Should -Be 'NotFound'
             $result.propertiesChanged | Should -Be @('description', 'displayName')
         }

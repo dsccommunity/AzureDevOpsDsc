@@ -1,7 +1,7 @@
 $currentFile = $MyInvocation.MyCommand.Path
 
 # Tests are currently disabled.
-Describe 'Set-xAzDoGroupPermission' -skip {
+Describe 'Set-AzDoGroupPermission' -skip {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -13,7 +13,7 @@ Describe 'Set-xAzDoGroupPermission' -skip {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-xAzDoGroupPermission.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Set-AzDoGroupPermission.tests.ps1'
         }
 
         # Load the functions to test
@@ -64,12 +64,12 @@ Describe 'Set-xAzDoGroupPermission' -skip {
             return @{ serializedACLs = 'mockSerializedACLs' }
         }
 
-        Mock -CommandName Set-xAzDoPermission
+        Mock -CommandName Set-AzDoPermission
 
     }
 
     It 'Should throw a warning when GroupName is invalid' {
-        { Set-xAzDoGroupPermission -GroupName 'InvalidGroupName' -isInherited $true } | Should -Throw
+        { Set-AzDoGroupPermission -GroupName 'InvalidGroupName' -isInherited $true } | Should -Throw
     }
 
     It 'Should set permissions when valid GroupName is provided' {
@@ -77,7 +77,7 @@ Describe 'Set-xAzDoGroupPermission' -skip {
             propertiesChanged = @{}
         }
 
-        Set-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
+        Set-AzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
 
         Assert-MockCalled -CommandName Get-CacheItem -Exactly -Times 1 -Scope It -ParameterFilter {
             $Key -eq 'Identity' -and $Type -eq 'SecurityNamespaces'
@@ -86,7 +86,7 @@ Describe 'Set-xAzDoGroupPermission' -skip {
             $Key -eq $ProjectName -and $Type -eq 'LiveProjects'
         }
         Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly -Times 1 -Scope It
-        Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly -Times 1 -Scope It
+        Assert-MockCalled -CommandName Set-AzDoPermission -Exactly -Times 1 -Scope It
     }
 
     It 'Should call ConvertTo-ACLHashtable with correct parameters' {
@@ -94,7 +94,7 @@ Describe 'Set-xAzDoGroupPermission' -skip {
             propertiesChanged = @{}
         }
 
-        Set-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
+        Set-AzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
 
         Assert-MockCalled -CommandName ConvertTo-ACLHashtable -Exactly -Times 1 -Scope It -ParameterFilter {
             $ReferenceACLs -eq $LookupResult.propertiesChanged -and
@@ -103,7 +103,7 @@ Describe 'Set-xAzDoGroupPermission' -skip {
         }
     }
 
-    It 'Should not call Set-xAzDoPermission if no ACLs are found' {
+    It 'Should not call Set-AzDoPermission if no ACLs are found' {
         Mock -CommandName Get-CacheItem -MockWith {
             param (
                 [string]$Key,
@@ -122,8 +122,8 @@ Describe 'Set-xAzDoGroupPermission' -skip {
             propertiesChanged = @{}
         }
 
-        Set-xAzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
+        Set-AzDoGroupPermission -GroupName 'Project\Repository' -isInherited $true -Permissions @{} -LookupResult $LookupResult -Ensure 'Present' -Force:$true
 
-        Assert-MockCalled -CommandName Set-xAzDoPermission -Exactly -Times 0 -Scope It
+        Assert-MockCalled -CommandName Set-AzDoPermission -Exactly -Times 0 -Scope It
     }
 }

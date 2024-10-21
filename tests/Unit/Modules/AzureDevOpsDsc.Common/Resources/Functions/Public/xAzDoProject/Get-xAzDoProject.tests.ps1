@@ -1,7 +1,7 @@
 $currentFile = $MyInvocation.MyCommand.Path
-# Pester tests for Get-xAzDoProject
+# Pester tests for Get-AzDoProject
 
-Describe "Get-xAzDoProject" {
+Describe "Get-AzDoProject" {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -14,7 +14,7 @@ Describe "Get-xAzDoProject" {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoProject.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzDoProject.tests.ps1'
         }
 
         # Load the functions to test
@@ -54,20 +54,20 @@ Describe "Get-xAzDoProject" {
         }
 
         It "should return the project details with status unchanged" {
-            $result = Get-xAzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
+            $result = Get-AzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
             $result.Status | Should -BeNullOrEmpty
             $result.ProjectName | Should -Be 'ExistingProject'
             $result.ProjectDescription | Should -Be 'ExistingDescription'
         }
 
         It "should return status changed when descriptions differ" {
-            $result = Get-xAzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'NewDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
+            $result = Get-AzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'NewDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
             $result.Status | Should -Be 'Changed'
             $result.propertiesChanged | Should -Contain 'Description'
         }
 
         It "should return status changed when visibility differs" {
-            $result = Get-xAzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Public'
+            $result = Get-AzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Public'
             $result.Status | Should -Be 'Changed'
             $result.propertiesChanged | Should -Contain 'Visibility'
         }
@@ -80,7 +80,7 @@ Describe "Get-xAzDoProject" {
         }
 
         It "should return status NotFound" {
-            $result = Get-xAzDoProject -ProjectName 'NonExistentProject' -ProjectDescription 'AnyDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
+            $result = Get-AzDoProject -ProjectName 'NonExistentProject' -ProjectDescription 'AnyDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
             $result.Status | Should -Be 'NotFound'
         }
     }
@@ -93,7 +93,7 @@ Describe "Get-xAzDoProject" {
         }
 
         It "should throw an error" {
-            { Get-xAzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'NonExistentTemplate' -Visibility 'Private' } | Should -Throw
+            { Get-AzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'NonExistentTemplate' -Visibility 'Private' } | Should -Throw
         }
     }
 
@@ -108,7 +108,7 @@ Describe "Get-xAzDoProject" {
         }
 
         It "should warn about source control type conflict" {
-            $result = Get-xAzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
+            $result = Get-AzDoProject -ProjectName 'ExistingProject' -ProjectDescription 'ExistingDescription' -SourceControlType 'Git' -ProcessTemplate 'Agile' -Visibility 'Private'
             $result.Status | Should -BeNullOrEmpty
             $result.ProjectName | Should -Be 'ExistingProject'
             $result.SourceControlType | Should -Be 'Git'

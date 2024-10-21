@@ -76,17 +76,18 @@ System.Collections.Hashtable
 The constructed ACLs hashtable containing the serialized ACLs.
 #>
 
-Function ConvertTo-ACLHashtable {
+Function ConvertTo-ACLHashtable
+{
     param(
         [Parameter()]
         [Object[]]
         $ReferenceACLs,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [Object[]]
         $DescriptorACLList,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]
         $DescriptorMatchToken
     )
@@ -113,7 +114,8 @@ Function ConvertTo-ACLHashtable {
 
     # Iterate through the filtered descriptor ACLs to construct the ACLs object
     Write-Verbose "[ConvertTo-ACLHashtable] Iterating through the filtered descriptor ACLs to construct the ACLs object."
-    ForEach ($DescriptorACL in $FilteredDescriptorACLs) {
+    ForEach ($DescriptorACL in $FilteredDescriptorACLs)
+    {
         Write-Verbose "Adding filtered ACL to the ACLs object."
         $ACLHashtable.value.Add($DescriptorACL)
     }
@@ -122,7 +124,8 @@ Function ConvertTo-ACLHashtable {
     Write-Verbose "[ConvertTo-ACLHashtable] Constructing the ACLs object from the reference ACLs."
 
     # Iterate through the ACLs in the ReferenceACLs
-    ForEach ($ReferenceACL in $ReferenceACLs) {
+    ForEach ($ReferenceACL in $ReferenceACLs)
+    {
         Write-Verbose "[ConvertTo-ACLHashtable] Processing reference ACL."
         Write-Verbose "[ConvertTo-ACLHashtable] Reference ACL: $($ReferenceACL | ConvertTo-Json -Depth 3)"
 
@@ -134,7 +137,8 @@ Function ConvertTo-ACLHashtable {
         }
 
         # Iterate through the ACEs in the current ACL to construct the ACEs Dictionary
-        ForEach ($ACE in $ReferenceACL.aces) {
+        ForEach ($ACE in $ReferenceACL.aces)
+        {
             Write-Verbose "[ConvertTo-ACLHashtable] Constructing ACE Object."
 
             # Construct the ACE Object with properties allow, deny, and descriptor

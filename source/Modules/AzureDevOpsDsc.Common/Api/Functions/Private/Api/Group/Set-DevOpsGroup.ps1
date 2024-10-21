@@ -31,21 +31,20 @@ This example updates the group named "MyGroup" in the Azure DevOps organization 
 #>
 
 # This function is designed to update the description of a group in Azure DevOps.
-Function Set-DevOpsGroup {
-    # CmdletBinding attribute allows the function to use cmdlet parameters and supports advanced functionality like ShouldProcess.
+Function Set-DevOpsGroup
+{
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    # OutputType attribute specifies the type of object that the function returns.
     [OutputType([System.Management.Automation.PSObject])]
     param
     (
         # Parameter attribute marks this as a mandatory parameter that the user must supply when calling the function.
-        [Parameter(Mandatory, ParameterSetName = 'ProjectScope')]
-        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ProjectScope')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Default')]
         [string]
         $ApiUri, # The URI for the Azure DevOps API.
 
-        [Parameter(Mandatory, ParameterSetName = 'ProjectScope')]
-        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ProjectScope')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Default')]
         [string]
         $GroupName, # The name of the group to be updated.
 
@@ -62,19 +61,19 @@ Function Set-DevOpsGroup {
         $ApiVersion = $(Get-AzDevOpsApiVersion -Default), # The API version to use for the request.
 
         # Group Descriptor for the project within which the group exists.
-        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Default')]
         [String]
         $GroupDescriptor,
 
         # Optional parameter without a default value.
-        [Parameter(Mandatory, ParameterSetName = 'ProjectScope')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ProjectScope')]
         [String]
         $ProjectScopeDescriptor # Scope descriptor for the project within which the group exists.
     )
 
     # A hashtable is created to hold parameters that will be used in the REST method invocation.
     $params = @{
-        Uri = "{0}/_apis/graph/groups/{1}?api-version={2}" -f $ApiUri, $GroupDescriptor, $ApiVersion # The API endpoint, formatted with the base URI and API version.
+        Uri = '{0}/_apis/graph/groups/{1}?api-version={2}' -f $ApiUri, $GroupDescriptor, $ApiVersion # The API endpoint, formatted with the base URI and API version.
         Method = 'Patch' # The HTTP method used for the request, indicating an update operation.
         ContentType = 'application/json-patch+json' # The content type of the request body.
         Body = @(
@@ -92,16 +91,19 @@ Function Set-DevOpsGroup {
     }
 
     # If ProjectScopeDescriptor is provided, modify the URI to include it in the query parameters.
-    if ($ProjectScopeDescriptor) {
-        $params.Uri = "{0}/_apis/graph/groups?scopeDescriptor={1}&api-version={2}" -f $ApiUri, $ProjectScopeDescriptor, $ApiVersion
+    if ($ProjectScopeDescriptor)
+    {
+        $params.Uri = '{0}/_apis/graph/groups?scopeDescriptor={1}&api-version={2}' -f $ApiUri, $ProjectScopeDescriptor, $ApiVersion
     }
 
-    try {
+    try
+    {
         # Invoke the REST method with the parameters and store the result in $group.
         $group = Invoke-AzDevOpsApiRestMethod @params
         return $group # Return the result of the REST method call.
     }
-    catch {
+    catch
+    {
         # Write an error message to the console if the REST method call fails.
         Write-Error "Failed to create group: $_"
     }

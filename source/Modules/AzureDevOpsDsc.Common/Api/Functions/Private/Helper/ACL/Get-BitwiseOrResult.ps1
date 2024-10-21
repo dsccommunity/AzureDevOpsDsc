@@ -24,7 +24,8 @@
     Author: Your Name
     Date:   Current Date
 #>
-Function Get-BitwiseOrResult {
+Function Get-BitwiseOrResult
+{
     [CmdletBinding()]
     param (
         [int[]]$integers
@@ -35,19 +36,23 @@ Function Get-BitwiseOrResult {
 
     $result = 0
 
-    if ($integers.Count -eq 0) {
+    if ($integers.Count -eq 0)
+    {
         return 0
     }
 
-    foreach ($integer in $integers) {
-        if (-not [int]::TryParse($integer.ToString(), [ref]$null)) {
+    foreach ($integer in $integers)
+    {
+        if (-not [int]::TryParse($integer.ToString(), [ref]$null))
+        {
             Write-Error "Invalid integer value: $integer"
             return 0
         }
         $result = $result -bor $integer
     }
 
-    if ([String]::IsNullOrEmpty($result)) {
+    if ([String]::IsNullOrEmpty($result))
+    {
         return 0
     }
 

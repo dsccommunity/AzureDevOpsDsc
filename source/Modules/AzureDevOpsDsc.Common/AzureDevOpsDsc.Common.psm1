@@ -77,7 +77,10 @@ Export-ModuleMember -Function 'Get-AzDoAPIGroupCache'
 Export-ModuleMember -Function 'Get-AzDoAPIProjectCache'
 Export-ModuleMember -Function 'Initialize-CacheObject'
 Export-ModuleMember -Function 'Get-AzDoCacheObjects'
-Export-ModuleMember -Function '*-xAzDoProjectGroup'
+Export-ModuleMember -Function '*-AzDoProjectGroup'
 
 # Stop processing
-if ($isClass) { return }
+if ($isClass)
+{
+    return
+}

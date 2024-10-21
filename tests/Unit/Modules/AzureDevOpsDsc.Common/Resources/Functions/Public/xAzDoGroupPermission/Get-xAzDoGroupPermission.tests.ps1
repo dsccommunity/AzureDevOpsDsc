@@ -2,7 +2,7 @@ $currentFile = $MyInvocation.MyCommand.Path
 
 
 # Tests are currently disabled.
-Describe 'Get-xAzDoGroupPermission' -skip {
+Describe 'Get-AzDoGroupPermission' -skip {
 
     AfterAll {
         Remove-Variable -Name DSCAZDO_OrganizationName -Scope Global
@@ -14,7 +14,7 @@ Describe 'Get-xAzDoGroupPermission' -skip {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-xAzDoGroupMember.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Get-AzDoGroupMember.tests.ps1'
         }
 
         # Load the functions to test
@@ -106,7 +106,7 @@ Describe 'Get-xAzDoGroupPermission' -skip {
 
     It 'Should return group result with correct properties when valid GroupName is provided' {
 
-        $result = Get-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true
+        $result = Get-AzDoGroupPermission -GroupName 'Project\Group' -isInherited $true
 
         $result | Should -Not -BeNullOrEmpty
         $result.project | Should -Be 'Project'
@@ -117,7 +117,7 @@ Describe 'Get-xAzDoGroupPermission' -skip {
     }
 
     It 'Should not throw an error when GroupName is invalid' {
-        $result = Get-xAzDoGroupPermission -GroupName 'InvalidGroupName' -isInherited $true
+        $result = Get-AzDoGroupPermission -GroupName 'InvalidGroupName' -isInherited $true
         $result | Should -BeNullOrEmpty
     }
 
@@ -131,7 +131,7 @@ Describe 'Get-xAzDoGroupPermission' -skip {
             }
         }
 
-        $result = Get-xAzDoGroupPermission -GroupName 'Project\Group' -isInherited $true
+        $result = Get-AzDoGroupPermission -GroupName 'Project\Group' -isInherited $true
         $result | Should -BeNullOrEmpty
     }
 }
