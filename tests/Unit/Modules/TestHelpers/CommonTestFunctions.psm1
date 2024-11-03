@@ -14,7 +14,7 @@ Function Split-RecurivePath {
     $Path
 }
 
-Function Invoke-BeforeEachFunctions {
+Function Get-FunctionItem {
     param(
         [string[]]$FileNames
     )
@@ -44,7 +44,7 @@ Function Invoke-BeforeEachFunctions {
 
 }
 
-Function Find-Functions {
+Function Find-MockedFunctions {
     param(
         [String]$TestFilePath
     )
@@ -106,4 +106,4 @@ Function Import-Enums {
     return ($Global:TestPaths | Where-Object { $_.Directory.Name -eq 'Enum' })
 }
 
-Export-ModuleMember -Function Split-RecurivePath, Invoke-BeforeEachFunctions, Find-Functions, Get-ClassFilePath, Import-Enums
+Export-ModuleMember -Function Split-RecurivePath, Get-FunctionItem, Find-MockedFunctions, Get-ClassFilePath, Import-Enums

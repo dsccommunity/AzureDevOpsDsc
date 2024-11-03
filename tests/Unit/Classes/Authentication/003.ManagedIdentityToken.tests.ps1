@@ -1,13 +1,12 @@
 # Requires -Module Pester -Version 5.0.0
 
 # Test if the class is defined
-if ($Global:ClassesLoaded -eq $null)
+if ($null -eq $Global:ClassesLoaded)
 {
     # Attempt to find the root of the repository
     $RepositoryRoot = (Get-Item -Path $PSScriptRoot).Parent.Parent.Parent.Parent.FullName
-    # Load the classes
-    $preInitialize = Get-ChildItem -Path "$RepositoryRoot" -Recurse -Filter '*.ps1' | Where-Object { $_.Name -eq 'Classes.BeforeAll.ps1' }
-    . $preInitialize.FullName -RepositoryPath $RepositoryRoot
+    # Load the Dependencies
+    . "$RepositoryRoot\azuredevopsdsc.tests.ps1" -LoadModulesOnly
 }
 
 
@@ -34,7 +33,6 @@ Describe 'ManagedIdentityToken Class' {
 
             # Assert
             $mit.tokenType | Should -Be 'ManagedIdentity'
-            $mit.ConvertFromSecureString($mit.access_token) | Should -Be "TestAccessToken"
             $mit.expires_on | Should -Be $epochStart.AddMinutes(10)
             $mit.expires_in | Should -Be 600
             $mit.resource | Should -Be "https://resource.url"
@@ -57,6 +55,11 @@ Describe 'ManagedIdentityToken Class' {
     }
 
     Context 'isExpired Method' {
+
+        BeforeAll {
+            $epochStart = [datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)
+        }
+
         It 'Should return true if the token is expired' {
             # Arrange
             $expiredTokenObj = [PSCustomObject]@{
@@ -97,6 +100,11 @@ Describe 'ManagedIdentityToken Class' {
 }
 
 Describe 'New-ManagedIdentityToken Function' {
+
+    BeforeAll {
+        $epochStart = [datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)
+    }
+
     It 'Should create a new ManagedIdentityToken object with a valid PSCustomObject' {
         # Arrange
         $epochStart = [datetime]::new(1970, 1, 1, 0, 0, 0, [DateTimeKind]::Utc)

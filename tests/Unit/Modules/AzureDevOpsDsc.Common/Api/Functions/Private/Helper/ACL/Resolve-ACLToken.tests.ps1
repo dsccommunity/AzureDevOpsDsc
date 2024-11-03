@@ -10,7 +10,7 @@ Describe 'Resolve-ACLToken' -Tags "Unit", "ACL", "Helper" {
         }
 
         # Load the functions to test
-        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        $files = Get-FunctionItem (Find-MockedFunctions -TestFilePath $currentFile)
         ForEach ($file in $files) {
             . $file.FullName
         }

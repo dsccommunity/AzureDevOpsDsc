@@ -4,18 +4,11 @@
         This example shows how to delete a project called 'Test Project'.
 #>
 
+# Refer to Authentication\1-NewAuthenticationPAT.ps1 for the New-AzDoAuthenticationProvider command
+New-AzDoAuthenticationProvider -OrganizationName 'test-organization' -PersonalAccessToken 'my-pat'
+
 Configuration Example
 {
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $ApiUri,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $Pat
-    )
 
     Import-DscResource -ModuleName 'AzureDevOpsDsc'
 
@@ -25,10 +18,6 @@ Configuration Example
         AzDevOpsProject 'DeleteProject'
         {
             Ensure               = 'Absent'  # 'Absent' ensures this will be removed/deleted
-
-            ApiUri               = $ApiUri
-            Pat                  = $Pat
-
             ProjectName          = 'Test Project'  # Identifies the name of the project to be deleted
         }
 

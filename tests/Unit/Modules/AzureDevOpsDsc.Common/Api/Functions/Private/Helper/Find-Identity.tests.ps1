@@ -11,7 +11,7 @@ Describe 'Find-Identity Function Tests' {
         }
 
         # Load the functions to test
-        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        $files = Get-FunctionItem (Find-MockedFunctions -TestFilePath $currentFile)
         ForEach ($file in $files) {
             . $file.FullName
         }
@@ -77,6 +77,48 @@ Describe 'Find-Identity Function Tests' {
             $result = Find-Identity -Name 'duplicateDescriptor' -OrganizationName 'TestOrg' -SearchType 'descriptor'
 
             $result | Should -BeNullOrEmpty
+        }
+
+    }
+
+    Context "when searching the cache with a known name" {
+
+        BeforeAll {
+
+            $params = @(
+                @{
+                    SearchType = 'descriptor'
+                }
+                @{
+                    SearchType = 'descriptorId'
+                }
+                @{
+                    SearchType = 'originId'
+                }
+                @{
+                    SearchType = 'principalName'
+                }
+                @{
+                    SearchType = 'displayName'
+                }
+            )
+
+        }
+
+        it 'Should write a non-terminating error when the SearchType is incorrect' {
+            Mock Write-Error -Verifiable
+            { Find-Identity -Name 'groupDescriptor' -OrganizationName 'TestOrg' -SearchType 'invalidType' } | Should -Throw
+            $result | Should -BeNullOrEmpty
+        }
+
+        it 'Should return a value for the search-type <SearchType>' -TestCases $params {
+            param (
+                [string]$SearchType
+            )
+
+            $result = Find-Identity -Name 'groupDescriptor' -OrganizationName 'TestOrg' -SearchType $SearchType
+            $result | Should -Not -BeNullOrEmpty
+
         }
 
     }

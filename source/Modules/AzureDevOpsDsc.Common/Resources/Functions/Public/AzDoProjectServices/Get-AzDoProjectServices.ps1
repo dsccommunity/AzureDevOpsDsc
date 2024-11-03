@@ -100,7 +100,7 @@ Function Get-AzDoProjectServices
     }
 
     # Attempt to retrive the Project from the Live Cache.
-    Write-Verbose "[Get-xAzDevOpsProjectServices] Retriving the Project from the Live Cache."
+    Write-Verbose "[Get-AzDevOpsProjectServices] Retriving the Project from the Live Cache."
 
     # Retrive the Repositories from the Live Cache.
     $Project = Get-CacheItem -Key $ProjectName -Type 'LiveProjects'
@@ -108,7 +108,7 @@ Function Get-AzDoProjectServices
     # If the Project does not exist in the Live Cache, return the Project object.
     if ($null -eq $Project)
     {
-        Write-Warning "[Get-xAzDevOpsProjectServices] The Project '$ProjectName' was not found in the Live Cache."
+        Write-Warning "[Get-AzDevOpsProjectServices] The Project '$ProjectName' was not found in the Live Cache."
         $Result.Status = [DSCGetSummaryState]::NotFound
         return $Result
     }

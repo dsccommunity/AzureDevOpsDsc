@@ -41,7 +41,7 @@
     NestedModules = @()
 
     DscResourcesToExport = @(
-      'xAzDevOpsProject',
+      'AzDevOpsProject',
       'AzDoOrganizationGroup',
       'AzDoProjectGroup'
     )

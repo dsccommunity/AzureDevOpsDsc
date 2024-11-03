@@ -65,7 +65,7 @@ function Test-AzDoProject
         [System.String]$Visibility = 'Private',
 
         [Parameter()]
-        [PSCustomObject]$LookupResult,
+        [HashTable]$LookupResult,
 
         [Parameter()]
         [Ensure]$Ensure,

@@ -79,11 +79,11 @@ Function New-AzDoAuthenticationProvider
         # if the NoVerify switch is not set, verify the Token.
         if ($NoVerify)
         {
-            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken
+            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken -OrganizationName $OrganizationName
         }
         else
         {
-            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken -Verify
+            $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -PersonalAccessToken $PersonalAccessToken -Verify -OrganizationName $OrganizationName
         }
 
     }
@@ -109,7 +109,7 @@ Function New-AzDoAuthenticationProvider
     {
         Write-Verbose "[New-AzDoAuthenticationProvider] Creating a new Personal Access Token with OrganizationName $OrganizationName."
         # If the Token is not Valid. Get a new Token.
-        $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -SecureStringPersonalAccessToken $SecureStringPersonalAccessToken
+        $Global:DSCAZDO_AuthenticationToken = Set-AzPersonalAccessToken -SecureStringPersonalAccessToken $SecureStringPersonalAccessToken -OrganizationName $OrganizationName
     }
 
     # Export the Token information to the Cache Directory
@@ -118,6 +118,7 @@ Function New-AzDoAuthenticationProvider
         Write-Verbose "[New-AzDoAuthenticationProvider] isResource is set. The Token will not be exported."
         return
     }
+
 
     # Initialize the Cache
     Get-AzDoCacheObjects | ForEach-Object {

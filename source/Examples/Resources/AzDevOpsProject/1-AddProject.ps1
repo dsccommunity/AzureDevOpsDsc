@@ -5,18 +5,11 @@
         called 'Test Project' exists (or is added if it does not exist).
 #>
 
+# Refer to Authentication\1-NewAuthenticationPAT.ps1 for the New-AzDoAuthenticationProvider command
+New-AzDoAuthenticationProvider -OrganizationName 'test-organization' -PersonalAccessToken 'my-pat'
+
 Configuration Example
 {
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $ApiUri,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $Pat
-    )
 
     Import-DscResource -ModuleName 'AzureDevOpsDsc'
 
@@ -25,13 +18,8 @@ Configuration Example
         AzDevOpsProject 'AddProject'
         {
             Ensure               = 'Present'
-
-            ApiUri               = $ApiUri
-            Pat                  = $Pat
-
             ProjectName          = 'Test Project'
             ProjectDescription   = 'A Test Project'
-
             SourceControlType    = 'Git'
         }
 

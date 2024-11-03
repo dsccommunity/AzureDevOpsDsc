@@ -1,4 +1,7 @@
 {
     "Organization" : "akkodistestorg",
-    "AuthenticationType" : "ManagedIdentity"
+    "AuthenticationType" : "ManagedIdentity",
+    "excludedProjectsFromTeardown": [
+        "DSC Pipeline Services"
+    ]
 }

@@ -16,11 +16,11 @@ Describe "Refresh-CacheObject" -tags Unit, Cache {
 
         # Load the functions to test
         if ($null -eq $currentFile) {
-            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Remove-CacheItem.tests.ps1'
+            $currentFile = Join-Path -Path $PSScriptRoot -ChildPath 'Refresh-CacheObject.tests.ps1'
         }
 
         # Load the functions to test
-        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        $files = Get-FunctionItem (Find-MockedFunctions -TestFilePath $currentFile)
         ForEach ($file in $files) {
             . $file.FullName
         }

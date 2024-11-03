@@ -72,7 +72,7 @@ Function New-AzDoGroupMember
     # Check if the group members are already cached
     if (
         ($null -ne $CachedGroupMembers) -and
-        ($CachedGroupMembers.ContainsKey($GroupIdentity.principalName))
+        (($CachedGroupMembers | Where-Object { $_.Key -eq $GroupIdentity.principalName }).Count -ne 0)
     )
     {
         Write-Error "[New-AzDoGroupMember] Group members are already cached for group '$GroupName'."

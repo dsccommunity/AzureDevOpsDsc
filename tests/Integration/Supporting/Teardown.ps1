@@ -14,7 +14,11 @@ param (
 
     [Parameter()]
     [String]
-    $OrganizationName
+    $OrganizationName,
+
+    [Parameter()]
+    [Object]
+    $TestFrameworkConfiguration
 
 )
 
@@ -25,7 +29,7 @@ $Global:DSCAZDO_AuthenticationToken = Get-MIToken -OrganizationName $Organizatio
 if ($ClearAll -or $ClearProjects)
 {
     # List all projects and remove them
-    List-DevOpsProjects -OrganizationName $OrganizationName | ForEach-Object {
+    List-DevOpsProjects -OrganizationName $OrganizationName | Where-Object { $_.Name -notin $TestFrameworkConfiguration.excludedProjectsFromTeardown }  | ForEach-Object {
         Remove-DevOpsProject -ProjectId $_.id -Organization $OrganizationName
     }
 }

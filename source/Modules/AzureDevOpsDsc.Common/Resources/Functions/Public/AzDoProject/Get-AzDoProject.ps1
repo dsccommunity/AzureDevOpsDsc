@@ -88,6 +88,7 @@ function Get-AzDoProject
         propertiesChanged  = @()
         status             = $null
     }
+
     Write-Verbose "[Get-AzDoProject] Initial result hashtable constructed."
 
     # Perform a lookup to see if the project exists in Azure DevOps
@@ -121,7 +122,7 @@ function Get-AzDoProject
         Write-Warning "[Get-AzDoProject] Source control type cannot be changed. Please delete the project and recreate it."
     }
 
-    # If the project description is null, set it to an empty string.
+    # If the project description property does not exist. Create it and set it to an empty string.
     if ($null -eq $project.description)
     {
         $project | Add-Member -MemberType NoteProperty -Name description -Value ''
@@ -144,9 +145,16 @@ function Get-AzDoProject
         Write-Verbose "[Get-AzDoProject] Project visibility has changed."
     }
 
+    # Test if the properties have changed. If the properties haven't changed, return Unchanged.
+    if ($result.propertiesChanged.Count -eq 0)
+    {
+        $result.Status = [DSCGetSummaryState]::Unchanged
+        Write-Verbose "[Get-AzDoProject] Project properties have not changed."
+    }
+
     # Return the group from the cache
     Write-Verbose "[Get-AzDoProject] Returning final result."
 
-    return [PSCustomObject]$result
+    return $result
 
 }

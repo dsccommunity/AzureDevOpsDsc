@@ -10,27 +10,9 @@ Describe 'Group-ACEs' -Tags "Unit", "ACL", "Helper" {
         }
 
         # Load the functions to test
-        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        $files = Get-FunctionItem (Find-MockedFunctions -TestFilePath $currentFile)
         ForEach ($file in $files) {
             . $file.FullName
-        }
-
-        Mock -CommandName Group-ACEs -MockWith {
-            param ($ACEs)
-            if ($ACEs.Count -eq 0) {
-                return @()
-            } elseif ($ACEs.Count -eq 1) {
-                return $ACEs
-            } else {
-                $groupedACEs = @{}
-                foreach ($ace in $ACEs) {
-                    $id = $ace.Identity.value.originId
-                    if (-not $groupedACEs.ContainsKey($id)) {
-                        $groupedACEs[$id] = $ace
-                    }
-                }
-                return $groupedACEs.Values
-            }
         }
 
         $ace1 = @{
@@ -87,11 +69,17 @@ Describe 'Group-ACEs' -Tags "Unit", "ACL", "Helper" {
     }
 
     It 'Groups multiple identities correctly' {
+
         $result = Group-ACEs -ACEs @($ace1, $ace2, $ace3)
         $result.Count | Should -Be 2
-        $grouped = $result | Where-Object { $_.Identity.value.originId -eq "user1" }
-        $grouped.Permissions.Deny | Should -Be 0,1
-        $grouped.Permissions.Allow | Should -Be 2,3
+        $user1 = $result | Where-Object { $_.Identity.value.originId -eq "user1" }
+        $user2 = $result | Where-Object { $_.Identity.value.originId -eq "user2" }
+
+        $user1.Permissions.Deny | Should -Be 0
+        $user1.Permissions.Allow | Should -Be 2
+        $user2.Permissions.Deny | Should -Be 0,1
+        $user2.Permissions.Allow | Should -Be 2,3
+
     }
 
     It "Doesn't group single identity ACE" {

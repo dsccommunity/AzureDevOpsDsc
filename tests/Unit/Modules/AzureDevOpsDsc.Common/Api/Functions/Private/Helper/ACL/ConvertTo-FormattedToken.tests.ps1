@@ -12,7 +12,7 @@ Describe "ConvertTo-FormattedToken" -Tags "Unit", "ACL", "Helper" {
         }
 
         # Load the functions to test
-        $files = Invoke-BeforeEachFunctions (Find-Functions -TestFilePath $currentFile)
+        $files = Get-FunctionItem (Find-MockedFunctions -TestFilePath $currentFile)
         ForEach ($file in $files) {
             . $file.FullName
         }
@@ -24,8 +24,6 @@ Describe "ConvertTo-FormattedToken" -Tags "Unit", "ACL", "Helper" {
             type = 'GitOrganization'
         }
 
-        Mock -CommandName ConvertTo-FormattedToken -ParameterFilter { $Token.type -eq 'GitOrganization' } -MockWith { return 'repoV2' }
-
         $result = ConvertTo-FormattedToken -Token $token
 
         $result | Should -Be 'repoV2'
@@ -36,8 +34,6 @@ Describe "ConvertTo-FormattedToken" -Tags "Unit", "ACL", "Helper" {
             type = 'GitProject'
             projectId = 'myProject'
         }
-
-        Mock -CommandName ConvertTo-FormattedToken -ParameterFilter { $Token.type -eq 'GitProject' -and $Token.projectId -eq 'myProject' } -MockWith { return 'repoV2/myProject' }
 
         $result = ConvertTo-FormattedToken -Token $token
 
@@ -51,8 +47,6 @@ Describe "ConvertTo-FormattedToken" -Tags "Unit", "ACL", "Helper" {
             RepoId = 'myRepo'
         }
 
-        Mock -CommandName ConvertTo-FormattedToken -ParameterFilter { $Token.type -eq 'GitRepository' -and $Token.projectId -eq 'myProject' -and $Token.RepoId -eq 'myRepo' } -MockWith { return 'repoV2/myProject/myRepo' }
-
         $result = ConvertTo-FormattedToken -Token $token
 
         $result | Should -Be 'repoV2/myProject/myRepo'
@@ -63,8 +57,6 @@ Describe "ConvertTo-FormattedToken" -Tags "Unit", "ACL", "Helper" {
             type = 'UnknownType'
         }
 
-        Mock -CommandName ConvertTo-FormattedToken -ParameterFilter { $Token.type -eq 'UnknownType' } -MockWith { return '' }
-
         $result = ConvertTo-FormattedToken -Token $token
 
         $result | Should -Be ''
@@ -72,8 +64,6 @@ Describe "ConvertTo-FormattedToken" -Tags "Unit", "ACL", "Helper" {
 
     It "should return an empty string for an empty token" {
         $token = @{}
-
-        Mock -CommandName ConvertTo-FormattedToken -ParameterFilter { $null -eq $Token.type } -MockWith { return '' }
 
         $result = ConvertTo-FormattedToken -Token $token
 

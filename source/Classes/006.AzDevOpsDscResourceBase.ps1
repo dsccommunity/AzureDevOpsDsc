@@ -85,12 +85,11 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
         #
         # Initialize the cache objects. Don't delete the cache objects since they are used by other resources.
-        Get-AzDoCacheObjects | ForEach-Object
-        {
+
+        Get-AzDoCacheObjects | ForEach-Object {
             Initialize-CacheObject -CacheType $_ -BypassFileCheck -Debug
             Write-Verbose "[AzDevOpsDscResourceBase] Initialized cache object of type: $_"
         }
-
 
     }
 
@@ -135,7 +134,11 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         }
 
         $props.LookupResult = $this.GetDscCurrentStateResourceObject($getParameters)
-        $props.Ensure       = $props.LookupResult.Ensure
+        $props.Ensure       = $(
+            if ($null -eq $props.LookupResult.Ensure) { [Ensure]::Absent }
+            else { $props.LookupResult.Ensure }
+        )
+        $props.LookupResult.Ensure
 
         return $props
 
@@ -205,40 +208,41 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
         [System.String[]]$dscPropertyNamesWithNoSetSupport = $this.GetDscResourcePropertyNamesWithNoSetSupport()
         [System.String[]]$dscPropertyNamesToCompare = $this.GetDscResourcePropertyNames()
 
+
         switch ($desiredProperties.Ensure)
         {
             ([Ensure]::Present) {
 
                 Write-Verbose "Desired state is Present."
 
-                if ($currentProperties.Ensure -eq [Ensure]::Absent)
+                switch ($currentProperties.LookupResult.Status)
                 {
-                    Write-Verbose "Current state is Absent."
-
-                    switch ($currentProperties.LookupResult.Status)
-                    {
-                        ([DSCGetSummaryState]::NotFound) {
-                            $dscRequiredAction = [RequiredAction]::New
-                            Write-Verbose "Resource not found. Setting action to New."
-                        }([DSCGetSummaryState]::Changed) {
-                            $dscRequiredAction = [RequiredAction]::Set
-                            Write-Verbose "Resource Changed. Setting action to Set."
-                        }([DSCGetSummaryState]::Renamed) {
-                            $dscRequiredAction = [RequiredAction]::Set
-                            Write-Verbose "Resource Renamed. Setting action to Set."
-                        }
-                        ([DSCGetSummaryState]::Missing) {
-                            $dscRequiredAction = [RequiredAction]::Remove
-                            Write-Verbose "Resource missing. Setting action to Remove."
-                        }
+                    ([DSCGetSummaryState]::NotFound) {
+                        $dscRequiredAction = [RequiredAction]::New
+                        Write-Verbose "Resource not found. Setting action to New."
+                    }([DSCGetSummaryState]::Changed) {
+                        $dscRequiredAction = [RequiredAction]::Set
+                        Write-Verbose "Resource Changed. Setting action to Set."
+                    }([DSCGetSummaryState]::Renamed) {
+                        $dscRequiredAction = [RequiredAction]::Set
+                        Write-Verbose "Resource Renamed. Setting action to Set."
+                    }([DSCGetSummaryState]::Missing) {
+                        $dscRequiredAction = [RequiredAction]::Remove
+                        Write-Verbose "Resource missing. Setting action to Remove."
+                    }([DSCGetSummaryState]::Unchanged) {
+                        $dscRequiredAction = [RequiredAction]::None
+                        Write-Verbose "Resource Not Changed. Setting action to Remove."
                     }
-
-                    Write-Verbose "DscActionRequired='$dscRequiredAction'"
-                    return $dscRequiredAction
+                    default {
+                        $errorMessage = "Could not obtain a valid 'LookupResult.Status' value within '$($this.GetResourceName())' Test() function. Value was '$($currentProperties.LookupResult.Status)'"
+                        Write-Verbose $errorMessage
+                        throw (New-InvalidOperationException -Message $errorMessage)
+                    }
                 }
 
-                Write-Verbose "No changes required. Desired state already achieved."
+                Write-Verbose "DscActionRequired='$dscRequiredAction'"
                 return $dscRequiredAction
+
             }
 
             ([Ensure]::Absent) {
@@ -254,7 +258,7 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
             default {
                 $errorMessage = "Could not obtain a valid 'Ensure' value within '$($this.GetResourceName())' Test() function. Value was '$($desiredProperties.Ensure)'."
                 Write-Verbose $errorMessage
-                New-InvalidOperationException -Message $errorMessage
+                throw (New-InvalidOperationException -Message $errorMessage)
             }
         }
 
@@ -277,14 +281,6 @@ class AzDevOpsDscResourceBase : AzDevOpsApiDscResourceBase
 
             return $desiredStateParameters
 
-            return @{
-                    ApiUri                      = $DesiredStateProperties.ApiUri
-                    Pat                         = $DesiredStateProperties.Pat
-                    Force                       = $true
-
-                    # Set this from the 'Current' state as we would expect this to have an existing key/ID value to use
-                    "$IdPropertyName" = $CurrentStateProperties."$IdPropertyName"
-                }
         }
         # If the desired state/action is to add/new or update/set  the resource, start with the values in the $DesiredStateProperties variable, and amend
         elseif ($RequiredAction -in @([RequiredAction]::New, [RequiredAction]::Set))

@@ -3,7 +3,7 @@
 Obtains a managed identity token from Azure AD.
 
 .DESCRIPTION
-The Get-AzManagedIdentityToken function is used to obtain an access token from Azure AD using a managed identity. It can only be called from the New-AzManagedIdentity or Update-AzManagedIdentity functions.
+The Get-AzManagedIdentityToken function is used to obtain an access token from Azure AD using a managed identity. It can only be called from the New-AzDoAuthenticationProvider or Update-AzManagedIdentity functions.
 
 .PARAMETER OrganizationName
 Specifies the name of the organization.
@@ -50,24 +50,15 @@ Function Get-AzManagedIdentityToken
     if ($env:IDENTITY_ENDPOINT)
     {
 
-        # Validate what type of machine it is.
-        if ($null -eq $IsCoreCLR)
-        {
-            # If the $IsCoreCLR variable is not set, the script is running on Windows PowerShell.
-            Write-Verbose "[Get-AzManagedIdentityToken] The machine is a Windows machine Running Windows PowerShell."
-            $IsWindows = $true
-        }
+        $OSInfo = Get-OperatingSystemInfo
 
         # Test if console is being run as Administrator
-        if (
-            ($IsWindows) -and
-            (-not (
-                [Security.Principal.WindowsPrincipal]
-                [Security.Principal.WindowsIdentity]::GetCurrent()
-            ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
-        )
+        if ($OSInfo.Windows)
         {
-            throw "[Get-AzManagedIdentityToken] Error: Authentication to Azure Arc requires Administrator privileges."
+            # Check if the current user is in the Administrator role
+            if (-not(Test-isWindowsAdmin)) {
+                throw "[Get-AzManagedIdentityToken] Error: Authentication to Azure Arc requires Administrator privileges."
+            }
         }
 
         Write-Verbose "[Get-AzManagedIdentityToken] The machine is an Azure Arc machine. The Uri needs to be updated to $($env:IDENTITY_ENDPOINT):"

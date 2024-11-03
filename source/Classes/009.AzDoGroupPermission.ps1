@@ -71,6 +71,10 @@ class AzDoGroupPermission : AzDevOpsDscResourceBase
         $this.Construct()
     }
 
+    AzDoGroupPermission([bool]$isTest)
+    {
+    }
+
     [AzDoGroupPermission] Get()
     {
         return [AzDoGroupPermission]$($this.GetDscCurrentStateProperties())
