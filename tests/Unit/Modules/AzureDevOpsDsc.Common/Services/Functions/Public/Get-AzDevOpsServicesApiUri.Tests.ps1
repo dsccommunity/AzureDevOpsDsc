@@ -10,7 +10,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
     $script:subModuleName = 'AzureDevOpsDsc.Common'
     $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
     $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Services\Functions\Public\$($script:commandName).ps1"
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\builtModule\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Services\Functions\Public\$($script:commandName).ps1"
     $script:tag = @($($script:commandName -replace '-'))
 
     . $script:commandScriptPath

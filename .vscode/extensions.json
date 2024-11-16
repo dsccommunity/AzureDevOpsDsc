@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "davidanson.vscode-markdownlint",
+        "pspester.pester-test",
+        "ms-vscode.powershell",
+        "redhat.vscode-yaml",
+        "gruntfuggly.todo-tree",
+        "codecov.codecov"
+    ]
+}
