@@ -275,7 +275,7 @@ stages:
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
-                dependsOn:
+        dependsOn:
           - test_unit_macos
           - test_unit_linux
           - test_unit_windows_core
