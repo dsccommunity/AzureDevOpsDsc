@@ -113,6 +113,7 @@ DscTest:
   ExcludeSourceFile:
     - output
   ExcludeModuleFile:
+    - Modules/DscResource.Common
   MainGitBranch: main
 
 ####################################################
