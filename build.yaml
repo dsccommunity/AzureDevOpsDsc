@@ -78,6 +78,9 @@ BuildWorkflow:
     - Convert_Pester_Coverage
     - Pester_if_Code_Coverage_Under_Threshold
 
+  merge:
+    - Merge_CodeCoverage_Files
+
   publish:
     - Publish_release_to_GitHub
     - publish_module_to_gallery
@@ -105,7 +108,7 @@ Pester:
 ####################################################
 DscTest:
   ExcludeTag:
-    - "Common Tests - New Error-Level Script Analyzer Rules"
+    - 'Common Tests - New Error-Level Script Analyzer Rules'
   Tag:
   ExcludeSourceFile:
     - output
@@ -145,4 +148,4 @@ DscResource.DocGenerator:
       Type: CompositeResource
       Category: Resources
   Generate_Wiki_Sidebar:
-     AlwaysOverwrite: true
+    AlwaysOverwrite: true
