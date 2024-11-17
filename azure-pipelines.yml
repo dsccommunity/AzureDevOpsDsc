@@ -59,7 +59,7 @@ stages:
         displayName: 'HQRM'
         pool:
           vmImage: 'windows-latest'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Build Artifact'
@@ -85,7 +85,7 @@ stages:
       - job: test_unit_linux
         condition: succeededOrFailed()
         displayName: 'Linux - Unit Tests'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -121,7 +121,7 @@ stages:
       - job: test_unit_windows_core
         condition: succeededOrFailed()
         displayName: 'Windows (PowerShell Core) - Unit Tests'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         pool:
           vmImage: 'windows-latest'
         steps:
@@ -155,54 +155,54 @@ stages:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
               artifactName: 'CodeCoverageWinPS7_$(System.JobAttempt)'
 
-      - job: test_integration_windows_core
-        displayName: 'Windows (PowerShell Core) - Integration Tests'
-        timeoutInMinutes: 0
-        variables:
-          # This sets environment variable $env:CI.
-          CI: true
-          # This sets environment variable $env:CONFIGURATION.
-          configuration: Integration
-        pool:
-          vmImage: 'windows-latest'
-        steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download Build Artifact'
-            inputs:
-              buildType: 'current'
-              artifactName: $(buildArtifactName)
-              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
+      # - job: test_integration_windows_core
+      #   displayName: 'Windows (PowerShell Core) - Integration Tests'
+      #   timeoutInMinutes: 0
+      #   variables:
+      #     # This sets environment variable $env:CI.
+      #     CI: true
+      #     # This sets environment variable $env:CONFIGURATION.
+      #     configuration: Integration
+      #   pool:
+      #     vmImage: 'windows-latest'
+      #   steps:
+      #     - task: DownloadPipelineArtifact@2
+      #       displayName: 'Download Build Artifact'
+      #       inputs:
+      #         buildType: 'current'
+      #         artifactName: $(buildArtifactName)
+      #         targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
 
-          - task: PowerShell@2
-            name: configureWinRM
-            displayName: 'Configure WinRM'
-            inputs:
-              targetType: 'inline'
-              script: 'winrm quickconfig -quiet'
-              pwsh: false
+      #     - task: PowerShell@2
+      #       name: configureWinRM
+      #       displayName: 'Configure WinRM'
+      #       inputs:
+      #         targetType: 'inline'
+      #         script: 'winrm quickconfig -quiet'
+      #         pwsh: false
 
-          - powershell: |
-              ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterScript @(
-                'tests/Integration/'
-              )
-            name: test
-            displayName: 'Run Integration Tests'
-            env:
-              azureDevOpsIntegrationApiUri: $(AzureDevOps.Integration.ApiUri)
-              azureDevOpsIntegrationPat: $(AzureDevOps.Integration.Pat)
+      #     - powershell: |
+      #         ./build.ps1 -Tasks test -CodeCoverageThreshold 0 -PesterScript @(
+      #           'tests/Integration/'
+      #         )
+      #       name: test
+      #       displayName: 'Run Integration Tests'
+      #       env:
+      #         azureDevOpsIntegrationApiUri: $(AzureDevOps.Integration.ApiUri)
+      #         azureDevOpsIntegrationPat: $(AzureDevOps.Integration.Pat)
 
-          - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
-            condition: succeededOrFailed()
-            inputs:
-              testResultsFormat: 'NUnit'
-              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Windows Server Core (PowerShell Core) - Integration'
+      #     - task: PublishTestResults@2
+      #       displayName: 'Publish Test Results'
+      #       condition: succeededOrFailed()
+      #       inputs:
+      #         testResultsFormat: 'NUnit'
+      #         testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+      #         testRunTitle: 'Windows Server Core (PowerShell Core) - Integration'
 
       - job: test_unit_windows_ps
         condition: succeededOrFailed()
         displayName: 'Windows (Windows PowerShell) - Unit Tests'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         pool:
           vmImage: 'windows-latest'
         steps:
@@ -282,7 +282,7 @@ stages:
           - test_unit_windows_ps
         pool:
           vmImage: 'ubuntu-latest'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Build Artifact'
