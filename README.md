@@ -6,6 +6,7 @@ configuration of Azure DevOps and Azure DevOps Server.
 [![Build Status](https://dev.azure.com/dsccommunity/AzureDevOpsDsc/_apis/build/status/dsccommunity.AzureDevOpsDsc?branchName=main)](https://dev.azure.com/dsccommunity/AzureDevOpsDsc/_build/latest?definitionId=41&branchName=main)
 ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/AzureDevOpsDsc/41/main)
 [![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/AzureDevOpsDsc/41/main)](https://dsccommunity.visualstudio.com/AzureDevOpsDsc/_test/analytics?definitionId=41&contextType=build)
+[![codecov](https://codecov.io/gh/dsccommunity/AzureDevOpsDsc/branch/main/graph/badge.svg)](https://codecov.io/gh/dsccommunity/AzureDevOpsDsc)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/AzureDevOpsDsc?label=AzureDevOpsDsc%20Preview)](https://www.powershellgallery.com/packages/AzureDevOpsDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/AzureDevOpsDsc?label=AzureDevOpsDsc)](https://www.powershellgallery.com/packages/AzureDevOpsDsc/)
 

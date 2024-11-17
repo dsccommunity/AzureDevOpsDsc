@@ -9,7 +9,7 @@ InModuleScope 'AzureDevOpsDsc' {
     $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
     $script:dscResourceName = Split-Path $PSScriptRoot -Leaf
     $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\builtModule\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
     $script:tag = @($($script:commandName -replace '-'))
 
 

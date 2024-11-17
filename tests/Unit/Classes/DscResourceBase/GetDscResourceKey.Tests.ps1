@@ -1,4 +1,4 @@
-using module ..\..\..\..\output\AzureDevOpsDsc\0.2.0\AzureDevOpsDsc.psm1
+using module ..\..\..\..\output\builtModule\AzureDevOpsDsc\0.2.0\AzureDevOpsDsc.psm1
 
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
@@ -11,7 +11,7 @@ InModuleScope 'AzureDevOpsDsc' {
     $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
     $script:dscResourceName = Split-Path $PSScriptRoot -Leaf
     $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\builtModule\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
     $script:tag = @($($script:commandName -replace '-'))
 
 

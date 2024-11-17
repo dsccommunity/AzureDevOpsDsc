@@ -9,8 +9,8 @@ InModuleScope 'AzureDevOpsDsc.Common' {
     $script:moduleVersion = $(Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1).Version
     $script:subModuleName = 'AzureDevOpsDsc.Common'
     $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
-    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Resources\Functions\Private\$($script:commandName).ps1"
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests', '')
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\..\..\..\" -ChildPath "output\builtModule\$($script:dscModuleName)\$($script:moduleVersion)\Modules\$($script:subModuleName)\Resources\Functions\Private\$($script:commandName).ps1"
     $script:tag = @($($script:commandName -replace '-'))
 
     . $script:commandScriptPath
@@ -36,7 +36,7 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         It 'Should return $false - "*<ProjectName>*"' -TestCases $testCasesValidProjectNames {
                             param ([System.String]$ProjectName)
 
-                            Test-AzDevOpsProjectName -ProjectName $('*'+$ProjectName+'*') -IsValid | Should -BeFalse
+                            Test-AzDevOpsProjectName -ProjectName $('*' + $ProjectName + '*') -IsValid | Should -BeFalse
                         }
                     }
 
@@ -82,13 +82,13 @@ InModuleScope 'AzureDevOpsDsc.Common' {
                         It 'Should not throw - "*<ProjectName>*"' -TestCases $testCasesValidProjectNames {
                             param ([System.String]$ProjectName)
 
-                            { Test-AzDevOpsProjectName -ProjectName $('*'+$ProjectName+'*') -IsValid -AllowWildcard } | Should -Not -Throw
+                            { Test-AzDevOpsProjectName -ProjectName $('*' + $ProjectName + '*') -IsValid -AllowWildcard } | Should -Not -Throw
                         }
 
                         It 'Should return $true - "*<ProjectName>*"' -TestCases $testCasesValidProjectNames {
                             param ([System.String]$ProjectName)
 
-                            Test-AzDevOpsProjectName -ProjectName $('*'+$ProjectName+'*') -IsValid -AllowWildcard | Should -BeTrue
+                            Test-AzDevOpsProjectName -ProjectName $('*' + $ProjectName + '*') -IsValid -AllowWildcard | Should -BeTrue
                         }
                     }
 

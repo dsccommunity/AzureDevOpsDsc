@@ -1,4 +1,4 @@
-using module ..\..\..\..\output\AzureDevOpsDsc\0.2.0\AzureDevOpsDsc.psm1
+using module ..\..\..\..\output\builtModule\AzureDevOpsDsc\0.2.0\AzureDevOpsDsc.psm1
 
 # Initialize tests for module function
 . $PSScriptRoot\..\Classes.TestInitialization.ps1
@@ -10,8 +10,8 @@ InModuleScope 'AzureDevOpsDsc' {
     $script:subModuleName = 'AzureDevOpsDsc.Common'
     $script:subModuleBase = $(Get-Module $script:subModuleName).ModuleBase
     $script:dscResourceName = Split-Path $PSScriptRoot -Leaf
-    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests','')
-    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
+    $script:commandName = $(Get-Item $PSCommandPath).BaseName.Replace('.Tests', '')
+    $script:commandScriptPath = Join-Path "$PSScriptRoot\..\..\..\..\" -ChildPath "output\builtModule\$($script:dscModuleName)\$($script:moduleVersion)\Classes\$script:dscResourceName\$script:dscResourceName.psm1"
     $script:tag = @($($script:commandName -replace '-'))
 
 
@@ -24,7 +24,7 @@ InModuleScope 'AzureDevOpsDsc' {
 
                 $dscResourceWithNoSetSupportProperties = [DscResourceBase]::new()
 
-                {$dscResourceWithNoSetSupportProperties.GetDscResourcePropertyNamesWithNoSetSupport()} | Should -Not -Throw
+                { $dscResourceWithNoSetSupportProperties.GetDscResourcePropertyNamesWithNoSetSupport() } | Should -Not -Throw
             }
 
             It 'Should return empty array' {

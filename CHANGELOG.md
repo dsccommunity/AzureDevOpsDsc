@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `WikiSource` will be published to the GitHub repository wiki. The markdown
     file `Home.md` will be updated with the correct module version on each
     publish to gallery (including preview).
+  - CodeCov integration.
 - AzureDevOpsDsc.Common
   - Added 'wrapper' functionality around the [Azure DevOps REST API](https://docs.microsoft.com/en-us/rest/api/azure/devops/)
 
@@ -47,6 +48,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Update comment-based help to remove text which the valid values are
     since that is now add automatically to the documentation (conceptual
     help and wiki documentation).
+- Repository Updates
+  - Update repository files to latest versions.
+    - Resolve-Dependency
+    - build.yml
+    - Sampler files
+    - azure-pipelines
 
 ### Fixed
 
