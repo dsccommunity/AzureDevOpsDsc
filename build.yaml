@@ -2,6 +2,7 @@
 ####################################################
 #          ModuleBuilder Configuration             #
 ####################################################
+
 CopyPaths:
   - en-US
   - Modules
@@ -36,6 +37,7 @@ TaskHeader: |
 ####################################################
 #     Dependent Modules Configuration (Sampler)    #
 ####################################################
+
 NestedModule:
   DscResource.Common:
     CopyOnly: true
@@ -46,6 +48,7 @@ NestedModule:
 ####################################################
 #            Pipeline Configuration                #
 ####################################################
+
 BuildWorkflow:
   '.':
     - build
@@ -104,8 +107,20 @@ Pester:
   CodeCoverageOutputFileEncoding: ascii
 
 ####################################################
+#           Code Coverage Configuration            #
+####################################################
+
+CodeCoverage:
+  # Filename of the file that will be outputted by the task Merge_CodeCoverage_Files.
+  CodeCoverageMergedOutputFile: JaCoCo_coverage.xml
+  # File pattern used to search for files under the ./output/testResults folder
+  # by task Merge_CodeCoverage_Files.
+  CodeCoverageFilePattern: Codecov*.xml
+
+####################################################
 #      Pester Configuration (DscResource.Test)     #
 ####################################################
+
 DscTest:
   ExcludeTag:
     - 'Common Tests - New Error-Level Script Analyzer Rules'
@@ -119,6 +134,7 @@ DscTest:
 ####################################################
 #               GitHub Configuration               #
 ####################################################
+
 GitHubConfig:
   GitHubFilesToAdd:
     - 'CHANGELOG.md'
@@ -129,6 +145,7 @@ GitHubConfig:
 ####################################################
 #      DscResource.DocGenerator Configuration      #
 ####################################################
+
 DscResource.DocGenerator:
   Generate_Conceptual_Help:
     MarkdownCodeRegularExpression:
