@@ -32,7 +32,7 @@ Function Write-Warning
         [string]$Message,
 
         [Parameter()]
-        [string]$LogFilePath = "C:\Temp\warning_log.txt"
+        [string]$LogFilePath = "$($env:AZDO_WARNINGLOGGING_FILEPATH)"
     )
 
     # Call the original Write-Verbose cmdlet to display the message if verbose preference is enabled
@@ -41,7 +41,11 @@ Function Write-Warning
     Microsoft.PowerShell.Utility\Write-Warning $Message
     $VerbosePreference = $originalPreference
 
-    # Append the message to the log file
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Add-Content -Path $LogFilePath -Value "[$timestamp] $Message"
+    if ($null -ne $LogFilePath)
+    {
+        # Append the message to the log file
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Add-Content -Path $LogFilePath -Value "[$timestamp] $Message"
+    }
+
 }

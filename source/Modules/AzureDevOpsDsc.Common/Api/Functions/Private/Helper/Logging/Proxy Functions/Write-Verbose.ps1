@@ -35,7 +35,7 @@ Function Write-Verbose
     Microsoft.PowerShell.Utility\Write-Verbose $Message
 
     # Test if the env:enableVerboseLogging variable is set to true
-    if ($null -ne $env:AZDO_VERBOSELOGGING_FILEPATH)
+    if ($null -ne $LogFilePath)
     {
         # Append the message to the log file
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
