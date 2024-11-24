@@ -26,10 +26,30 @@ Ensure you have the following prerequisites before proceeding:
   - `Sampler`
   - `xDSCResourceDesigner`
 
-### Setting Up: *AZDODSC_CACHE_DIRECTORY* Environment Variable
+### *AZDODSC_CACHE_DIRECTORY* Environment Variable
 
-The system environment variable `AZDODSC_CACHE_DIRECTORY` is used by the module to store caching settings and the cache itself.
-Make sure this variable is properly set up in your system environment.
+The system environment variable `AZDODSC_CACHE_DIRECTORY` is used by the module
+to store caching settings and the cache itself. Make sure this variable is properly
+set up in your system environment.
+
+### *AZDO_WARNINGLOGGING_FILEPATH* and *AZDO_ERRORLOGGING_FILEPATH* Environment Variables
+
+The `AZDO_WARNINGLOGGING_FILEPATH` and `AZDO_ERRORLOGGING_FILEPATH`environment
+variables are typically used in Azure DevOps (AzDO) pipelines or custom scripts
+to specify file paths where warning and error logs should be stored.
+These variables help manage logging by directing different types of log messages
+to separate files, aiding in better organization and analysis.
+
+#### Usage
+
+- **AZDO_WARNINGLOGGING_FILEPATH**: This variable defines the path to a file
+where all warnings generated during the execution of a pipeline or script will
+be logged. It's useful for tracking non-critical issues that may need attention
+but do not halt the execution.
+
+- **AZDO_ERRORLOGGING_FILEPATH**: This variable specifies the path to a file
+designated for logging errors. Errors are typically more severe than warnings
+and might require immediate action or investigation.
 
 ## Setting Up Managed Identity
 

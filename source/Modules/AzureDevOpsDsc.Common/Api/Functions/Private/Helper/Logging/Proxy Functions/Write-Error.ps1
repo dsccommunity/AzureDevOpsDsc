@@ -33,15 +33,19 @@ Function Write-Error
         [string]$Message,
 
         [Parameter()]
-        [string]$LogFilePath = "C:\Temp\error_log.txt"
+        [string]$LogFilePath = "$($env:AZDO_ERRORLOGGING_FILEPATH)"
     )
 
     #  Call the original Write-Error cmdlet to display the message
     Microsoft.PowerShell.Utility\Write-Error $Message
     $VerbosePreference = $originalPreference
 
-    # Append the message to the log file
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Add-Content -Path $LogFilePath -Value "[$timestamp] $Message"
+    # Test if the env:enableVerboseLogging variable is set to true
+    if ($null -ne $LogFilePath)
+    {
+        # Append the message to the log file
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Add-Content -Path $LogFilePath -Value "[$timestamp] $Message"
+    }
 
 }
