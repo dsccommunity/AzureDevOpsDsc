@@ -46,4 +46,3 @@ if ($ClearAll -or $ClearOrganizationGroups)
         Remove-DevOpsGroup -GroupDescriptor $_.descriptor -OrganizationName $OrganizationName
     }
 }
-

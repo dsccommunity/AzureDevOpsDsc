@@ -38,9 +38,7 @@ Configuration ExampleConfig {
     }
 }
 
-OrgGroup
 Start-DscConfiguration -Path ./ExampleConfig -Wait -Verbose
-
 ```
 
 ## Example 2: Sample Configuration using Invoke-DSCResource

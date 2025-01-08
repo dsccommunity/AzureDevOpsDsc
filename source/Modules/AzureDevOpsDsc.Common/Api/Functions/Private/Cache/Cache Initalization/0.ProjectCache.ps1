@@ -19,8 +19,8 @@ None.
 None.
 
 .NOTES
-Author: [Author Name]
-Date: [Date]
+Author: Michael Zanatta
+Date: 2025-01-06
 #>
 
 Function AzDoAPI_0_ProjectCache

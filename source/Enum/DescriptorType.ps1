@@ -130,5 +130,4 @@ Enum DescriptorType {
     DashboardsPrivileges
     CSS
     VersionControlItems
-
 }

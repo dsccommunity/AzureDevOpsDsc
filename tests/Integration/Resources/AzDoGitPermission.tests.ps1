@@ -1,5 +1,3 @@
-
-
 Describe "AzDoGitPermission Integration Tests" {
 
     BeforeAll {

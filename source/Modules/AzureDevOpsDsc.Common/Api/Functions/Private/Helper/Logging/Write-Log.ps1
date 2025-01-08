@@ -1,3 +1,4 @@
+<#
 Function Write-Log
 {
     [CmdletBinding()]
@@ -49,3 +50,4 @@ Function Write-Log
     Write-Verbose "[Write-Log] Log message written to log file."
 
 }
+#>

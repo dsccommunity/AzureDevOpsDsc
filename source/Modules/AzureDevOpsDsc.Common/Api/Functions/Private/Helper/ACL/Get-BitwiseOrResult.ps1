@@ -21,8 +21,8 @@
     # Output: 15
 
 .NOTES
-    Author: Your Name
-    Date:   Current Date
+    Author: Michael Zanatta
+    Date: 2025-01-06
 #>
 Function Get-BitwiseOrResult
 {

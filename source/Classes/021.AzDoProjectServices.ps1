@@ -44,7 +44,7 @@
 
 .NOTES
     Version: 1.0
-    Author: Your Name
+    Author: Michael Zanatta
     Required Modules: xAzDevOpsDSC
 #>
 

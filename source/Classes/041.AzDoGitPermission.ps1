@@ -21,7 +21,7 @@
     This class is part of the AzureDevOpsDSC module.
 
 .LINK
-    https://github.com/Azure/AzureDevOpsDSC
+    https://github.com/dsccommunity/AzureDevOpsDsc
 
 .EXAMPLE
     This example shows how to use the AzDoGitPermission class to manage Git permissions in Azure DevOps.

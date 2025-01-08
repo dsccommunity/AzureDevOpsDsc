@@ -20,8 +20,8 @@
     Returns the ACLIdentity object of the found identity. If no identity is found, null is returned.
 
 .NOTES
-    Author: Your Name
-    Date:   Current Date
+    Author: Michael Zanatta
+    Date: 2025-01-06
 
 .EXAMPLE
     Find-Identity -Name "JohnDoe"

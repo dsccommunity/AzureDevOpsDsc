@@ -6,8 +6,8 @@
     The AzDoGroupPermission class is a DSC resource that allows you to manage permissions for a group in an Azure DevOps project.
 
 .NOTES
-    Author: Your Name
-    Date:   Current Date
+    Author: Michael Zanatta
+    Date: 2025-01-06
 
 .LINK
     GitHub Repository: <link to the GitHub repository>

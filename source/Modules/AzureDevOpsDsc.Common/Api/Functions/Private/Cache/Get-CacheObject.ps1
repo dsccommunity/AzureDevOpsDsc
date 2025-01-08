@@ -29,7 +29,7 @@ The cache object of the specified type.
 This function is part of the AzureDevOpsDsc module.
 
 .LINK
-https://github.com/Azure/AzureDevOpsDsc
+https://github.com/dsccommunity/AzureDevOpsDsc
 
 #>
 function Get-CacheObject

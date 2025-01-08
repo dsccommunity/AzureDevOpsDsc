@@ -1,4 +1,4 @@
-# AzDoGroupPermission Resource Documentation (Currently Disabled)
+# AzDoGroupPermission Resource Documentation (Not Currently Supported)
 
 ## Overview
 

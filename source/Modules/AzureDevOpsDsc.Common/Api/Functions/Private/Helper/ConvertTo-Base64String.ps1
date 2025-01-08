@@ -16,7 +16,7 @@ $base64String
 
 .NOTES
 Author: GitHub Copilot
-Date: September 2021
+Date: 2025-01-06
 #>
 function ConvertTo-Base64String
 {

@@ -22,8 +22,8 @@ $filteredCacheItem
 # Returns the CacheItem with the name 'MyCacheItem' from the list of cache items.
 
 .NOTES
-Author: Your Name
-Date: Today's Date
+Author: Michael Zanatta
+Date: 2025-01-06
 #>
 Function Find-CacheItem
 {

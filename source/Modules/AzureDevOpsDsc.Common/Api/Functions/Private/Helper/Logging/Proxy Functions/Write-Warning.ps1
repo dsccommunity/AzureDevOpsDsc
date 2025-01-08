@@ -41,7 +41,7 @@ Function Write-Warning
     Microsoft.PowerShell.Utility\Write-Warning $Message
     $VerbosePreference = $originalPreference
 
-    if ($null -ne $LogFilePath)
+    if (-not [String]::IsNullOrEmpty($LogFilePath))
     {
         # Append the message to the log file
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"

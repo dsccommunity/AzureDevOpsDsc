@@ -48,7 +48,7 @@ Function Test-AzDoOrganizationGroup
     )
 
     # Firstly we need to compare to see if the group names are the same. If so we can return $false.
-    if ($GetReslut.Status -eq [DSCGetSummaryState]::Unchanged )
+    if ($GetResult.Status -eq [DSCGetSummaryState]::Unchanged )
     {
 
         $result = $true

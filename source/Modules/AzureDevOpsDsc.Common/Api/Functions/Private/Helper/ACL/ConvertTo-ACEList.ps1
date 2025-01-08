@@ -23,8 +23,8 @@ ConvertTo-ACEList -SecurityNamespace "Namespace" -Identity "User1" -Permissions 
 This example converts the permissions "Read" and "Write" for the identity "User1" in the specified security namespace and organization name to an ACE token.
 
 .NOTES
-Author: Your Name
-Date: Today's Date
+Author: Michael Zanatta
+Date: 2025-01-06
 #>
 
 Function ConvertTo-ACEList

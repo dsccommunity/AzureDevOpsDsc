@@ -105,10 +105,8 @@ Describe 'Find-Identity Function Tests' {
 
         }
 
-        it 'Should write a non-terminating error when the SearchType is incorrect' {
-            Mock Write-Error -Verifiable
+        it 'Should write a terminating error when the SearchType is incorrect' {
             { Find-Identity -Name 'groupDescriptor' -OrganizationName 'TestOrg' -SearchType 'invalidType' } | Should -Throw
-            $result | Should -BeNullOrEmpty
         }
 
         it 'Should return a value for the search-type <SearchType>' -TestCases $params {

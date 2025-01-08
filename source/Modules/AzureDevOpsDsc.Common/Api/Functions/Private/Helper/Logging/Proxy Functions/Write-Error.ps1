@@ -41,7 +41,7 @@ Function Write-Error
     $VerbosePreference = $originalPreference
 
     # Test if the env:enableVerboseLogging variable is set to true
-    if ($null -ne $LogFilePath)
+    if (-not [String]::IsNullOrEmpty($LogFilePath))
     {
         # Append the message to the log file
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"

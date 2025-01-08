@@ -26,7 +26,7 @@ A list of formatted ACLs.
 
 .NOTES
 Author: Michael Zanatta
-Date: 06/26/2024
+Date: 2025-01-06
 #>
 
 Function ConvertTo-FormattedACL

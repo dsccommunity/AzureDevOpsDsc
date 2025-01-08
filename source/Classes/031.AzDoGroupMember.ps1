@@ -7,8 +7,8 @@
     It inherits from the AzDevOpsDscResourceBase class.
 
 .NOTES
-    Author: Your Name
-    Date:   Current Date
+    Author: Michael Zanatta
+    Date: 2025-01-06
 
 .LINK
     GitHub Repository: <link to the GitHub repository>

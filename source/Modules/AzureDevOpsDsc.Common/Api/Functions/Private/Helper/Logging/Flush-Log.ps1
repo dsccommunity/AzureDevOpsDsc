@@ -1,3 +1,4 @@
+<#
 Function Flush-Log
 {
     [CmdletBinding()]
@@ -34,3 +35,4 @@ Function Flush-Log
 
     Write-Verbose "[Flush-Log] Log messages written to log files."
 }
+#>

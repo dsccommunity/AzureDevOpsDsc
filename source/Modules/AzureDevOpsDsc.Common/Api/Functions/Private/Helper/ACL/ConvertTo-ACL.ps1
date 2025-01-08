@@ -38,8 +38,8 @@ System.Collections.Generic.List[HashTable]
 A list of Access Control Lists (ACLs) created from the provided permissions.
 
 .NOTES
-Author: Your Name
-Date: Today's Date
+Author: Michael Zanatta
+Date: 2025-01-06
 #>
 Function ConvertTo-ACL
 {

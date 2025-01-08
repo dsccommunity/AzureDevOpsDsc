@@ -1,5 +1,3 @@
-
-
 Function New-Project {
     param(
         [string]$ProjectName
@@ -45,8 +43,6 @@ Function New-Repository {
     $null = Invoke-DscResource @parameters
 
 }
-
-
 
 Function New-Group {
     param(

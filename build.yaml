@@ -31,6 +31,7 @@ BuildWorkflow:
     - test
 
   build:
+    - PreLoad
     - Clean
     - Build_Module_ModuleBuilder
     - Build_NestedModules_ModuleBuilder
@@ -46,6 +47,7 @@ BuildWorkflow:
     - DscResource_Tests_Stop_On_Fail
 
   test:
+    - PreLoad
     - Pester_Tests_Stop_On_Fail
     - Pester_if_Code_Coverage_Under_Threshold
 

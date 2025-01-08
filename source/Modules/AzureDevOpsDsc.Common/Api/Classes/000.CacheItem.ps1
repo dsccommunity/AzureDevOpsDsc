@@ -25,7 +25,7 @@ $cacheItem = [CacheItem]::new("exampleKey", "exampleValue")
 Creates a new CacheItem instance with the key "exampleKey" and the value "exampleValue".
 
 .NOTES
-Author: Your Name
+Author: Michael Zanatta
 #>
 
 class CacheItem

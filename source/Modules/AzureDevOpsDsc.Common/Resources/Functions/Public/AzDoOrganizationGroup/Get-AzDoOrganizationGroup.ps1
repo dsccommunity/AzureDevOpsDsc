@@ -120,8 +120,6 @@ Function Get-AzDoOrganizationGroup
                 {
                     # Update the Result
                     $getGroupResult.status = [DSCGetSummaryState]::Changed
-                    # Add the reason
-                    #$getGroupResult.Reasons += [DscResourceReason]::New('AzDoOrganizationGroup:AzDoOrganizationGroup:Deleted&ReCreate', 'The group was deleted and recreated with another group. The properties have changed')
                 }
                 else
                 {
@@ -157,11 +155,8 @@ Function Get-AzDoOrganizationGroup
             }
         )
 
-        if ($getGroupResult.status -eq [DSCGetSummaryState]::Changed)
+        if ($getGroupResult.status -ne [DSCGetSummaryState]::Changed)
         {
-            # Add the reason
-            #$getGroupResult.Reasons += [DscResourceReason]::New('AzDoOrganizationGroup:AzDoOrganizationGroup:Changed', 'The group has changed')
-        } else {
             $getGroupResult.Ensure = [Ensure]::Present
         }
 
@@ -230,8 +225,6 @@ Function Get-AzDoOrganizationGroup
     {
         $getGroupResult.status = [DSCGetSummaryState]::NotFound
         $getGroupResult.propertiesChanged = @('description', 'displayName')
-        # Add the reason
-        #$getGroupResult.Reasons += [DscResourceReason]::New('AzDoOrganizationGroup:AzDoOrganizationGroup:NotFound', 'The group is not found')
         return $getGroupResult
     }
 

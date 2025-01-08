@@ -49,9 +49,8 @@ function Remove-DevOpsProject
     try
     {
         # Invoke the Azure DevOps REST API to create the project
-        $response = Invoke-APIRestMethod @params
-        # Output the response which contains the created project details
-        return $response
+        return (Invoke-APIRestMethod @params)
+
     } catch
     {
         Write-Error "[Remove-DevOpsProject] Failed to create the Azure DevOps project: $_"

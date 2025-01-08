@@ -38,7 +38,10 @@ class PersonalAccessToken : AuthenticationToken
     }
 
     [Bool]isExpired() {
-        # Personal Access Tokens do not expire.
+
+        # Personal Access Tokens don't contain expiry information. Without performing a global lookup of PAT tokens,
+        # we can't determine if a PAT is expired Therefore, we always return $false.
+
         return $false
     }
 

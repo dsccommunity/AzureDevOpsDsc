@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        This is a light, generic, wrapper proceedure around 'Invoke-RestMethod' to handle
+        This is a light, generic, wrapper around 'Invoke-RestMethod' to handle
         multiple retries and error/exception handling.
 
         This function makes no assumptions around the versions of the API used, the resource

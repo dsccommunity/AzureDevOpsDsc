@@ -64,14 +64,6 @@ function Update-DevOpsProject
     $body = @{
         name = $ProjectName
         visibility = $Visibility
-        <#
-        TODO: ISSUE with updating the ProcessTemplateId.
-        capabilities = @{
-            processTemplate = @{
-                templateTypeId = $ProcessTemplateId
-            }
-        }
-        #>
     }
 
     # Add the description if provided

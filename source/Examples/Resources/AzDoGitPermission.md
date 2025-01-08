@@ -37,7 +37,7 @@ AzDoGitPermission/Permissions/Permission
 
 ## Permission List
 
-> Either 'Name' or 'DisplayName' can be used
+> Either 'Name' or 'DisplayName' can be used, but we Strongly Recommend that you use 'Name' in your configuration.
 
 | Name      | DisplayName      | Values | Note |
 | ------------- | ------------- | - | - |
@@ -92,8 +92,8 @@ Configuration ExampleConfig {
                     Identity = '[ProjectName]\GroupName'
                     Permissions = @{
                         Read = 'Allow'
-                        "Manage Notes" = 'Allow'
-                        "Contribute" = 'Deny'
+                        ManageNote = 'Allow'
+                        Contribute = 'Deny'
                     }
                 }
             )
@@ -120,8 +120,8 @@ $properties = @{
                                     Identity = '[ProjectName]\GroupName'
                                     Permissions = @{
                                         Read = 'Allow'
-                                        "Manage Notes" = 'Allow'
-                                        "Contribute" = 'Deny'
+                                        ManageNote = 'Allow'
+                                        Contribute = 'Deny'
                                     }
                                 }
                         )
@@ -173,7 +173,7 @@ resources:
         - Identity: '[$ProjectName]\SampleGroupReadAccess'
           Permission:
             Read: "Allow"
-            "Manage notes": "Allow"   
+            ManageNote: "Allow"   
 ```
 
 LCM Initialization:

@@ -26,6 +26,56 @@ Ensure you have the following prerequisites before proceeding:
   - `Sampler`
   - `xDSCResourceDesigner`
 
+__Using Install-Module__
+
+``` PowerShell
+# Run as Administrator
+Install-Module -Scope AllUsers -Name @(
+  'ChangelogManagement'
+  'Configuration'
+  'DscResource.AnalyzerRules'
+  'DscResource.Common'
+  'DscResource.DocGenerator'
+  'DscResource.Test'
+  'InvokeBuild'
+  'MarkdownLinkCheck'
+  'Metadata'
+  'ModuleBuilder'
+  'Pester'
+  'Plaster'
+  'PSDepend'
+  'PSDscResources'
+  'PSScriptAnalyzer'
+  'Sampler'
+  'xDSCResourceDesigner'
+)
+```
+
+__Using Install-PSResource__
+
+``` PowerShell
+# Run as Administrator
+Install-PSResource @(
+  'ChangelogManagement'
+  'Configuration'
+  'DscResource.AnalyzerRules'
+  'DscResource.Common'
+  'DscResource.DocGenerator'
+  'DscResource.Test'
+  'InvokeBuild'
+  'MarkdownLinkCheck'
+  'Metadata'
+  'ModuleBuilder'
+  'Pester'
+  'Plaster'
+  'PSDepend'
+  'PSDscResources'
+  'PSScriptAnalyzer'
+  'Sampler'
+  'xDSCResourceDesigner'
+)
+```
+
 ### *AZDODSC_CACHE_DIRECTORY* Environment Variable
 
 The system environment variable `AZDODSC_CACHE_DIRECTORY` is used by the module

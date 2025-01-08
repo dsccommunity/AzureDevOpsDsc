@@ -18,8 +18,8 @@
     Wait-DevOpsProject -OrganizationName "MyOrg" -ProjectURL "https://dev.azure.com/MyOrg/MyProject"
 
 .NOTES
-    Author: Your Name
-    Date:   Current Date
+    Author: Michael Zanatta
+    Date: 2025-01-06
 #>
 
 Function Wait-DevOpsProject

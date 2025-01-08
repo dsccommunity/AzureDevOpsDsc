@@ -1,3 +1,4 @@
+<#
 Function Initialize-Log {
     [CmdletBinding()]
     param (
@@ -30,3 +31,4 @@ Function Initialize-Log {
     # Initialize the log files
     Write-Verbose "[Initialize-Log] Log files initialized at: $LogDirectory"
 }
+#>

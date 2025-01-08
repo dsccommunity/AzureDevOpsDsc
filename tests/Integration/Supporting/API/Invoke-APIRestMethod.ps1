@@ -1,4 +1,3 @@
-
 function Invoke-APIRestMethod
 {
     [CmdletBinding()]
