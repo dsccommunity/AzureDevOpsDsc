@@ -17,7 +17,7 @@ body:
   validations:
     required: true
   attributes:
-    label: Can you provide at least 1 hour per week to help maintain this repository?
+    label: Can you provide at least 1 hour per week spread over the course of the year to help maintain this repository?
     description: >-
       Please select Yes or No.
     options:
