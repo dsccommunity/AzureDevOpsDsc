@@ -1,0 +1,41 @@
+name: 📖 Presentation Request
+description: Request to Present about this repository
+title: "📖 Presentation Request: <where at...?> "
+labels: ["PresentationRequest"]
+projects: ["AzureDevOpsDSC-repo-management"] ## Can also create another DSCCommunity Wide Project just for Presentation Requests
+assignees:
+  - kilasuit
+body:
+- type: textarea
+  id: PresentationRequest
+  attributes:
+    label: Summary
+    description: Please a link (ideally via a form)
+    placeholder: |
+      Are you requesting me to present about this?
+      Do you want to present about this?
+  validations:
+    required: true
+- type: textarea
+  id: ContactLink
+  attributes:
+    label: Contact link
+    description: How to get in contact with you
+    placeholder: |
+      Ideally you should learn about PGP & provide me your contact details via an encrypted message that can be decrypted only by you and me
+      My Current PGP key is on my github profile readme.
+      Ideally using your gh handle and this repo as a password i.e. kilasuit/DocTypes
+      Don't know about PGP? there are other services that you can use like temp.pm & intime I will build & run my own
+      Want me to walk through PGP with you? let me know and
+  validations:
+    required: true
+- type: textarea
+  id: AdditionalInfo
+  attributes:
+    label: Anything else?
+    description: |
+      Any other comments, like did you like this Project?
+      Have you used this Project & linked projects to help you with your work?
+      If no other comments, please put N/A or None
+  validations:
+    required: true
