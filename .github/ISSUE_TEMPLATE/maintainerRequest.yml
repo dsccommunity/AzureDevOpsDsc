@@ -2,28 +2,28 @@ name: Maintainer Request
 description: Request membership to help maintain this repository.
 title: Maintainer Request
 labels: ['maintainer-request']
-projects: ['repo-management']
+projects: ['AzureDevOpsDSC-repo-management']
 assignees:
   - kilasuit
 body:
 - type: markdown
   attributes:
     value: |
-      ## Thank you for your interest in joining as a maintainer of this project. 
+      ## Thank you for your interest in joining as a maintainer of this project.
 
-      ### Please complete the following public form to request we review your application to join as a maintainer. 
-- type: dropdown  
+      ### Please complete the following public form to request we review your application to join as a maintainer.
+- type: dropdown
   id: time
   validations:
     required: true
   attributes:
     label: Can you provide at least 1 hour per week to help maintain this repository?
     description: >-
-      Please select Yes or No.     
+      Please select Yes or No.
     options:
       - "Yes"
       - "No"
-- type: dropdown  
+- type: dropdown
   id: accesslevel
   validations:
     required: true
@@ -38,24 +38,25 @@ body:
       - "Yes"
       - "No"
       - "Maybe"
-- type: checkboxes  
+- type: checkboxes
   id: type
   attributes:
     label: maintainer type
     description: >-
       Please select the type of maintainer you are interested in becoming.
     options:
-      - "Code Maintainer"
-      - "Issue Triage"
-      - "Code Review"
-      - "Documentation"
-      - "Testing"
-      - "Content Creation"
-      - "Other"
-- type: markdown  
+      - label: "Code Maintainer"
+      - label: "Issue Triage"
+      - label: "Code Review"
+      - label: "Documentation"
+      - label: "Testing"
+      - label: "Content Creation"
+      - label: "Other"
+- type: textarea
   attributes:
+    label: "Note"
     value: |
-      ## ⚠️ This form is public. Do not provide any private or proprietary information. ⚠️   
+      ## ⚠️ This form is public. Do not provide any private or proprietary information. ⚠️
 - type: textarea
   attributes:
     label: Why do you want to join as a maintainer?
@@ -80,4 +81,3 @@ body:
       I have the following public links to articles, code, or other resources that demonstrate my skills...
   validations:
     required: true
-
