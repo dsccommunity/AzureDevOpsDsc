@@ -44,6 +44,9 @@ body:
     label: maintainer type
     description: >-
       Please select the type of maintainer you are interested in becoming.
+      For more information on the types of maintainers, please see the 
+      Different Types of Maintainer blog post
+      https://blog.kilasuit.org/2025/08/01/different-types-of-code-maintainer/
     options:
       - label: "Code Maintainer"
       - label: "Issue Triage"
