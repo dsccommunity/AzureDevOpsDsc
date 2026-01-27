@@ -37,6 +37,7 @@ class AzDevOpsProject : AzDevOpsDscResourceBase
     [System.String]$ProjectDescription
 
     [DscProperty()]
+    [ValidateSet('Git', 'Tfvc')]
     [System.String]$SourceControlType
 
 

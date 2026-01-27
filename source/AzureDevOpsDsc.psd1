@@ -2,7 +2,7 @@
     RootModule           = 'AzureDevOpsDsc.psm1'
 
     # Version number of this module.
-    moduleVersion        = '0.3.0'
+    moduleVersion        = '0.0.0'
 
     # ID used to uniquely identify this module
     GUID                 = '3f8bbada-0fa9-4d80-b3d8-f019c3c60230'
@@ -38,13 +38,9 @@
     AliasesToExport      = @()
 
     # Import all the 'DSCClassResource', modules as part of this module
-    NestedModules        = @(
-        'Modules\DscResource.Common\0.19.0\DscResource.Common.psd1',
-        'Modules\AzureDevOpsDsc.Common\AzureDevOpsDsc.Common.psd1'
-    )
+    NestedModules        = @()
 
-
-    DscResourcesToExport = @('AzDevOpsProject')
+    DscResourcesToExport = @()
 
     RequiredAssemblies   = @()
 
