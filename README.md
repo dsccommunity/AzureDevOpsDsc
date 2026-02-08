@@ -1,5 +1,9 @@
 # AzureDevOpsDsc
 
+> Note - This repo is mostly unmaintained and as such you may be better looking at [this new DSCv3 version by @mimachniak](https://github.com/mimachniak/AzureDevOpsDscv3)
+> As such @kilasuit who is looking for a replacement maintainer in https://github.com/dsccommunity/AzureDevOpsDsc/issues/44 is recommending this repo be archived unless another maintainer steps up.
+
+
 The **AzureDevOpsDsc** module contains DSC Resources for deployment and
 configuration of Azure DevOps and Azure DevOps Server.
 
