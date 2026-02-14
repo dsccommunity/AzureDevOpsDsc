@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- RepoManagement
+  - Added Codeowners File - [#42](https://github.com/dsccommunity/AzureDevOpsDsc/issues/42)
+  - Added Maintainer Request Template - [#38](https://github.com/dsccommunity/AzureDevOpsDsc/issues/38)
+  - Added Presentation Request Template - [#41](https://github.com/dsccommunity/AzureDevOpsDsc/issues/41)
+
 - AzureDevOpsDsc
   - Updated pipeline files to support change of default branch to main.
   - Added GitHub issue templates and pull request template
